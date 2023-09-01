@@ -26,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonIgnoreProperties(ignoreUnknown = true, value = { "success", "error_message", "error_code" }, allowGetters = true)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class JobRequest implements ZeebeMessage {
 
     @JsonProperty("job_key")
@@ -113,14 +113,12 @@ public class JobRequest implements ZeebeMessage {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("JobRequest{");
-        sb.append("jobKey=").append(jobKey);
-        sb.append(", variables=").append(variables);
-        sb.append(", retries=").append(retries);
-        sb.append(", failMessage='").append(failMessage).append('\'');
-        sb.append(", errorMessage='").append(errorMessage).append('\'');
-        sb.append(", errorCode='").append(errorCode).append('\'');
-        sb.append('}');
-        return sb.toString();
+        return "JobRequest{" + "jobKey=" + jobKey +
+               ", variables=" + variables +
+               ", retries=" + retries +
+               ", failMessage='" + failMessage + '\'' +
+               ", errorMessage='" + errorMessage + '\'' +
+               ", errorCode='" + errorCode + '\'' +
+               '}';
     }
 }

@@ -107,7 +107,10 @@ public class DefaultNettyHttpBinding implements NettyHttpBinding, Cloneable {
             exchange.getExchangeExtension().addOnCompletion(new SynchronizationAdapter() {
                 @Override
                 public void onDone(Exchange exchange) {
-                    ReferenceCountUtil.release(request.content());
+                    if (request.content().refCnt() > 0) {
+                        LOG.debug("Releasing Netty HttpResponse ByteBuf");
+                        ReferenceCountUtil.release(request.content());
+                    }
                 }
             });
         } else {
@@ -461,7 +464,7 @@ public class DefaultNettyHttpBinding implements NettyHttpBinding, Cloneable {
 
         if (body instanceof InputStream && configuration.isDisableStreamCache()) {
             response = new OutboundStreamHttpResponse(
-                    (InputStream) body, new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.valueOf(code)));
+                    (InputStream) body, new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.valueOf(code), false));
             response.headers().set(TRANSFER_ENCODING, CHUNKED);
         }
 
@@ -490,7 +493,7 @@ public class DefaultNettyHttpBinding implements NettyHttpBinding, Cloneable {
             }
 
             if (buffer != null) {
-                response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.valueOf(code), buffer);
+                response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.valueOf(code), buffer, false);
                 // We just need to reset the readerIndex this time
                 if (buffer.readerIndex() == buffer.writerIndex()) {
                     buffer.setIndex(0, buffer.writerIndex());
@@ -501,7 +504,7 @@ public class DefaultNettyHttpBinding implements NettyHttpBinding, Cloneable {
                 response.headers().set(HttpHeaderNames.CONTENT_LENGTH.toString(), len);
                 LOG.trace("Content-Length: {}", len);
             } else {
-                response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.valueOf(code));
+                response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.valueOf(code), false);
             }
         }
 
@@ -528,8 +531,8 @@ public class DefaultNettyHttpBinding implements NettyHttpBinding, Cloneable {
         String contentType = MessageHelper.getContentType(message);
         if (contentType != null) {
             // set content-type
-            response.headers().set(HttpHeaderNames.CONTENT_TYPE.toString(), contentType);
             LOG.trace("Content-Type: {}", contentType);
+            response.headers().set(HttpHeaderNames.CONTENT_TYPE.toString(), contentType);
         }
 
         // configure connection to accordingly to keep alive configuration

@@ -61,8 +61,8 @@ public abstract class GenericFileConsumer<T> extends ScheduledBatchPollingConsum
     private final String[] includeExt;
     private final String[] excludeExt;
 
-    public GenericFileConsumer(GenericFileEndpoint<T> endpoint, Processor processor, GenericFileOperations<T> operations,
-                               GenericFileProcessStrategy<T> processStrategy) {
+    protected GenericFileConsumer(GenericFileEndpoint<T> endpoint, Processor processor, GenericFileOperations<T> operations,
+                                  GenericFileProcessStrategy<T> processStrategy) {
         super(endpoint, processor);
         this.endpoint = endpoint;
         this.operations = operations;
@@ -406,11 +406,11 @@ public abstract class GenericFileConsumer<T> extends ScheduledBatchPollingConsum
             }
             if (beginCause != null) {
                 String msg = endpoint + " cannot begin processing file: " + file + " due to: " + beginCause.getMessage();
-                handleException(msg, beginCause);
+                handleException(msg, exchange, beginCause);
             }
             if (abortCause != null) {
                 String msg2 = endpoint + " cannot abort processing file: " + file + " due to: " + abortCause.getMessage();
-                handleException(msg2, abortCause);
+                handleException(msg2, exchange, abortCause);
             }
             return false;
         }
@@ -502,7 +502,7 @@ public abstract class GenericFileConsumer<T> extends ScheduledBatchPollingConsum
             endpoint.getInProgressRepository().remove(absoluteFileName);
 
             String msg = "Error processing file " + file + " due to " + e.getMessage();
-            handleException(msg, e);
+            handleException(msg, exchange, e);
         }
 
         return true;
@@ -547,7 +547,7 @@ public abstract class GenericFileConsumer<T> extends ScheduledBatchPollingConsum
             LOG.debug("{} error custom processing: {} due to: {}. This exception will be ignored.",
                     endpoint, file, e.getMessage(), e);
 
-            handleException(e);
+            handleException("Error during custom processing", exchange, e);
         } finally {
             // always remove file from the in progress list as its no longer in
             // progress
@@ -622,6 +622,26 @@ public abstract class GenericFileConsumer<T> extends ScheduledBatchPollingConsum
     }
 
     /**
+     * Strategy to perform hidden file matching based on endpoint configuration.
+     * <p/>
+     * Will always return <tt>false</tt> for certain files/folders:
+     * <ul>
+     * <li>Starting with a dot (hidden)</li>
+     * </ul>
+     */
+    protected boolean isMatchedHiddenFile(GenericFile<T> file, boolean isDirectory) {
+        String name = file.getFileNameOnly();
+
+        // folders/names starting with dot is always skipped (eg. ".", ".camel",
+        // ".camelLock")
+        if (name.startsWith(".")) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Strategy to perform file matching based on endpoint configuration.
      * <p/>
      * Will always return <tt>false</tt> for certain files/folders:
@@ -639,9 +659,9 @@ public abstract class GenericFileConsumer<T> extends ScheduledBatchPollingConsum
     protected boolean isMatched(GenericFile<T> file, boolean isDirectory, T[] files) {
         String name = file.getFileNameOnly();
 
-        // folders/names starting with dot is always skipped (eg. ".", ".camel",
-        // ".camelLock")
-        if (name.startsWith(".")) {
+        if (!isMatchedHiddenFile(file, isDirectory)) {
+            // folders/names starting with dot is always skipped (eg. ".", ".camel",
+            // ".camelLock")
             return false;
         }
 

@@ -24,7 +24,6 @@ import org.apache.camel.Component;
 import org.apache.camel.Consumer;
 import org.apache.camel.Processor;
 import org.apache.camel.Producer;
-import org.apache.camel.RuntimeCamelException;
 import org.apache.camel.spi.Metadata;
 import org.apache.camel.spi.UriEndpoint;
 import org.apache.camel.spi.UriParam;
@@ -41,7 +40,7 @@ public class MicrometerEndpoint extends DefaultEndpoint {
 
     protected MeterRegistry registry;
 
-    @UriPath(description = "Type of metrics", enums = "counter,distribution_summary,timer")
+    @UriPath(description = "Type of metrics", enums = "counter,summary,timer")
     @Metadata(required = true)
     protected final Meter.Type metricsType;
     @UriPath(description = "Name of metrics")
@@ -71,7 +70,7 @@ public class MicrometerEndpoint extends DefaultEndpoint {
 
     @Override
     public Consumer createConsumer(Processor processor) {
-        throw new RuntimeCamelException("Cannot consume from " + getClass().getSimpleName() + ": " + getEndpointUri());
+        throw new UnsupportedOperationException("Consumer not supported");
     }
 
     @Override

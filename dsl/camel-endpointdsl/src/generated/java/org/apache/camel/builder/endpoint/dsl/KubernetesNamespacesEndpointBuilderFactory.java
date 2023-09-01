@@ -107,6 +107,21 @@ public interface KubernetesNamespacesEndpointBuilderFactory {
             return this;
         }
         /**
+         * The namespace.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: common
+         * 
+         * @param namespace the value to set
+         * @return the dsl builder
+         */
+        default KubernetesNamespacesEndpointConsumerBuilder namespace(
+                String namespace) {
+            doSetProperty("namespace", namespace);
+            return this;
+        }
+        /**
          * The port name, used for ServiceCall EIP.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -240,21 +255,6 @@ public interface KubernetesNamespacesEndpointBuilderFactory {
         default KubernetesNamespacesEndpointConsumerBuilder labelValue(
                 String labelValue) {
             doSetProperty("labelValue", labelValue);
-            return this;
-        }
-        /**
-         * The namespace.
-         * 
-         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
-         * 
-         * Group: consumer
-         * 
-         * @param namespace the value to set
-         * @return the dsl builder
-         */
-        default KubernetesNamespacesEndpointConsumerBuilder namespace(
-                String namespace) {
-            doSetProperty("namespace", namespace);
             return this;
         }
         /**
@@ -734,6 +734,21 @@ public interface KubernetesNamespacesEndpointBuilderFactory {
             return this;
         }
         /**
+         * The namespace.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: common
+         * 
+         * @param namespace the value to set
+         * @return the dsl builder
+         */
+        default KubernetesNamespacesEndpointProducerBuilder namespace(
+                String namespace) {
+            doSetProperty("namespace", namespace);
+            return this;
+        }
+        /**
          * The port name, used for ServiceCall EIP.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -1142,6 +1157,20 @@ public interface KubernetesNamespacesEndpointBuilderFactory {
             return this;
         }
         /**
+         * The namespace.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: common
+         * 
+         * @param namespace the value to set
+         * @return the dsl builder
+         */
+        default KubernetesNamespacesEndpointBuilder namespace(String namespace) {
+            doSetProperty("namespace", namespace);
+            return this;
+        }
+        /**
          * The port name, used for ServiceCall EIP.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -1414,7 +1443,7 @@ public interface KubernetesNamespacesEndpointBuilderFactory {
          * Perform operations on Kubernetes Namespaces and get notified on
          * Namespace changes.
          * 
-         * Category: container,cloud,paas
+         * Category: container,cloud
          * Since: 2.17
          * Maven coordinates: org.apache.camel:camel-kubernetes
          * 
@@ -1428,7 +1457,7 @@ public interface KubernetesNamespacesEndpointBuilderFactory {
          * Perform operations on Kubernetes Namespaces and get notified on
          * Namespace changes.
          * 
-         * Category: container,cloud,paas
+         * Category: container,cloud
          * Since: 2.17
          * Maven coordinates: org.apache.camel:camel-kubernetes
          * 
@@ -1449,7 +1478,7 @@ public interface KubernetesNamespacesEndpointBuilderFactory {
          * Perform operations on Kubernetes Namespaces and get notified on
          * Namespace changes.
          * 
-         * Category: container,cloud,paas
+         * Category: container,cloud
          * Since: 2.17
          * Maven coordinates: org.apache.camel:camel-kubernetes
          * 

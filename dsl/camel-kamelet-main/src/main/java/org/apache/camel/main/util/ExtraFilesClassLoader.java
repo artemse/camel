@@ -19,15 +19,16 @@ package org.apache.camel.main.util;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 /**
  * Classloader used to load the extra files that were present in the CLI arguments
  */
 public final class ExtraFilesClassLoader extends ClassLoader {
 
-    final String[] files;
+    final List<String> files;
 
-    public ExtraFilesClassLoader(ClassLoader parent, String[] files) {
+    public ExtraFilesClassLoader(ClassLoader parent, List<String> files) {
         super(parent);
         this.files = files;
     }
@@ -39,10 +40,17 @@ public final class ExtraFilesClassLoader extends ClassLoader {
 
     @Override
     public URL getResource(String name) {
-        for (String n : files) {
-            if (name.equals(n)) {
+        for (String f : files) {
+            String source = f;
+            // deal with adding files to classpath that are in src/main/resources
+            if (source.startsWith("src/main/resources/")) {
+                source = source.substring(19);
+            } else if (source.startsWith("src\\main\\resources\\")) {
+                source = source.substring(19);
+            }
+            if (name.equals(source)) {
                 try {
-                    return new File(name).toURI().toURL();
+                    return new File(f).toURI().toURL();
                 } catch (MalformedURLException e) {
                     // ignore
                 }

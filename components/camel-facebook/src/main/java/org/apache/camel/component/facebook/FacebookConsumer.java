@@ -119,14 +119,13 @@ public class FacebookConsumer extends ScheduledPollConsumer {
 
         FacebookMethodsType result;
         // find one that takes the largest subset of endpoint parameters
-        final Set<String> argNames = new HashSet<>();
-        argNames.addAll(
+        final Set<String> argNames = new HashSet<>(
                 FacebookPropertiesHelper.getEndpointPropertyNames(endpoint.getCamelContext(), endpoint.getConfiguration()));
 
         // add reading property for polling, if it doesn't already exist!
         argNames.add(READING_PROPERTY);
 
-        final String[] argNamesArray = argNames.toArray(new String[argNames.size()]);
+        final String[] argNamesArray = argNames.toArray(new String[0]);
         List<FacebookMethodsType> filteredMethods = filterMethods(
                 endpoint.getCandidates(), MatchType.SUPER_SET, argNamesArray);
 
@@ -209,14 +208,13 @@ public class FacebookConsumer extends ScheduledPollConsumer {
         // must be a Collection
         // TODO add support for Paging using ResponseList
         Collection<?> collection = (Collection<?>) result;
-        return collection.toArray(new Object[collection.size()]);
+        return collection.toArray(new Object[0]);
     }
 
     private Map<String, Object> getMethodArguments() {
         // start by setting the Reading since and until fields,
         // these are used to avoid reading duplicate results across polls
-        Map<String, Object> arguments = new HashMap<>();
-        arguments.putAll(endpointProperties);
+        Map<String, Object> arguments = new HashMap<>(endpointProperties);
 
         Reading reading = (Reading) arguments.remove(READING_PROPERTY);
         if (reading == null) {

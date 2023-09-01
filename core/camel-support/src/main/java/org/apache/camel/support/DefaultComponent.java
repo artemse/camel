@@ -32,7 +32,6 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.CamelContextAware;
 import org.apache.camel.Component;
 import org.apache.camel.Endpoint;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.ResolveEndpointFailedException;
 import org.apache.camel.component.extension.ComponentExtension;
 import org.apache.camel.spi.Metadata;
@@ -376,11 +375,11 @@ public abstract class DefaultComponent extends ServiceSupport implements Compone
         }
         if (defaultName != null) {
             if (componentPropertyConfigurer == null) {
-                componentPropertyConfigurer = getCamelContext().adapt(ExtendedCamelContext.class).getConfigurerResolver()
+                componentPropertyConfigurer = PluginHelper.getConfigurerResolver(getCamelContext())
                         .resolvePropertyConfigurer(defaultName + "-component-configurer", getCamelContext());
             }
             if (endpointPropertyConfigurer == null) {
-                endpointPropertyConfigurer = getCamelContext().adapt(ExtendedCamelContext.class).getConfigurerResolver()
+                endpointPropertyConfigurer = PluginHelper.getConfigurerResolver(getCamelContext())
                         .resolvePropertyConfigurer(defaultName + "-endpoint-configurer", getCamelContext());
             }
         }
@@ -389,16 +388,6 @@ public abstract class DefaultComponent extends ServiceSupport implements Compone
     @Override
     protected void doInit() throws Exception {
         ObjectHelper.notNull(getCamelContext(), "camelContext");
-    }
-
-    @Override
-    protected void doStart() throws Exception {
-        // noop
-    }
-
-    @Override
-    protected void doStop() throws Exception {
-        // noop
     }
 
     /**

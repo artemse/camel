@@ -34,7 +34,7 @@ public interface JooqComponentBuilderFactory {
      * JOOQ (camel-jooq)
      * Store and retrieve Java objects from an SQL database using JOOQ.
      * 
-     * Category: database,sql
+     * Category: database
      * Since: 3.0
      * Maven coordinates: org.apache.camel:camel-jooq
      * 
@@ -192,6 +192,42 @@ public interface JooqComponentBuilderFactory {
             doSetProperty("autowiredEnabled", autowiredEnabled);
             return this;
         }
+        /**
+         * Used for enabling or disabling all consumer based health checks from
+         * this component.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: true
+         * Group: health
+         * 
+         * @param healthCheckConsumerEnabled the value to set
+         * @return the dsl builder
+         */
+        default JooqComponentBuilder healthCheckConsumerEnabled(
+                boolean healthCheckConsumerEnabled) {
+            doSetProperty("healthCheckConsumerEnabled", healthCheckConsumerEnabled);
+            return this;
+        }
+        /**
+         * Used for enabling or disabling all producer based health checks from
+         * this component. Notice: Camel has by default disabled all producer
+         * based health-checks. You can turn on producer checks globally by
+         * setting camel.health.producersEnabled=true.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: true
+         * Group: health
+         * 
+         * @param healthCheckProducerEnabled the value to set
+         * @return the dsl builder
+         */
+        default JooqComponentBuilder healthCheckProducerEnabled(
+                boolean healthCheckProducerEnabled) {
+            doSetProperty("healthCheckProducerEnabled", healthCheckProducerEnabled);
+            return this;
+        }
     }
 
     class JooqComponentBuilderImpl
@@ -224,6 +260,8 @@ public interface JooqComponentBuilderFactory {
             case "operation": getOrCreateConfiguration((JooqComponent) component).setOperation((org.apache.camel.component.jooq.JooqOperation) value); return true;
             case "query": getOrCreateConfiguration((JooqComponent) component).setQuery((java.lang.String) value); return true;
             case "autowiredEnabled": ((JooqComponent) component).setAutowiredEnabled((boolean) value); return true;
+            case "healthCheckConsumerEnabled": ((JooqComponent) component).setHealthCheckConsumerEnabled((boolean) value); return true;
+            case "healthCheckProducerEnabled": ((JooqComponent) component).setHealthCheckProducerEnabled((boolean) value); return true;
             default: return false;
             }
         }

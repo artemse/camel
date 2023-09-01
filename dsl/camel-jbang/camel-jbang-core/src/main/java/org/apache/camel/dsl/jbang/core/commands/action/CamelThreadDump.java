@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import com.github.freva.asciitable.AsciiTable;
@@ -37,13 +38,25 @@ import org.apache.camel.util.json.Jsoner;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
-@Command(name = "thread-dump", description = "List threads in a running Camel integration")
+@Command(name = "thread-dump", description = "List threads in a running Camel integration", sortOptions = false)
 public class CamelThreadDump extends ActionWatchCommand {
 
-    @CommandLine.Parameters(description = "Name or pid of running Camel integration", arity = "1")
-    String name;
+    public static class IdNameStateCompletionCandidates implements Iterable<String> {
 
-    @CommandLine.Option(names = { "--sort" },
+        public IdNameStateCompletionCandidates() {
+        }
+
+        @Override
+        public Iterator<String> iterator() {
+            return List.of("id", "name", "state").iterator();
+        }
+
+    }
+
+    @CommandLine.Parameters(description = "Name or pid of running Camel integration", arity = "0..1")
+    String name = "*";
+
+    @CommandLine.Option(names = { "--sort" }, completionCandidates = IdNameStateCompletionCandidates.class,
                         description = "Sort by id, name or state", defaultValue = "id")
     String sort;
 
@@ -66,7 +79,7 @@ public class CamelThreadDump extends ActionWatchCommand {
     }
 
     @Override
-    public Integer doCall() throws Exception {
+    public Integer doWatchCall() throws Exception {
         List<Row> rows = new ArrayList<>();
 
         List<Long> pids = findPids(name);
@@ -86,12 +99,12 @@ public class CamelThreadDump extends ActionWatchCommand {
         this.pid = pids.get(0);
 
         // ensure output file is deleted before executing action
-        File outputFile = getOutputFile("" + pid);
+        File outputFile = getOutputFile(Long.toString(pid));
         FileUtil.deleteFile(outputFile);
 
         JsonObject root = new JsonObject();
         root.put("action", "thread-dump");
-        File f = getActionFile("" + pid);
+        File f = getActionFile(Long.toString(pid));
         try {
             IOHelper.writeText(root.toJson(), f);
         } catch (Exception e) {
@@ -132,7 +145,9 @@ public class CamelThreadDump extends ActionWatchCommand {
         // sort rows
         rows.sort(this::sortRow);
 
-        clearScreen();
+        if (watch) {
+            clearScreen();
+        }
         if (!rows.isEmpty()) {
             int total = jo.getInteger("threadCount");
             int peak = jo.getInteger("peakThreadCount");
@@ -153,7 +168,7 @@ public class CamelThreadDump extends ActionWatchCommand {
 
     protected void singleTable(List<Row> rows) {
         System.out.println(AsciiTable.getTable(AsciiTable.NO_BORDERS, rows, Arrays.asList(
-                new Column().header("ID").headerAlign(HorizontalAlign.CENTER).with(r -> "" + r.id),
+                new Column().header("ID").headerAlign(HorizontalAlign.CENTER).with(r -> Long.toString(r.id)),
                 new Column().header("NAME").dataAlign(HorizontalAlign.LEFT).maxWidth(60, OverflowBehaviour.ELLIPSIS_RIGHT)
                         .with(r -> r.name),
                 new Column().header("STATE").headerAlign(HorizontalAlign.RIGHT).with(r -> r.state),
@@ -166,7 +181,7 @@ public class CamelThreadDump extends ActionWatchCommand {
     protected void tableAndStackTrace(List<Row> rows) {
         for (Row row : rows) {
             System.out.println(AsciiTable.getTable(AsciiTable.NO_BORDERS, List.of(row), Arrays.asList(
-                    new Column().header("ID").headerAlign(HorizontalAlign.CENTER).with(r -> "" + r.id),
+                    new Column().header("ID").headerAlign(HorizontalAlign.CENTER).with(r -> Long.toString(r.id)),
                     new Column().header("NAME").dataAlign(HorizontalAlign.LEFT).maxWidth(60, OverflowBehaviour.ELLIPSIS_RIGHT)
                             .with(r -> r.name),
                     new Column().header("STATE").headerAlign(HorizontalAlign.RIGHT).with(r -> r.state),
@@ -222,7 +237,7 @@ public class CamelThreadDump extends ActionWatchCommand {
         if (r.blockedTime > 0) {
             return r.blocked + "(" + r.blockedTime + "ms)";
         } else {
-            return "" + r.blocked;
+            return Long.toString(r.blocked);
         }
     }
 
@@ -230,7 +245,7 @@ public class CamelThreadDump extends ActionWatchCommand {
         if (r.waitedTime > 0) {
             return r.waited + "(" + r.waitedTime + "ms)";
         } else {
-            return "" + r.waited;
+            return Long.toString(r.waited);
         }
     }
 
@@ -238,7 +253,7 @@ public class CamelThreadDump extends ActionWatchCommand {
         if (r.stackTrace == null || r.stackTrace.isEmpty()) {
             return "";
         }
-        return "" + r.stackTrace.get(0);
+        return r.stackTrace.get(0);
     }
 
     private static class Row {

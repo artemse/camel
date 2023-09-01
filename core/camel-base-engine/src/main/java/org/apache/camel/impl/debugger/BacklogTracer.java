@@ -62,6 +62,8 @@ public final class BacklogTracer extends ServiceSupport implements org.apache.ca
     private boolean bodyIncludeFiles = true;
     private boolean includeExchangeProperties = true;
     private boolean includeException = true;
+    private boolean traceRests;
+    private boolean traceTemplates;
     // a pattern to filter tracing nodes
     private String tracePattern;
     private String[] patterns;
@@ -244,6 +246,22 @@ public final class BacklogTracer extends ServiceSupport implements org.apache.ca
         this.includeException = includeException;
     }
 
+    public boolean isTraceRests() {
+        return traceRests;
+    }
+
+    public void setTraceRests(boolean traceRests) {
+        this.traceRests = traceRests;
+    }
+
+    public boolean isTraceTemplates() {
+        return traceTemplates;
+    }
+
+    public void setTraceTemplates(boolean traceTemplates) {
+        this.traceTemplates = traceTemplates;
+    }
+
     @Override
     public String getTracePattern() {
         return tracePattern;
@@ -340,8 +358,7 @@ public final class BacklogTracer extends ServiceSupport implements org.apache.ca
 
     @Override
     public List<BacklogTracerEventMessage> dumpAllTracedMessages() {
-        List<BacklogTracerEventMessage> answer = new ArrayList<>();
-        answer.addAll(queue);
+        List<BacklogTracerEventMessage> answer = new ArrayList<>(queue);
         if (isRemoveOnDump()) {
             queue.clear();
         }

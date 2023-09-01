@@ -16,8 +16,12 @@
  */
 package org.apache.camel.main.download;
 
+import java.util.Collection;
+import java.util.List;
+
 import org.apache.camel.CamelContextAware;
 import org.apache.camel.StaticService;
+import org.apache.camel.tooling.maven.MavenArtifact;
 
 /**
  * To download dependencies at runtime.
@@ -82,6 +86,16 @@ public interface DependencyDownloader extends CamelContextAware, StaticService {
     void downloadDependency(String groupId, String artifactId, String version);
 
     /**
+     * Downloads the dependency incl transitive dependencies
+     *
+     * @param groupId    maven group id
+     * @param artifactId maven artifact id
+     * @param version    maven version
+     * @param extraRepos additional remote maven repositories to use when downloading
+     */
+    void downloadDependency(String groupId, String artifactId, String version, String extraRepos);
+
+    /**
      * Downloads the dependency
      *
      * @param groupId      maven group id
@@ -111,6 +125,18 @@ public interface DependencyDownloader extends CamelContextAware, StaticService {
     MavenArtifact downloadArtifact(String groupId, String artifactId, String version);
 
     /**
+     * Resolves the available versions for the given maven artifact
+     *
+     * @param  groupId        maven group id
+     * @param  artifactId     maven artifact id
+     * @param  minimumVersion optional minimum version to avoid resolving too old releases
+     * @param  repo           to use specific maven repository instead of maven central (used if repo is {@code null})
+     * @return                list of versions of the given artifact (0=camel-core version, 1=runtime version, such as
+     *                        spring-boot or quarkus)
+     */
+    List<String[]> resolveAvailableVersions(String groupId, String artifactId, String minimumVersion, String repo);
+
+    /**
      * Checks whether the dependency is already on the classpath
      *
      * @param  groupId    maven group id
@@ -134,5 +160,18 @@ public interface DependencyDownloader extends CamelContextAware, StaticService {
      * @param value modeline value
      */
     void onLoadingModeline(String key, String value);
+
+    /**
+     * Gets download record for a given artifact
+     *
+     * @return download record (if any) or <tt>null</tt> if artifact was not downloaded, but could have been resolved
+     *         from local disk
+     */
+    DownloadRecord getDownloadState(String groupId, String artifactId, String version);
+
+    /**
+     * Gets the records for the downloaded artifacts
+     */
+    Collection<DownloadRecord> downloadRecords();
 
 }

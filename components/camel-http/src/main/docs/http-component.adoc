@@ -2,9 +2,10 @@
 :doctitle: HTTP
 :shortname: http
 :artifactid: camel-http
-:description: Send requests to external HTTP servers using Apache HTTP Client 4.x.
+:description: Send requests to external HTTP servers using Apache HTTP Client 5.x.
 :since: 2.3
 :supportlevel: Stable
+:tabs-sync-option:
 :component-header: Only producer is supported
 //Manually maintained attributes
 :camel-spring-boot-name: http
@@ -66,7 +67,7 @@ HTTP response headers as well to the OUT message headers.
 == Using System Properties
 
 When setting useSystemProperties to true, the HTTP Client will look for
-the following System Properties and it will use it:
+the following System Properties, and it will use it:
 
 * ssl.TrustManagerFactory.algorithm
 * http://javax.net/[javax.net].ssl.trustStoreType
@@ -402,17 +403,17 @@ Spring DSL based configuration of endpoint
 Configuring Apache HTTP Client Directly
 
 Basically camel-http component is built on the top of
-http://hc.apache.org/httpcomponents-client-ga/[Apache HttpClient].
+https://hc.apache.org/httpcomponents-client-5.1.x/[Apache HttpClient].
 Please refer to
 https://hc.apache.org/httpcomponents-client-4.5.x/current/tutorial/html/connmgmt.html[SSL/TLS
-customization] for details or have a look into the
+customization] (even if the link is referring to an article about version 4, it is still more or less relevant moreover there is no equivalent for version 5) for details or have a look into the
 `org.apache.camel.component.http.HttpsServerTestSupport` unit test base
 class. +
  You can also implement a custom
 `org.apache.camel.component.http.HttpClientConfigurer` to do some
 configuration on the http client if you need full control of it.
 
-However if you _just_ want to specify the keystore and truststore you
+However, if you _just_ want to specify the keystore and truststore you
 can do this with Apache HTTP `HttpClientConfigurer`, for example:
 
 [source,java]
@@ -447,7 +448,7 @@ If you are doing this using the Spring DSL, you can specify your
 <to uri="https://myhostname.com:443/myURL?httpClientConfigurer=myHttpClientConfigurer"/>
 -----------------------------------------------------------------------------------------
 
-As long as you implement the HttpClientConfigurer and configure your
+As long as you implement the `HttpClientConfigurer` and configure your
 keystore and truststore as described above, it will work fine.
 
 [[HTTP-UsingHTTPStoauthenticategotchas]]
@@ -455,7 +456,7 @@ Using HTTPS to authenticate gotchas
 
 An end user reported that he had problem with authenticating with HTTPS.
 The problem was eventually resolved by providing a custom configured
-`org.apache.http.protocol.HttpContext`:
+`org.apache.hc.core5.http.protocol.HttpContext`:
 
 * 1. Create a (Spring) factory for HttpContexts:
 
@@ -465,15 +466,23 @@ public class HttpContextFactory {
 
   private String httpHost = "localhost";
   private String httpPort = 9001;
+  private String user = "some-user";
+  private String password = "my-secret";
 
-  private BasicHttpContext httpContext = new BasicHttpContext();
+  private HttpClientContext context = HttpClientContext.create();
   private BasicAuthCache authCache = new BasicAuthCache();
   private BasicScheme basicAuth = new BasicScheme();
 
   public HttpContext getObject() {
-    authCache.put(new HttpHost(httpHost, httpPort), basicAuth);
+    UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(user, password.toCharArray());
+    BasicCredentialsProvider provider = new BasicCredentialsProvider();
+    HttpHost host = new HttpHost(httpHost, httpPort);
+    provider.setCredentials(host, credentials);
 
-    httpContext.setAttribute(ClientContext.AUTH_CACHE, authCache);
+    authCache.put(host, basicAuth);
+
+    httpContext.setAuthCache(authCache);
+    httpContext.setCredentialsProvider(provider);
 
     return httpContext;
   }
@@ -482,7 +491,7 @@ public class HttpContextFactory {
 }
 ------------------------------------------------------------------
 
-* 2. Declare an HttpContext in the Spring application context file:
+* 2. Declare an` HttpContext` in the Spring application context file:
 
 [source,xml]
 ---------------------------------------------------------------------------------------

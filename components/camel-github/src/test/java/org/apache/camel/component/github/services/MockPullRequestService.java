@@ -66,7 +66,7 @@ public class MockPullRequestService extends PullRequestService {
 
         User author = createAuthor();
         commitComment.setUser(author);
-        commitComment.setCommitId("" + pullRequestId);
+        commitComment.setCommitId(Long.toString(pullRequestId));
         commitComment.setId(commentId.getAndIncrement());
         commitComment.setBody(bodyText);
         commitComment.setBodyText(bodyText);
@@ -115,14 +115,13 @@ public class MockPullRequestService extends PullRequestService {
     public synchronized List<PullRequest> getPullRequests(IRepositoryIdProvider repository, String state) {
         List<PullRequest> result = new ArrayList<>();
 
-        for (Long id : pullRequests.keySet()) {
-            PullRequest pr = pullRequests.get(id);
+        for (PullRequest pr : pullRequests.values()) {
             if (pr.getState().equals(state)) {
                 result.add(pr);
             }
         }
 
-        LOG.debug("Returning list of " + result.size() + " pull requests with state " + state);
+        LOG.debug("Returning list of {} pull requests with state {}", result.size(), state);
         return result;
     }
 

@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.apache.camel</groupId>
         <artifactId>maven-plugins</artifactId>
-        <version>4.0.0-SNAPSHOT</version>
+        <version>4.1.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>camel-eip-documentation-enricher-maven-plugin</artifactId>
@@ -31,6 +31,10 @@
 
     <name>Camel :: Maven Plugins :: Camel EIP Documentation Enricher Plugin</name>
     <description>Adds documentation to camel xsd schema</description>
+
+    <properties>
+        <camel.surefire.fork.additional-vmargs>--add-opens java.base/java.io=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED</camel.surefire.fork.additional-vmargs>
+    </properties>
 
     <dependencyManagement>
         <dependencies>
@@ -59,14 +63,10 @@
         </dependency>
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-utils</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.sonatype.plexus</groupId>
+            <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-build-api</artifactId>
         </dependency>
 
@@ -95,8 +95,8 @@
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>${commons-lang3-version}</version>
+            <artifactId>commons-text</artifactId>
+            <version>${commons-text-version}</version>
         </dependency>
 
         <!-- logging -->
@@ -105,7 +105,7 @@
             <artifactId>log4j-slf4j2-impl</artifactId>
             <scope>test</scope>
         </dependency>
-        
+
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
@@ -126,12 +126,14 @@
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest</artifactId>
+            <version>${hamcrest-version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito-version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -164,16 +166,5 @@
                 </plugin>
             </plugins>
         </pluginManagement>
-
-        <plugins>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <argLine>--add-opens java.base/java.io=ALL-UNNAMED --add-opens
-                        java.base/java.lang=ALL-UNNAMED
-                    </argLine>
-                </configuration>
-            </plugin>
-        </plugins>
     </build>
 </project>

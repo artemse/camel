@@ -83,19 +83,20 @@ public class CamelServlet extends HttpServlet implements HttpRegistryProvider {
         this.servletName = config.getServletName();
 
         final String asyncParam = config.getInitParameter(ASYNC_PARAM);
-        this.async = asyncParam == null ? false : ObjectHelper.toBoolean(asyncParam);
+        this.async = asyncParam != null && ObjectHelper.toBoolean(asyncParam);
         this.forceAwait = Boolean.parseBoolean(config.getInitParameter(FORCE_AWAIT_PARAM));
         this.executorRef = config.getInitParameter(EXECUTOR_REF_PARAM);
         log.trace("servlet '{}' initialized with: async={}", servletName, async);
     }
 
+    @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) {
         log.trace("Service: {}", request);
         try {
             handleService(request, response);
         } catch (Exception e) {
             // do not leak exception back to caller
-            log.warn("Error handling request due to: " + e.getMessage(), e);
+            log.warn("Error handling request due to: {}", e.getMessage(), e);
             try {
                 if (!response.isCommitted()) {
                     response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -414,7 +415,11 @@ public class CamelServlet extends HttpServlet implements HttpRegistryProvider {
     @Override
     public void connect(HttpConsumer consumer) {
         log.debug("Connecting consumer: {}", consumer);
-        consumers.put(consumer.getEndpoint().getEndpointUri(), consumer);
+        String endpointUri = consumer.getEndpoint().getEndpointUri();
+        if (consumers.containsKey(endpointUri)) {
+            throw new IllegalStateException("Duplicate request path for " + endpointUri);
+        }
+        consumers.put(endpointUri, consumer);
     }
 
     @Override

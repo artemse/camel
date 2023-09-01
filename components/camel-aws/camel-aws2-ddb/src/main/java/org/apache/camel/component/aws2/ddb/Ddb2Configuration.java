@@ -35,7 +35,7 @@ public class Ddb2Configuration implements Cloneable {
     @UriParam(label = "security", secret = true)
     private String secretKey;
     @UriParam
-    @Metadata(autowired = true)
+    @Metadata(label = "advanced", autowired = true)
     private DynamoDbClient amazonDDBClient;
     @UriParam
     private boolean consistentRead;
@@ -51,22 +51,26 @@ public class Ddb2Configuration implements Cloneable {
     private String keyAttributeType;
     @UriParam
     private String keyScalarType;
-    @UriParam(enums = "HTTP,HTTPS", defaultValue = "HTTPS")
+    @UriParam(label = "proxy", enums = "HTTP,HTTPS", defaultValue = "HTTPS")
     private Protocol proxyProtocol = Protocol.HTTPS;
-    @UriParam
+    @UriParam(label = "proxy")
     private String proxyHost;
-    @UriParam
+    @UriParam(label = "proxy")
     private Integer proxyPort;
     @UriParam
     private String region;
-    @UriParam(defaultValue = "false")
+    @UriParam(label = "security")
     private boolean trustAllCertificates;
-    @UriParam(defaultValue = "false")
+    @UriParam
     private boolean overrideEndpoint;
     @UriParam
     private String uriEndpointOverride;
-    @UriParam(defaultValue = "false")
+    @UriParam(label = "security")
     private boolean useDefaultCredentialsProvider;
+    @UriParam(label = "security")
+    private boolean useProfileCredentialsProvider;
+    @UriParam(label = "security")
+    private String profileCredentialsName;
     @UriParam(defaultValue = "true")
     private boolean enabledInitialDescribeTable = true;
 
@@ -291,6 +295,28 @@ public class Ddb2Configuration implements Cloneable {
      */
     public void setEnabledInitialDescribeTable(boolean enabledInitialDescribeTable) {
         this.enabledInitialDescribeTable = enabledInitialDescribeTable;
+    }
+
+    public boolean isUseProfileCredentialsProvider() {
+        return useProfileCredentialsProvider;
+    }
+
+    /**
+     * Set whether the DDB client should expect to load credentials through a profile credentials provider.
+     */
+    public void setUseProfileCredentialsProvider(boolean useProfileCredentialsProvider) {
+        this.useProfileCredentialsProvider = useProfileCredentialsProvider;
+    }
+
+    public String getProfileCredentialsName() {
+        return profileCredentialsName;
+    }
+
+    /**
+     * If using a profile credentials provider this parameter will set the profile name
+     */
+    public void setProfileCredentialsName(String profileCredentialsName) {
+        this.profileCredentialsName = profileCredentialsName;
     }
 
     // *************************************************

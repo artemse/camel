@@ -108,6 +108,21 @@ public interface KubernetesReplicationControllersEndpointBuilderFactory {
             return this;
         }
         /**
+         * The namespace.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: common
+         * 
+         * @param namespace the value to set
+         * @return the dsl builder
+         */
+        default KubernetesReplicationControllersEndpointConsumerBuilder namespace(
+                String namespace) {
+            doSetProperty("namespace", namespace);
+            return this;
+        }
+        /**
          * The port name, used for ServiceCall EIP.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -241,21 +256,6 @@ public interface KubernetesReplicationControllersEndpointBuilderFactory {
         default KubernetesReplicationControllersEndpointConsumerBuilder labelValue(
                 String labelValue) {
             doSetProperty("labelValue", labelValue);
-            return this;
-        }
-        /**
-         * The namespace.
-         * 
-         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
-         * 
-         * Group: consumer
-         * 
-         * @param namespace the value to set
-         * @return the dsl builder
-         */
-        default KubernetesReplicationControllersEndpointConsumerBuilder namespace(
-                String namespace) {
-            doSetProperty("namespace", namespace);
             return this;
         }
         /**
@@ -736,6 +736,21 @@ public interface KubernetesReplicationControllersEndpointBuilderFactory {
             return this;
         }
         /**
+         * The namespace.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: common
+         * 
+         * @param namespace the value to set
+         * @return the dsl builder
+         */
+        default KubernetesReplicationControllersEndpointProducerBuilder namespace(
+                String namespace) {
+            doSetProperty("namespace", namespace);
+            return this;
+        }
+        /**
          * The port name, used for ServiceCall EIP.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -1146,6 +1161,21 @@ public interface KubernetesReplicationControllersEndpointBuilderFactory {
             return this;
         }
         /**
+         * The namespace.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: common
+         * 
+         * @param namespace the value to set
+         * @return the dsl builder
+         */
+        default KubernetesReplicationControllersEndpointBuilder namespace(
+                String namespace) {
+            doSetProperty("namespace", namespace);
+            return this;
+        }
+        /**
          * The port name, used for ServiceCall EIP.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -1426,7 +1456,7 @@ public interface KubernetesReplicationControllersEndpointBuilderFactory {
          * Perform operations on Kubernetes Replication Controllers and get
          * notified on Replication Controllers changes.
          * 
-         * Category: container,cloud,paas
+         * Category: container,cloud
          * Since: 2.17
          * Maven coordinates: org.apache.camel:camel-kubernetes
          * 
@@ -1440,7 +1470,7 @@ public interface KubernetesReplicationControllersEndpointBuilderFactory {
          * Perform operations on Kubernetes Replication Controllers and get
          * notified on Replication Controllers changes.
          * 
-         * Category: container,cloud,paas
+         * Category: container,cloud
          * Since: 2.17
          * Maven coordinates: org.apache.camel:camel-kubernetes
          * 
@@ -1461,7 +1491,7 @@ public interface KubernetesReplicationControllersEndpointBuilderFactory {
          * Perform operations on Kubernetes Replication Controllers and get
          * notified on Replication Controllers changes.
          * 
-         * Category: container,cloud,paas
+         * Category: container,cloud
          * Since: 2.17
          * Maven coordinates: org.apache.camel:camel-kubernetes
          * 

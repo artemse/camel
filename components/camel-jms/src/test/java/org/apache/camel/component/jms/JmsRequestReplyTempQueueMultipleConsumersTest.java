@@ -29,8 +29,10 @@ import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.test.infra.artemis.services.ArtemisService;
 import org.apache.camel.test.infra.artemis.services.ArtemisServiceFactory;
 import org.apache.camel.test.junit5.CamelTestSupport;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.parallel.Isolated;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.messaginghub.pooled.jms.JmsPoolConnectionFactory;
@@ -42,6 +44,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Reliability tests for JMS TempQueue Reply Manager with multiple consumers.
  */
+@Isolated("Creates multiple threads")
 public class JmsRequestReplyTempQueueMultipleConsumersTest extends CamelTestSupport {
 
     @RegisterExtension
@@ -65,6 +68,7 @@ public class JmsRequestReplyTempQueueMultipleConsumersTest extends CamelTestSupp
 
     @ParameterizedTest
     @ValueSource(ints = { 500, 100, 100 })
+    @Disabled("This will spam logs with Session is closed")
     public void testTempQueueRefreshed(int numFiles) throws Exception {
         executorService = context.getExecutorServiceManager().newFixedThreadPool(this, "test", 5);
 

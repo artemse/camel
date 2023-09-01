@@ -18,9 +18,13 @@ package org.apache.camel.support;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.OptionalInt;
+import java.util.stream.Collectors;
 
 /**
  * A context path matcher when using rest-dsl that allows components to reuse the same matching logic.
@@ -113,22 +117,23 @@ public final class RestConsumerContextPathMatcher {
      * @param  consumerPaths the list of consumer context path details
      * @return               the best matched consumer, or <tt>null</tt> if none could be determined.
      */
-    public static ConsumerPath matchBestPath(String requestMethod, String requestPath, List<ConsumerPath> consumerPaths) {
-        ConsumerPath answer = null;
+    public static <
+            T> ConsumerPath<T> matchBestPath(String requestMethod, String requestPath, List<ConsumerPath<T>> consumerPaths) {
+        ConsumerPath<T> answer = null;
 
-        List<ConsumerPath> candidates = new ArrayList<>();
+        List<ConsumerPath<T>> candidates = new ArrayList<>();
 
         // first match by http method
-        for (ConsumerPath entry : consumerPaths) {
+        for (ConsumerPath<T> entry : consumerPaths) {
             if (matchRestMethod(requestMethod, entry.getRestrictMethod())) {
                 candidates.add(entry);
             }
         }
 
         // then see if we got a direct match
-        Iterator<ConsumerPath> it = candidates.iterator();
+        Iterator<ConsumerPath<T>> it = candidates.iterator();
         while (it.hasNext()) {
-            ConsumerPath consumer = it.next();
+            ConsumerPath<T> consumer = it.next();
             if (matchRestPath(requestPath, consumer.getConsumerPath(), false)) {
                 answer = consumer;
                 break;
@@ -143,7 +148,7 @@ public final class RestConsumerContextPathMatcher {
             // then try again to see if we can find a direct match
             it = candidates.iterator();
             while (it.hasNext()) {
-                ConsumerPath consumer = it.next();
+                ConsumerPath<T> consumer = it.next();
                 if (matchRestPath(requestPath, consumer.getConsumerPath(), false)) {
                     answer = consumer;
                     break;
@@ -161,46 +166,67 @@ public final class RestConsumerContextPathMatcher {
                     .sorted(Comparator.comparingInt(o -> -1 * o.getConsumerPath().length())).findFirst().orElse(null);
         }
 
+        if (answer != null) {
+            return answer;
+        }
+
         // then match by wildcard path
-        if (answer == null) {
-            it = candidates.iterator();
-            while (it.hasNext()) {
-                ConsumerPath consumer = it.next();
-                // filter non matching paths
-                if (!matchRestPath(requestPath, consumer.getConsumerPath(), true)) {
-                    it.remove();
-                }
-            }
-
-            // if there is multiple candidates with wildcards then pick anyone with the least number of wildcards
-            int bestWildcard = Integer.MAX_VALUE;
-            ConsumerPath best = null;
-            if (candidates.size() > 1) {
-                it = candidates.iterator();
-                while (it.hasNext()) {
-                    ConsumerPath entry = it.next();
-                    int wildcards = countWildcards(entry.getConsumerPath());
-                    if (wildcards > 0) {
-                        if (best == null || wildcards < bestWildcard) {
-                            best = entry;
-                            bestWildcard = wildcards;
-                        }
-                    }
-                }
-
-                if (best != null) {
-                    // pick the best among the wildcards
-                    answer = best;
-                }
-            }
-
-            // if there is one left then its our answer
-            if (answer == null && candidates.size() == 1) {
-                answer = candidates.get(0);
+        it = candidates.iterator();
+        while (it.hasNext()) {
+            ConsumerPath<?> consumer = it.next();
+            // filter non matching paths
+            if (!matchRestPath(requestPath, consumer.getConsumerPath(), true)) {
+                it.remove();
             }
         }
 
+        // if there is multiple candidates with wildcards then pick anyone with the least number of wildcards
+        ConsumerPath<T> best = null;
+        Map<Integer, List<ConsumerPath<T>>> pathMap = new HashMap<>();
+        if (candidates.size() > 1) {
+            it = candidates.iterator();
+            while (it.hasNext()) {
+                ConsumerPath<T> entry = it.next();
+                int wildcards = countWildcards(entry.getConsumerPath());
+                if (wildcards > 0) {
+                    List<ConsumerPath<T>> consumerPathsLst = pathMap.computeIfAbsent(wildcards, key -> new ArrayList<>());
+                    consumerPathsLst.add(entry);
+                }
+            }
+
+            OptionalInt min = pathMap.keySet().stream().mapToInt(Integer::intValue).min();
+            if (min.isPresent()) {
+                List<ConsumerPath<T>> bestConsumerPaths = pathMap.get(min.getAsInt());
+                if (bestConsumerPaths.size() > 1 && !canBeAmbiguous(requestMethod, requestMethod)) {
+                    String exceptionMsg = "Ambiguous paths " + bestConsumerPaths.stream().map(ConsumerPath::getConsumerPath)
+                            .collect(Collectors.joining(",")) + " for request path " + requestPath;
+                    throw new IllegalStateException(exceptionMsg);
+                }
+                best = bestConsumerPaths.get(0);
+            }
+
+            if (best != null) {
+                // pick the best among the wildcards
+                answer = best;
+            }
+        }
+
+        // if there is one left then its our answer
+        if (answer == null && candidates.size() == 1) {
+            answer = candidates.get(0);
+        }
+
         return answer;
+    }
+
+    /**
+     *
+     * @param  requestMethod The request method
+     * @param  requestPath   The request path
+     * @return               if the request method and path can escape from the ambiguous exception
+     */
+    private static boolean canBeAmbiguous(String requestMethod, String requestPath) {
+        return requestMethod.equalsIgnoreCase("options");
     }
 
     /**

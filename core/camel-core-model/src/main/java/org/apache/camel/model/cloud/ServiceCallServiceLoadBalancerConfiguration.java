@@ -24,7 +24,6 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
 
 import org.apache.camel.CamelContext;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.NoFactoryAvailableException;
 import org.apache.camel.cloud.ServiceLoadBalancer;
 import org.apache.camel.cloud.ServiceLoadBalancerFactory;
@@ -100,7 +99,7 @@ public class ServiceCallServiceLoadBalancerConfiguration extends ServiceCallConf
             Class<?> type;
             try {
                 // Then use Service factory.
-                type = camelContext.adapt(ExtendedCamelContext.class)
+                type = camelContext.getCamelContextExtension()
                         .getFactoryFinder(ServiceCallDefinitionConstants.RESOURCE_PATH).findClass(factoryKey).orElse(null);
             } catch (Exception e) {
                 throw new NoFactoryAvailableException(ServiceCallDefinitionConstants.RESOURCE_PATH + factoryKey, e);
@@ -126,7 +125,7 @@ public class ServiceCallServiceLoadBalancerConfiguration extends ServiceCallConf
                             v = camelContext.resolvePropertyPlaceholders((String) v);
                         } catch (Exception e) {
                             throw new IllegalArgumentException(
-                                    String.format("Exception while resolving %s (%s)", k, v.toString()), e);
+                                    String.format("Exception while resolving %s (%s)", k, v), e);
                         }
                     }
 

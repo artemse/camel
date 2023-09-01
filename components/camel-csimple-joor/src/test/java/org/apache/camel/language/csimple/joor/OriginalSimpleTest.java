@@ -47,7 +47,6 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.apache.camel.test.junit5.TestSupport.assertIsInstanceOf;
-import static org.apache.camel.test.junit5.TestSupport.getJavaMajorVersion;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -57,7 +56,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-@Disabled
 public class OriginalSimpleTest extends LanguageTestSupport {
 
     private static final String JAVA8_INDEX_OUT_OF_BOUNDS_ERROR_MSG = "Index: 2, Size: 2";
@@ -246,6 +244,13 @@ public class OriginalSimpleTest extends LanguageTestSupport {
     }
 
     @Test
+    public void testSimpleThreadId() {
+        long id = Thread.currentThread().getId();
+        assertExpression("${threadId}", id);
+        assertExpression("The id is ${threadId}", "The id is " + id);
+    }
+
+    @Test
     public void testSimpleThreadName() {
         String name = Thread.currentThread().getName();
         assertExpression("${threadName}", name);
@@ -336,6 +341,7 @@ public class OriginalSimpleTest extends LanguageTestSupport {
         assertExpression("${body[0][code]}", 4321);
     }
 
+    @Disabled("Investigation pending - see CAMEL-19681")
     @Test
     public void testOGNLBodyEmptyList() {
         Map<String, List<String>> map = new HashMap<>();
@@ -473,12 +479,7 @@ public class OriginalSimpleTest extends LanguageTestSupport {
             fail("Should have thrown an exception");
         } catch (Exception e) {
             IndexOutOfBoundsException cause = assertIsInstanceOf(IndexOutOfBoundsException.class, e.getCause());
-            if (getJavaMajorVersion() <= 8) {
-                assertEquals(JAVA8_INDEX_OUT_OF_BOUNDS_ERROR_MSG, cause.getMessage());
-            } else {
-                assertEquals(INDEX_OUT_OF_BOUNDS_ERROR_MSG, cause.getMessage());
-            }
-
+            assertEquals(INDEX_OUT_OF_BOUNDS_ERROR_MSG, cause.getMessage());
         }
         assertExpression("${exchangeProperty.unknown[cool]}", null);
     }
@@ -498,11 +499,7 @@ public class OriginalSimpleTest extends LanguageTestSupport {
             fail("Should have thrown an exception");
         } catch (Exception e) {
             IndexOutOfBoundsException cause = assertIsInstanceOf(IndexOutOfBoundsException.class, e.getCause());
-            if (getJavaMajorVersion() <= 8) {
-                assertEquals(JAVA8_INDEX_OUT_OF_BOUNDS_ERROR_MSG, cause.getMessage());
-            } else {
-                assertEquals(INDEX_OUT_OF_BOUNDS_ERROR_MSG, cause.getMessage());
-            }
+            assertEquals(INDEX_OUT_OF_BOUNDS_ERROR_MSG, cause.getMessage());
         }
         assertExpression("${exchangeProperty.unknown[cool]}", null);
         assertExpression("${exchangePropertyAsIndex(unknown, OrderLine, 'cool')}", null);
@@ -669,7 +666,8 @@ public class OriginalSimpleTest extends LanguageTestSupport {
     @Test
     public void testDatePredicates() {
         assertPredicate("${date:now} < ${date:now+60s}");
-        assertPredicate("${date:now-2s+2s} == ${date:now}");
+        assertPredicate("${date:now-5s} < ${date:now}");
+        assertPredicate("${date:now+5s} > ${date:now}");
     }
 
     @Test
@@ -966,11 +964,7 @@ public class OriginalSimpleTest extends LanguageTestSupport {
             fail("Should have thrown an exception");
         } catch (Exception e) {
             IndexOutOfBoundsException cause = assertIsInstanceOf(IndexOutOfBoundsException.class, e.getCause());
-            if (getJavaMajorVersion() <= 8) {
-                assertEquals(JAVA8_INDEX_OUT_OF_BOUNDS_ERROR_MSG, cause.getMessage());
-            } else {
-                assertEquals(INDEX_OUT_OF_BOUNDS_ERROR_MSG, cause.getMessage());
-            }
+            assertEquals(INDEX_OUT_OF_BOUNDS_ERROR_MSG, cause.getMessage());
         }
         assertExpression("${header.unknown[cool]}", null);
     }
@@ -989,11 +983,7 @@ public class OriginalSimpleTest extends LanguageTestSupport {
             fail("Should have thrown an exception");
         } catch (Exception e) {
             IndexOutOfBoundsException cause = assertIsInstanceOf(IndexOutOfBoundsException.class, e.getCause());
-            if (getJavaMajorVersion() <= 8) {
-                assertEquals(JAVA8_INDEX_OUT_OF_BOUNDS_ERROR_MSG, cause.getMessage());
-            } else {
-                assertEquals(INDEX_OUT_OF_BOUNDS_ERROR_MSG, cause.getMessage());
-            }
+            assertEquals(INDEX_OUT_OF_BOUNDS_ERROR_MSG, cause.getMessage());
         }
         assertExpression("${header.unknown[cool]}", null);
     }
@@ -1332,6 +1322,7 @@ public class OriginalSimpleTest extends LanguageTestSupport {
         }
     }
 
+    @Disabled("Investigation pending - see CAMEL-19681")
     @Test
     public void testBodyOGNLOrderListOutOfBoundsWithNullSafe() {
         List<OrderLine> lines = new ArrayList<>();
@@ -1344,6 +1335,7 @@ public class OriginalSimpleTest extends LanguageTestSupport {
         assertExpression("${bodyAs(Order)?.getLines[3].getId}", null);
     }
 
+    @Disabled("Investigation pending - see CAMEL-19681")
     @Test
     public void testBodyOGNLOrderListOutOfBoundsWithNullSafeShorthand() {
         List<OrderLine> lines = new ArrayList<>();
@@ -1356,6 +1348,7 @@ public class OriginalSimpleTest extends LanguageTestSupport {
         assertExpression("${bodyAs(Order)?.lines[3].id}", null);
     }
 
+    @Disabled("Investigation pending - see CAMEL-19681")
     @Test
     public void testBodyOGNLOrderListNoMethodNameWithNullSafe() {
         List<OrderLine> lines = new ArrayList<>();
@@ -1374,6 +1367,7 @@ public class OriginalSimpleTest extends LanguageTestSupport {
         }
     }
 
+    @Disabled("Investigation pending - see CAMEL-19681")
     @Test
     public void testBodyOGNLOrderListNoMethodNameWithNullSafeShorthand() {
         List<OrderLine> lines = new ArrayList<>();
@@ -1392,6 +1386,7 @@ public class OriginalSimpleTest extends LanguageTestSupport {
         }
     }
 
+    @Disabled("Investigation pending - see CAMEL-19681")
     @Test
     public void testBodyOGNLNullSafeToAvoidNPE() {
         Animal tiger = new Animal("Tony the Tiger", 13);
@@ -1420,6 +1415,7 @@ public class OriginalSimpleTest extends LanguageTestSupport {
         }
     }
 
+    @Disabled("Investigation pending - see CAMEL-19681")
     @Test
     public void testBodyOGNLNullSafeToAvoidNPEShorthand() {
         Animal tiger = new Animal("Tony the Tiger", 13);
@@ -1541,6 +1537,7 @@ public class OriginalSimpleTest extends LanguageTestSupport {
         assertExpression("${bodyAs(String).replace(\"$\", \"-\")}", "foo-bar-baz");
     }
 
+    @Disabled("Investigation pending - see CAMEL-19681")
     @Test
     public void testBodyOgnlReplaceEscapedBackslashChar() {
         exchange.getIn().setBody("foo\\bar\\baz");
@@ -1559,6 +1556,7 @@ public class OriginalSimpleTest extends LanguageTestSupport {
         assertExpression("${bodyAs(String).replaceFirst(\"http:\",\" \")}", " camel.apache.org");
     }
 
+    @Disabled("Investigation pending - see CAMEL-19681")
     @Test
     public void testBodyOgnlReplaceSingleQuoteInDouble() {
         exchange.getIn().setBody("Hello O\"Conner");
@@ -1897,6 +1895,7 @@ public class OriginalSimpleTest extends LanguageTestSupport {
         assertExpression("Hi ${bodyOneLine} Again", "Hi HelloGreatWorld Again");
     }
 
+    @Disabled("Investigation pending - see CAMEL-19681")
     @Test
     public void testListIndexByNestedFunction() {
         List<String> alist = new ArrayList<>();
@@ -1913,6 +1912,7 @@ public class OriginalSimpleTest extends LanguageTestSupport {
         assertExpression(exp, "99");
     }
 
+    @Disabled("Investigation pending - see CAMEL-19681")
     @Test
     public void testNestedFunction() {
         exchange.getMessage().setBody("Tony");

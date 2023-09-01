@@ -18,6 +18,7 @@ package org.apache.camel.main;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 
 import org.apache.camel.CamelConfiguration;
 import org.apache.camel.RoutesBuilder;
@@ -57,6 +58,7 @@ public class MainConfigurationProperties extends DefaultConfigurationProperties<
     private FaultToleranceConfigurationProperties faultToleranceConfigurationProperties;
     private RestConfigurationProperties restConfigurationProperties;
     private VaultConfigurationProperties vaultConfigurationProperties;
+    private HttpServerConfigurationProperties httpServerConfigurationProperties;
 
     @Override
     public void close() {
@@ -87,6 +89,10 @@ public class MainConfigurationProperties extends DefaultConfigurationProperties<
         if (vaultConfigurationProperties != null) {
             vaultConfigurationProperties.close();
             vaultConfigurationProperties = null;
+        }
+        if (httpServerConfigurationProperties != null) {
+            httpServerConfigurationProperties.close();
+            httpServerConfigurationProperties = null;
         }
         if (routesBuilders != null) {
             routesBuilders.clear();
@@ -133,6 +139,23 @@ public class MainConfigurationProperties extends DefaultConfigurationProperties<
      */
     public boolean hasLraConfiguration() {
         return lraConfigurationProperties != null;
+    }
+
+    /**
+     * To configure embedded HTTP server (for standalone applications; not Spring Boot or Quarkus)
+     */
+    public HttpServerConfigurationProperties httpServer() {
+        if (httpServerConfigurationProperties == null) {
+            httpServerConfigurationProperties = new HttpServerConfigurationProperties(this);
+        }
+        return httpServerConfigurationProperties;
+    }
+
+    /**
+     * Whether there has been any embedded HTTP server configuration specified
+     */
+    public boolean hasHttpServerConfiguration() {
+        return httpServerConfigurationProperties != null;
     }
 
     /**
@@ -310,8 +333,9 @@ public class MainConfigurationProperties extends DefaultConfigurationProperties<
     }
 
     /**
-     * Package name to use as base (offset) for classpath scanning of {@link RouteBuilder}, and
-     * {@link org.apache.camel.TypeConverter} classes.
+     * Package name to use as base (offset) for classpath scanning of {@link RouteBuilder},
+     * {@link org.apache.camel.TypeConverter}, {@link CamelConfiguration} classes, and also classes annotated with
+     * {@link org.apache.camel.Converter}, or {@link org.apache.camel.BindToRegistry}.
      *
      * If you are using Spring Boot then it is instead recommended to use Spring Boots component scanning and annotate
      * your route builder classes with `@Component`. In other words only use this for Camel Main in standalone mode.
@@ -376,19 +400,16 @@ public class MainConfigurationProperties extends DefaultConfigurationProperties<
      */
     @SuppressWarnings("unchecked")
     private void addConfigurationClass(Class<? extends CamelConfiguration>... configuration) {
-        String existing = configurationClasses;
-        if (existing == null) {
-            existing = "";
+        StringJoiner existing = new StringJoiner(",");
+        if (configurationClasses != null && !configurationClasses.isEmpty()) {
+            existing.add(configurationClasses);
         }
         if (configuration != null) {
             for (Class<? extends CamelConfiguration> clazz : configuration) {
-                if (!existing.isEmpty()) {
-                    existing = existing + ",";
-                }
-                existing = existing + clazz.getName();
+                existing.add(clazz.getName());
             }
         }
-        setConfigurationClasses(existing);
+        setConfigurationClasses(existing.toString());
     }
 
     /**
@@ -452,19 +473,16 @@ public class MainConfigurationProperties extends DefaultConfigurationProperties<
      * Add an additional {@link RoutesBuilder} class to the known list of builders.
      */
     public void addRoutesBuilder(Class<?>... routeBuilder) {
-        String existing = routesBuilderClasses;
-        if (existing == null) {
-            existing = "";
+        StringJoiner existing = new StringJoiner(",");
+        if (routesBuilderClasses != null && !routesBuilderClasses.isEmpty()) {
+            existing.add(routesBuilderClasses);
         }
         if (routeBuilder != null) {
             for (Class<?> clazz : routeBuilder) {
-                if (!existing.isEmpty()) {
-                    existing = existing + ",";
-                }
-                existing = existing + clazz.getName();
+                existing.add(clazz.getName());
             }
         }
-        setRoutesBuilderClasses(existing);
+        setRoutesBuilderClasses(existing.toString());
     }
 
     /**
@@ -571,8 +589,9 @@ public class MainConfigurationProperties extends DefaultConfigurationProperties<
     }
 
     /**
-     * Package name to use as base (offset) for classpath scanning of {@link RouteBuilder}, and
-     * {@link org.apache.camel.TypeConverter} classes.
+     * Package name to use as base (offset) for classpath scanning of {@link RouteBuilder},
+     * {@link org.apache.camel.TypeConverter}, {@link CamelConfiguration} classes, and also classes annotated with
+     * {@link org.apache.camel.Converter}, or {@link org.apache.camel.BindToRegistry}.
      *
      * If you are using Spring Boot then it is instead recommended to use Spring Boots component scanning and annotate
      * your route builder classes with `@Component`. In other words only use this for Camel Main in standalone mode.

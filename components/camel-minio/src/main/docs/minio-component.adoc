@@ -5,6 +5,7 @@
 :description: Store and retrieve objects from Minio Storage Service using Minio SDK.
 :since: 3.5
 :supportlevel: Stable
+:tabs-sync-option:
 :component-header: Both producer and consumer are supported
 //Manually maintained attributes
 :camel-spring-boot-name: minio
@@ -35,7 +36,7 @@ For example in order to read file `hello.txt` from the bucket `helloBucket`, use
 
 [source,java]
 --------------------------------------------------------------------------------
-from("minio://helloBucket?accessKey=yourAccessKey&secretKey=yourSecretKey&prefix=hello.txt")
+from("minio://helloBucket?accessKey=yourAccessKey&secretKey=yourSecretKey&objectName=hello.txt")
   .to("file:/var/downloaded");
 --------------------------------------------------------------------------------
 
@@ -64,8 +65,6 @@ This component implements the Batch Consumer.
 This allows you for instance to know how many messages exists in this
 batch and for instance let the Aggregator
 aggregate this number of messages.
-
-== Usage
 
 // component headers: START
 include::partial$component-endpoint-headers.adoc[]
@@ -303,4 +302,3 @@ where `$\{camel-version}` must be replaced by the actual version of Camel.
 
 
 include::spring-boot:partial$starter.adoc[]
-

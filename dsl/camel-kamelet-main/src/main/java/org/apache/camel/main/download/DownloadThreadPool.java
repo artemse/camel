@@ -25,6 +25,7 @@ import java.util.concurrent.TimeoutException;
 import org.apache.camel.CamelContext;
 import org.apache.camel.CamelContextAware;
 import org.apache.camel.support.service.ServiceSupport;
+import org.apache.camel.tooling.maven.MavenGav;
 import org.apache.camel.util.StopWatch;
 import org.apache.camel.util.TimeUtils;
 import org.slf4j.Logger;
@@ -34,8 +35,14 @@ import org.slf4j.Logger;
  */
 class DownloadThreadPool extends ServiceSupport implements CamelContextAware {
 
+    private final MavenDependencyDownloader downloader;
     private CamelContext camelContext;
     private volatile ExecutorService executorService;
+    private boolean verbose;
+
+    public DownloadThreadPool(MavenDependencyDownloader downloader) {
+        this.downloader = downloader;
+    }
 
     @Override
     public CamelContext getCamelContext() {
@@ -45,6 +52,14 @@ class DownloadThreadPool extends ServiceSupport implements CamelContextAware {
     @Override
     public void setCamelContext(CamelContext camelContext) {
         this.camelContext = camelContext;
+    }
+
+    public boolean isVerbose() {
+        return verbose;
+    }
+
+    public void setVerbose(boolean verbose) {
+        this.verbose = verbose;
     }
 
     public void download(Logger log, Runnable task, String gav) {
@@ -62,7 +77,7 @@ class DownloadThreadPool extends ServiceSupport implements CamelContextAware {
             } catch (TimeoutException e) {
                 // not done
             } catch (Exception e) {
-                log.error("Error downloading: " + gav + " due: " + e.getMessage(), e);
+                log.error("Error downloading: {} due to: {}", gav, e.getMessage(), e);
                 return;
             }
             if (!done) {
@@ -70,15 +85,25 @@ class DownloadThreadPool extends ServiceSupport implements CamelContextAware {
             }
         }
 
-        // only report at INFO if downloading took > 1s because loading from cache is faster
-        // and then it is not downloaded over the internet
-        long taken = watch.taken();
-        String msg = "Downloaded: " + gav + " (took: "
-                     + TimeUtils.printDuration(taken, true) + ")";
-        if (taken < 1000) {
-            log.debug(msg);
-        } else {
+        MavenGav a = MavenGav.parseGav(gav);
+        DownloadRecord record = downloader.getDownloadState(a.getGroupId(), a.getArtifactId(), a.getVersion());
+        if (record != null) {
+            long taken = watch.taken();
+            String url = record.repoUrl();
+            String id = record.repoId();
+            String msg = "Downloaded: " + gav + " (took: "
+                         + TimeUtils.printDuration(taken, true) + ") from: " + id + "@" + url;
             log.info(msg);
+        } else {
+            long taken = watch.taken();
+            String msg = "Resolved: " + gav + " (took: "
+                         + TimeUtils.printDuration(taken, true) + ")";
+            if (verbose || taken > 2000) {
+                // slow resolving then log
+                log.info(msg);
+            } else {
+                log.debug(msg);
+            }
         }
     }
 
@@ -89,6 +114,7 @@ class DownloadThreadPool extends ServiceSupport implements CamelContextAware {
         } else {
             executorService = Executors.newCachedThreadPool();
         }
+        downloader.setVerbose(verbose);
     }
 
     @Override

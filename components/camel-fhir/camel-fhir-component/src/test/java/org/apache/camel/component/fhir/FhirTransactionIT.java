@@ -31,6 +31,7 @@ import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Patient;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +43,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Test class for {@link org.apache.camel.component.fhir.api.FhirTransaction} APIs. The class source won't be generated
  * again if the generator MOJO finds it under src/test/java.
  */
+@DisabledIfSystemProperty(named = "ci.env.name", matches = "apache.org",
+                          disabledReason = "Apache CI nodes are too resource constrained for this test - see CAMEL-19659")
 public class FhirTransactionIT extends AbstractFhirTestSupport {
 
     private static final Logger LOG = LoggerFactory.getLogger(FhirTransactionIT.class);
@@ -55,7 +58,7 @@ public class FhirTransactionIT extends AbstractFhirTestSupport {
 
         assertNotNull(result, "withBundle result");
         assertTrue(result.getEntry().get(0).getResponse().getStatus().contains("Created"));
-        LOG.debug("withBundle: " + result);
+        LOG.debug("withBundle: {}", result);
     }
 
     @Test
@@ -68,7 +71,7 @@ public class FhirTransactionIT extends AbstractFhirTestSupport {
 
         assertNotNull(result, "withBundle result");
         assertTrue(result.contains("Bundle"));
-        LOG.debug("withBundle: " + result);
+        LOG.debug("withBundle: {}", result);
     }
 
     @Test
@@ -83,7 +86,7 @@ public class FhirTransactionIT extends AbstractFhirTestSupport {
         List<IBaseResource> result = requestBody("direct://WITH_RESOURCES", patients);
 
         assertNotNull(result, "withResources result");
-        LOG.debug("withResources: " + result);
+        LOG.debug("withResources: {}", result);
         assertEquals(2, result.size());
     }
 
@@ -101,7 +104,7 @@ public class FhirTransactionIT extends AbstractFhirTestSupport {
         List<IBaseResource> result = requestBodyAndHeaders("direct://WITH_RESOURCES", patients, headers);
 
         assertNotNull(result, "withResources result");
-        LOG.debug("withResources: " + result);
+        LOG.debug("withResources: {}", result);
         assertEquals(2, result.size());
     }
 

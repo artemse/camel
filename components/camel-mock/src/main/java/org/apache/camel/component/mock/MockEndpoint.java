@@ -41,7 +41,6 @@ import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.Expression;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.Handler;
 import org.apache.camel.Message;
 import org.apache.camel.Predicate;
@@ -377,7 +376,7 @@ public class MockEndpoint extends DefaultEndpoint implements BrowsableEndpoint, 
             private boolean initDone;
 
             @Override
-            public void process(Exchange exchange) throws Exception {
+            public void process(Exchange exchange) {
                 if (!initDone) {
                     expression.init(exchange.getContext());
                     initDone = true;
@@ -399,7 +398,7 @@ public class MockEndpoint extends DefaultEndpoint implements BrowsableEndpoint, 
             private boolean initDone;
 
             @Override
-            public void process(Exchange exchange) throws Exception {
+            public void process(Exchange exchange) {
                 if (!initDone) {
                     expression.init(exchange.getContext());
                     initDone = true;
@@ -580,7 +579,7 @@ public class MockEndpoint extends DefaultEndpoint implements BrowsableEndpoint, 
             expectedMinimumMessageCount(1);
         }
         if (expectedHeaderValues == null) {
-            HeadersMapFactory factory = getCamelContext().adapt(ExtendedCamelContext.class).getHeadersMapFactory();
+            HeadersMapFactory factory = getCamelContext().getCamelContextExtension().getHeadersMapFactory();
             if (factory != null) {
                 expectedHeaderValues = factory.newMap();
             } else {
@@ -646,7 +645,7 @@ public class MockEndpoint extends DefaultEndpoint implements BrowsableEndpoint, 
     }
 
     /**
-     * Adds an expectation that the given header values are received by this endpoint in any order.
+     * Adds an expectation that this endpoint receives the given header values in any order.
      * <p/>
      * <b>Important:</b> The number of values must match the expected number of messages, so if you expect 3 messages,
      * then there must be 3 values.
@@ -656,33 +655,31 @@ public class MockEndpoint extends DefaultEndpoint implements BrowsableEndpoint, 
     public void expectedHeaderValuesReceivedInAnyOrder(final String name, final List<?> values) {
         expectedMessageCount(values.size());
 
-        expects(new Runnable() {
-            public void run() {
-                // these are the expected values to find
-                final Set<Object> actualHeaderValues = new CopyOnWriteArraySet<>(values);
+        expects(() -> {
+            // these are the expected values to find
+            final Set<Object> actualHeaderValues = new CopyOnWriteArraySet<>(values);
 
-                for (int i = 0; i < getReceivedExchanges().size(); i++) {
-                    Exchange exchange = getReceivedExchange(i);
+            for (int i = 0; i < getReceivedExchanges().size(); i++) {
+                Exchange exchange = getReceivedExchange(i);
 
-                    Object actualValue = exchange.getIn().getHeader(name);
-                    for (Object expectedValue : actualHeaderValues) {
-                        actualValue = extractActualValue(exchange, actualValue, expectedValue);
-                        // remove any found values
-                        actualHeaderValues.remove(actualValue);
-                    }
+                Object actualValue = exchange.getIn().getHeader(name);
+                for (Object expectedValue : actualHeaderValues) {
+                    actualValue = extractActualValue(exchange, actualValue, expectedValue);
+                    // remove any found values
+                    actualHeaderValues.remove(actualValue);
                 }
-
-                // should be empty, as we should find all the values
-                assertTrue("Expected " + values.size() + " headers with key[" + name + "], received "
-                           + (values.size() - actualHeaderValues.size())
-                           + " headers. Expected header values: " + actualHeaderValues,
-                        actualHeaderValues.isEmpty());
             }
+
+            // should be empty, as we should find all the values
+            assertTrue("Expected " + values.size() + " headers with key[" + name + "], received "
+                       + (values.size() - actualHeaderValues.size())
+                       + " headers. Expected header values: " + actualHeaderValues,
+                    actualHeaderValues.isEmpty());
         });
     }
 
     /**
-     * Adds an expectation that the given header values are received by this endpoint in any order
+     * Adds an expectation that this endpoint receives the given header values in any order
      * <p/>
      * <b>Important:</b> The number of values must match the expected number of messages, so if you expect 3 messages,
      * then there must be 3 values.
@@ -690,8 +687,7 @@ public class MockEndpoint extends DefaultEndpoint implements BrowsableEndpoint, 
      * <b>Important:</b> This overrides any previous set value using {@link #expectedMessageCount(int)}
      */
     public void expectedHeaderValuesReceivedInAnyOrder(String name, Object... values) {
-        List<Object> valueList = new ArrayList<>();
-        valueList.addAll(Arrays.asList(values));
+        List<Object> valueList = new ArrayList<>(Arrays.asList(values));
         expectedHeaderValuesReceivedInAnyOrder(name, valueList);
     }
 
@@ -737,7 +733,7 @@ public class MockEndpoint extends DefaultEndpoint implements BrowsableEndpoint, 
     }
 
     /**
-     * Adds an expectation that the given property values are received by this endpoint in any order.
+     * Adds an expectation that this endpoint receives the given property values in any order.
      * <p/>
      * <b>Important:</b> The number of values must match the expected number of messages, so if you expect 3 messages,
      * then there must be 3 values.
@@ -747,33 +743,31 @@ public class MockEndpoint extends DefaultEndpoint implements BrowsableEndpoint, 
     public void expectedPropertyValuesReceivedInAnyOrder(final String name, final List<?> values) {
         expectedMessageCount(values.size());
 
-        expects(new Runnable() {
-            public void run() {
-                // these are the expected values to find
-                final Set<Object> actualPropertyValues = new CopyOnWriteArraySet<>(values);
+        expects(() -> {
+            // these are the expected values to find
+            final Set<Object> actualPropertyValues = new CopyOnWriteArraySet<>(values);
 
-                for (int i = 0; i < getReceivedExchanges().size(); i++) {
-                    Exchange exchange = getReceivedExchange(i);
+            for (int i = 0; i < getReceivedExchanges().size(); i++) {
+                Exchange exchange = getReceivedExchange(i);
 
-                    Object actualValue = exchange.getProperty(name);
-                    for (Object expectedValue : actualPropertyValues) {
-                        actualValue = extractActualValue(exchange, actualValue, expectedValue);
-                        // remove any found values
-                        actualPropertyValues.remove(actualValue);
-                    }
+                Object actualValue = exchange.getProperty(name);
+                for (Object expectedValue : actualPropertyValues) {
+                    actualValue = extractActualValue(exchange, actualValue, expectedValue);
+                    // remove any found values
+                    actualPropertyValues.remove(actualValue);
                 }
-
-                // should be empty, as we should find all the values
-                assertTrue("Expected " + values.size() + " properties with key[" + name + "], received "
-                           + (values.size() - actualPropertyValues.size())
-                           + " properties. Expected property values: " + actualPropertyValues,
-                        actualPropertyValues.isEmpty());
             }
+
+            // should be empty, as we should find all the values
+            assertTrue("Expected " + values.size() + " properties with key[" + name + "], received "
+                       + (values.size() - actualPropertyValues.size())
+                       + " properties. Expected property values: " + actualPropertyValues,
+                    actualPropertyValues.isEmpty());
         });
     }
 
     /**
-     * Adds an expectation that the given property values are received by this endpoint in any order
+     * Adds an expectation that this endpoint receives the given property values in any order
      * <p/>
      * <b>Important:</b> The number of values must match the expected number of messages, so if you expect 3 messages,
      * then there must be 3 values.
@@ -781,13 +775,12 @@ public class MockEndpoint extends DefaultEndpoint implements BrowsableEndpoint, 
      * <b>Important:</b> This overrides any previous set value using {@link #expectedMessageCount(int)}
      */
     public void expectedPropertyValuesReceivedInAnyOrder(String name, Object... values) {
-        List<Object> valueList = new ArrayList<>();
-        valueList.addAll(Arrays.asList(values));
+        List<Object> valueList = new ArrayList<>(Arrays.asList(values));
         expectedPropertyValuesReceivedInAnyOrder(name, valueList);
     }
 
     /**
-     * Adds an expectation that the given body values are received by this endpoint in the specified order
+     * Adds an expectation that this endpoint receives the given body values in the specified order
      * <p/>
      * <b>Important:</b> The number of values must match the expected number of messages, so if you expect 3 messages,
      * then there must be 3 values.
@@ -871,8 +864,7 @@ public class MockEndpoint extends DefaultEndpoint implements BrowsableEndpoint, 
      * <b>Important:</b> This overrides any previous set value using {@link #expectedMessageCount(int)}
      */
     public void expectedBodiesReceived(Object... bodies) {
-        List<Object> bodyList = new ArrayList<>();
-        bodyList.addAll(Arrays.asList(bodies));
+        List<Object> bodyList = new ArrayList<>(Arrays.asList(bodies));
         expectedBodiesReceived(bodyList);
     }
 
@@ -904,7 +896,7 @@ public class MockEndpoint extends DefaultEndpoint implements BrowsableEndpoint, 
     }
 
     /**
-     * Adds an expectation that the given body values are received by this endpoint in any order
+     * Adds an expectation that this endpoint receives the given body values in any order
      * <p/>
      * <b>Important:</b> The number of bodies must match the expected number of messages, so if you expect 3 messages,
      * then there must be 3 bodies.
@@ -916,22 +908,20 @@ public class MockEndpoint extends DefaultEndpoint implements BrowsableEndpoint, 
         this.expectedBodyValues = bodies;
         this.actualBodyValues = new ArrayList<>();
 
-        expects(new Runnable() {
-            public void run() {
-                List<Object> actualBodyValuesSet = new ArrayList<>(actualBodyValues);
-                for (int i = 0; i < expectedBodyValues.size(); i++) {
-                    getReceivedExchange(i);
+        expects(() -> {
+            List<Object> actualBodyValuesSet = new ArrayList<>(actualBodyValues);
+            for (int i = 0; i < expectedBodyValues.size(); i++) {
+                getReceivedExchange(i);
 
-                    Object expectedBody = expectedBodyValues.get(i);
-                    assertTrue("Message with body " + expectedBody + " was expected but not found in " + actualBodyValuesSet,
-                            actualBodyValuesSet.remove(expectedBody));
-                }
+                Object expectedBody = expectedBodyValues.get(i);
+                assertTrue("Message with body " + expectedBody + " was expected but not found in " + actualBodyValuesSet,
+                        actualBodyValuesSet.remove(expectedBody));
             }
         });
     }
 
     /**
-     * Adds an expectation that the given body values are received by this endpoint in any order
+     * Adds an expectation that this endpoint receives the given body values in any order
      * <p/>
      * <b>Important:</b> The number of bodies must match the expected number of messages, so if you expect 3 messages,
      * then there must be 3 bodies.
@@ -939,8 +929,7 @@ public class MockEndpoint extends DefaultEndpoint implements BrowsableEndpoint, 
      * <b>Important:</b> This overrides any previous set value using {@link #expectedMessageCount(int)}
      */
     public void expectedBodiesReceivedInAnyOrder(Object... bodies) {
-        List<Object> bodyList = new ArrayList<>();
-        bodyList.addAll(Arrays.asList(bodies));
+        List<Object> bodyList = new ArrayList<>(Arrays.asList(bodies));
         expectedBodiesReceivedInAnyOrder(bodyList);
     }
 
@@ -985,27 +974,25 @@ public class MockEndpoint extends DefaultEndpoint implements BrowsableEndpoint, 
     public void expectedFileExists(final String name, final String content) {
         final File file = new File(FileUtil.normalizePath(name));
 
-        expects(new Runnable() {
-            public void run() {
-                // wait at most 5 seconds for the file to exists
-                final long timeout = System.currentTimeMillis() + 5000;
+        expects(() -> {
+            // wait at most 5 seconds for the file to exists
+            final long timeout = System.currentTimeMillis() + 5000;
 
-                boolean stop = false;
-                while (!stop && !file.exists()) {
-                    try {
-                        Thread.sleep(50);
-                    } catch (InterruptedException e) {
-                        // ignore
-                    }
-                    stop = System.currentTimeMillis() > timeout;
+            boolean stop = false;
+            while (!stop && !file.exists()) {
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    // ignore
                 }
+                stop = System.currentTimeMillis() > timeout;
+            }
 
-                assertTrue("The file should exists: " + name, file.exists());
+            assertTrue("The file should exists: " + name, file.exists());
 
-                if (content != null) {
-                    String body = getCamelContext().getTypeConverter().convertTo(String.class, file);
-                    assertEquals("Content of file: " + name, content, body);
-                }
+            if (content != null) {
+                String body = getCamelContext().getTypeConverter().convertTo(String.class, file);
+                assertEquals("Content of file: " + name, content, body);
             }
         });
     }
@@ -1014,11 +1001,7 @@ public class MockEndpoint extends DefaultEndpoint implements BrowsableEndpoint, 
      * Adds an expectation that messages received should have the given exchange pattern
      */
     public void expectedExchangePattern(final ExchangePattern exchangePattern) {
-        expectedMessagesMatches(new Predicate() {
-            public boolean matches(Exchange exchange) {
-                return exchange.getPattern().equals(exchangePattern);
-            }
-        });
+        expectedMessagesMatches(exchange -> exchange.getPattern().equals(exchangePattern));
     }
 
     /**
@@ -1124,7 +1107,7 @@ public class MockEndpoint extends DefaultEndpoint implements BrowsableEndpoint, 
     public void expectsNoDuplicates(final Expression expression) {
         expects(new AssertionTask() {
             private boolean initDone;
-            private Map<Object, Exchange> map = new HashMap<>();
+            private final Map<Object, Exchange> map = new HashMap<>();
 
             @Override
             public void assertOnIndex(int index) {
@@ -1132,16 +1115,7 @@ public class MockEndpoint extends DefaultEndpoint implements BrowsableEndpoint, 
                     expression.init(getCamelContext());
                     initDone = true;
                 }
-                List<Exchange> list = getReceivedExchanges();
-                Exchange e2 = list.get(index);
-                Object key = expression.evaluate(e2, Object.class);
-                Exchange e1 = map.get(key);
-                if (e1 != null) {
-                    fail("Duplicate message found on message " + index + " has value: " + key + " for expression: " + expression
-                         + ". Exchanges: " + e1 + " and " + e2);
-                } else {
-                    map.put(key, e2);
-                }
+                duplicateCheck(index, expression, map);
             }
 
             public void run() {
@@ -1156,13 +1130,30 @@ public class MockEndpoint extends DefaultEndpoint implements BrowsableEndpoint, 
         });
     }
 
+    private void duplicateCheck(int index, Expression expression, Map<Object, Exchange> map) {
+        List<Exchange> list = getReceivedExchanges();
+        Exchange e2 = list.get(index);
+        evalDuplicate(expression, e2, map, index);
+    }
+
+    private void evalDuplicate(Expression expression, Exchange e2, Map<Object, Exchange> map, int i) {
+        Object key = expression.evaluate(e2, Object.class);
+        Exchange e1 = map.get(key);
+        if (e1 != null) {
+            fail("Duplicate message found on message " + i + " has value: " + key + " for expression: " + expression
+                 + ". Exchanges: " + e1 + " and " + e2);
+        } else {
+            map.put(key, e2);
+        }
+    }
+
     /**
      * Adds an expectation that no duplicate messages should be received using the expression to determine the message
      * ID
      */
     public AssertionClause expectsNoDuplicates() {
         final AssertionClause clause = new AssertionClauseTask(this) {
-            private Map<Object, Exchange> map = new HashMap<>();
+            private final Map<Object, Exchange> map = new HashMap<>();
             private Expression exp;
 
             @Override
@@ -1170,16 +1161,7 @@ public class MockEndpoint extends DefaultEndpoint implements BrowsableEndpoint, 
                 if (exp == null) {
                     exp = createExpression(getCamelContext());
                 }
-                List<Exchange> list = getReceivedExchanges();
-                Exchange e2 = list.get(index);
-                Object key = exp.evaluate(e2, Object.class);
-                Exchange e1 = map.get(key);
-                if (e1 != null) {
-                    fail("Duplicate message found on message " + index + " has value: " + key + " for expression: " + exp
-                         + ". Exchanges: " + e1 + " and " + e2);
-                } else {
-                    map.put(key, e2);
-                }
+                duplicateCheck(index, exp, map);
             }
 
             public void run() {
@@ -1254,14 +1236,7 @@ public class MockEndpoint extends DefaultEndpoint implements BrowsableEndpoint, 
         List<Exchange> list = getReceivedExchanges();
         for (int i = 0; i < list.size(); i++) {
             Exchange e2 = list.get(i);
-            Object key = expression.evaluate(e2, Object.class);
-            Exchange e1 = map.get(key);
-            if (e1 != null) {
-                fail("Duplicate message found on message " + i + " has value: " + key + " for expression: " + expression
-                     + ". Exchanges: " + e1 + " and " + e2);
-            } else {
-                map.put(key, e2);
-            }
+            evalDuplicate(expression, e2, map, i);
         }
     }
 
@@ -1351,7 +1326,7 @@ public class MockEndpoint extends DefaultEndpoint implements BrowsableEndpoint, 
             if (!skip) {
                 try {
                     test.run();
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     // the test failed so we do not match
                     return false;
                 }
@@ -1444,7 +1419,7 @@ public class MockEndpoint extends DefaultEndpoint implements BrowsableEndpoint, 
      * is done routing some messages, before you call the {@link #assertIsSatisfied()} method on the mocks. This allows
      * you to not use a fixed assert period, to speedup testing times.
      * <p/>
-     * If you want to assert that <b>exactly</b> n'th message arrives to this mock endpoint, then see also the
+     * If you want to assert that <b>exactly</b> nth message arrives to this mock endpoint, then see also the
      * {@link #setAssertPeriod(long)} method for further details.
      *
      * @param expectedCount the number of message exchanges that should be expected by this endpoint
@@ -1496,7 +1471,7 @@ public class MockEndpoint extends DefaultEndpoint implements BrowsableEndpoint, 
     }
 
     /**
-     * Specifies to only retain the first n'th number of received {@link Exchange}s.
+     * Specifies to only retain the first nth number of received {@link Exchange}s.
      * <p/>
      * This is used when testing with big data, to reduce memory consumption by not storing copies of every
      * {@link Exchange} this mock endpoint receives.
@@ -1526,7 +1501,7 @@ public class MockEndpoint extends DefaultEndpoint implements BrowsableEndpoint, 
     }
 
     /**
-     * Specifies to only retain the last n'th number of received {@link Exchange}s.
+     * Specifies to only retain the last nth number of received {@link Exchange}s.
      * <p/>
      * This is used when testing with big data, to reduce memory consumption by not storing copies of every
      * {@link Exchange} this mock endpoint receives.
@@ -1629,7 +1604,7 @@ public class MockEndpoint extends DefaultEndpoint implements BrowsableEndpoint, 
             performAssertions(exchange, copy);
 
             if (failFast) {
-                // fail fast mode so check n'th expectations as soon as possible
+                // fail fast mode so check nth expectations as soon as possible
                 int index = getReceivedCounter() - 1;
                 for (Runnable test : tests) {
                     // only assertion tasks can support fail fast mode
@@ -1651,8 +1626,8 @@ public class MockEndpoint extends DefaultEndpoint implements BrowsableEndpoint, 
                     }
                 }
             }
-        } catch (Throwable e) {
-            // must catch java.lang.Throwable as AssertionError extends java.lang.Error
+        } catch (AssertionError | Exception e) {
+            // AssertionError extends java.lang.Error
             failures.add(e);
         } finally {
             // make sure latch is counted down to avoid test hanging forever
@@ -1675,11 +1650,11 @@ public class MockEndpoint extends DefaultEndpoint implements BrowsableEndpoint, 
 
         if (expectedHeaderValues != null) {
             if (actualHeaderValues == null) {
-                HeadersMapFactory factory = getCamelContext().adapt(ExtendedCamelContext.class).getHeadersMapFactory();
+                HeadersMapFactory factory = getCamelContext().getCamelContextExtension().getHeadersMapFactory();
                 if (factory != null) {
                     actualHeaderValues = factory.newMap();
                 } else {
-                    // should not really happen but some tests dont start camel context
+                    // should not really happen but some tests don't start camel context
                     actualHeaderValues = new HashMap<>();
                 }
             }
@@ -1762,7 +1737,7 @@ public class MockEndpoint extends DefaultEndpoint implements BrowsableEndpoint, 
                         receivedExchanges.remove(index);
                     }
                 }
-                // store a copy of the last n'th received
+                // store a copy of the last nth received
                 receivedExchanges.add(copy);
             }
         }
@@ -1812,9 +1787,34 @@ public class MockEndpoint extends DefaultEndpoint implements BrowsableEndpoint, 
         }
     }
 
+    protected void assertEquals(String message, int expectedValue, int actualValue) {
+        if (expectedValue != actualValue) {
+            logReceivedExchanges();
+
+            fail(message + ". Expected: <" + expectedValue + "> but was: <" + actualValue + ">");
+        }
+    }
+
     protected void assertEquals(String message, Object expectedValue, Object actualValue) {
         if (!ObjectHelper.equal(expectedValue, actualValue)) {
+            logReceivedExchanges();
+
             fail(message + ". Expected: <" + expectedValue + "> but was: <" + actualValue + ">");
+        }
+    }
+
+    private void logReceivedExchanges() {
+        for (Exchange exchange : receivedExchanges) {
+            LOG.warn("Received exchange: {}", exchange);
+            final Message exchangeMessage = exchange.getMessage();
+            if (exchangeMessage != null) {
+                LOG.warn("Received exchange message: {}", exchangeMessage);
+                final Object body = exchangeMessage.getBody();
+                if (body != null) {
+                    LOG.warn("Received exchange message body: {}", body);
+                    LOG.warn("Received exchange message body type: {}", body.getClass());
+                }
+            }
         }
     }
 

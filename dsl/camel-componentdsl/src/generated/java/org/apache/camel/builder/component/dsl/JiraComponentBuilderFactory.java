@@ -34,7 +34,7 @@ public interface JiraComponentBuilderFactory {
      * Jira (camel-jira)
      * Interact with JIRA issue tracker.
      * 
-     * Category: api,reporting
+     * Category: document
      * Since: 3.0
      * Maven coordinates: org.apache.camel:camel-jira
      * 
@@ -156,6 +156,42 @@ public interface JiraComponentBuilderFactory {
         default JiraComponentBuilder configuration(
                 org.apache.camel.component.jira.JiraConfiguration configuration) {
             doSetProperty("configuration", configuration);
+            return this;
+        }
+        /**
+         * Used for enabling or disabling all consumer based health checks from
+         * this component.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: true
+         * Group: health
+         * 
+         * @param healthCheckConsumerEnabled the value to set
+         * @return the dsl builder
+         */
+        default JiraComponentBuilder healthCheckConsumerEnabled(
+                boolean healthCheckConsumerEnabled) {
+            doSetProperty("healthCheckConsumerEnabled", healthCheckConsumerEnabled);
+            return this;
+        }
+        /**
+         * Used for enabling or disabling all producer based health checks from
+         * this component. Notice: Camel has by default disabled all producer
+         * based health-checks. You can turn on producer checks globally by
+         * setting camel.health.producersEnabled=true.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: true
+         * Group: health
+         * 
+         * @param healthCheckProducerEnabled the value to set
+         * @return the dsl builder
+         */
+        default JiraComponentBuilder healthCheckProducerEnabled(
+                boolean healthCheckProducerEnabled) {
+            doSetProperty("healthCheckProducerEnabled", healthCheckProducerEnabled);
             return this;
         }
         /**
@@ -281,6 +317,8 @@ public interface JiraComponentBuilderFactory {
             case "lazyStartProducer": ((JiraComponent) component).setLazyStartProducer((boolean) value); return true;
             case "autowiredEnabled": ((JiraComponent) component).setAutowiredEnabled((boolean) value); return true;
             case "configuration": ((JiraComponent) component).setConfiguration((org.apache.camel.component.jira.JiraConfiguration) value); return true;
+            case "healthCheckConsumerEnabled": ((JiraComponent) component).setHealthCheckConsumerEnabled((boolean) value); return true;
+            case "healthCheckProducerEnabled": ((JiraComponent) component).setHealthCheckProducerEnabled((boolean) value); return true;
             case "accessToken": getOrCreateConfiguration((JiraComponent) component).setAccessToken((java.lang.String) value); return true;
             case "consumerKey": getOrCreateConfiguration((JiraComponent) component).setConsumerKey((java.lang.String) value); return true;
             case "password": getOrCreateConfiguration((JiraComponent) component).setPassword((java.lang.String) value); return true;

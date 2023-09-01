@@ -17,7 +17,11 @@
 package org.apache.camel.component.aws2.kinesis.client;
 
 import org.apache.camel.component.aws2.kinesis.Kinesis2Configuration;
+import org.apache.camel.component.aws2.kinesis.client.impl.KinesisAsyncClientIAMOptimizedImpl;
+import org.apache.camel.component.aws2.kinesis.client.impl.KinesisAsyncClientIAMProfileOptimizedImpl;
+import org.apache.camel.component.aws2.kinesis.client.impl.KinesisAsyncClientStandardImpl;
 import org.apache.camel.component.aws2.kinesis.client.impl.KinesisClientIAMOptimizedImpl;
+import org.apache.camel.component.aws2.kinesis.client.impl.KinesisClientIAMProfileOptimizedImpl;
 import org.apache.camel.component.aws2.kinesis.client.impl.KinesisClientStandardImpl;
 
 /**
@@ -35,7 +39,28 @@ public final class KinesisClientFactory {
      * @return               KinesisClient
      */
     public static KinesisInternalClient getKinesisClient(Kinesis2Configuration configuration) {
-        return configuration.isUseDefaultCredentialsProvider()
-                ? new KinesisClientIAMOptimizedImpl(configuration) : new KinesisClientStandardImpl(configuration);
+        if (Boolean.TRUE.equals(configuration.isUseDefaultCredentialsProvider())) {
+            return new KinesisClientIAMOptimizedImpl(configuration);
+        } else if (Boolean.TRUE.equals(configuration.isUseProfileCredentialsProvider())) {
+            return new KinesisClientIAMProfileOptimizedImpl(configuration);
+        } else {
+            return new KinesisClientStandardImpl(configuration);
+        }
+    }
+
+    /**
+     * Return the standard aws Kinesis Async client.
+     *
+     * @param  configuration configuration
+     * @return               KinesisAsyncClient
+     */
+    public static KinesisAsyncInternalClient getKinesisAsyncClient(Kinesis2Configuration configuration) {
+        if (Boolean.TRUE.equals(configuration.isUseDefaultCredentialsProvider())) {
+            return new KinesisAsyncClientIAMOptimizedImpl(configuration);
+        } else if (Boolean.TRUE.equals(configuration.isUseProfileCredentialsProvider())) {
+            return new KinesisAsyncClientIAMProfileOptimizedImpl(configuration);
+        } else {
+            return new KinesisAsyncClientStandardImpl(configuration);
+        }
     }
 }

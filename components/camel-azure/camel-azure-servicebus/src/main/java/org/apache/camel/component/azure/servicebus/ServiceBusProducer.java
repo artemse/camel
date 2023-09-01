@@ -16,12 +16,11 @@
  */
 package org.apache.camel.component.azure.servicebus;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import com.azure.messaging.servicebus.ServiceBusSenderAsyncClient;
@@ -47,7 +46,7 @@ public class ServiceBusProducer extends DefaultAsyncProducer {
     private ServiceBusSenderOperations serviceBusSenderOperations;
 
     private final Map<ServiceBusProducerOperationDefinition, BiConsumer<Exchange, AsyncCallback>> operationsToExecute
-            = new HashMap<>();
+            = new EnumMap<>(ServiceBusProducerOperationDefinition.class);
 
     {
         bind(ServiceBusProducerOperationDefinition.sendMessages, sendMessages());
@@ -193,7 +192,7 @@ public class ServiceBusProducer extends DefaultAsyncProducer {
     private List<String> convertBodyToList(final Iterable<Object> inputBody) {
         return StreamSupport.stream(inputBody.spliterator(), false)
                 .map(body -> getEndpoint().getCamelContext().getTypeConverter().convertTo(String.class, body))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private <T> void subscribeToMono(

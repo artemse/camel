@@ -22,6 +22,7 @@ import java.util.Properties;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.ContextTestSupport;
+import org.apache.camel.NoSuchBeanException;
 import org.apache.camel.PropertyBindingException;
 import org.apache.camel.spi.Injector;
 import org.apache.camel.spi.PropertiesComponent;
@@ -467,6 +468,30 @@ public class PropertyBindingSupportTest extends ContextTestSupport {
     }
 
     @Test
+    public void testNestedClassConstructorParameterMandatoryBean() throws Exception {
+        Foo foo = new Foo();
+
+        PropertyBindingSupport.build().bind(context, foo, "name", "James");
+        try {
+            PropertyBindingSupport.build().bind(context, foo, "animal",
+                    "#class:org.apache.camel.support.Animal('#bean:myName', false)");
+            fail("Should have thrown exception");
+        } catch (PropertyBindingException e) {
+            NoSuchBeanException nsb = assertIsInstanceOf(NoSuchBeanException.class, e.getCause());
+            assertEquals("myName", nsb.getName());
+        }
+
+        // add bean and try again
+        context.getRegistry().bind("myName", "Acme");
+        PropertyBindingSupport.build().bind(context, foo, "animal",
+                "#class:org.apache.camel.support.Animal('#bean:myName', false)");
+
+        assertEquals("James", foo.getName());
+        assertEquals("Acme", foo.getAnimal().getName());
+        assertFalse(foo.getAnimal().isDangerous());
+    }
+
+    @Test
     public void testNestedClassFactoryParameterOneParameter() throws Exception {
         Foo foo = new Foo();
 
@@ -579,6 +604,30 @@ public class PropertyBindingSupportTest extends ContextTestSupport {
         } catch (PropertyBindingException e) {
             assertEquals("unknown", e.getPropertyName());
         }
+    }
+
+    @Test
+    public void testConvert() throws Exception {
+        Foo foo = new Foo();
+
+        Map<String, Object> prop = new HashMap<>();
+        prop.put("name", "James");
+        prop.put("bar.age", "#valueAs(Integer):33");
+        prop.put("bar.rider", "#valueAs(boolean):true");
+        prop.put("bar.gold-customer", "#valueAs(boolean):true");
+        prop.put("bar.work.id", "#valueAs(int):123");
+        prop.put("bar.work.name", "{{companyName}}");
+
+        PropertyBindingSupport.bindProperties(context, foo, prop);
+
+        assertEquals("James", foo.getName());
+        assertEquals(33, foo.getBar().getAge());
+        assertTrue(foo.getBar().isRider());
+        assertTrue(foo.getBar().isGoldCustomer());
+        assertEquals(123, foo.getBar().getWork().getId());
+        assertEquals("Acme", foo.getBar().getWork().getName());
+
+        assertTrue(prop.isEmpty(), "Should bind all properties");
     }
 
     public static class Foo {

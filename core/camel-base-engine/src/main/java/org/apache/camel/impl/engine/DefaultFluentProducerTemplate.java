@@ -174,13 +174,6 @@ public class DefaultFluentProducerTemplate extends ServiceSupport implements Flu
     }
 
     @Override
-    public FluentProducerTemplate clearAll() {
-        clearBody();
-        clearHeaders();
-        return this;
-    }
-
-    @Override
     public FluentProducerTemplate withHeaders(Map<String, Object> headers) {
         DefaultFluentProducerTemplate clone = checkCloned();
 
@@ -215,16 +208,6 @@ public class DefaultFluentProducerTemplate extends ServiceSupport implements Flu
     }
 
     @Override
-    public FluentProducerTemplate clearHeaders() {
-        DefaultFluentProducerTemplate clone = checkCloned();
-
-        if (clone.headers != null) {
-            clone.headers.clear();
-        }
-        return clone;
-    }
-
-    @Override
     public FluentProducerTemplate withBody(Object body) {
         DefaultFluentProducerTemplate clone = checkCloned();
 
@@ -243,18 +226,9 @@ public class DefaultFluentProducerTemplate extends ServiceSupport implements Flu
             throw new IllegalArgumentException("Cannot use both withBodyAs and withProcessor with FluentProducerTemplate");
         }
 
-        Object b = type != null
+        clone.body = type != null
                 ? clone.context.getTypeConverter().convertTo(type, body)
                 : body;
-        clone.body = b;
-        return clone;
-    }
-
-    @Override
-    public FluentProducerTemplate clearBody() {
-        DefaultFluentProducerTemplate clone = checkCloned();
-
-        clone.body = null;
         return clone;
     }
 
@@ -619,7 +593,6 @@ public class DefaultFluentProducerTemplate extends ServiceSupport implements Flu
 
     @Override
     protected void doStop() throws Exception {
-        clearAll();
         this.endpoint = null;
         this.endpointUri = null;
         this.exchangeSupplier = null;

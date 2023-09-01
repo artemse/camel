@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.apache.camel</groupId>
         <artifactId>camel-aws-parent</artifactId>
-        <version>4.0.0-SNAPSHOT</version>
+        <version>4.1.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>camel-aws2-kinesis</artifactId>
@@ -31,9 +31,6 @@
 
     <name>Camel :: AWS2 Kinesis</name>
     <description>A Camel Amazon Kinesis Web Service Component Version 2</description>
-
-    <properties>
-    </properties>
 
     <dependencies>
         <dependency>
@@ -43,6 +40,11 @@
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>kinesis</artifactId>
+            <version>${aws-java-sdk2-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>netty-nio-client</artifactId>
             <version>${aws-java-sdk2-version}</version>
         </dependency>
         <dependency>
@@ -74,11 +76,13 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito-version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest</artifactId>
+            <version>${hamcrest-version}</version>
             <scope>test</scope>
         </dependency>
 

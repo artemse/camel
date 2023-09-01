@@ -24,6 +24,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import io.opentelemetry.api.common.AttributeKey;
@@ -37,8 +39,12 @@ import io.opentelemetry.sdk.trace.SpanProcessor;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SimpleSpanProcessor;
 import org.apache.camel.CamelContext;
+import org.apache.camel.spi.InterceptStrategy;
 import org.apache.camel.test.junit5.CamelTestSupport;
 import org.apache.camel.tracing.SpanDecorator;
+import org.awaitility.Awaitility;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,12 +52,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class CamelOpenTelemetryTestSupport extends CamelTestSupport {
-
     static final AttributeKey<String> CAMEL_URI_KEY = AttributeKey.stringKey("camel-uri");
     static final AttributeKey<String> COMPONENT_KEY = AttributeKey.stringKey("component");
     static final AttributeKey<String> PRE_KEY = AttributeKey.stringKey("pre");
     static final AttributeKey<String> POST_KEY = AttributeKey.stringKey("post");
     static final AttributeKey<String> MESSAGE_KEY = AttributeKey.stringKey("message");
+
+    private static final Logger LOG = LoggerFactory.getLogger(CamelOpenTelemetryTestSupport.class);
 
     private InMemorySpanExporter inMemorySpanExporter = InMemorySpanExporter.create();
     private SpanTestData[] expected;
@@ -61,6 +68,11 @@ class CamelOpenTelemetryTestSupport extends CamelTestSupport {
 
     CamelOpenTelemetryTestSupport(SpanTestData[] expected) {
         this.expected = expected;
+    }
+
+    @AfterEach
+    void noLeakingContext() {
+        Assertions.assertSame(Context.root(), Context.current(), "There must be no leaking span after test");
     }
 
     @Override
@@ -76,6 +88,7 @@ class CamelOpenTelemetryTestSupport extends CamelTestSupport {
         ottracer.setTracer(tracer);
         ottracer.setExcludePatterns(getExcludePatterns());
         ottracer.addDecorator(new TestSEDASpanDecorator());
+        ottracer.setTracingStrategy(getTracingStrategy().apply(ottracer));
         ottracer.init(context);
         return context;
     }
@@ -95,10 +108,10 @@ class CamelOpenTelemetryTestSupport extends CamelTestSupport {
     protected List<SpanData> verify(SpanTestData[] expected, boolean async) {
         List<SpanData> spans = inMemorySpanExporter.getFinishedSpanItems();
         spans.forEach(mockSpan -> {
-            System.out.println("Span: " + mockSpan);
-            System.out.println("\tComponent: " + mockSpan.getAttributes().get(COMPONENT_KEY));
-            System.out.println("\tTags: " + mockSpan.getAttributes());
-            System.out.println("\tLogs: ");
+            LOG.info("Span: {}", mockSpan);
+            LOG.info("Component: {}", mockSpan.getAttributes().get(COMPONENT_KEY));
+            LOG.info("Tags: {}", mockSpan.getAttributes());
+            LOG.info("Logs: ");
 
         });
         assertEquals(expected.length, spans.size(), "Incorrect number of spans");
@@ -135,6 +148,12 @@ class CamelOpenTelemetryTestSupport extends CamelTestSupport {
 
     protected void verifyTraceSpanNumbers(int numOfTraces, int numSpansPerTrace) {
         Map<String, List<SpanData>> traces = new HashMap<>();
+        Awaitility.await()
+                .alias("inMemorySpanExporter.getFinishedSpanItems() should eventually contain all expected spans")
+                .atMost(5, TimeUnit.SECONDS)
+                .pollInterval(10, TimeUnit.MILLISECONDS)
+                .pollDelay(0, TimeUnit.MILLISECONDS)
+                .until(() -> inMemorySpanExporter.getFinishedSpanItems().size() >= (numOfTraces * numSpansPerTrace));
 
         List<SpanData> finishedSpans = inMemorySpanExporter.getFinishedSpanItems();
         // Sort spans into separate traces
@@ -143,6 +162,7 @@ class CamelOpenTelemetryTestSupport extends CamelTestSupport {
             spans.add(finishedSpans.get(i));
         }
 
+        LOG.info("Found traces: {}", traces);
         assertEquals(numOfTraces, traces.size());
 
         for (Map.Entry<String, List<SpanData>> spans : traces.entrySet()) {
@@ -190,6 +210,10 @@ class CamelOpenTelemetryTestSupport extends CamelTestSupport {
 
     protected void verifySameTrace() {
         assertEquals(1, inMemorySpanExporter.getFinishedSpanItems().stream().map(s -> s.getTraceId()).distinct().count());
+    }
+
+    protected Function<OpenTelemetryTracer, InterceptStrategy> getTracingStrategy() {
+        return ottracer -> new NoopTracingStrategy();
     }
 
     private static class LoggingSpanProcessor implements SpanProcessor {

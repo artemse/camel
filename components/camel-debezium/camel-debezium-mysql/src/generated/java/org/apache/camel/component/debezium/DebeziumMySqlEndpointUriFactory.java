@@ -21,7 +21,7 @@ public class DebeziumMySqlEndpointUriFactory extends org.apache.camel.support.co
     private static final Set<String> SECRET_PROPERTY_NAMES;
     private static final Set<String> MULTI_VALUE_PREFIXES;
     static {
-        Set<String> props = new HashSet<>(90);
+        Set<String> props = new HashSet<>(97);
         props.add("additionalProperties");
         props.add("bigintUnsignedHandlingMode");
         props.add("binaryHandlingMode");
@@ -52,6 +52,7 @@ public class DebeziumMySqlEndpointUriFactory extends org.apache.camel.support.co
         props.add("datatypePropagateSourceType");
         props.add("decimalHandlingMode");
         props.add("enableTimeAdjuster");
+        props.add("errorsMaxRetries");
         props.add("eventDeserializationFailureHandlingMode");
         props.add("eventProcessingFailureHandlingMode");
         props.add("exceptionHandler");
@@ -76,6 +77,8 @@ public class DebeziumMySqlEndpointUriFactory extends org.apache.camel.support.co
         props.add("messageKeyColumns");
         props.add("minRowCountToStreamResults");
         props.add("name");
+        props.add("notificationEnabledChannels");
+        props.add("notificationSinkTopicName");
         props.add("offsetCommitPolicy");
         props.add("offsetCommitTimeoutMs");
         props.add("offsetFlushIntervalMs");
@@ -88,13 +91,15 @@ public class DebeziumMySqlEndpointUriFactory extends org.apache.camel.support.co
         props.add("provideTransactionMetadata");
         props.add("queryFetchSize");
         props.add("retriableRestartConnectorWaitMs");
-        props.add("sanitizeFieldNames");
         props.add("schemaHistoryInternal");
         props.add("schemaHistoryInternalFileFilename");
         props.add("schemaHistoryInternalSkipUnparseableDdl");
+        props.add("schemaHistoryInternalStoreOnlyCapturedDatabasesDdl");
         props.add("schemaHistoryInternalStoreOnlyCapturedTablesDdl");
         props.add("schemaNameAdjustmentMode");
         props.add("signalDataCollection");
+        props.add("signalEnabledChannels");
+        props.add("signalPollIntervalMs");
         props.add("skippedOperations");
         props.add("snapshotDelayMs");
         props.add("snapshotFetchSize");
@@ -105,6 +110,8 @@ public class DebeziumMySqlEndpointUriFactory extends org.apache.camel.support.co
         props.add("snapshotMode");
         props.add("snapshotNewTables");
         props.add("snapshotSelectStatementOverrides");
+        props.add("snapshotTablesOrderByRowCount");
+        props.add("sourceinfoStructMaker");
         props.add("tableExcludeList");
         props.add("tableIgnoreBuiltin");
         props.add("tableIncludeList");

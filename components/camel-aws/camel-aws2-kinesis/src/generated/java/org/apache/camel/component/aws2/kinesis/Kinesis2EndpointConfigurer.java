@@ -25,6 +25,8 @@ public class Kinesis2EndpointConfigurer extends PropertyConfigurerSupport implem
         case "accessKey": target.getConfiguration().setAccessKey(property(camelContext, java.lang.String.class, value)); return true;
         case "amazonkinesisclient":
         case "amazonKinesisClient": target.getConfiguration().setAmazonKinesisClient(property(camelContext, software.amazon.awssdk.services.kinesis.KinesisClient.class, value)); return true;
+        case "asyncclient":
+        case "asyncClient": target.getConfiguration().setAsyncClient(property(camelContext, boolean.class, value)); return true;
         case "backofferrorthreshold":
         case "backoffErrorThreshold": target.setBackoffErrorThreshold(property(camelContext, int.class, value)); return true;
         case "backoffidlethreshold":
@@ -53,6 +55,8 @@ public class Kinesis2EndpointConfigurer extends PropertyConfigurerSupport implem
         case "overrideEndpoint": target.getConfiguration().setOverrideEndpoint(property(camelContext, boolean.class, value)); return true;
         case "pollstrategy":
         case "pollStrategy": target.setPollStrategy(property(camelContext, org.apache.camel.spi.PollingConsumerPollStrategy.class, value)); return true;
+        case "profilecredentialsname":
+        case "profileCredentialsName": target.getConfiguration().setProfileCredentialsName(property(camelContext, java.lang.String.class, value)); return true;
         case "proxyhost":
         case "proxyHost": target.getConfiguration().setProxyHost(property(camelContext, java.lang.String.class, value)); return true;
         case "proxyport":
@@ -91,6 +95,8 @@ public class Kinesis2EndpointConfigurer extends PropertyConfigurerSupport implem
         case "useDefaultCredentialsProvider": target.getConfiguration().setUseDefaultCredentialsProvider(property(camelContext, boolean.class, value)); return true;
         case "usefixeddelay":
         case "useFixedDelay": target.setUseFixedDelay(property(camelContext, boolean.class, value)); return true;
+        case "useprofilecredentialsprovider":
+        case "useProfileCredentialsProvider": target.getConfiguration().setUseProfileCredentialsProvider(property(camelContext, boolean.class, value)); return true;
         default: return false;
         }
     }
@@ -107,6 +113,8 @@ public class Kinesis2EndpointConfigurer extends PropertyConfigurerSupport implem
         case "accessKey": return java.lang.String.class;
         case "amazonkinesisclient":
         case "amazonKinesisClient": return software.amazon.awssdk.services.kinesis.KinesisClient.class;
+        case "asyncclient":
+        case "asyncClient": return boolean.class;
         case "backofferrorthreshold":
         case "backoffErrorThreshold": return int.class;
         case "backoffidlethreshold":
@@ -135,6 +143,8 @@ public class Kinesis2EndpointConfigurer extends PropertyConfigurerSupport implem
         case "overrideEndpoint": return boolean.class;
         case "pollstrategy":
         case "pollStrategy": return org.apache.camel.spi.PollingConsumerPollStrategy.class;
+        case "profilecredentialsname":
+        case "profileCredentialsName": return java.lang.String.class;
         case "proxyhost":
         case "proxyHost": return java.lang.String.class;
         case "proxyport":
@@ -173,6 +183,8 @@ public class Kinesis2EndpointConfigurer extends PropertyConfigurerSupport implem
         case "useDefaultCredentialsProvider": return boolean.class;
         case "usefixeddelay":
         case "useFixedDelay": return boolean.class;
+        case "useprofilecredentialsprovider":
+        case "useProfileCredentialsProvider": return boolean.class;
         default: return null;
         }
     }
@@ -185,6 +197,8 @@ public class Kinesis2EndpointConfigurer extends PropertyConfigurerSupport implem
         case "accessKey": return target.getConfiguration().getAccessKey();
         case "amazonkinesisclient":
         case "amazonKinesisClient": return target.getConfiguration().getAmazonKinesisClient();
+        case "asyncclient":
+        case "asyncClient": return target.getConfiguration().isAsyncClient();
         case "backofferrorthreshold":
         case "backoffErrorThreshold": return target.getBackoffErrorThreshold();
         case "backoffidlethreshold":
@@ -213,6 +227,8 @@ public class Kinesis2EndpointConfigurer extends PropertyConfigurerSupport implem
         case "overrideEndpoint": return target.getConfiguration().isOverrideEndpoint();
         case "pollstrategy":
         case "pollStrategy": return target.getPollStrategy();
+        case "profilecredentialsname":
+        case "profileCredentialsName": return target.getConfiguration().getProfileCredentialsName();
         case "proxyhost":
         case "proxyHost": return target.getConfiguration().getProxyHost();
         case "proxyport":
@@ -251,6 +267,8 @@ public class Kinesis2EndpointConfigurer extends PropertyConfigurerSupport implem
         case "useDefaultCredentialsProvider": return target.getConfiguration().isUseDefaultCredentialsProvider();
         case "usefixeddelay":
         case "useFixedDelay": return target.isUseFixedDelay();
+        case "useprofilecredentialsprovider":
+        case "useProfileCredentialsProvider": return target.getConfiguration().isUseProfileCredentialsProvider();
         default: return null;
         }
     }

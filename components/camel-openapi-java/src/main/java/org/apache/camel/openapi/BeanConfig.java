@@ -16,16 +16,13 @@
  */
 package org.apache.camel.openapi;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import io.apicurio.datamodels.core.models.common.Info;
-import io.apicurio.datamodels.core.models.common.Server;
-import io.apicurio.datamodels.openapi.models.OasDocument;
-import io.apicurio.datamodels.openapi.v2.models.Oas20Document;
-import io.apicurio.datamodels.openapi.v3.models.Oas30Document;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.servers.Server;
 
 public class BeanConfig {
+    public static final String DEFAULT_MEDIA_TYPE = "application/json";
+
     String[] schemes;
     String title;
     String version;
@@ -35,6 +32,8 @@ public class BeanConfig {
     Info info;
     String host;
     String basePath;
+    String defaultConsumes = DEFAULT_MEDIA_TYPE;
+    String defaultProduces = DEFAULT_MEDIA_TYPE;
 
     public String[] getSchemes() {
         return schemes;
@@ -97,7 +96,7 @@ public class BeanConfig {
     }
 
     public void setBasePath(String basePath) {
-        if (!"".equals(basePath) && basePath != null) {
+        if (basePath != null && !basePath.isEmpty()) {
             if (!basePath.startsWith("/")) {
                 this.basePath = "/" + basePath;
             } else {
@@ -106,40 +105,31 @@ public class BeanConfig {
         }
     }
 
-    public OasDocument configure(OasDocument openApi) {
-        if (openApi instanceof Oas20Document) {
-            configureOas20((Oas20Document) openApi);
-        } else if (openApi instanceof Oas30Document) {
-            configureOas30((Oas30Document) openApi);
+    public String getDefaultConsumes() {
+        return defaultConsumes;
+    }
+
+    public void setDefaultConsumes(String defaultConsumes) {
+        this.defaultConsumes = defaultConsumes;
+    }
+
+    public String getDefaultProduces() {
+        return defaultProduces;
+    }
+
+    public void setDefaultProduces(String defaultProduces) {
+        this.defaultProduces = defaultProduces;
+    }
+
+    public OpenAPI configure(OpenAPI openApi) {
+        if (info != null) {
+            openApi.setInfo(info);
+        }
+        for (String scheme : this.schemes) {
+            Server server = new Server().url(scheme + "://" + this.host + this.basePath);
+            openApi.addServersItem(server);
         }
         return openApi;
-    }
-
-    private void configureOas30(Oas30Document openApi) {
-        if (info != null) {
-            openApi.info = info;
-            info._ownerDocument = openApi;
-            info._parent = openApi;
-        }
-        Server server = openApi.createServer();
-        server.url = this.schemes[0] + "://" + this.host + this.basePath;
-        openApi.addServer(server);
-    }
-
-    private void configureOas20(Oas20Document openApi) {
-        if (schemes != null) {
-            if (openApi.schemes == null) {
-                openApi.schemes = new ArrayList<String>();
-            }
-            openApi.schemes.addAll(Arrays.asList(schemes));
-        }
-        if (info != null) {
-            openApi.info = info;
-            info._ownerDocument = openApi;
-            info._parent = openApi;
-        }
-        openApi.host = host;
-        openApi.basePath = basePath;
     }
 
     public boolean isOpenApi3() {

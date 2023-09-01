@@ -29,6 +29,7 @@ import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Isolated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Tests the MarkerFileExclusiveReadLockStrategy in a multi-threaded scenario.
  */
+@Isolated
 public class MarkerFileExclusiveReadLockStrategyTest extends ContextTestSupport {
 
     private static final Logger LOG = LoggerFactory.getLogger(MarkerFileExclusiveReadLockStrategyTest.class);
@@ -59,12 +61,14 @@ public class MarkerFileExclusiveReadLockStrategyTest extends ContextTestSupport 
 
         String content = new String(Files.readAllBytes(testFile("out/file1.dat")));
         String[] lines = content.split(LS);
+        assertEquals(20, lines.length);
         for (int i = 0; i < 20; i++) {
             assertEquals("Line " + i, lines[i]);
         }
 
         content = new String(Files.readAllBytes(testFile("out/file2.dat")));
         lines = content.split(LS);
+        assertEquals(20, lines.length);
         for (int i = 0; i < 20; i++) {
             assertEquals("Line " + i, lines[i]);
         }

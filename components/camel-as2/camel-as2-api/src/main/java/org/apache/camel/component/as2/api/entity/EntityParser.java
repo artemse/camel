@@ -202,7 +202,7 @@ public final class EntityParser {
 
             // Read Text Report Body Part Headers
             Header[] headers = AbstractMessageParser.parseHeaders(inbuffer, -1, -1, BasicLineParser.INSTANCE,
-                    new ArrayList<CharArrayBuffer>());
+                    new ArrayList<>());
 
             // Get Content-Type and Content-Transfer-Encoding
             ContentType entityContentType = null;
@@ -369,14 +369,14 @@ public final class EntityParser {
     private static void parseApplicationEDIEntity(
             HttpMessage message, AS2SessionInputBuffer inBuffer, ContentType contentType, String contentTransferEncoding)
             throws HttpException {
-        ApplicationEDIEntity applicationEDIEntity = null;
+        ApplicationEntity applicationEntity = null;
 
         ObjectHelper.notNull(message, "message");
         ObjectHelper.notNull(inBuffer, "inBuffer");
 
         HttpEntity entity = ObjectHelper.notNull(EntityUtils.getMessageEntity(message), "message entity");
 
-        if (entity instanceof ApplicationEDIEntity) {
+        if (entity instanceof ApplicationEntity) {
             // already parsed
             return;
         }
@@ -385,10 +385,10 @@ public final class EntityParser {
 
         try {
 
-            applicationEDIEntity = parseEDIEntityBody(inBuffer, null, contentType, contentTransferEncoding, "");
-            applicationEDIEntity.setMainBody(true);
+            applicationEntity = parseEDIEntityBody(inBuffer, null, contentType, contentTransferEncoding, "");
+            applicationEntity.setMainBody(true);
 
-            EntityUtils.setMessageEntity(message, applicationEDIEntity);
+            EntityUtils.setMessageEntity(message, applicationEntity);
 
         } catch (Exception e) {
             throw new HttpException("Failed to parse entity content", e);
@@ -444,6 +444,10 @@ public final class EntityParser {
             try {
                 // Determine Content Type of Message
                 String contentTypeStr = HttpMessageUtils.getHeaderValue(message, AS2Header.CONTENT_TYPE);
+                if (contentTypeStr == null) {
+                    // contentTypeStr can be null when dispositionNotificationTo isn't set
+                    return;
+                }
                 ContentType contentType = ContentType.parse(contentTypeStr);
 
                 // Determine Charset
@@ -457,7 +461,8 @@ public final class EntityParser {
                 String boundary = HttpMessageUtils.getParameterValue(message, AS2Header.CONTENT_TYPE, "boundary");
 
                 // Determine content transfer encoding
-                String contentTransferEncoding = HttpMessageUtils.getHeaderValue(message, AS2Header.CONTENT_TRANSFER_ENCODING);
+                String contentTransferEncoding
+                        = HttpMessageUtils.getHeaderValue(message, AS2Header.CONTENT_TRANSFER_ENCODING);
 
                 AS2SessionInputBuffer inBuffer = new AS2SessionInputBuffer(new HttpTransportMetricsImpl(), 8 * 1024);
                 inBuffer.bind(entity.getContent());
@@ -497,6 +502,7 @@ public final class EntityParser {
                 throw new HttpException("Failed to parse entity content", e);
             }
         }
+
     }
 
     public static MultipartSignedEntity parseMultipartSignedEntityBody(
@@ -529,7 +535,7 @@ public final class EntityParser {
 
             // Read Text Report Body Part Headers
             Header[] headers = AbstractMessageParser.parseHeaders(inbuffer, -1, -1, BasicLineParser.INSTANCE,
-                    new ArrayList<CharArrayBuffer>());
+                    new ArrayList<>());
 
             // Get Content-Type and Content-Transfer-Encoding
             ContentType signedEntityContentType = null;
@@ -560,7 +566,7 @@ public final class EntityParser {
 
             // Read Signature Body Part Headers
             headers = AbstractMessageParser.parseHeaders(inbuffer, -1, -1, BasicLineParser.INSTANCE,
-                    new ArrayList<CharArrayBuffer>());
+                    new ArrayList<>());
 
             // Get Content-Type and Content-Transfer-Encoding
             ContentType signatureContentType = null;
@@ -637,7 +643,7 @@ public final class EntityParser {
 
             // Read Text Report Body Part Headers
             Header[] headers = AbstractMessageParser.parseHeaders(inbuffer, -1, -1, BasicLineParser.INSTANCE,
-                    new ArrayList<CharArrayBuffer>());
+                    new ArrayList<>());
 
             // Get Content-Type and Content-Transfer-Encoding
             ContentType textReportContentType = null;
@@ -674,16 +680,13 @@ public final class EntityParser {
 
             // Read Disposition Notification Body Part Headers
             headers = AbstractMessageParser.parseHeaders(inbuffer, -1, -1, BasicLineParser.INSTANCE,
-                    new ArrayList<CharArrayBuffer>());
+                    new ArrayList<>());
 
             // Get Content-Type and Content-Transfer-Encoding
             ContentType dispositionNotificationContentType = null;
-            String dispositionNotificationContentTransferEncoding = null;
             for (Header header : headers) {
                 if (header.getName().equalsIgnoreCase(AS2Header.CONTENT_TYPE)) {
                     dispositionNotificationContentType = ContentType.parse(header.getValue());
-                } else if (header.getName().equalsIgnoreCase(AS2Header.CONTENT_TRANSFER_ENCODING)) {
-                    dispositionNotificationContentTransferEncoding = header.getValue();
                 }
             }
             if (dispositionNotificationContentType == null) {
@@ -769,7 +772,7 @@ public final class EntityParser {
             inbuffer.setCharsetDecoder(charsetDecoder);
 
             List<CharArrayBuffer> dispositionNotificationFields = parseBodyPartFields(inbuffer, boundary,
-                    BasicLineParser.INSTANCE, new ArrayList<CharArrayBuffer>());
+                    BasicLineParser.INSTANCE, new ArrayList<>());
 
             AS2MessageDispositionNotificationEntity as2MessageDispositionNotificationEntity
                     = DispositionNotificationContentUtils.parseDispositionNotification(dispositionNotificationFields);
@@ -809,6 +812,7 @@ public final class EntityParser {
                 case AS2MimeType.APPLICATION_EDIFACT:
                 case AS2MimeType.APPLICATION_EDI_X12:
                 case AS2MimeType.APPLICATION_EDI_CONSENT:
+                case AS2MimeType.APPLICATION_XML:
                     entity = parseEDIEntityBody(inbuffer, boundary, entityContentType, contentTransferEncoding, filename);
                     break;
                 case AS2MimeType.MULTIPART_SIGNED:
@@ -866,7 +870,7 @@ public final class EntityParser {
 
     }
 
-    public static ApplicationEDIEntity parseEDIEntityBody(
+    public static ApplicationEntity parseEDIEntityBody(
             AS2SessionInputBuffer inbuffer,
             String boundary,
             ContentType ediMessageContentType,
@@ -888,10 +892,9 @@ public final class EntityParser {
             if (contentTransferEncoding != null) {
                 ediMessageBodyPartContent = EntityUtils.decode(ediMessageBodyPartContent, charset, contentTransferEncoding);
             }
-            ApplicationEDIEntity applicationEDIEntity = EntityUtils.createEDIEntity(ediMessageBodyPartContent,
-                    ediMessageContentType, contentTransferEncoding, false, filename);
 
-            return applicationEDIEntity;
+            return EntityUtils.createEDIEntity(ediMessageBodyPartContent,
+                    ediMessageContentType, contentTransferEncoding, false, filename);
         } catch (Exception e) {
             ParseException parseException = new ParseException("failed to parse EDI entity");
             parseException.initCause(e);

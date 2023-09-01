@@ -74,7 +74,10 @@ public class DynamicRouterTestSupport extends CamelTestSupport {
     public static final String TEST_PREDICATE = "testPredicate";
 
     @Mock
-    protected ExtendedCamelContext context;
+    protected CamelContext context;
+
+    @Mock
+    protected ExtendedCamelContext ecc;
 
     @Mock
     protected ExchangeFactory exchangeFactory;
@@ -113,7 +116,10 @@ public class DynamicRouterTestSupport extends CamelTestSupport {
     protected DynamicRouterControlProducer controlProducer;
 
     @Mock
-    protected PrioritizedFilterProcessor filterProcessor;
+    protected PrioritizedFilterProcessor filterProcessorLowPriority;
+
+    @Mock
+    protected PrioritizedFilterProcessor filterProcessorLowestPriority;
 
     @Mock
     protected DynamicRouterControlMessage controlMessage;
@@ -169,8 +175,8 @@ public class DynamicRouterTestSupport extends CamelTestSupport {
         lenient().when(endpoint.getDynamicRouterComponent()).thenReturn(component);
         lenient().when(endpoint.getConfiguration()).thenReturn(configuration);
 
-        lenient().when(context.adapt(ExtendedCamelContext.class)).thenReturn(context);
-        lenient().when(context.getExchangeFactory()).thenReturn(exchangeFactory);
+        lenient().when(context.getCamelContextExtension()).thenReturn(ecc);
+        lenient().when(ecc.getExchangeFactory()).thenReturn(exchangeFactory);
         lenient().when(context.resolveLanguage("simple")).thenReturn(simpleLanguage);
         lenient().when(context.getExecutorServiceManager()).thenReturn(executorServiceManager);
 
@@ -183,8 +189,10 @@ public class DynamicRouterTestSupport extends CamelTestSupport {
 
         lenient().when(simpleLanguage.createPredicate(anyString())).thenReturn(predicate);
 
-        lenient().when(filterProcessor.getId()).thenReturn(TEST_ID);
-        lenient().when(filterProcessor.getPriority()).thenReturn(Integer.MAX_VALUE);
+        lenient().when(filterProcessorLowPriority.getId()).thenReturn(TEST_ID);
+        lenient().when(filterProcessorLowPriority.getPriority()).thenReturn(Integer.MAX_VALUE - 1000);
+
+        lenient().when(filterProcessorLowestPriority.getPriority()).thenReturn(Integer.MAX_VALUE);
 
         lenient().doNothing().when(asyncCallback).done(anyBoolean());
 
@@ -249,7 +257,7 @@ public class DynamicRouterTestSupport extends CamelTestSupport {
             @Override
             public PrioritizedFilterProcessor getInstance(
                     String id, int priority, CamelContext context, Predicate predicate, Processor processor) {
-                return filterProcessor;
+                return filterProcessorLowPriority;
             }
         };
     }

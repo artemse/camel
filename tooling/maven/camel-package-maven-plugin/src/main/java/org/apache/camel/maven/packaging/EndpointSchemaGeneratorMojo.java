@@ -156,20 +156,18 @@ public class EndpointSchemaGeneratorMojo extends AbstractGeneratorMojo {
         // make sure we sort the classes in case one inherit from the other
         classes.sort(this::compareClasses);
 
-        Map<Class, ComponentModel> models = new HashMap<>();
+        Map<Class<?>, ComponentModel> models = new HashMap<>();
         for (Class<?> classElement : classes) {
             UriEndpoint uriEndpoint = classElement.getAnnotation(UriEndpoint.class);
             String scheme = uriEndpoint.scheme();
             String extendsScheme = uriEndpoint.extendsScheme();
             String title = uriEndpoint.title();
             Category[] categories = uriEndpoint.category();
-            String label;
+            String label = null;
             if (categories.length > 0) {
                 label = Arrays.stream(categories)
                         .map(Category::getValue)
                         .collect(Collectors.joining(","));
-            } else {
-                label = uriEndpoint.label();
             }
             validateSchemaName(scheme, classElement);
             // support multiple schemes separated by comma, which maps to
@@ -185,7 +183,8 @@ public class EndpointSchemaGeneratorMojo extends AbstractGeneratorMojo {
     }
 
     private void processSchemas(
-            Map<Class, ComponentModel> models, Class<?> classElement, UriEndpoint uriEndpoint, String label, String[] schemes,
+            Map<Class<?>, ComponentModel> models, Class<?> classElement, UriEndpoint uriEndpoint, String label,
+            String[] schemes,
             String[] titles, String[] extendsSchemes) {
         for (int i = 0; i < schemes.length; i++) {
             final String alias = schemes[i];
@@ -207,7 +206,7 @@ public class EndpointSchemaGeneratorMojo extends AbstractGeneratorMojo {
         }
     }
 
-    private ComponentModel collectParentData(Map<Class, ComponentModel> models, Class<?> classElement) {
+    private ComponentModel collectParentData(Map<Class<?>, ComponentModel> models, Class<?> classElement) {
         ComponentModel parentData = null;
         final Class<?> superclass = classElement.getSuperclass();
 
@@ -866,10 +865,10 @@ public class EndpointSchemaGeneratorMojo extends AbstractGeneratorMojo {
         model.setDeprecationNote(deprecationNote);
         model.setDeprecatedSince(project.getProperties().getProperty("deprecatedSince"));
 
-        // these information is not available at compile time and we enrich
+        // this information is not available at compile time, and we enrich
         // these later during the camel-package-maven-plugin
         if (model.getJavaType() == null) {
-            throw new IllegalStateException("Could not find component java type");
+            throw new IllegalStateException("Could not find @Component(\"" + scheme + "\") annotated class.");
         }
 
         // favor to use endpoint class javadoc as description
@@ -968,6 +967,7 @@ public class EndpointSchemaGeneratorMojo extends AbstractGeneratorMojo {
                 String label = metadata != null ? metadata.label() : null;
                 boolean secret = metadata != null && metadata.secret();
                 boolean autowired = metadata != null && metadata.autowired();
+                boolean supportFileReference = metadata != null && metadata.supportFileReference();
 
                 // we do not yet have default values / notes / as no annotation
                 // support yet
@@ -1083,6 +1083,7 @@ public class EndpointSchemaGeneratorMojo extends AbstractGeneratorMojo {
                     option.setNestedType(nestedType);
                     option.setConfigurationClass(nestedTypeName);
                     option.setConfigurationField(nestedFieldName);
+                    option.setSupportFileReference(supportFileReference);
                     componentModel.addComponentOption(option);
                 }
             }
@@ -1125,7 +1126,7 @@ public class EndpointSchemaGeneratorMojo extends AbstractGeneratorMojo {
     }
 
     private List<Method> findCandidateClassMethods(Class<?> classElement) {
-        List<Method> methods = Stream.of(classElement.getDeclaredMethods()).filter(method -> {
+        return Stream.of(classElement.getDeclaredMethods()).filter(method -> {
             Metadata metadata = method.getAnnotation(Metadata.class);
             String methodName = method.getName();
             if (metadata != null && metadata.skip()) {
@@ -1153,7 +1154,6 @@ public class EndpointSchemaGeneratorMojo extends AbstractGeneratorMojo {
             }
             return true;
         }).collect(Collectors.toList());
-        return methods;
     }
 
     private void processMetadataClassAnnotation(ComponentModel componentModel, Class<?> classElement, Set<String> excludes) {
@@ -1166,7 +1166,6 @@ public class EndpointSchemaGeneratorMojo extends AbstractGeneratorMojo {
         }
     }
 
-    // CHECKSTYLE:OFF
     protected void findClassProperties(
             ComponentModel componentModel, Class<?> classElement,
             Set<String> excludes, String prefix,
@@ -1201,7 +1200,8 @@ public class EndpointSchemaGeneratorMojo extends AbstractGeneratorMojo {
                 }
                 Boolean secret = metadata != null ? metadata.secret() : null;
 
-                if (collectUriPathProperties(componentModel, classElement, excludes, prefix, nestedTypeName, nestedFieldName, componentOption, orgClassElement, metadata, fieldElement, deprecated, deprecationNote, secret)) {
+                if (collectUriPathProperties(componentModel, classElement, excludes, prefix, nestedTypeName, nestedFieldName,
+                        componentOption, orgClassElement, metadata, fieldElement, deprecated, deprecationNote, secret)) {
                     continue;
                 }
                 String fieldName;
@@ -1257,7 +1257,10 @@ public class EndpointSchemaGeneratorMojo extends AbstractGeneratorMojo {
                     } else {
                         ApiParam apiParam = fieldElement.getAnnotation(ApiParam.class);
 
-                        collectNonNestedField(componentModel, classElement, nestedTypeName, nestedFieldName, componentOption, apiName, apiOption, apiParams, metadata, fieldElement, deprecated, deprecationNote, secret, fieldName, param, apiParam, name, paramOptionalPrefix, paramPrefix, multiValue, defaultValue, defaultValueNote, required, label, displayName, fieldTypeElement, fieldTypeName);
+                        collectNonNestedField(componentModel, classElement, nestedTypeName, nestedFieldName, componentOption,
+                                apiName, apiOption, apiParams, metadata, fieldElement, deprecated, deprecationNote, secret,
+                                fieldName, param, apiParam, name, paramOptionalPrefix, paramPrefix, multiValue, defaultValue,
+                                defaultValueNote, required, label, displayName, fieldTypeElement, fieldTypeName);
                     }
                 }
             }
@@ -1278,7 +1281,13 @@ public class EndpointSchemaGeneratorMojo extends AbstractGeneratorMojo {
         }
     }
 
-    private void collectNonNestedField(ComponentModel componentModel, Class<?> classElement, String nestedTypeName, String nestedFieldName, boolean componentOption, String apiName, boolean apiOption, ApiParams apiParams, Metadata metadata, Field fieldElement, boolean deprecated, String deprecationNote, Boolean secret, String fieldName, UriParam param, ApiParam apiParam, String name, String paramOptionalPrefix, String paramPrefix, boolean multiValue, Object defaultValue, String defaultValueNote, boolean required, String label, String displayName, Class<?> fieldTypeElement, String fieldTypeName) {
+    private void collectNonNestedField(
+            ComponentModel componentModel, Class<?> classElement, String nestedTypeName, String nestedFieldName,
+            boolean componentOption, String apiName, boolean apiOption, ApiParams apiParams, Metadata metadata,
+            Field fieldElement, boolean deprecated, String deprecationNote, Boolean secret, String fieldName, UriParam param,
+            ApiParam apiParam, String name, String paramOptionalPrefix, String paramPrefix, boolean multiValue,
+            Object defaultValue, String defaultValueNote, boolean required, String label, String displayName,
+            Class<?> fieldTypeElement, String fieldTypeName) {
         String docComment = param.description();
         if (Strings.isNullOrEmpty(docComment)) {
             docComment = findJavaDoc(fieldElement, fieldName, name, classElement, false);
@@ -1306,6 +1315,7 @@ public class EndpointSchemaGeneratorMojo extends AbstractGeneratorMojo {
 
         boolean isSecret = secret != null && secret || param.secret();
         boolean isAutowired = metadata != null && metadata.autowired();
+        boolean supportFileReference = metadata != null && metadata.supportFileReference();
         String group = EndpointHelper.labelAsGroupName(label, componentModel.isConsumerOnly(),
                 componentModel.isProducerOnly());
 
@@ -1361,6 +1371,7 @@ public class EndpointSchemaGeneratorMojo extends AbstractGeneratorMojo {
         option.setPrefix(paramPrefix);
         option.setOptionalPrefix(paramOptionalPrefix);
         option.setMultiValue(multiValue);
+        option.setSupportFileReference(supportFileReference);
         if (componentOption) {
             option.setKind("property");
             componentModel.addComponentOption((ComponentOptionModel) option);
@@ -1431,7 +1442,10 @@ public class EndpointSchemaGeneratorMojo extends AbstractGeneratorMojo {
         }
     }
 
-    private boolean collectUriPathProperties(ComponentModel componentModel, Class<?> classElement, Set<String> excludes, String prefix, String nestedTypeName, String nestedFieldName, boolean componentOption, Class<?> orgClassElement, Metadata metadata, Field fieldElement, boolean deprecated, String deprecationNote, Boolean secret) {
+    private boolean collectUriPathProperties(
+            ComponentModel componentModel, Class<?> classElement, Set<String> excludes, String prefix, String nestedTypeName,
+            String nestedFieldName, boolean componentOption, Class<?> orgClassElement, Metadata metadata, Field fieldElement,
+            boolean deprecated, String deprecationNote, Boolean secret) {
         UriPath path = fieldElement.getAnnotation(UriPath.class);
         String fieldName = fieldElement.getName();
         // component options should not include @UriPath as they are for endpoints only
@@ -1489,6 +1503,7 @@ public class EndpointSchemaGeneratorMojo extends AbstractGeneratorMojo {
 
             boolean isSecret = secret != null && secret || path.secret();
             boolean isAutowired = metadata != null && metadata.autowired();
+            boolean supportFileReference = metadata != null && metadata.supportFileReference();
             String group = EndpointHelper.labelAsGroupName(label, componentModel.isConsumerOnly(),
                     componentModel.isProducerOnly());
 
@@ -1540,6 +1555,7 @@ public class EndpointSchemaGeneratorMojo extends AbstractGeneratorMojo {
             option.setNestedType(nestedType);
             option.setConfigurationClass(nestedTypeName);
             option.setConfigurationField(nestedFieldName);
+            option.setSupportFileReference(supportFileReference);
             if (componentModel.getEndpointOptions().stream().noneMatch(opt -> name.equals(opt.getName()))) {
                 componentModel.addEndpointOption((EndpointOptionModel) option);
             }
@@ -1590,7 +1606,6 @@ public class EndpointSchemaGeneratorMojo extends AbstractGeneratorMojo {
 
         return null;
     }
-    // CHECKSTYLE:ON
 
     private static boolean isNullOrEmpty(Object value) {
         return value == null || "".equals(value) || "null".equals(value);
@@ -1608,8 +1623,6 @@ public class EndpointSchemaGeneratorMojo extends AbstractGeneratorMojo {
 
         return false;
     }
-
-    // CHECKSTYLE:ON
 
     private static boolean isGroovyMetaClassProperty(final Method method) {
         final String methodName = method.getName();

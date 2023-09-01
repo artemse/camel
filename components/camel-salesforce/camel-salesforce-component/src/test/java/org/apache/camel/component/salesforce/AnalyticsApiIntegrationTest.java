@@ -74,7 +74,7 @@ public class AnalyticsApiIntegrationTest extends AbstractSalesforceTestBase {
     @Test
     public void testGetRecentReports() throws Exception {
 
-        final List recentReports = template().requestBody("direct:getRecentReports", null, List.class);
+        final List<?> recentReports = template().requestBody("direct:getRecentReports", null, List.class);
 
         assertNotNull(recentReports, "getRecentReports");
         LOG.debug("getRecentReports: {}", recentReports);
@@ -155,7 +155,7 @@ public class AnalyticsApiIntegrationTest extends AbstractSalesforceTestBase {
         final String testReportInstanceId = reportInstance.getId();
 
         // 4. getReportInstances
-        final List reportInstances = template().requestBody("direct:getReportInstances", testReportId, List.class);
+        final List<?> reportInstances = template().requestBody("direct:getReportInstances", testReportId, List.class);
 
         assertNotNull(reportInstances, "getReportInstances");
         assertFalse(reportInstances.isEmpty(), "getReportInstances empty");
@@ -191,8 +191,7 @@ public class AnalyticsApiIntegrationTest extends AbstractSalesforceTestBase {
         // defaults
         String convertResults = template.requestBody("direct:convertResults", asyncReportResults, String.class);
         assertNotNull(convertResults, "default convertResults");
-        LOG.debug("Default options", convertResults);
-        LOG.debug("{}", convertResults);
+        LOG.debug("Default options {}", convertResults);
 
         // permutations of include details, include headers, include summary
         final boolean[] values = new boolean[NUM_OPTIONS];

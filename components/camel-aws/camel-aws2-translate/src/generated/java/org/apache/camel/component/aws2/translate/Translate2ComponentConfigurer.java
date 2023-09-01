@@ -35,6 +35,10 @@ public class Translate2ComponentConfigurer extends PropertyConfigurerSupport imp
         case "autowiredenabled":
         case "autowiredEnabled": target.setAutowiredEnabled(property(camelContext, boolean.class, value)); return true;
         case "configuration": target.setConfiguration(property(camelContext, org.apache.camel.component.aws2.translate.Translate2Configuration.class, value)); return true;
+        case "healthcheckconsumerenabled":
+        case "healthCheckConsumerEnabled": target.setHealthCheckConsumerEnabled(property(camelContext, boolean.class, value)); return true;
+        case "healthcheckproducerenabled":
+        case "healthCheckProducerEnabled": target.setHealthCheckProducerEnabled(property(camelContext, boolean.class, value)); return true;
         case "lazystartproducer":
         case "lazyStartProducer": target.setLazyStartProducer(property(camelContext, boolean.class, value)); return true;
         case "operation": getOrCreateConfiguration(target).setOperation(property(camelContext, org.apache.camel.component.aws2.translate.Translate2Operations.class, value)); return true;
@@ -42,6 +46,8 @@ public class Translate2ComponentConfigurer extends PropertyConfigurerSupport imp
         case "overrideEndpoint": getOrCreateConfiguration(target).setOverrideEndpoint(property(camelContext, boolean.class, value)); return true;
         case "pojorequest":
         case "pojoRequest": getOrCreateConfiguration(target).setPojoRequest(property(camelContext, boolean.class, value)); return true;
+        case "profilecredentialsname":
+        case "profileCredentialsName": getOrCreateConfiguration(target).setProfileCredentialsName(property(camelContext, java.lang.String.class, value)); return true;
         case "proxyhost":
         case "proxyHost": getOrCreateConfiguration(target).setProxyHost(property(camelContext, java.lang.String.class, value)); return true;
         case "proxyport":
@@ -63,6 +69,8 @@ public class Translate2ComponentConfigurer extends PropertyConfigurerSupport imp
         case "uriEndpointOverride": getOrCreateConfiguration(target).setUriEndpointOverride(property(camelContext, java.lang.String.class, value)); return true;
         case "usedefaultcredentialsprovider":
         case "useDefaultCredentialsProvider": getOrCreateConfiguration(target).setUseDefaultCredentialsProvider(property(camelContext, boolean.class, value)); return true;
+        case "useprofilecredentialsprovider":
+        case "useProfileCredentialsProvider": getOrCreateConfiguration(target).setUseProfileCredentialsProvider(property(camelContext, boolean.class, value)); return true;
         default: return false;
         }
     }
@@ -82,6 +90,10 @@ public class Translate2ComponentConfigurer extends PropertyConfigurerSupport imp
         case "autowiredenabled":
         case "autowiredEnabled": return boolean.class;
         case "configuration": return org.apache.camel.component.aws2.translate.Translate2Configuration.class;
+        case "healthcheckconsumerenabled":
+        case "healthCheckConsumerEnabled": return boolean.class;
+        case "healthcheckproducerenabled":
+        case "healthCheckProducerEnabled": return boolean.class;
         case "lazystartproducer":
         case "lazyStartProducer": return boolean.class;
         case "operation": return org.apache.camel.component.aws2.translate.Translate2Operations.class;
@@ -89,6 +101,8 @@ public class Translate2ComponentConfigurer extends PropertyConfigurerSupport imp
         case "overrideEndpoint": return boolean.class;
         case "pojorequest":
         case "pojoRequest": return boolean.class;
+        case "profilecredentialsname":
+        case "profileCredentialsName": return java.lang.String.class;
         case "proxyhost":
         case "proxyHost": return java.lang.String.class;
         case "proxyport":
@@ -110,6 +124,8 @@ public class Translate2ComponentConfigurer extends PropertyConfigurerSupport imp
         case "uriEndpointOverride": return java.lang.String.class;
         case "usedefaultcredentialsprovider":
         case "useDefaultCredentialsProvider": return boolean.class;
+        case "useprofilecredentialsprovider":
+        case "useProfileCredentialsProvider": return boolean.class;
         default: return null;
         }
     }
@@ -125,6 +141,10 @@ public class Translate2ComponentConfigurer extends PropertyConfigurerSupport imp
         case "autowiredenabled":
         case "autowiredEnabled": return target.isAutowiredEnabled();
         case "configuration": return target.getConfiguration();
+        case "healthcheckconsumerenabled":
+        case "healthCheckConsumerEnabled": return target.isHealthCheckConsumerEnabled();
+        case "healthcheckproducerenabled":
+        case "healthCheckProducerEnabled": return target.isHealthCheckProducerEnabled();
         case "lazystartproducer":
         case "lazyStartProducer": return target.isLazyStartProducer();
         case "operation": return getOrCreateConfiguration(target).getOperation();
@@ -132,6 +152,8 @@ public class Translate2ComponentConfigurer extends PropertyConfigurerSupport imp
         case "overrideEndpoint": return getOrCreateConfiguration(target).isOverrideEndpoint();
         case "pojorequest":
         case "pojoRequest": return getOrCreateConfiguration(target).isPojoRequest();
+        case "profilecredentialsname":
+        case "profileCredentialsName": return getOrCreateConfiguration(target).getProfileCredentialsName();
         case "proxyhost":
         case "proxyHost": return getOrCreateConfiguration(target).getProxyHost();
         case "proxyport":
@@ -153,6 +175,8 @@ public class Translate2ComponentConfigurer extends PropertyConfigurerSupport imp
         case "uriEndpointOverride": return getOrCreateConfiguration(target).getUriEndpointOverride();
         case "usedefaultcredentialsprovider":
         case "useDefaultCredentialsProvider": return getOrCreateConfiguration(target).isUseDefaultCredentialsProvider();
+        case "useprofilecredentialsprovider":
+        case "useProfileCredentialsProvider": return getOrCreateConfiguration(target).isUseProfileCredentialsProvider();
         default: return null;
         }
     }

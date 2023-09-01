@@ -41,7 +41,10 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -273,7 +276,7 @@ public final class IOHelper {
                 log = LOG;
             }
             if (name != null) {
-                log.warn("Cannot force FileChannel: " + name + ". Reason: " + e.getMessage(), e);
+                log.warn("Cannot force FileChannel: {}. Reason: {}", name, e.getMessage(), e);
             } else {
                 log.warn("Cannot force FileChannel. Reason: {}", e.getMessage(), e);
             }
@@ -299,7 +302,7 @@ public final class IOHelper {
                 log = LOG;
             }
             if (name != null) {
-                log.warn("Cannot sync FileDescriptor: " + name + ". Reason: " + e.getMessage(), e);
+                log.warn("Cannot sync FileDescriptor: {}. Reason: {}", name, e.getMessage(), e);
             } else {
                 log.warn("Cannot sync FileDescriptor. Reason: {}", e.getMessage(), e);
             }
@@ -328,7 +331,7 @@ public final class IOHelper {
                     log = LOG;
                 }
                 if (name != null) {
-                    log.warn("Cannot flush Writer: " + name + ". Reason: " + e.getMessage(), e);
+                    log.warn("Cannot flush Writer: {}. Reason: {}", name, e.getMessage(), e);
                 } else {
                     log.warn("Cannot flush Writer. Reason: {}", e.getMessage(), e);
                 }
@@ -356,7 +359,7 @@ public final class IOHelper {
                     log = LOG;
                 }
                 if (name != null) {
-                    log.warn("Cannot close: " + name + ". Reason: " + e.getMessage(), e);
+                    log.warn("Cannot close: {}. Reason: {}", name, e.getMessage(), e);
                 } else {
                     log.warn("Cannot close. Reason: {}", e.getMessage(), e);
                 }
@@ -476,26 +479,24 @@ public final class IOHelper {
      * Appends the text to the file.
      */
     public static void appendText(String text, File file) throws IOException {
-        if (!file.exists()) {
-            String path = FileUtil.onlyPath(file.getPath());
-            if (path != null) {
-                new File(path).mkdirs();
-            }
-        }
-        writeText(text, new FileOutputStream(file, true));
+        doWriteText(text, file, true);
     }
 
     /**
      * Writes the text to the file.
      */
     public static void writeText(String text, File file) throws IOException {
+        doWriteText(text, file, false);
+    }
+
+    private static void doWriteText(String text, File file, boolean append) throws IOException {
         if (!file.exists()) {
             String path = FileUtil.onlyPath(file.getPath());
             if (path != null) {
                 new File(path).mkdirs();
             }
         }
-        writeText(text, new FileOutputStream(file, false));
+        writeText(text, new FileOutputStream(file, append));
     }
 
     /**
@@ -601,7 +602,7 @@ public final class IOHelper {
         private final Charset defaultStreamCharset;
 
         private ByteBuffer bufferBytes;
-        private CharBuffer bufferedChars = CharBuffer.allocate(4096);
+        private final CharBuffer bufferedChars = CharBuffer.allocate(4096);
 
         public EncodingInputStream(File file, String charset) throws IOException {
             this.file = file;
@@ -740,4 +741,29 @@ public final class IOHelper {
     public static BufferedWriter toWriter(FileOutputStream os, Charset charset) {
         return IOHelper.buffered(new EncodingFileWriter(os, charset));
     }
+
+    /**
+     * Reads the file under the given {@code path}, strips lines starting with {@code commentPrefix} and optionally also
+     * strips blank lines (the ones for which {@link String#isBlank()} returns {@code true}. Normalizes EOL characters
+     * to {@code '\n'}.
+     *
+     * @param  path            the path of the file to read
+     * @param  commentPrefix   the leading character sequence of comment lines.
+     * @param  stripEmptylines if true {@code true} the lines matching {@link String#isBlank()} will not appear in the
+     *                         result
+     * @return                 the filtered content of the file
+     */
+    public static String stripLineComments(Path path, String commentPrefix, boolean stripBlankLines) {
+        StringBuilder result = new StringBuilder();
+        try (Stream<String> lines = Files.lines(path)) {
+            lines
+                    .filter(l -> !l.isBlank())
+                    .filter(line -> !line.startsWith(commentPrefix))
+                    .forEach(line -> result.append(line).append('\n'));
+        } catch (IOException e) {
+            throw new RuntimeException("Could not read " + path, e);
+        }
+        return result.toString();
+    }
+
 }

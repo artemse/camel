@@ -25,6 +25,7 @@ import com.github.freva.asciitable.Column;
 import com.github.freva.asciitable.HorizontalAlign;
 import com.github.freva.asciitable.OverflowBehaviour;
 import org.apache.camel.dsl.jbang.core.commands.CamelJBangMain;
+import org.apache.camel.dsl.jbang.core.common.PidNameAgeCompletionCandidates;
 import org.apache.camel.dsl.jbang.core.common.ProcessHelper;
 import org.apache.camel.util.TimeUtils;
 import org.apache.camel.util.json.JsonArray;
@@ -33,13 +34,13 @@ import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
 @Command(name = "circuit-breaker",
-         description = "Get status of Circuit Breaker EIPs")
+         description = "Get status of Circuit Breaker EIPs", sortOptions = false)
 public class ListCircuitBreaker extends ProcessWatchCommand {
 
     @CommandLine.Parameters(description = "Name or pid of running Camel integration", arity = "0..1")
     String name = "*";
 
-    @CommandLine.Option(names = { "--sort" },
+    @CommandLine.Option(names = { "--sort" }, completionCandidates = PidNameAgeCompletionCandidates.class,
                         description = "Sort by pid, name or age", defaultValue = "pid")
     String sort;
 
@@ -48,7 +49,7 @@ public class ListCircuitBreaker extends ProcessWatchCommand {
     }
 
     @Override
-    public Integer doCall() throws Exception {
+    public Integer doProcessWatchCall() throws Exception {
         List<Row> rows = new ArrayList<>();
 
         List<Long> pids = findPids(name);
@@ -67,7 +68,7 @@ public class ListCircuitBreaker extends ProcessWatchCommand {
                         if ("CamelJBang".equals(row.name)) {
                             row.name = ProcessHelper.extractName(root, ph);
                         }
-                        row.pid = "" + ph.pid();
+                        row.pid = Long.toString(ph.pid());
                         row.uptime = extractSince(ph);
                         row.age = TimeUtils.printSince(row.uptime);
                         Row baseRow = row.copy();
@@ -103,6 +104,23 @@ public class ListCircuitBreaker extends ProcessWatchCommand {
                                     row.id = jo.getString("id");
                                     row.routeId = jo.getString("routeId");
                                     row.state = jo.getString("state");
+                                    rows.add(row);
+                                }
+                            }
+                        }
+                        mo = (JsonObject) root.get("route-circuit-breaker");
+                        if (mo != null) {
+                            JsonArray arr = (JsonArray) mo.get("circuitBreakers");
+                            if (arr != null) {
+                                for (int i = 0; i < arr.size(); i++) {
+                                    row = baseRow.copy();
+                                    JsonObject jo = (JsonObject) arr.get(i);
+                                    row.component = "core";
+                                    row.id = jo.getString("routeId");
+                                    row.routeId = jo.getString("routeId");
+                                    row.state = jo.getString("state");
+                                    row.successfulCalls = jo.getInteger("successfulCalls");
+                                    row.failedCalls = jo.getInteger("failedCalls");
                                     rows.add(row);
                                 }
                             }
@@ -160,27 +178,27 @@ public class ListCircuitBreaker extends ProcessWatchCommand {
         } else if (r.failureRate > 0) {
             return +r.failedCalls + " (" + String.format("%.0f", r.failureRate) + "%)";
         } else {
-            return "" + r.failedCalls;
+            return Integer.toString(r.failedCalls);
         }
     }
 
     private String getPending(Row r) {
         if ("resilience4j".equals(r.component)) {
-            return "" + r.bufferedCalls;
+            return Integer.toString(r.bufferedCalls);
         }
         return "";
     }
 
     private String getSuccess(Row r) {
-        if ("resilience4j".equals(r.component)) {
-            return "" + r.successfulCalls;
+        if ("resilience4j".equals(r.component) || "core".equals(r.component)) {
+            return Integer.toString(r.successfulCalls);
         }
         return "";
     }
 
     private String getReject(Row r) {
         if ("resilience4j".equals(r.component)) {
-            return "" + r.notPermittedCalls;
+            return Long.toString(r.notPermittedCalls);
         }
         return "";
     }

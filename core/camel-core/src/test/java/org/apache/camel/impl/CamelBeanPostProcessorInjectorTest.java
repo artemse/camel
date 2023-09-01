@@ -20,13 +20,13 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import org.apache.camel.ContextTestSupport;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.PropertyInject;
 import org.apache.camel.impl.engine.CamelPostProcessorHelper;
 import org.apache.camel.spi.CamelBeanPostProcessor;
 import org.apache.camel.spi.CamelBeanPostProcessorInjector;
 import org.apache.camel.spi.CamelLogger;
 import org.apache.camel.support.ObjectHelper;
+import org.apache.camel.support.PluginHelper;
 import org.apache.camel.util.ReflectionHelper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,7 +41,7 @@ public class CamelBeanPostProcessorInjectorTest extends ContextTestSupport {
     @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
-        postProcessor = context.adapt(ExtendedCamelContext.class).getBeanPostProcessor();
+        postProcessor = PluginHelper.getBeanPostProcessor(context);
         postProcessor.addCamelBeanPostProjectInjector(new MyInjector());
         helper = new CamelPostProcessorHelper(context);
     }

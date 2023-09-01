@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.apache.camel</groupId>
         <artifactId>tooling</artifactId>
-        <version>4.0.0-SNAPSHOT</version>
+        <version>4.1.0-SNAPSHOT</version>
     </parent>
 
     <!-- should not be OSGi bundle as we shade this component into camel-core -->
@@ -31,15 +31,4 @@
 
     <name>Camel :: SPI Annotations</name>
     <description>Annotations for Camel Endpoint developers</description>
-
-    <properties>
-    </properties>
-
-    <dependencies>
-    </dependencies>
-
-    <build>
-        <plugins>
-        </plugins>
-    </build>
 </project>

@@ -1017,6 +1017,24 @@ public interface NettyHttpComponentBuilderFactory {
             return this;
         }
         /**
+         * Path to unix domain socket to use instead of inet socket. Host and
+         * port parameters will not be used, however required. It is ok to set
+         * dummy values for them. Must be used with nativeTransport=true and
+         * clientMode=false.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: advanced
+         * 
+         * @param unixDomainSocketPath the value to set
+         * @return the dsl builder
+         */
+        default NettyHttpComponentBuilder unixDomainSocketPath(
+                java.lang.String unixDomainSocketPath) {
+            doSetProperty("unixDomainSocketPath", unixDomainSocketPath);
+            return this;
+        }
+        /**
          * When netty works on nio mode, it uses default workerCount parameter
          * from Netty (which is cpu_core_threads x 2). User can use this option
          * to override the default workerCount from Netty.
@@ -1403,6 +1421,9 @@ public interface NettyHttpComponentBuilderFactory {
          * by default from classpath, but you can prefix with classpath:, file:,
          * or http: to load the resource from different systems.
          * 
+         * This option can also be loaded from an existing file, by prefixing
+         * with file: or classpath: followed by the location of the file.
+         * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
          * Group: security
@@ -1509,6 +1530,7 @@ public interface NettyHttpComponentBuilderFactory {
             case "sendBufferSize": getOrCreateConfiguration((NettyHttpComponent) component).setSendBufferSize((int) value); return true;
             case "transferExchange": getOrCreateConfiguration((NettyHttpComponent) component).setTransferExchange((boolean) value); return true;
             case "udpByteArrayCodec": getOrCreateConfiguration((NettyHttpComponent) component).setUdpByteArrayCodec((boolean) value); return true;
+            case "unixDomainSocketPath": getOrCreateConfiguration((NettyHttpComponent) component).setUnixDomainSocketPath((java.lang.String) value); return true;
             case "workerCount": getOrCreateConfiguration((NettyHttpComponent) component).setWorkerCount((int) value); return true;
             case "workerGroup": getOrCreateConfiguration((NettyHttpComponent) component).setWorkerGroup((io.netty.channel.EventLoopGroup) value); return true;
             case "allowDefaultCodec": getOrCreateConfiguration((NettyHttpComponent) component).setAllowDefaultCodec((boolean) value); return true;

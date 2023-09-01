@@ -34,7 +34,6 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -156,6 +155,21 @@ public final class ObjectHelper {
             throw new IllegalArgumentException(name + " must be specified");
         }
 
+        return value;
+    }
+
+    /**
+     * Asserts that the given {@code value} is neither {@code null} nor an emptyString.
+     *
+     * @param  value                    the value to test
+     * @param  name                     the key that resolved the value
+     * @return                          the passed {@code value} as is
+     * @throws IllegalArgumentException is thrown if assertion fails
+     */
+    public static String notNullOrEmpty(String value, String name) {
+        if (value == null || value.isEmpty()) {
+            throw new IllegalArgumentException(name + " must be specified and non-empty");
+        }
         return value;
     }
 
@@ -473,7 +487,6 @@ public final class ObjectHelper {
      * @param  name the name of the class to load
      * @return      the class or <tt>null</tt> if it could not be loaded
      */
-    //CHECKSTYLE:OFF
     public static Class<?> loadSimpleType(String name) {
         // special for byte[] or Object[] as its common to use
         if ("java.lang.byte[]".equals(name) || "byte[]".equals(name)) {
@@ -522,7 +535,6 @@ public final class ObjectHelper {
         }
         return null;
     }
-    //CHECKSTYLE:ON
 
     /**
      * Loads the given class with the provided classloader (may be null). Will ignore any class not found and return
@@ -1046,7 +1058,7 @@ public final class ObjectHelper {
     public static String getPropertyName(Method method) {
         String propertyName = method.getName();
         if (propertyName.startsWith("set") && method.getParameterCount() == 1) {
-            propertyName = propertyName.substring(3, 4).toLowerCase(Locale.ENGLISH) + propertyName.substring(4);
+            propertyName = StringHelper.decapitalize(propertyName.substring(3));
         }
         return propertyName;
     }
@@ -1276,34 +1288,6 @@ public final class ObjectHelper {
     public static boolean isNaN(Object value) {
         return value instanceof Float && ((Float) value).isNaN()
                 || value instanceof Double && ((Double) value).isNaN();
-    }
-
-    /**
-     * Wraps the caused exception in a {@link RuntimeException} if its not already such an exception.
-     *
-     * @param      e the caused exception
-     * @return       the wrapper exception
-     * @deprecated   Use {@link org.apache.camel.RuntimeCamelException#wrapRuntimeCamelException} instead
-     */
-    @Deprecated
-    public static RuntimeException wrapRuntimeCamelException(Throwable e) {
-        try {
-            Class<? extends RuntimeException> clazz = (Class) Class.forName("org.apache.camel.RuntimeException");
-            if (clazz.isInstance(e)) {
-                // don't double wrap
-                return clazz.cast(e);
-            } else {
-                return clazz.getConstructor(Throwable.class).newInstance(e);
-            }
-        } catch (Throwable t) {
-            // ignore
-        }
-        if (e instanceof RuntimeException) {
-            // don't double wrap
-            return (RuntimeException) e;
-        } else {
-            return new RuntimeException(e);
-        }
     }
 
     /**

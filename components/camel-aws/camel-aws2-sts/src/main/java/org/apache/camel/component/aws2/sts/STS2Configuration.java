@@ -31,7 +31,7 @@ public class STS2Configuration implements Cloneable {
     @UriPath(description = "Logical name")
     @Metadata(required = true)
     private String label;
-    @UriParam
+    @UriParam(label = "advanced")
     @Metadata(autowired = true)
     private StsClient stsClient;
     @UriParam(label = "security", secret = true)
@@ -41,24 +41,28 @@ public class STS2Configuration implements Cloneable {
     @UriParam
     @Metadata(required = true, defaultValue = "assumeRole")
     private STS2Operations operation = STS2Operations.assumeRole;
-    @UriParam(enums = "HTTP,HTTPS", defaultValue = "HTTPS")
+    @UriParam(label = "proxy", enums = "HTTP,HTTPS", defaultValue = "HTTPS")
     private Protocol proxyProtocol = Protocol.HTTPS;
-    @UriParam
+    @UriParam(label = "proxy")
     private String proxyHost;
-    @UriParam
+    @UriParam(label = "proxy")
     private Integer proxyPort;
     @UriParam(defaultValue = "aws-global")
     private String region = Region.AWS_GLOBAL.id();
-    @UriParam(defaultValue = "false")
+    @UriParam
     private boolean pojoRequest;
-    @UriParam(defaultValue = "false")
+    @UriParam(label = "security")
     private boolean trustAllCertificates;
-    @UriParam(defaultValue = "false")
+    @UriParam
     private boolean overrideEndpoint;
     @UriParam
     private String uriEndpointOverride;
-    @UriParam(defaultValue = "false")
+    @UriParam(label = "security")
     private boolean useDefaultCredentialsProvider;
+    @UriParam(label = "security")
+    private boolean useProfileCredentialsProvider;
+    @UriParam(label = "security")
+    private String profileCredentialsName;
 
     public StsClient getStsClient() {
         return stsClient;
@@ -204,6 +208,28 @@ public class STS2Configuration implements Cloneable {
 
     public Boolean isUseDefaultCredentialsProvider() {
         return useDefaultCredentialsProvider;
+    }
+
+    public boolean isUseProfileCredentialsProvider() {
+        return useProfileCredentialsProvider;
+    }
+
+    /**
+     * Set whether the STS client should expect to load credentials through a profile credentials provider.
+     */
+    public void setUseProfileCredentialsProvider(boolean useProfileCredentialsProvider) {
+        this.useProfileCredentialsProvider = useProfileCredentialsProvider;
+    }
+
+    public String getProfileCredentialsName() {
+        return profileCredentialsName;
+    }
+
+    /**
+     * If using a profile credentials provider this parameter will set the profile name
+     */
+    public void setProfileCredentialsName(String profileCredentialsName) {
+        this.profileCredentialsName = profileCredentialsName;
     }
     // *************************************************
     //

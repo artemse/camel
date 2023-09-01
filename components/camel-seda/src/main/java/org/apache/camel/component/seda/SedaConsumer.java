@@ -202,7 +202,7 @@ public class SedaConsumer extends DefaultConsumer implements Runnable, ShutdownA
             } catch (InterruptedException e) {
                 LOG.debug("Sleep interrupted, are we stopping? {}", isStopping() || isStopped());
                 continue;
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 if (exchange != null) {
                     getExceptionHandler().handleException("Error processing exchange", exchange, e);
                 } else {
@@ -260,7 +260,7 @@ public class SedaConsumer extends DefaultConsumer implements Runnable, ShutdownA
             // and use the asynchronous routing engine to support it
             mp.process(exchange, doneSync -> {
                 // done the uow on the completions
-                UnitOfWorkHelper.doneSynchronizations(exchange, completions, LOG);
+                UnitOfWorkHelper.doneSynchronizations(exchange, completions);
             });
         } else {
             // use the regular processor and use the asynchronous routing engine to support it

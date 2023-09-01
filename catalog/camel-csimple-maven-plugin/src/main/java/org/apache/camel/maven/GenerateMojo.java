@@ -125,7 +125,6 @@ public class GenerateMojo extends AbstractExecMojo {
     private final Set<String> imports = new TreeSet<>();
     private final Map<String, String> aliases = new HashMap<>();
 
-    // CHECKSTYLE:OFF
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         loadConfiguration();
@@ -181,10 +180,9 @@ public class GenerateMojo extends AbstractExecMojo {
                     // parse the java source code and find Camel RouteBuilder classes
                     String fqn = file.getPath();
                     String baseDir = ".";
-                    JavaType out = Roaster.parse(file);
+                    JavaType<?> out = Roaster.parse(file);
                     // we should only parse java classes (not interfaces and enums etc)
-                    if (out instanceof JavaClassSource) {
-                        JavaClassSource clazz = (JavaClassSource) out;
+                    if (out instanceof JavaClassSource clazz) {
                         RouteBuilderParser.parseRouteBuilderCSimpleExpressions(clazz, baseDir, fqn, fileCSimpleExpressions);
                         csimpleExpressions.addAll(fileCSimpleExpressions);
                     }
@@ -209,7 +207,6 @@ public class GenerateMojo extends AbstractExecMojo {
                 }
             }
         }
-
 
         if (!csimpleExpressions.isEmpty()) {
             getLog().info("Discovered " + csimpleExpressions.size() + " csimple expressions");
@@ -249,7 +246,7 @@ public class GenerateMojo extends AbstractExecMojo {
                 classes.forEach(c -> w.write(c.getFqn() + "\n"));
                 String fileName = RESOURCE_FILE;
                 outputResourceDir.mkdirs();
-                boolean saved = updateResource(outputResourceDir.toPath().resolve(RESOURCE_FILE), w.toString());
+                boolean saved = updateResource(outputResourceDir.toPath().resolve(fileName), w.toString());
                 if (saved) {
                     getLog().info("Generated csimple resource file: " + fileName);
                 }
@@ -309,11 +306,10 @@ public class GenerateMojo extends AbstractExecMojo {
             }
         }
         if (counter1 > 0 || counter2 > 0) {
-            getLog().info("Loaded csimple language imports: " + counter1 + " and aliases: " + counter2 + " from configuration: " + configFile);
+            getLog().info("Loaded csimple language imports: " + counter1 + " and aliases: " + counter2 + " from configuration: "
+                          + configFile);
         }
     }
-
-    // CHECKSTYLE:ON
 
     private void findJavaFiles(File dir, Set<File> javaFiles) {
         File[] files = dir.isDirectory() ? dir.listFiles() : null;

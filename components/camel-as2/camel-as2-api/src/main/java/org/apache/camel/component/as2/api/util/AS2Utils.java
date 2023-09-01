@@ -69,7 +69,7 @@ public final class AS2Utils {
         Matcher matcher = AS_NAME_PATTERN.matcher(name);
         if (!matcher.matches()) {
             // if name does not match, determine where it fails to match.
-            int i = 0;
+            int i;
             for (i = name.length() - 1; i > 0; i--) {
                 Matcher region = matcher.region(0, i);
                 if (region.matches() || region.hitEnd()) {
@@ -107,8 +107,7 @@ public final class AS2Utils {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
              PrintStream ps = new PrintStream(baos, true, "utf-8")) {
             printRequest(ps, request);
-            String content = baos.toString(StandardCharsets.UTF_8.name());
-            return content;
+            return baos.toString(StandardCharsets.UTF_8.name());
         }
     }
 
@@ -116,8 +115,7 @@ public final class AS2Utils {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
              PrintStream ps = new PrintStream(baos, true, "utf-8")) {
             printMessage(ps, message);
-            String content = baos.toString(StandardCharsets.UTF_8.name());
-            return content;
+            return baos.toString(StandardCharsets.UTF_8.name());
         }
     }
 

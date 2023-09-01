@@ -36,7 +36,7 @@ public interface JpaComponentBuilderFactory {
      * Store and retrieve Java objects from databases using Java Persistence API
      * (JPA).
      * 
-     * Category: database,sql
+     * Category: database
      * Since: 1.0
      * Maven coordinates: org.apache.camel:camel-jpa
      * 
@@ -124,23 +124,6 @@ public interface JpaComponentBuilderFactory {
             return this;
         }
         /**
-         * To use the PlatformTransactionManager for managing transactions.
-         * 
-         * The option is a:
-         * &lt;code&gt;org.springframework.transaction.PlatformTransactionManager&lt;/code&gt; type.
-         * 
-         * Group: common
-         * 
-         * @param transactionManager the value to set
-         * @return the dsl builder
-         */
-        @Deprecated
-        default JpaComponentBuilder transactionManager(
-                org.springframework.transaction.PlatformTransactionManager transactionManager) {
-            doSetProperty("transactionManager", transactionManager);
-            return this;
-        }
-        /**
          * To use the TransactionStrategy for running the operations in a
          * transaction.
          * 
@@ -222,6 +205,42 @@ public interface JpaComponentBuilderFactory {
             doSetProperty("autowiredEnabled", autowiredEnabled);
             return this;
         }
+        /**
+         * Used for enabling or disabling all consumer based health checks from
+         * this component.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: true
+         * Group: health
+         * 
+         * @param healthCheckConsumerEnabled the value to set
+         * @return the dsl builder
+         */
+        default JpaComponentBuilder healthCheckConsumerEnabled(
+                boolean healthCheckConsumerEnabled) {
+            doSetProperty("healthCheckConsumerEnabled", healthCheckConsumerEnabled);
+            return this;
+        }
+        /**
+         * Used for enabling or disabling all producer based health checks from
+         * this component. Notice: Camel has by default disabled all producer
+         * based health-checks. You can turn on producer checks globally by
+         * setting camel.health.producersEnabled=true.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: true
+         * Group: health
+         * 
+         * @param healthCheckProducerEnabled the value to set
+         * @return the dsl builder
+         */
+        default JpaComponentBuilder healthCheckProducerEnabled(
+                boolean healthCheckProducerEnabled) {
+            doSetProperty("healthCheckProducerEnabled", healthCheckProducerEnabled);
+            return this;
+        }
     }
 
     class JpaComponentBuilderImpl
@@ -243,11 +262,12 @@ public interface JpaComponentBuilderFactory {
             case "entityManagerFactory": ((JpaComponent) component).setEntityManagerFactory((jakarta.persistence.EntityManagerFactory) value); return true;
             case "joinTransaction": ((JpaComponent) component).setJoinTransaction((boolean) value); return true;
             case "sharedEntityManager": ((JpaComponent) component).setSharedEntityManager((boolean) value); return true;
-            case "transactionManager": ((JpaComponent) component).setTransactionManager((org.springframework.transaction.PlatformTransactionManager) value); return true;
             case "transactionStrategy": ((JpaComponent) component).setTransactionStrategy((org.apache.camel.component.jpa.TransactionStrategy) value); return true;
             case "bridgeErrorHandler": ((JpaComponent) component).setBridgeErrorHandler((boolean) value); return true;
             case "lazyStartProducer": ((JpaComponent) component).setLazyStartProducer((boolean) value); return true;
             case "autowiredEnabled": ((JpaComponent) component).setAutowiredEnabled((boolean) value); return true;
+            case "healthCheckConsumerEnabled": ((JpaComponent) component).setHealthCheckConsumerEnabled((boolean) value); return true;
+            case "healthCheckProducerEnabled": ((JpaComponent) component).setHealthCheckProducerEnabled((boolean) value); return true;
             default: return false;
             }
         }

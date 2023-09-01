@@ -68,7 +68,7 @@ public class SpringHttpsRouteTest {
 
     @BeforeEach
     public void setUp() {
-        // ensure jsse clients can validate the self signed dummy localhost
+        // ensure jsse clients can validate the self-signed dummy localhost
         // cert,
         // use the server keystore as the trust store for these tests
         URL trustStoreUrl = Thread.currentThread().getContextClassLoader().getResource("jsse/localhost.p12");
@@ -86,8 +86,9 @@ public class SpringHttpsRouteTest {
     }
 
     private void restoreSystemProperties() {
-        for (Object key : originalValues.keySet()) {
-            Object value = originalValues.get(key);
+        for (Map.Entry<Object, Object> entry : originalValues.entrySet()) {
+            Object key = entry.getKey();
+            Object value = entry.getValue();
             if (NULL_VALUE_MARKER.equals(value)) {
                 System.clearProperty((String) key);
             } else {
@@ -113,7 +114,7 @@ public class SpringHttpsRouteTest {
 
         Map<String, Object> headers = in.getHeaders();
 
-        log.info("Headers: " + headers);
+        log.info("Headers: {}", headers);
 
         assertTrue(headers.size() > 0, "Should be more than one header but was: " + headers);
     }

@@ -140,9 +140,7 @@ public class AntPathMatcher {
         if (pathIdxStart > pathIdxEnd) {
             // Path is exhausted, only match if rest of pattern is * or **'s
             if (pattIdxStart > pattIdxEnd) {
-                return pattern.endsWith(this.pathSeparator)
-                        ? path.endsWith(this.pathSeparator) : !path
-                                .endsWith(this.pathSeparator);
+                return pattern.endsWith(this.pathSeparator) == path.endsWith(this.pathSeparator);
             }
             if (!fullMatch) {
                 return true;
@@ -460,7 +458,7 @@ public class AntPathMatcher {
                 tokens.add(token);
             }
         }
-        return tokens.toArray(new String[tokens.size()]);
+        return tokens.toArray(new String[0]);
     }
 
     private static boolean different(boolean caseSensitive, char ch, char other) {

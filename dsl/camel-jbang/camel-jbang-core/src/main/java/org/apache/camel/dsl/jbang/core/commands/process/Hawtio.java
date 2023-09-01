@@ -24,21 +24,21 @@ import java.util.concurrent.CountDownLatch;
 import org.apache.camel.dsl.jbang.core.commands.CamelCommand;
 import org.apache.camel.dsl.jbang.core.commands.CamelJBangMain;
 import org.apache.camel.main.download.DependencyDownloaderClassLoader;
-import org.apache.camel.main.download.MavenArtifact;
 import org.apache.camel.main.download.MavenDependencyDownloader;
 import org.apache.camel.support.ObjectHelper;
+import org.apache.camel.tooling.maven.MavenArtifact;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
-@Command(name = "hawtio", description = "Launch Hawtio web console")
+@Command(name = "hawtio", description = "Launch Hawtio web console", sortOptions = false)
 public class Hawtio extends CamelCommand {
 
     @CommandLine.Parameters(description = "Name or pid of running Camel integration", arity = "0..1")
     String name;
 
     @CommandLine.Option(names = { "--version" },
-                        description = "Version of the Hawtio web console", defaultValue = "2.17.0")
-    String version = "2.17.0";
+                        description = "Version of the Hawtio web console", defaultValue = "2.17.6")
+    String version = "2.17.6";
 
     // use port 8888 as 8080 is too commonly used
     @CommandLine.Option(names = { "--port" },
@@ -57,10 +57,7 @@ public class Hawtio extends CamelCommand {
     }
 
     @Override
-    public Integer call() throws Exception {
-        // configure logging first
-        configureLoggingOff();
-
+    public Integer doCall() throws Exception {
         int exit;
         if (name == null) {
             exit = callHawtio();
@@ -88,7 +85,7 @@ public class Hawtio extends CamelCommand {
 
     protected void disconnectJolokia() throws Exception {
         Jolokia jolokia = new Jolokia(getMain());
-        jolokia.name = "" + pid;
+        jolokia.name = Long.toString(pid);
         jolokia.stop = true;
         jolokia.call();
     }
@@ -115,7 +112,7 @@ public class Hawtio extends CamelCommand {
             // turn off hawito auth
             System.setProperty("hawtio.authenticationEnabled", "false");
 
-            // use CL from camel context that now has the downloaded JAR
+            // use CL from that has the downloaded JAR
             Thread.currentThread().setContextClassLoader(cl);
             Class<?> clazz = cl.loadClass("io.hawt.embedded.Main");
             Object hawt = clazz.getDeclaredConstructor().newInstance();
@@ -154,8 +151,7 @@ public class Hawtio extends CamelCommand {
     }
 
     private ClassLoader createClassLoader() {
-        ClassLoader parentCL = Hawtio.class.getClassLoader();
-        return new DependencyDownloaderClassLoader(parentCL);
+        return new DependencyDownloaderClassLoader(null);
     }
 
     private void installHangupInterceptor() {

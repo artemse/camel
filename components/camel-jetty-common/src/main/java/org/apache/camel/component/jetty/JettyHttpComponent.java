@@ -119,7 +119,6 @@ public abstract class JettyHttpComponent extends HttpCommonComponent
     protected ThreadPool threadPool;
     protected MBeanContainer mbContainer;
     protected boolean enableJmx;
-    protected JettyHttpBinding jettyHttpBinding;
     protected Long continuationTimeout;
     protected boolean useContinuation = true;
     protected SSLContextParameters sslContextParameters;
@@ -135,7 +134,7 @@ public abstract class JettyHttpComponent extends HttpCommonComponent
     private boolean sendServerVersion = true;
     private QueuedThreadPool defaultQueuedThreadPool;
 
-    public JettyHttpComponent() {
+    protected JettyHttpComponent() {
     }
 
     static class ConnectorRef {
@@ -190,8 +189,7 @@ public abstract class JettyHttpComponent extends HttpCommonComponent
         // extract filterInit. parameters
         Map filterInitParameters = PropertiesHelper.extractProperties(parameters, "filterInit.");
 
-        String address = remaining;
-        URI addressUri = new URI(UnsafeUriCharactersEncoder.encodeHttpURI(address));
+        URI addressUri = new URI(UnsafeUriCharactersEncoder.encodeHttpURI(remaining));
         URI endpointUri = URISupport.createRemainingURI(addressUri, parameters);
         // need to keep the httpMethodRestrict parameter for the endpointUri
         String httpMethodRestrict = getAndRemoveParameter(parameters, "httpMethodRestrict", String.class);
@@ -410,7 +408,7 @@ public abstract class JettyHttpComponent extends HttpCommonComponent
             }
             filterHolder.setFilter(new CamelFilterWrapper(filter));
             String pathSpec = endpoint.getPath();
-            if (pathSpec == null || "".equals(pathSpec)) {
+            if (pathSpec == null || pathSpec.isEmpty()) {
                 pathSpec = "/";
             }
             if (endpoint.isMatchOnUriPrefix()) {
@@ -446,7 +444,7 @@ public abstract class JettyHttpComponent extends HttpCommonComponent
         }
         filterHolder.setFilter(new CamelFilterWrapper(filter));
         String pathSpec = endpoint.getPath();
-        if (pathSpec == null || "".equals(pathSpec)) {
+        if (pathSpec == null || pathSpec.isEmpty()) {
             pathSpec = "/";
         }
         if (endpoint.isMatchOnUriPrefix()) {
@@ -656,28 +654,28 @@ public abstract class JettyHttpComponent extends HttpCommonComponent
         if (ssl != null && ssl.getCipherSuitesFilter() != null) {
             List<String> includeCiphers = ssl.getCipherSuitesFilter().getInclude();
             if (includeCiphers != null && !includeCiphers.isEmpty()) {
-                String[] arr = includeCiphers.toArray(new String[includeCiphers.size()]);
+                String[] arr = includeCiphers.toArray(new String[0]);
                 answer.setIncludeCipherSuites(arr);
             } else {
                 answer.setIncludeCipherSuites(".*");
             }
             List<String> excludeCiphers = ssl.getCipherSuitesFilter().getExclude();
             if (excludeCiphers != null && !excludeCiphers.isEmpty()) {
-                String[] arr = excludeCiphers.toArray(new String[excludeCiphers.size()]);
+                String[] arr = excludeCiphers.toArray(new String[0]);
                 answer.setExcludeCipherSuites(arr);
             }
         }
         if (ssl != null && ssl.getSecureSocketProtocolsFilter() != null) {
             List<String> includeProtocols = ssl.getSecureSocketProtocolsFilter().getInclude();
             if (includeProtocols != null && !includeProtocols.isEmpty()) {
-                String[] arr = includeProtocols.toArray(new String[includeProtocols.size()]);
+                String[] arr = includeProtocols.toArray(new String[0]);
                 answer.setIncludeProtocols(arr);
             } else {
                 answer.setIncludeProtocols(".*");
             }
             List<String> excludeProtocols = ssl.getSecureSocketProtocolsFilter().getExclude();
             if (excludeProtocols != null && !excludeProtocols.isEmpty()) {
-                String[] arr = excludeProtocols.toArray(new String[excludeProtocols.size()]);
+                String[] arr = excludeProtocols.toArray(new String[0]);
                 answer.setExcludeProtocols(arr);
             }
         }
@@ -689,13 +687,7 @@ public abstract class JettyHttpComponent extends HttpCommonComponent
         try {
             Method method = instance.getClass().getMethod("checkConfig");
             return (Boolean) method.invoke(instance);
-        } catch (NoSuchMethodException ex) {
-            // ignore
-        } catch (IllegalArgumentException e) {
-            // ignore
-        } catch (IllegalAccessException e) {
-            // ignore
-        } catch (InvocationTargetException e) {
+        } catch (IllegalArgumentException | NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
             // ignore
         }
         return false;
@@ -777,20 +769,6 @@ public abstract class JettyHttpComponent extends HttpCommonComponent
     @Metadata(description = "If this option is true, Jetty JMX support will be enabled for this endpoint.")
     public void setEnableJmx(boolean enableJmx) {
         this.enableJmx = enableJmx;
-    }
-
-    public JettyHttpBinding getJettyHttpBinding() {
-        return jettyHttpBinding;
-    }
-
-    /**
-     * To use a custom org.apache.camel.component.jetty.JettyHttpBinding, which are used to customize how a response
-     * should be written for the producer.
-     */
-    @Metadata(description = "To use a custom org.apache.camel.component.jetty.JettyHttpBinding, which are used to customize how a response should be written for the producer.",
-              label = "advanced")
-    public void setJettyHttpBinding(JettyHttpBinding jettyHttpBinding) {
-        this.jettyHttpBinding = jettyHttpBinding;
     }
 
     /**

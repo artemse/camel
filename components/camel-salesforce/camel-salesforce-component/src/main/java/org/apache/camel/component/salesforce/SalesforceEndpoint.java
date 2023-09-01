@@ -35,13 +35,12 @@ import org.slf4j.LoggerFactory;
  * Communicate with Salesforce using Java DTOs.
  */
 @UriEndpoint(firstVersion = "2.12.0", scheme = "salesforce", title = "Salesforce",
-             syntax = "salesforce:operationName:topicName", category = { Category.CLOUD, Category.API, Category.CRM },
+             syntax = "salesforce:operationName:topicName", category = { Category.CLOUD, Category.SAAS },
              headersClass = SalesforceConstants.class)
 public class SalesforceEndpoint extends DefaultEndpoint {
 
     private static final Logger LOG = LoggerFactory.getLogger(SalesforceEndpoint.class);
 
-    //CHECKSTYLE:OFF
     @UriPath( label = "common", description = "The operation to use", enums = "getVersions,"
             + "getResources,getGlobalObjects,getBasicInfo,getDescription,getSObject,createSObject,"
             + "updateSObject,deleteSObject,getSObjectWithId,upsertSObject,deleteSObjectWithId,"
@@ -57,17 +56,21 @@ public class SalesforceEndpoint extends DefaultEndpoint {
             + "bulk2AbortJob,bulk2DeleteJob,bulk2GetSuccessfulResults,bulk2GetFailedResults,"
             + "bulk2GetUnprocessedRecords,bulk2CreateQueryJob,bulk2GetQueryJob,"
             + "bulk2GetAllQueryJobs,bulk2GetQueryJobResults,bulk2AbortQueryJob,bulk2DeleteQueryJob,"
-            + "raw,subscribe")
+            + "raw,subscribe,pubSubSubscribe,pubSubPublish")
     @Metadata(required = true)
     private final OperationName operationName;
-    //CHECKSTYLE:ON
-    @UriPath(label = "consumer", description = "The name of the topic/channel to use")
+
+    @UriPath(label = "consumer,producer", description = "The name of the topic/channel to use")
     private final String topicName;
+
     @UriParam
     private final SalesforceEndpointConfig configuration;
 
-    @UriParam(label = "consumer", description = "The replayId value to use when subscribing")
+    @UriParam(label = "consumer", description = "The replayId value to use when subscribing to the Streaming API.")
     private Long replayId;
+
+    @UriParam(label = "consumer", description = "The replayId value to use when subscribing to the Pub/Sub API.")
+    private String pubSubReplayId;
 
     public SalesforceEndpoint(String uri, SalesforceComponent salesforceComponent, SalesforceEndpointConfig configuration,
                               OperationName operationName, String topicName) {
@@ -91,8 +94,16 @@ public class SalesforceEndpoint extends DefaultEndpoint {
 
     @Override
     public Consumer createConsumer(Processor processor) throws Exception {
-        final SubscriptionHelper subscriptionHelper = getComponent().getSubscriptionHelper();
-        final SalesforceConsumer consumer = new SalesforceConsumer(this, processor, subscriptionHelper);
+        Consumer consumer = null;
+        switch (operationName) {
+            case SUBSCRIBE -> {
+                final SubscriptionHelper subscriptionHelper = getComponent().getSubscriptionHelper();
+                consumer = new StreamingApiConsumer(this, processor, subscriptionHelper);
+            }
+            case PUBSUB_SUBSCRIBE -> {
+                consumer = new PubSubApiConsumer(this, processor);
+            }
+        }
         configureConsumer(consumer);
         return consumer;
     }
@@ -120,6 +131,14 @@ public class SalesforceEndpoint extends DefaultEndpoint {
 
     public Long getReplayId() {
         return replayId;
+    }
+
+    public String getPubSubReplayId() {
+        return pubSubReplayId;
+    }
+
+    public void setPubSubReplayId(String pubSubReplayId) {
+        this.pubSubReplayId = pubSubReplayId;
     }
 
     @Override

@@ -35,7 +35,7 @@ public interface InfinispanEmbeddedComponentBuilderFactory {
      * Read and write from/to Infinispan distributed key/value store and data
      * grid.
      * 
-     * Category: cache,datagrid,clustering
+     * Category: cache,clustering
      * Since: 2.13
      * Maven coordinates: org.apache.camel:camel-infinispan-embedded
      * 
@@ -330,6 +330,9 @@ public interface InfinispanEmbeddedComponentBuilderFactory {
         }
         /**
          * An implementation specific URI for the CacheManager.
+         * 
+         * This option can also be loaded from an existing file, by prefixing
+         * with file: or classpath: followed by the location of the file.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 

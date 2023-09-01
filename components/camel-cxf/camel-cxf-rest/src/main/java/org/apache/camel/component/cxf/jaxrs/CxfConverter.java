@@ -67,7 +67,7 @@ public final class CxfConverter {
         if (object instanceof Collection) {
             return ((Collection<?>) object).toArray();
         } else {
-            Object answer[];
+            Object[] answer;
             if (object == null) {
                 answer = new Object[0];
             } else {
@@ -91,8 +91,7 @@ public final class CxfConverter {
             throws SOAPException, IOException {
         CachedOutputStream cos = new CachedOutputStream(exchange);
         soapMessage.writeTo(cos);
-        InputStream in = cos.getInputStream();
-        return in;
+        return cos.getInputStream();
     }
 
     @Converter

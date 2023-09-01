@@ -25,7 +25,6 @@ import org.apache.camel.CamelContextAware;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.Expression;
 import org.apache.camel.ExpressionFactory;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.Processor;
 import org.apache.camel.Route;
 import org.apache.camel.cloud.ServiceChooser;
@@ -147,7 +146,8 @@ public class ServiceCallProcessorFactory extends TypedProcessorFactory<ServiceCa
 
     private ServiceCallConfigurationDefinition retrieveDefaultConfig(CamelContext camelContext) {
         // check if a default configuration is bound to the registry
-        ServiceCallConfigurationDefinition config = camelContext.getExtension(Model.class).getServiceCallConfiguration(null);
+        ServiceCallConfigurationDefinition config
+                = camelContext.getCamelContextExtension().getContextPlugin(Model.class).getServiceCallConfiguration(null);
 
         if (config == null) {
             // Or if it is in the registry
@@ -172,7 +172,8 @@ public class ServiceCallProcessorFactory extends TypedProcessorFactory<ServiceCa
             config = lookup(camelContext, definition.getConfigurationRef(), ServiceCallConfigurationDefinition.class);
             if (config == null) {
                 // and fallback as service configuration
-                config = camelContext.getExtension(Model.class).getServiceCallConfiguration(definition.getConfigurationRef());
+                config = camelContext.getCamelContextExtension().getContextPlugin(Model.class)
+                        .getServiceCallConfiguration(definition.getConfigurationRef());
             }
         }
 
@@ -425,7 +426,7 @@ public class ServiceCallProcessorFactory extends TypedProcessorFactory<ServiceCa
 
                 try {
                     // Then use Service factory.
-                    type = camelContext.adapt(ExtendedCamelContext.class)
+                    type = camelContext.getCamelContextExtension()
                             .getFactoryFinder(ServiceCallDefinitionConstants.RESOURCE_PATH).findClass(lookupName).orElse(null);
                 } catch (Exception e) {
                 }

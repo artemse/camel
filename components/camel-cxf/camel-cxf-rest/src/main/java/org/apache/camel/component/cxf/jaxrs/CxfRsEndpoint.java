@@ -26,6 +26,7 @@ import java.util.Map;
 
 import javax.net.ssl.HostnameVerifier;
 
+import org.apache.camel.Category;
 import org.apache.camel.Component;
 import org.apache.camel.Consumer;
 import org.apache.camel.Processor;
@@ -68,8 +69,8 @@ import static org.apache.camel.component.cxf.common.message.CxfConstants.SCHEME_
 /**
  * Expose JAX-RS REST services using Apache CXF or connect to external REST services using CXF REST client.
  */
-@UriEndpoint(firstVersion = "2.0.0", scheme = SCHEME_CXF_RS, title = "CXF-RS", syntax = "cxfrs:beanId:address", label = "rest",
-             lenientProperties = true, headersClass = CxfConstants.class)
+@UriEndpoint(firstVersion = "2.0.0", scheme = SCHEME_CXF_RS, title = "CXF-RS", syntax = "cxfrs:beanId:address",
+             category = { Category.REST }, lenientProperties = true, headersClass = CxfConstants.class)
 public class CxfRsEndpoint extends DefaultEndpoint implements HeaderFilterStrategyAware, Service {
 
     private static final Logger LOG = LoggerFactory.getLogger(CxfRsEndpoint.class);
@@ -386,7 +387,7 @@ public class CxfRsEndpoint extends DefaultEndpoint implements HeaderFilterStrate
         }
         if (this.isSkipFaultLogging()) {
             if (factory.getProperties() == null) {
-                factory.setProperties(new HashMap<String, Object>());
+                factory.setProperties(new HashMap<>());
             }
             factory.getProperties().put(FaultListener.class.getName(), new NullFaultListener());
         }
@@ -697,7 +698,7 @@ public class CxfRsEndpoint extends DefaultEndpoint implements HeaderFilterStrate
      * Set the feature list to the CxfRs endpoint.
      */
     public void setFeatures(List<Feature> features) {
-        this.features = new ArrayList<Feature>(features);
+        this.features = new ArrayList<>(features);
     }
 
     public Map<String, Object> getProperties() {

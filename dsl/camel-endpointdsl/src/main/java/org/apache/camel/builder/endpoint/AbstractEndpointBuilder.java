@@ -16,7 +16,6 @@
  */
 package org.apache.camel.builder.endpoint;
 
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -27,9 +26,7 @@ import java.util.TreeMap;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Endpoint;
 import org.apache.camel.Expression;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.NoSuchEndpointException;
-import org.apache.camel.RuntimeCamelException;
 import org.apache.camel.spi.Language;
 import org.apache.camel.spi.NormalizedEndpointUri;
 import org.apache.camel.spi.PropertiesComponent;
@@ -64,8 +61,7 @@ public class AbstractEndpointBuilder {
         Map<String, Object> remaining = new LinkedHashMap<>();
         // we should not bind complex objects to registry as we create the endpoint via the properties as-is
         NormalizedEndpointUri uri = computeUri(remaining, context, false, true);
-        ExtendedCamelContext ecc = (ExtendedCamelContext) context;
-        Endpoint endpoint = ecc.getEndpoint(uri, properties);
+        Endpoint endpoint = context.getCamelContextExtension().getEndpoint(uri, properties);
         if (endpoint == null) {
             throw new NoSuchEndpointException(uri.getUri());
         }
@@ -79,7 +75,7 @@ public class AbstractEndpointBuilder {
             Object value = entry.getValue();
             if (value instanceof String) {
                 String text = (String) value;
-                String changed = context.adapt(ExtendedCamelContext.class).resolvePropertyPlaceholders(text, true);
+                String changed = context.getCamelContextExtension().resolvePropertyPlaceholders(text, true);
                 if (changed.startsWith(PropertiesComponent.PREFIX_OPTIONAL_TOKEN)) {
                     // unresolved then remove it
                     toRemove.add(entry.getKey());
@@ -134,16 +130,12 @@ public class AbstractEndpointBuilder {
         if (params.isEmpty()) {
             answer = NormalizedUri.newNormalizedUri(targetScheme + "://" + targetPath, true);
         } else {
-            try {
-                // build query string from parameters
-                String query = URISupport.createQueryString(params, encode);
-                if (targetPath.contains("?")) {
-                    answer = NormalizedUri.newNormalizedUri(targetScheme + "://" + targetPath + "&" + query, true);
-                } else {
-                    answer = NormalizedUri.newNormalizedUri(targetScheme + "://" + targetPath + "?" + query, true);
-                }
-            } catch (URISyntaxException e) {
-                throw RuntimeCamelException.wrapRuntimeCamelException(e);
+            // build query string from parameters
+            String query = URISupport.createQueryString(params, encode);
+            if (targetPath.contains("?")) {
+                answer = NormalizedUri.newNormalizedUri(targetScheme + "://" + targetPath + "&" + query, true);
+            } else {
+                answer = NormalizedUri.newNormalizedUri(targetScheme + "://" + targetPath + "?" + query, true);
             }
         }
 

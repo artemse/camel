@@ -130,7 +130,7 @@ public class PrinterPrintTest extends CamelTestSupport {
         template.send("direct:start", new Processor() {
             public void process(Exchange exchange) throws Exception {
                 // Read from an input stream
-                InputStream is = IOHelper.buffered(new FileInputStream("src/test/resources/asf-logo.JPG"));
+                InputStream is = IOHelper.buffered(new FileInputStream("src/test/resources/asf-logo.jpg"));
 
                 byte buffer[] = new byte[is.available()];
                 int n = is.available();
@@ -261,7 +261,7 @@ public class PrinterPrintTest extends CamelTestSupport {
         context.start();
 
         // Are there two different PrintConfigurations?
-        Map<String, Endpoint> epm = context().getEndpointMap();
+        Map<String, Endpoint> epm = context().getEndpointRegistry().getReadOnlyMap();
         assertEquals(4, epm.size(), "Four endpoints");
         Endpoint lp1 = null;
         Endpoint lp2 = null;

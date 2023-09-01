@@ -277,6 +277,36 @@ public interface ArangoDbEndpointBuilderFactory {
             doSetProperty("lazyStartProducer", lazyStartProducer);
             return this;
         }
+        /**
+         * To use an existing ArangDB client.
+         * 
+         * The option is a: &lt;code&gt;com.arangodb.ArangoDB&lt;/code&gt; type.
+         * 
+         * Group: advanced
+         * 
+         * @param arangoDB the value to set
+         * @return the dsl builder
+         */
+        default AdvancedArangoDbEndpointBuilder arangoDB(
+                com.arangodb.ArangoDB arangoDB) {
+            doSetProperty("arangoDB", arangoDB);
+            return this;
+        }
+        /**
+         * To use an existing ArangDB client.
+         * 
+         * The option will be converted to a
+         * &lt;code&gt;com.arangodb.ArangoDB&lt;/code&gt; type.
+         * 
+         * Group: advanced
+         * 
+         * @param arangoDB the value to set
+         * @return the dsl builder
+         */
+        default AdvancedArangoDbEndpointBuilder arangoDB(String arangoDB) {
+            doSetProperty("arangoDB", arangoDB);
+            return this;
+        }
     }
 
     public interface ArangoDbBuilders {
@@ -285,7 +315,7 @@ public interface ArangoDbEndpointBuilderFactory {
          * Perform operations on ArangoDb when used as a Document Database, or
          * as a Graph Database
          * 
-         * Category: database,nosql
+         * Category: database
          * Since: 3.5
          * Maven coordinates: org.apache.camel:camel-arangodb
          * 
@@ -299,7 +329,7 @@ public interface ArangoDbEndpointBuilderFactory {
          * Perform operations on ArangoDb when used as a Document Database, or
          * as a Graph Database
          * 
-         * Category: database,nosql
+         * Category: database
          * Since: 3.5
          * Maven coordinates: org.apache.camel:camel-arangodb
          * 
@@ -319,7 +349,7 @@ public interface ArangoDbEndpointBuilderFactory {
          * Perform operations on ArangoDb when used as a Document Database, or
          * as a Graph Database
          * 
-         * Category: database,nosql
+         * Category: database
          * Since: 3.5
          * Maven coordinates: org.apache.camel:camel-arangodb
          * 

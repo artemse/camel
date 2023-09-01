@@ -18,6 +18,7 @@ package org.apache.camel.impl.engine;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ScheduledExecutorService;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Endpoint;
@@ -46,6 +47,7 @@ import org.apache.camel.spi.ComponentResolver;
 import org.apache.camel.spi.ConfigurerResolver;
 import org.apache.camel.spi.DataFormatResolver;
 import org.apache.camel.spi.DeferServiceFactory;
+import org.apache.camel.spi.DumpRoutesStrategy;
 import org.apache.camel.spi.EndpointRegistry;
 import org.apache.camel.spi.ExchangeFactory;
 import org.apache.camel.spi.ExchangeFactoryManager;
@@ -62,6 +64,7 @@ import org.apache.camel.spi.ManagementNameStrategy;
 import org.apache.camel.spi.MessageHistoryFactory;
 import org.apache.camel.spi.ModelJAXBContextFactory;
 import org.apache.camel.spi.ModelToXMLDumper;
+import org.apache.camel.spi.ModelToYAMLDumper;
 import org.apache.camel.spi.ModelineFactory;
 import org.apache.camel.spi.NodeIdFactory;
 import org.apache.camel.spi.PackageScanClassResolver;
@@ -91,6 +94,7 @@ import org.apache.camel.spi.ValidatorRegistry;
 import org.apache.camel.support.DefaultRegistry;
 import org.apache.camel.support.DefaultUuidGenerator;
 import org.apache.camel.support.NormalizedUri;
+import org.apache.camel.support.PluginHelper;
 import org.apache.camel.support.ResolverHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -128,6 +132,14 @@ public class SimpleCamelContext extends AbstractCamelContext {
     }
 
     @Override
+    public void doBuild() throws Exception {
+        super.doBuild();
+
+        getCamelContextExtension().addContextPlugin(CliConnectorFactory.class, createCliConnectorFactory());
+        getCamelContextExtension().addContextPlugin(ScheduledExecutorService.class, createErrorHandlerExecutorService());
+    }
+
+    @Override
     protected HealthCheckRegistry createHealthCheckRegistry() {
         Optional<HealthCheckRegistry> result = ResolverHelper.resolveService(
                 getCamelContextReference(),
@@ -152,7 +164,7 @@ public class SimpleCamelContext extends AbstractCamelContext {
     @Override
     protected TypeConverter createTypeConverter() {
         return new DefaultTypeConverter(
-                getCamelContextReference(), getPackageScanClassResolver(), getInjector(),
+                getCamelContextReference(), PluginHelper.getPackageScanClassResolver(this), getInjector(),
                 isLoadTypeConverters());
     }
 
@@ -173,11 +185,7 @@ public class SimpleCamelContext extends AbstractCamelContext {
     protected Injector createInjector() {
         FactoryFinder finder = getBootstrapFactoryFinder();
         Optional<Injector> result = finder.newInstance("Injector", Injector.class);
-        if (result.isPresent()) {
-            return result.get();
-        } else {
-            return new DefaultInjector(getCamelContextReference());
-        }
+        return result.orElseGet(() -> new DefaultInjector(getCamelContextReference()));
     }
 
     @Override
@@ -261,7 +269,7 @@ public class SimpleCamelContext extends AbstractCamelContext {
     @Override
     protected PeriodTaskResolver createPeriodTaskResolver() {
         // we need a factory finder
-        FactoryFinder finder = getFactoryFinderResolver()
+        FactoryFinder finder = PluginHelper.getFactoryFinderResolver(getCamelContextExtension())
                 .resolveBootstrapFactoryFinder(getClassResolver(), PeriodTaskResolver.RESOURCE_PATH);
         return new DefaultPeriodTaskResolver(finder);
     }
@@ -404,6 +412,37 @@ public class SimpleCamelContext extends AbstractCamelContext {
     }
 
     @Override
+    protected DumpRoutesStrategy createDumpRoutesStrategy() {
+        DumpRoutesStrategy answer = getCamelContextReference().hasService(DumpRoutesStrategy.class);
+        if (answer != null) {
+            return answer;
+        }
+
+        // is there any custom which we prioritize over default
+        Optional<DumpRoutesStrategy> result = ResolverHelper.resolveService(
+                getCamelContextReference(),
+                getBootstrapFactoryFinder(),
+                DumpRoutesStrategy.FACTORY,
+                DumpRoutesStrategy.class);
+
+        if (result.isEmpty()) {
+            // lookup default factory
+            result = ResolverHelper.resolveService(
+                    getCamelContextReference(),
+                    getBootstrapFactoryFinder(),
+                    "default-" + DumpRoutesStrategy.FACTORY,
+                    DumpRoutesStrategy.class);
+        }
+
+        if (result.isPresent()) {
+            return result.get();
+        } else {
+            throw new IllegalArgumentException(
+                    "Cannot find DumpRoutesStrategy on classpath. Add camel-core-engine to classpath.");
+        }
+    }
+
+    @Override
     protected CamelContextNameStrategy createCamelContextNameStrategy() {
         return new DefaultCamelContextNameStrategy();
     }
@@ -424,8 +463,7 @@ public class SimpleCamelContext extends AbstractCamelContext {
         return result.orElseGet(DefaultHeadersMapFactory::new);
     }
 
-    @Override
-    protected CliConnectorFactory createCliConnectorFactory() {
+    private CliConnectorFactory createCliConnectorFactory() {
         // lookup in registry first
         CliConnectorFactory ccf = getCamelContextReference().getRegistry().findSingleByType(CliConnectorFactory.class);
         if (ccf != null) {
@@ -541,7 +579,22 @@ public class SimpleCamelContext extends AbstractCamelContext {
         if (result.isPresent()) {
             return result.get();
         } else {
-            throw new IllegalArgumentException("Cannot find ModelToXMLDumper on classpath. Add camel-xml-jaxb to classpath.");
+            throw new IllegalArgumentException("Cannot find ModelToXMLDumper on classpath. Add camel-xml-io to classpath.");
+        }
+    }
+
+    @Override
+    protected ModelToYAMLDumper createModelToYAMLDumper() {
+        Optional<ModelToYAMLDumper> result = ResolverHelper.resolveService(
+                getCamelContextReference(),
+                getBootstrapFactoryFinder(),
+                ModelToYAMLDumper.FACTORY,
+                ModelToYAMLDumper.class);
+
+        if (result.isPresent()) {
+            return result.get();
+        } else {
+            throw new IllegalArgumentException("Cannot find ModelToYAMLDumper on classpath. Add camel-yaml-io to classpath.");
         }
     }
 
@@ -572,13 +625,17 @@ public class SimpleCamelContext extends AbstractCamelContext {
             }
         }
         if (tracer == null) {
-            tracer = getExtension(Tracer.class);
+            tracer = getCamelContextExtension().getContextPlugin(Tracer.class);
         }
         if (tracer == null) {
             tracer = new DefaultTracer();
             tracer.setEnabled(isTracing());
             tracer.setStandby(isTracingStandby());
-            setExtension(Tracer.class, tracer);
+            // enable both rest/templates if templates is enabled (we only want 1 public option)
+            boolean restOrTemplates = isTracingTemplates();
+            tracer.setTraceTemplates(restOrTemplates);
+            tracer.setTraceRests(restOrTemplates);
+            getCamelContextExtension().addContextPlugin(Tracer.class, tracer);
         }
         return tracer;
     }
@@ -689,12 +746,6 @@ public class SimpleCamelContext extends AbstractCamelContext {
 
     @Override
     public String addRouteFromTemplate(String routeId, String routeTemplateId, String prefixId, Map<String, Object> parameters)
-            throws Exception {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public String addRouteFromTemplate(String routeId, String routeTemplateId, RouteTemplateContext routeTemplateContext)
             throws Exception {
         throw new UnsupportedOperationException();
     }

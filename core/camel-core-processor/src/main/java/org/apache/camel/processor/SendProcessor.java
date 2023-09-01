@@ -20,12 +20,12 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.camel.AsyncCallback;
 import org.apache.camel.AsyncProducer;
+import org.apache.camel.CamelContext;
 import org.apache.camel.Endpoint;
 import org.apache.camel.EndpointAware;
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.ExchangePropertyKey;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.Traceable;
 import org.apache.camel.spi.IdAware;
 import org.apache.camel.spi.ProducerCache;
@@ -51,11 +51,11 @@ public class SendProcessor extends AsyncProcessorSupport implements Traceable, E
     private static final Logger LOG = LoggerFactory.getLogger(SendProcessor.class);
 
     protected transient String traceLabelToString;
-    protected final ExtendedCamelContext camelContext;
+    protected final CamelContext camelContext;
     protected final ExchangePattern pattern;
     protected ProducerCache producerCache;
     protected AsyncProducer producer;
-    protected Endpoint destination;
+    protected final Endpoint destination;
     protected ExchangePattern destinationExchangePattern;
     protected String id;
     protected String routeId;
@@ -69,7 +69,7 @@ public class SendProcessor extends AsyncProcessorSupport implements Traceable, E
     public SendProcessor(Endpoint destination, ExchangePattern pattern) {
         ObjectHelper.notNull(destination, "destination");
         this.destination = destination;
-        this.camelContext = (ExtendedCamelContext) destination.getCamelContext();
+        this.camelContext = destination.getCamelContext();
         ObjectHelper.notNull(this.camelContext, "camelContext");
         this.pattern = pattern;
         this.destinationExchangePattern = null;
@@ -139,7 +139,7 @@ public class SendProcessor extends AsyncProcessorSupport implements Traceable, E
             // set property which endpoint we send to
             exchange.setProperty(ExchangePropertyKey.TO_ENDPOINT, destination.getEndpointUri());
 
-            final boolean sending = camelContext.isEventNotificationApplicable()
+            final boolean sending = camelContext.getCamelContextExtension().isEventNotificationApplicable()
                     && EventHelper.notifyExchangeSending(exchange.getContext(), target, destination);
             // record timing for sending the exchange using the producer
             StopWatch watch;
@@ -174,7 +174,7 @@ public class SendProcessor extends AsyncProcessorSupport implements Traceable, E
                     EventHelper.notifyExchangeAsyncProcessingStartedEvent(camelContext, exchange);
                 }
                 return sync;
-            } catch (Throwable throwable) {
+            } catch (Exception throwable) {
                 exchange.setException(throwable);
                 callback.done(true);
             }

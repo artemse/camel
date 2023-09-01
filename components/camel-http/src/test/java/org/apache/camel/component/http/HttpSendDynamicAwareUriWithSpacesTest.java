@@ -18,14 +18,13 @@ package org.apache.camel.component.http;
 
 import java.util.Map;
 
-import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.apache.camel.RoutesBuilder;
 import org.apache.camel.builder.ExchangeBuilder;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.http.handler.BasicValidationHandler;
-import org.apache.http.impl.bootstrap.HttpServer;
-import org.apache.http.impl.bootstrap.ServerBootstrap;
+import org.apache.hc.core5.http.impl.bootstrap.HttpServer;
+import org.apache.hc.core5.http.impl.bootstrap.ServerBootstrap;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,8 +41,8 @@ public class HttpSendDynamicAwareUriWithSpacesTest extends BaseHttpTest {
     public void setUp() throws Exception {
         localServer = ServerBootstrap.bootstrap().setHttpProcessor(getBasicHttpProcessor())
                 .setConnectionReuseStrategy(getConnectionReuseStrategy()).setResponseFactory(getHttpResponseFactory())
-                .setExpectationVerifier(getHttpExpectationVerifier()).setSslContext(getSSLContext())
-                .registerHandler("/users/*", new BasicValidationHandler("GET", null, null, "a user")).create();
+                .setSslContext(getSSLContext())
+                .register("/users/*", new BasicValidationHandler("GET", null, null, "a user")).create();
         localServer.start();
 
         super.setUp();
@@ -82,7 +81,7 @@ public class HttpSendDynamicAwareUriWithSpacesTest extends BaseHttpTest {
         assertEquals("a user", out.getMessage().getBody(String.class));
 
         // and there should only be one http endpoint as they are both on same host
-        Map<String, Endpoint> endpointMap = context.getEndpointMap();
+        Map endpointMap = context.getEndpointRegistry();
         assertEquals(2, endpointMap.size());
         assertTrue(endpointMap.containsKey("http://localhost:" + localServer.getLocalPort()), "Should find static uri");
         assertTrue(endpointMap.containsKey("direct://usersDrink"), "Should find direct");

@@ -18,7 +18,6 @@ package org.apache.camel.main.download;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.CamelContextAware;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.dsl.yaml.KameletRoutesBuilderLoader;
 import org.apache.camel.impl.engine.DefaultRoutesLoader;
 import org.apache.camel.spi.FactoryFinder;
@@ -32,10 +31,16 @@ import org.apache.camel.support.service.ServiceHelper;
 public class DependencyDownloaderRoutesLoader extends DefaultRoutesLoader {
 
     private final DependencyDownloader downloader;
+    private final String kameletsVersion;
 
     public DependencyDownloaderRoutesLoader(CamelContext camelContext) {
+        this(camelContext, null);
+    }
+
+    public DependencyDownloaderRoutesLoader(CamelContext camelContext, String kameletsVersion) {
         setCamelContext(camelContext);
         this.downloader = camelContext.hasService(DependencyDownloader.class);
+        this.kameletsVersion = kameletsVersion;
     }
 
     @Override
@@ -53,7 +58,8 @@ public class DependencyDownloaderRoutesLoader extends DefaultRoutesLoader {
             downloadLoader("camel-jsh-dsl");
         } else if ("kts".equals(extension)) {
             downloadLoader("camel-kotlin-dsl");
-        } else if ("xml".equals(extension)) {
+        } else if ("xml".equals(extension)
+                || "camel.xml".equals(extension)) {
             downloadLoader("camel-xml-io-dsl");
         } else if ("yaml".equals(extension)
                 || "kamelet.yaml".equals(extension)
@@ -65,7 +71,7 @@ public class DependencyDownloaderRoutesLoader extends DefaultRoutesLoader {
         // special for kamelet as we want to track loading kamelets
         RoutesBuilderLoader loader;
         if (KameletRoutesBuilderLoader.EXTENSION.equals(extension)) {
-            loader = new KnownKameletRoutesBuilderLoader();
+            loader = new KnownKameletRoutesBuilderLoader(kameletsVersion);
             CamelContextAware.trySetCamelContext(loader, getCamelContext());
             // allows for custom initialization
             initRoutesBuilderLoader(loader);
@@ -75,8 +81,8 @@ public class DependencyDownloaderRoutesLoader extends DefaultRoutesLoader {
         }
         if (loader == null) {
             // need to use regular factory finder as bootstrap has already marked the loader as a miss
-            final ExtendedCamelContext ecc = getCamelContext().adapt(ExtendedCamelContext.class);
-            final FactoryFinder finder = ecc.getFactoryFinder(RoutesBuilderLoader.FACTORY_PATH);
+            final CamelContext ecc = getCamelContext();
+            final FactoryFinder finder = ecc.getCamelContextExtension().getFactoryFinder(RoutesBuilderLoader.FACTORY_PATH);
             loader = ResolverHelper.resolveService(ecc, finder, extension, RoutesBuilderLoader.class).orElse(null);
             if (loader != null) {
                 CamelContextAware.trySetCamelContext(loader, getCamelContext());

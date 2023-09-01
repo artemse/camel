@@ -16,23 +16,33 @@
  */
 package org.apache.camel.xml.out;
 
-import java.io.*;
+import java.io.IOError;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
 import jakarta.xml.bind.annotation.XmlTransient;
 
+import org.w3c.dom.Element;
+
 import org.apache.camel.model.RouteTemplatesDefinition;
 import org.apache.camel.model.RoutesDefinition;
 import org.apache.camel.model.TemplatedRoutesDefinition;
+import org.apache.camel.model.app.BeansDefinition;
 import org.apache.camel.model.rest.RestsDefinition;
+import org.apache.camel.util.StringHelper;
 import org.apache.camel.xml.in.ModelParser;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -40,7 +50,9 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.AssertionFailureBuilder.assertionFailure;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class ModelWriterTest {
 
@@ -102,6 +114,20 @@ public class ModelWriterTest {
         }
     }
 
+    @ParameterizedTest
+    @MethodSource("beans")
+    @DisplayName("Test xml roundtrip for <beans>")
+    void testBeans(String xml, String ns) throws Exception {
+        try (InputStream is = getClass().getClassLoader().getResourceAsStream(xml)) {
+            BeansDefinition expected = new ModelParser(is, NAMESPACE).parseBeansDefinition().get();
+            StringWriter sw = new StringWriter();
+            new ModelWriter(sw, ns).writeBeansDefinition(expected);
+            BeansDefinition actual
+                    = new ModelParser(new StringReader(sw.toString()), ns).parseBeansDefinition().get();
+            assertDeepEquals(expected, actual, sw.toString());
+        }
+    }
+
     private static Stream<Arguments> routes() {
         return definitions("routes");
     }
@@ -116,6 +142,10 @@ public class ModelWriterTest {
 
     private static Stream<Arguments> templatedRoutes() {
         return definitions("templatedRoutes");
+    }
+
+    private static Stream<Arguments> beans() {
+        return definitions("beans");
     }
 
     private static Stream<Arguments> definitions(String xml) {
@@ -173,6 +203,10 @@ public class ModelWriterTest {
             assertEquals(((Enum) expected).name(), ((Enum) actual).name(), path);
         } else if (expected.getClass().getName().startsWith("java.")) {
             assertEquals(expected, actual, path);
+        } else if (Element.class.isAssignableFrom(expected.getClass())) {
+            // TODO: deep check
+            assertEquals(((Element) expected).getTagName(), ((Element) actual).getTagName(), path);
+            assertEquals(((Element) expected).getNamespaceURI(), ((Element) actual).getNamespaceURI(), path);
         } else {
             for (Class<?> clazz = expected.getClass(); clazz != Object.class; clazz = clazz.getSuperclass()) {
                 for (Field field : clazz.getDeclaredFields()) {
@@ -202,7 +236,7 @@ public class ModelWriterTest {
         String name = field.getName();
         try {
             Method method = field.getDeclaringClass().getDeclaredMethod(
-                    "get" + name.substring(0, 1).toUpperCase() + name.substring(1));
+                    "get" + StringHelper.capitalize(name));
             if (method.getAnnotation(XmlTransient.class) != null) {
                 return true;
             }
@@ -211,7 +245,7 @@ public class ModelWriterTest {
         }
         try {
             Method method = field.getDeclaringClass().getDeclaredMethod(
-                    "set" + name.substring(0, 1).toUpperCase() + name.substring(1),
+                    "set" + StringHelper.capitalize(name),
                     field.getType());
             if (method.getAnnotation(XmlTransient.class) != null) {
                 return true;

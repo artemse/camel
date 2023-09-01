@@ -29,7 +29,6 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.CamelContextAware;
 import org.apache.camel.Endpoint;
 import org.apache.camel.ErrorHandlerFactory;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.Ordered;
 import org.apache.camel.Route;
 import org.apache.camel.RoutesBuilder;
@@ -47,6 +46,7 @@ import org.apache.camel.model.RouteTemplatesDefinition;
 import org.apache.camel.model.RoutesDefinition;
 import org.apache.camel.model.TemplatedRouteDefinition;
 import org.apache.camel.model.TemplatedRoutesDefinition;
+import org.apache.camel.model.app.RegistryBeanDefinition;
 import org.apache.camel.model.errorhandler.RefErrorHandlerDefinition;
 import org.apache.camel.model.rest.RestConfigurationDefinition;
 import org.apache.camel.model.rest.RestDefinition;
@@ -76,6 +76,8 @@ public abstract class RouteBuilder extends BuilderSupport implements RoutesBuild
     private final List<RouteBuilderLifecycleStrategy> lifecycleInterceptors = new ArrayList<>();
     private final List<TransformerBuilder> transformerBuilders = new ArrayList<>();
     private final List<ValidatorBuilder> validatorBuilders = new ArrayList<>();
+    // XML and YAML DSL allows to define custom beans which we need to capture
+    private final List<RegistryBeanDefinition> beans = new ArrayList<>();
 
     private RestsDefinition restCollection = new RestsDefinition();
     private RestConfigurationDefinition restConfiguration;
@@ -274,7 +276,6 @@ public abstract class RouteBuilder extends BuilderSupport implements RoutesBuild
         if (restConfiguration == null) {
             restConfiguration = new RestConfigurationDefinition();
         }
-
         return restConfiguration;
     }
 
@@ -309,6 +310,9 @@ public abstract class RouteBuilder extends BuilderSupport implements RoutesBuild
      */
     public RestDefinition rest() {
         getRestCollection().setCamelContext(getContext());
+        if (resource != null) {
+            getRestCollection().setResource(resource);
+        }
         RestDefinition answer = getRestCollection().rest();
         configureRest(answer);
         return answer;
@@ -322,6 +326,9 @@ public abstract class RouteBuilder extends BuilderSupport implements RoutesBuild
      */
     public RestDefinition rest(String path) {
         getRestCollection().setCamelContext(getContext());
+        if (resource != null) {
+            getRestCollection().setResource(resource);
+        }
         RestDefinition answer = getRestCollection().rest(path);
         configureRest(answer);
         return answer;
@@ -599,6 +606,7 @@ public abstract class RouteBuilder extends BuilderSupport implements RoutesBuild
         configureRests(context);
 
         // but populate rests before routes, as we want to turn rests into routes
+        populateBeans();
         populateRests();
         populateTransformers();
         populateValidators();
@@ -629,6 +637,7 @@ public abstract class RouteBuilder extends BuilderSupport implements RoutesBuild
         configureRests(context);
 
         // but populate rests before routes, as we want to turn rests into routes
+        populateBeans();
         populateRests();
         populateTransformers();
         populateValidators();
@@ -708,9 +717,9 @@ public abstract class RouteBuilder extends BuilderSupport implements RoutesBuild
         if (initialized.compareAndSet(false, true)) {
             // Set the CamelContext ErrorHandler here
             CamelContext camelContext = getContext();
-            if (camelContext.adapt(ExtendedCamelContext.class).getErrorHandlerFactory() != null) {
+            if (camelContext.getCamelContextExtension().getErrorHandlerFactory() != null) {
                 setErrorHandlerFactory(
-                        camelContext.adapt(ExtendedCamelContext.class).getErrorHandlerFactory());
+                        camelContext.getCamelContextExtension().getErrorHandlerFactory());
             }
 
             List<RouteBuilderLifecycleStrategy> strategies = new ArrayList<>(lifecycleInterceptors);
@@ -725,6 +734,11 @@ public abstract class RouteBuilder extends BuilderSupport implements RoutesBuild
 
             // remember the source resource
             getRouteCollection().setResource(getResource());
+            getRestCollection().setResource(getResource());
+            getRouteTemplateCollection().setResource(getResource());
+            for (RegistryBeanDefinition def : beans) {
+                def.setResource(getResource());
+            }
 
             for (RouteDefinition route : getRouteCollection().getRoutes()) {
                 // ensure the route is prepared after configure method is complete
@@ -743,7 +757,8 @@ public abstract class RouteBuilder extends BuilderSupport implements RoutesBuild
 
     private void populateTemplatedRoutes(CamelContext camelContext) throws Exception {
         getTemplatedRouteCollection().setCamelContext(camelContext);
-        camelContext.getExtension(Model.class).addRouteFromTemplatedRoutes(getTemplatedRouteCollection().getTemplatedRoutes());
+        camelContext.getCamelContextExtension().getContextPlugin(Model.class)
+                .addRouteFromTemplatedRoutes(getTemplatedRouteCollection().getTemplatedRoutes());
     }
 
     /**
@@ -761,7 +776,8 @@ public abstract class RouteBuilder extends BuilderSupport implements RoutesBuild
     protected void populateRouteTemplates() throws Exception {
         CamelContext camelContext = notNullCamelContext();
         getRouteTemplateCollection().setCamelContext(camelContext);
-        camelContext.getExtension(Model.class).addRouteTemplateDefinitions(getRouteTemplateCollection().getRouteTemplates());
+        camelContext.getCamelContextExtension().getContextPlugin(Model.class)
+                .addRouteTemplateDefinitions(getRouteTemplateCollection().getRouteTemplates());
     }
 
     protected void populateRoutes() throws Exception {
@@ -770,7 +786,8 @@ public abstract class RouteBuilder extends BuilderSupport implements RoutesBuild
         if (resource != null) {
             getRouteCollection().setResource(resource);
         }
-        camelContext.getExtension(Model.class).addRouteDefinitions(getRouteCollection().getRoutes());
+        camelContext.getCamelContextExtension().getContextPlugin(Model.class)
+                .addRouteDefinitions(getRouteCollection().getRoutes());
     }
 
     protected void populateOrUpdateRoutes() throws Exception {
@@ -784,7 +801,8 @@ public abstract class RouteBuilder extends BuilderSupport implements RoutesBuild
             camelContext.getRouteController().stopRoute(route.getRouteId());
             camelContext.removeRoute(route.getRouteId());
         }
-        camelContext.getExtension(Model.class).addRouteDefinitions(getRouteCollection().getRoutes());
+        camelContext.getCamelContextExtension().getContextPlugin(Model.class)
+                .addRouteDefinitions(getRouteCollection().getRoutes());
     }
 
     protected void populateRests() throws Exception {
@@ -798,7 +816,8 @@ public abstract class RouteBuilder extends BuilderSupport implements RoutesBuild
 
         // cannot add rests as routes yet as we need to initialize this
         // specially
-        camelContext.getExtension(Model.class).addRestDefinitions(getRestCollection().getRests(), false);
+        camelContext.getCamelContextExtension().getContextPlugin(Model.class).addRestDefinitions(getRestCollection().getRests(),
+                false);
 
         // convert rests api-doc into routes so they are routes for runtime
         RestConfiguration config = camelContext.getRestConfiguration();
@@ -810,7 +829,8 @@ public abstract class RouteBuilder extends BuilderSupport implements RoutesBuild
             // so we check all existing routes if they have rest-api route
             // already added
             boolean hasRestApi = false;
-            for (RouteDefinition route : camelContext.getExtension(Model.class).getRouteDefinitions()) {
+            for (RouteDefinition route : camelContext.getCamelContextExtension().getContextPlugin(Model.class)
+                    .getRouteDefinitions()) {
                 FromDefinition from = route.getInput();
                 if (from.getEndpointUri() != null && from.getEndpointUri().startsWith("rest-api:")) {
                     hasRestApi = true;
@@ -841,6 +861,20 @@ public abstract class RouteBuilder extends BuilderSupport implements RoutesBuild
         for (ValidatorBuilder vb : validatorBuilders) {
             vb.configure(camelContext);
         }
+    }
+
+    protected void populateBeans() {
+        CamelContext camelContext = notNullCamelContext();
+
+        Model model = camelContext.getCamelContextExtension().getContextPlugin(Model.class);
+        for (RegistryBeanDefinition def : beans) {
+            // add to model
+            model.addRegistryBean(def);
+        }
+    }
+
+    public List<RegistryBeanDefinition> getBeans() {
+        return beans;
     }
 
     public RestsDefinition getRestCollection() {

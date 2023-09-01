@@ -34,6 +34,7 @@ import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.RuntimeCamelException;
 import org.apache.camel.model.rest.RestDefinition;
 import org.apache.camel.model.rest.VerbDefinition;
+import org.apache.camel.spi.NodeIdFactory;
 import org.apache.camel.support.CamelContextHelper;
 import org.apache.camel.support.EndpointHelper;
 import org.apache.camel.util.ObjectHelper;
@@ -113,9 +114,7 @@ public final class RouteDefinitionHelper {
     private static String normalizeUri(String uri) {
         try {
             return URISupport.normalizeUri(uri);
-        } catch (UnsupportedEncodingException e) {
-            // ignore
-        } catch (URISyntaxException e) {
+        } catch (UnsupportedEncodingException | URISyntaxException e) {
             // ignore
         }
         return null;
@@ -129,7 +128,7 @@ public final class RouteDefinitionHelper {
      * @throws Exception is thrown if error force assign ids to the routes
      */
     public static void forceAssignIds(CamelContext context, List<RouteDefinition> routes) throws Exception {
-        ExtendedCamelContext ecc = context.adapt(ExtendedCamelContext.class);
+        ExtendedCamelContext ecc = context.getCamelContextExtension();
 
         // handle custom assigned id's first, and then afterwards assign auto
         // generated ids
@@ -163,7 +162,7 @@ public final class RouteDefinitionHelper {
         }
 
         // also include already existing on camel context
-        for (final RouteDefinition def : context.adapt(ModelCamelContext.class).getRouteDefinitions()) {
+        for (final RouteDefinition def : ((ModelCamelContext) context).getRouteDefinitions()) {
             if (def.getId() != null) {
                 customIds.add(def.getId());
             }
@@ -179,7 +178,7 @@ public final class RouteDefinitionHelper {
                 int attempts = 0;
                 while (!done && attempts < 1000) {
                     attempts++;
-                    id = route.idOrCreate(ecc.getNodeIdFactory());
+                    id = route.idOrCreate(ecc.getContextPlugin(NodeIdFactory.class));
                     if (customIds.contains(id)) {
                         // reset id and try again
                         route.setId(null);
@@ -190,8 +189,7 @@ public final class RouteDefinitionHelper {
                 if (!done) {
                     throw new IllegalArgumentException("Cannot auto assign id to route: " + route);
                 }
-                route.setId(id);
-                route.setCustomId(false);
+                route.setGeneratedId(id);
                 customIds.add(route.getId());
             }
             RestDefinition rest = route.getRestDefinition();
@@ -474,7 +472,7 @@ public final class RouteDefinitionHelper {
 
             // must clone to avoid side effects while building routes using
             // multiple RouteBuilders
-            ErrorHandlerFactory builder = context.adapt(ExtendedCamelContext.class).getErrorHandlerFactory();
+            ErrorHandlerFactory builder = context.getCamelContextExtension().getErrorHandlerFactory();
             if (builder != null) {
                 ErrorHandlerFactory clone = builder.cloneBuilder();
                 route.setErrorHandlerFactoryIfNull(clone);
@@ -745,7 +743,7 @@ public final class RouteDefinitionHelper {
      */
     public static void forceAssignIds(CamelContext context, final ProcessorDefinition processor) {
         // force id on the child
-        processor.idOrCreate(context.adapt(ExtendedCamelContext.class).getNodeIdFactory());
+        processor.idOrCreate(context.getCamelContextExtension().getContextPlugin(NodeIdFactory.class));
 
         // if there was a custom id assigned, then make sure to support property
         // placeholders

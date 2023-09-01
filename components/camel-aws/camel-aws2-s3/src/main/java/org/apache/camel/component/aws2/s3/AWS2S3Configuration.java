@@ -30,10 +30,10 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 public class AWS2S3Configuration implements Cloneable {
 
     private String bucketName;
-    @UriParam
+    @UriParam(label = "advanced")
     @Metadata(autowired = true)
     private S3Client amazonS3Client;
-    @UriParam
+    @UriParam(label = "advanced")
     @Metadata(autowired = true)
     private S3Presigner amazonS3Presigner;
     @UriParam(label = "security", secret = true)
@@ -52,6 +52,8 @@ public class AWS2S3Configuration implements Cloneable {
     private boolean includeFolders = true;
     @UriParam
     private String region;
+    @UriParam
+    private boolean forcePathStyle;
     @UriParam(label = "consumer", defaultValue = "true")
     private boolean deleteAfterRead = true;
     @UriParam(label = "consumer")
@@ -73,11 +75,11 @@ public class AWS2S3Configuration implements Cloneable {
     @UriParam(label = "producer")
     private String storageClass;
 
-    @UriParam(enums = "HTTP,HTTPS", defaultValue = "HTTPS")
+    @UriParam(label = "proxy", enums = "HTTP,HTTPS", defaultValue = "HTTPS")
     private Protocol proxyProtocol = Protocol.HTTPS;
-    @UriParam
+    @UriParam(label = "proxy")
     private String proxyHost;
-    @UriParam
+    @UriParam(label = "proxy")
     private Integer proxyPort;
     @UriParam(label = "consumer", defaultValue = "true")
     private boolean includeBody = true;
@@ -104,24 +106,30 @@ public class AWS2S3Configuration implements Cloneable {
     private String customerAlgorithm;
     @UriParam(label = "producer,advanced", defaultValue = "false")
     private boolean useSSES3;
-    @UriParam(defaultValue = "false")
+    @UriParam(label = "security")
     private boolean useDefaultCredentialsProvider;
+    @UriParam(label = "security")
+    private boolean useProfileCredentialsProvider;
+    @UriParam(label = "security")
+    private String profileCredentialsName;
     @UriParam(label = "producer")
     private String keyName;
-    @UriParam(defaultValue = "false")
+    @UriParam
     private boolean overrideEndpoint;
-    @UriParam(defaultValue = "false")
+    @UriParam(label = "security")
     private boolean trustAllCertificates;
     @UriParam
     private String uriEndpointOverride;
-    @UriParam(defaultValue = "false")
+    @UriParam
     private boolean pojoRequest;
-    @UriParam(defaultValue = "false", label = "producer")
+    @UriParam(label = "producer")
     private boolean streamingUploadMode;
     @UriParam(defaultValue = "10", label = "producer")
     private int batchMessageNumber = 10;
     @UriParam(defaultValue = "1000000", label = "producer")
     private int batchSize = 1000000;
+    @UriParam(defaultValue = "1000000", label = "producer")
+    private int bufferSize = 1000000;
     @UriParam(defaultValue = "progressive", label = "producer")
     private AWSS3NamingStrategyEnum namingStrategy = AWSS3NamingStrategyEnum.progressive;
     @UriParam(label = "producer")
@@ -514,9 +522,19 @@ public class AWS2S3Configuration implements Cloneable {
         this.customerAlgorithm = customerAlgorithm;
     }
 
+    public boolean isForcePathStyle() {
+        return forcePathStyle;
+    }
+
     /**
-     * Set whether the S3 client should expect to load credentials through a default credentials provider or to expect
-     * static credentials to be passed in.
+     * Set whether the S3 client should use path-style URL instead of virtual-hosted-style
+     */
+    public void setForcePathStyle(boolean forcePathStyle) {
+        this.forcePathStyle = forcePathStyle;
+    }
+
+    /**
+     * Set whether the S3 client should expect to load credentials through a default credentials provider.
      */
     public void setUseDefaultCredentialsProvider(Boolean useDefaultCredentialsProvider) {
         this.useDefaultCredentialsProvider = useDefaultCredentialsProvider;
@@ -524,6 +542,17 @@ public class AWS2S3Configuration implements Cloneable {
 
     public Boolean isUseDefaultCredentialsProvider() {
         return useDefaultCredentialsProvider;
+    }
+
+    /**
+     * Set whether the S3 client should expect to load credentials through a profile credentials provider.
+     */
+    public void setUseProfileCredentialsProvider(boolean useProfileCredentialsProvider) {
+        this.useProfileCredentialsProvider = useProfileCredentialsProvider;
+    }
+
+    public boolean isUseProfileCredentialsProvider() {
+        return useProfileCredentialsProvider;
     }
 
     public boolean isAutoCreateBucket() {
@@ -638,6 +667,17 @@ public class AWS2S3Configuration implements Cloneable {
         this.batchSize = batchSize;
     }
 
+    public int getBufferSize() {
+        return bufferSize;
+    }
+
+    /**
+     * The buffer size (in bytes) in streaming upload mode
+     */
+    public void setBufferSize(int bufferSize) {
+        this.bufferSize = bufferSize;
+    }
+
     public AWSS3NamingStrategyEnum getNamingStrategy() {
         return namingStrategy;
     }
@@ -680,6 +720,17 @@ public class AWS2S3Configuration implements Cloneable {
      */
     public void setUseSSES3(boolean useSSES3) {
         this.useSSES3 = useSSES3;
+    }
+
+    public String getProfileCredentialsName() {
+        return profileCredentialsName;
+    }
+
+    /**
+     * If using a profile credentials provider this parameter will set the profile name
+     */
+    public void setProfileCredentialsName(String profileCredentialsName) {
+        this.profileCredentialsName = profileCredentialsName;
     }
 
     public AWS2S3Configuration copy() {

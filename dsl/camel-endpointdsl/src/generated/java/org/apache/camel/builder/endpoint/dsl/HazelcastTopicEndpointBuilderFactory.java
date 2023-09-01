@@ -78,6 +78,24 @@ public interface HazelcastTopicEndpointBuilderFactory {
             return this;
         }
         /**
+         * Hazelcast configuration file.
+         * 
+         * This option can also be loaded from an existing file, by prefixing
+         * with file: or classpath: followed by the location of the file.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: common
+         * 
+         * @param hazelcastConfigUri the value to set
+         * @return the dsl builder
+         */
+        default HazelcastTopicEndpointConsumerBuilder hazelcastConfigUri(
+                String hazelcastConfigUri) {
+            doSetProperty("hazelcastConfigUri", hazelcastConfigUri);
+            return this;
+        }
+        /**
          * The hazelcast instance reference which can be used for hazelcast
          * endpoint.
          * 
@@ -332,6 +350,24 @@ public interface HazelcastTopicEndpointBuilderFactory {
             return this;
         }
         /**
+         * Hazelcast configuration file.
+         * 
+         * This option can also be loaded from an existing file, by prefixing
+         * with file: or classpath: followed by the location of the file.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: common
+         * 
+         * @param hazelcastConfigUri the value to set
+         * @return the dsl builder
+         */
+        default HazelcastTopicEndpointProducerBuilder hazelcastConfigUri(
+                String hazelcastConfigUri) {
+            doSetProperty("hazelcastConfigUri", hazelcastConfigUri);
+            return this;
+        }
+        /**
          * The hazelcast instance reference which can be used for hazelcast
          * endpoint.
          * 
@@ -521,6 +557,24 @@ public interface HazelcastTopicEndpointBuilderFactory {
             return this;
         }
         /**
+         * Hazelcast configuration file.
+         * 
+         * This option can also be loaded from an existing file, by prefixing
+         * with file: or classpath: followed by the location of the file.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: common
+         * 
+         * @param hazelcastConfigUri the value to set
+         * @return the dsl builder
+         */
+        default HazelcastTopicEndpointBuilder hazelcastConfigUri(
+                String hazelcastConfigUri) {
+            doSetProperty("hazelcastConfigUri", hazelcastConfigUri);
+            return this;
+        }
+        /**
          * The hazelcast instance reference which can be used for hazelcast
          * endpoint.
          * 
@@ -621,7 +675,7 @@ public interface HazelcastTopicEndpointBuilderFactory {
          * Hazelcast Topic (camel-hazelcast)
          * Send and receive messages to/from Hazelcast distributed topic.
          * 
-         * Category: cache,datagrid
+         * Category: cache,clustering
          * Since: 2.15
          * Maven coordinates: org.apache.camel:camel-hazelcast
          * 
@@ -634,7 +688,7 @@ public interface HazelcastTopicEndpointBuilderFactory {
          * Hazelcast Topic (camel-hazelcast)
          * Send and receive messages to/from Hazelcast distributed topic.
          * 
-         * Category: cache,datagrid
+         * Category: cache,clustering
          * Since: 2.15
          * Maven coordinates: org.apache.camel:camel-hazelcast
          * 
@@ -653,7 +707,7 @@ public interface HazelcastTopicEndpointBuilderFactory {
          * Hazelcast Topic (camel-hazelcast)
          * Send and receive messages to/from Hazelcast distributed topic.
          * 
-         * Category: cache,datagrid
+         * Category: cache,clustering
          * Since: 2.15
          * Maven coordinates: org.apache.camel:camel-hazelcast
          * 

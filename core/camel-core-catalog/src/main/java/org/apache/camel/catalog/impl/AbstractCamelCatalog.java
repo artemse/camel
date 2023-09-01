@@ -32,7 +32,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -61,8 +60,6 @@ import org.apache.camel.util.StringHelper;
  */
 @SuppressWarnings("unused")
 public abstract class AbstractCamelCatalog {
-
-    // CHECKSTYLE:OFF
 
     private static final Pattern SYNTAX_PATTERN = Pattern.compile("([\\w.]+)");
     private static final Pattern ENV_OR_SYS_PATTERN = Pattern.compile("\\{\\{(env|sys):\\w+\\}\\}");
@@ -163,9 +160,10 @@ public abstract class AbstractCamelCatalog {
         return validateProperties(scheme, properties, lenient, false, false);
     }
 
-    private EndpointValidationResult validateProperties(String scheme, Map<String, String> properties,
-                                                          boolean lenient, boolean consumerOnly,
-                                                          boolean producerOnly) {
+    private EndpointValidationResult validateProperties(
+            String scheme, Map<String, String> properties,
+            boolean lenient, boolean consumerOnly,
+            boolean producerOnly) {
         EndpointValidationResult result = new EndpointValidationResult(scheme);
 
         ComponentModel model = componentModel(scheme);
@@ -283,16 +281,7 @@ public abstract class AbstractCamelCatalog {
                         }
                     }
                     if (!found) {
-                        result.addInvalidEnum(name, value);
-                        result.addInvalidEnumChoices(name, enums.toArray(new String[0]));
-                        if (suggestionStrategy != null) {
-                            Set<String> names = new LinkedHashSet<>(enums);
-                            String[] suggestions = suggestionStrategy.suggestEndpointOptions(names, value);
-                            if (suggestions != null) {
-                                result.addInvalidEnumSuggestions(name, suggestions);
-                            }
-                        }
-
+                        handleNotFound(result, value, name, enums);
                     }
                 }
 
@@ -354,11 +343,12 @@ public abstract class AbstractCamelCatalog {
             String key2 = apiSyntax.length > 1 ? properties.get(apiSyntax[1]) : null;
 
             if (key1 != null && key2 != null) {
-                ApiModel api = model.getApiOptions().stream().filter(o -> o.getName().equalsIgnoreCase(key1)).findFirst().orElse(null);
+                ApiModel api = model.getApiOptions().stream().filter(o -> o.getName().equalsIgnoreCase(key1)).findFirst()
+                        .orElse(null);
                 if (api == null) {
                     result.addInvalidEnum(apiSyntax[0], key1);
-                    List<String> choices = model.getApiOptions().stream().map(ApiModel::getName).collect(Collectors.toList());
-                    result.addInvalidEnumChoices(apiSyntax[0], choices.toArray(new String[choices.size()]));
+                    result.addInvalidEnumChoices(apiSyntax[0],
+                            model.getApiOptions().stream().map(ApiModel::getName).toArray(String[]::new));
                 } else {
                     // walk each method and match against its name/alias
                     boolean found = false;
@@ -371,7 +361,8 @@ public abstract class AbstractCamelCatalog {
                     }
                     if (!found) {
                         result.addInvalidEnum(apiSyntax[1], key2);
-                        List<String> choices = api.getMethods().stream()
+
+                        result.addInvalidEnumChoices(apiSyntax[1], api.getMethods().stream()
                                 .map(m -> {
                                     // favour using method alias in choices
                                     String answer = apiMethodAlias(api, m);
@@ -379,10 +370,7 @@ public abstract class AbstractCamelCatalog {
                                         answer = m.getName();
                                     }
                                     return answer;
-                                })
-                                .collect(Collectors.toList());
-
-                        result.addInvalidEnumChoices(apiSyntax[1], choices.toArray(new String[choices.size()]));
+                                }).toArray(String[]::new));
                     }
                 }
             }
@@ -405,7 +393,33 @@ public abstract class AbstractCamelCatalog {
         return result;
     }
 
-    public EndpointValidationResult validateEndpointProperties(String uri, boolean ignoreLenientProperties, boolean consumerOnly, boolean producerOnly) {
+    private void handleNotFound(EndpointValidationResult result, String value, String name, List<String> enums) {
+        result.addInvalidEnum(name, value);
+        result.addInvalidEnumChoices(name, enums.toArray(new String[0]));
+        if (suggestionStrategy != null) {
+            Set<String> names = new LinkedHashSet<>(enums);
+            String[] suggestions = suggestionStrategy.suggestEndpointOptions(names, value);
+            if (suggestions != null) {
+                result.addInvalidEnumSuggestions(name, suggestions);
+            }
+        }
+    }
+
+    private void handleNotFound(
+            ConfigurationPropertiesValidationResult result, String value, String longKey, List<String> enums) {
+        result.addInvalidEnum(longKey, value);
+        result.addInvalidEnumChoices(longKey, enums.toArray(new String[0]));
+        if (suggestionStrategy != null) {
+            Set<String> names = new LinkedHashSet<>(enums);
+            String[] suggestions = suggestionStrategy.suggestEndpointOptions(names, value);
+            if (suggestions != null) {
+                result.addInvalidEnumSuggestions(longKey, suggestions);
+            }
+        }
+    }
+
+    public EndpointValidationResult validateEndpointProperties(
+            String uri, boolean ignoreLenientProperties, boolean consumerOnly, boolean producerOnly) {
         try {
             URI u = URISupport.normalizeUri(uri);
             String scheme = u.getScheme();
@@ -677,7 +691,8 @@ public abstract class AbstractCamelCatalog {
                     Map<String, Object> values = URISupport.extractProperties(parameters, prefix);
                     // build a string with the extra multi valued options with the prefix and & as separator
                     String csb = values.entrySet().stream()
-                            .map(multi -> prefix + multi.getKey() + "=" + (multi.getValue() != null ? multi.getValue().toString() : ""))
+                            .map(multi -> prefix + multi.getKey() + "="
+                                          + (multi.getValue() != null ? multi.getValue().toString() : ""))
                             .collect(Collectors.joining("&"));
                     // append the extra multi-values to the existing (which contains the first multi value)
                     if (!csb.isEmpty()) {
@@ -704,7 +719,8 @@ public abstract class AbstractCamelCatalog {
             String ecKey2 = StringHelper.asEnumConstantValue(key2);
             for (ApiModel am : model.getApiOptions()) {
                 String aKey = am.getName();
-                if (aKey.equalsIgnoreCase("DEFAULT") || aKey.equalsIgnoreCase(key) || aKey.equalsIgnoreCase(ecKey) || aKey.equalsIgnoreCase(dashKey)) {
+                if (aKey.equalsIgnoreCase("DEFAULT") || aKey.equalsIgnoreCase(key) || aKey.equalsIgnoreCase(ecKey)
+                        || aKey.equalsIgnoreCase(dashKey)) {
                     am.getMethods().stream()
                             .filter(m -> {
                                 if (key2 == null) {
@@ -712,7 +728,8 @@ public abstract class AbstractCamelCatalog {
                                     return true;
                                 }
                                 String name = m.getName();
-                                if (name.equalsIgnoreCase(key2) || name.equalsIgnoreCase(ecKey2) || name.equalsIgnoreCase(dashKey2)) {
+                                if (name.equalsIgnoreCase(key2) || name.equalsIgnoreCase(ecKey2)
+                                        || name.equalsIgnoreCase(dashKey2)) {
                                     return true;
                                 }
                                 // is there an alias then we need to compute the alias key and compare against the key2
@@ -720,7 +737,8 @@ public abstract class AbstractCamelCatalog {
                                 if (key3 != null) {
                                     String dashKey3 = StringHelper.camelCaseToDash(key3);
                                     String ecKey3 = StringHelper.asEnumConstantValue(key3);
-                                    if (key2.equalsIgnoreCase(key3) || ecKey2.equalsIgnoreCase(ecKey3) || dashKey2.equalsIgnoreCase(dashKey3)) {
+                                    if (key2.equalsIgnoreCase(key3) || ecKey2.equalsIgnoreCase(ecKey3)
+                                            || dashKey2.equalsIgnoreCase(dashKey3)) {
                                         return true;
                                     }
                                 }
@@ -774,8 +792,7 @@ public abstract class AbstractCamelCatalog {
         Map<String, String> answer = new LinkedHashMap<>();
 
         // and covert the values to String so its JMX friendly
-        parameters.forEach((k, v) -> {
-            String key = k;
+        parameters.forEach((key, v) -> {
             String value = v != null ? v.toString() : "";
 
             // is the key a prefix property
@@ -796,10 +813,7 @@ public abstract class AbstractCamelCatalog {
 
     public String endpointComponentName(String uri) {
         if (uri != null) {
-            int idx = uri.indexOf(':');
-            if (idx > 0) {
-                return uri.substring(0, idx);
-            }
+            return StringHelper.before(uri, ":");
         }
         return null;
     }
@@ -812,7 +826,8 @@ public abstract class AbstractCamelCatalog {
         return doAsEndpointUri(scheme, properties, "&amp;", encode);
     }
 
-    String doAsEndpointUri(String scheme, Map<String, String> properties, String ampersand, boolean encode) throws URISyntaxException {
+    String doAsEndpointUri(String scheme, Map<String, String> properties, String ampersand, boolean encode)
+            throws URISyntaxException {
         // grab the syntax
         ComponentModel model = componentModel(scheme);
         if (model == null) {
@@ -840,22 +855,22 @@ public abstract class AbstractCamelCatalog {
         Map<String, String> copy = new TreeMap<>(properties);
 
         Matcher syntaxMatcher = COMPONENT_SYNTAX_PARSER.matcher(originalSyntax);
-        StringBuffer buf = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         while (syntaxMatcher.find()) {
-            buf.append(syntaxMatcher.group(1));
+            sb.append(syntaxMatcher.group(1));
             String propertyName = syntaxMatcher.group(2);
             String propertyValue = copy.remove(propertyName);
-            buf.append(propertyValue != null ? propertyValue : propertyName);
+            sb.append(propertyValue != null ? propertyValue : propertyName);
         }
         // clip the scheme from the syntax
-        String syntax = buf.toString();
+        String syntax = sb.toString();
 
         // do we have all the options the original syntax needs (easy way)
         String[] keys = syntaxKeys(originalSyntax);
         boolean hasAllKeys = properties.keySet().containsAll(Arrays.asList(keys));
 
         // build endpoint uri
-        StringBuilder sb = new StringBuilder();
+        sb = new StringBuilder();
         // add scheme later as we need to take care if there is any context-path or query parameters which
         // affect how the URI should be constructed
 
@@ -865,21 +880,7 @@ public abstract class AbstractCamelCatalog {
 
             if (!copy.isEmpty()) {
                 // wrap secret values with RAW to avoid breaking URI encoding in case of encoded values
-                copy.replaceAll((key, val) -> {
-                    if (val == null) {
-                        return val;
-                    }
-                    BaseOptionModel option = rows.get(key);
-                    if (option == null) {
-                        return val;
-                    }
-
-                    if (option.isSecret() && !val.startsWith("#") && !val.startsWith("RAW(")) {
-                        return "RAW(" + val + ")";
-                    }
-
-                    return val;
-                });
+                copy.replaceAll((key, val) -> wrapRAW(key, val, rows));
 
                 boolean hasQuestionMark = sb.toString().contains("?");
                 // the last option may already contain a ? char, if so we should use & instead of ?
@@ -967,25 +968,7 @@ public abstract class AbstractCamelCatalog {
 
             if (!copy.isEmpty()) {
                 // wrap secret values with RAW to avoid breaking URI encoding in case of encoded values
-                copy.replaceAll(new BiFunction<String, String, String>() {
-                    @Override
-                    public String apply(String key, String val) {
-
-                        if (val == null) {
-                            return val;
-                        }
-                        BaseOptionModel option = rows.get(key);
-                        if (option == null) {
-                            return val;
-                        }
-
-                        if (option.isSecret() && !val.startsWith("#") && !val.startsWith("RAW(")) {
-                            return "RAW(" + val + ")";
-                        }
-
-                        return val;
-                    }
-                });
+                copy.replaceAll((key, val) -> wrapRAW(key, val, rows));
 
                 // the last option may already contain a ? char, if so we should use & instead of ?
                 sb.append(hasQuestionmark ? ampersand : '?');
@@ -1006,6 +989,22 @@ public abstract class AbstractCamelCatalog {
             // its empty without anything
             return scheme;
         }
+    }
+
+    private static String wrapRAW(String key, String val, Map<String, BaseOptionModel> rows) {
+        if (val == null) {
+            return val;
+        }
+        BaseOptionModel option = rows.get(key);
+        if (option == null) {
+            return val;
+        }
+
+        if (option.isSecret() && !val.startsWith("#") && !val.startsWith("RAW(")) {
+            return "RAW(" + val + ")";
+        }
+
+        return val;
     }
 
     private static String[] syntaxKeys(String syntax) {
@@ -1032,7 +1031,7 @@ public abstract class AbstractCamelCatalog {
             }
         }
 
-        return tokens.toArray(new String[tokens.size()]);
+        return tokens.toArray(new String[0]);
     }
 
     public ConfigurationPropertiesValidationResult validateConfigurationProperty(String line) {
@@ -1077,12 +1076,12 @@ public abstract class AbstractCamelCatalog {
             String name = key.substring(0, idx);
             String option = key.substring(idx + 1);
 
-             if (value != null) {
+            if (value != null) {
                 BaseModel<?> model = loader.apply(name);
-                 if (model == null) {
-                     result.addUnknownComponent(name);
-                     return result;
-                 }
+                if (model == null) {
+                    result.addUnknownComponent(name);
+                    return result;
+                }
                 Map<String, BaseOptionModel> rows = new HashMap<>();
                 model.getOptions().forEach(o -> rows.put(o.getName(), o));
 
@@ -1150,10 +1149,11 @@ public abstract class AbstractCamelCatalog {
         return result;
     }
 
-    private void doValidateConfigurationProperty(ConfigurationPropertiesValidationResult result,
-                                                 Map<String, BaseOptionModel> rows,
-                                                 String name, String value, String longKey,
-                                                 String lookupKey, String suffix) {
+    private void doValidateConfigurationProperty(
+            ConfigurationPropertiesValidationResult result,
+            Map<String, BaseOptionModel> rows,
+            String name, String value, String longKey,
+            String lookupKey, String suffix) {
 
         // find option
         String rowKey = rows.keySet().stream()
@@ -1232,15 +1232,7 @@ public abstract class AbstractCamelCatalog {
                     }
                 }
                 if (!found) {
-                    result.addInvalidEnum(longKey, value);
-                    result.addInvalidEnumChoices(longKey, enums.toArray(new String[0]));
-                    if (suggestionStrategy != null) {
-                        Set<String> names = new LinkedHashSet<>(enums);
-                        String[] suggestions = suggestionStrategy.suggestEndpointOptions(names, value);
-                        if (suggestions != null) {
-                            result.addInvalidEnumSuggestions(longKey, suggestions);
-                        }
-                    }
+                    handleNotFound(result, value, longKey, enums);
                 }
             }
 
@@ -1277,15 +1269,15 @@ public abstract class AbstractCamelCatalog {
             return false;
         }
         return key.startsWith("camel.component.")
-            || key.startsWith("camel.dataformat.")
-            || key.startsWith("camel.language.")
-            || key.startsWith("camel.main.")
-            || key.startsWith("camel.resilience4j.")
-            || key.startsWith("camel.faulttolerance.")
-            || key.startsWith("camel.threadpool.")
-            || key.startsWith("camel.health.")
-            || key.startsWith("camel.lra.")
-            || key.startsWith("camel.rest.");
+                || key.startsWith("camel.dataformat.")
+                || key.startsWith("camel.language.")
+                || key.startsWith("camel.main.")
+                || key.startsWith("camel.resilience4j.")
+                || key.startsWith("camel.faulttolerance.")
+                || key.startsWith("camel.threadpool.")
+                || key.startsWith("camel.health.")
+                || key.startsWith("camel.lra.")
+                || key.startsWith("camel.rest.");
     }
 
     private LanguageValidationResult doValidateSimple(ClassLoader classLoader, String simple, boolean predicate) {
@@ -1351,7 +1343,7 @@ public abstract class AbstractCamelCatalog {
                             int index = (int) result;
                             answer.setIndex(index);
                         }
-                    } catch (Throwable i) {
+                    } catch (Exception i) {
                         // ignore
                     }
                 }
@@ -1365,7 +1357,7 @@ public abstract class AbstractCamelCatalog {
                             String msg = (String) result;
                             answer.setShortError(msg);
                         }
-                    } catch (Throwable i) {
+                    } catch (Exception i) {
                         // ignore
                     }
 
@@ -1402,7 +1394,8 @@ public abstract class AbstractCamelCatalog {
         }
     }
 
-    private LanguageValidationResult doValidateLanguage(ClassLoader classLoader, String language, String text, boolean predicate) {
+    private LanguageValidationResult doValidateLanguage(
+            ClassLoader classLoader, String language, String text, boolean predicate) {
         if (classLoader == null) {
             classLoader = getClass().getClassLoader();
         }
@@ -1550,8 +1543,8 @@ public abstract class AbstractCamelCatalog {
     /**
      * Converts the string from dash format into camel case (hello-great-world -> helloGreatWorld)
      *
-     * @param text  the string
-     * @return the string camel cased
+     * @param  text the string
+     * @return      the string camel cased
      */
     private static String dashToCamelCase(String text) {
         if (text == null) {
@@ -1578,7 +1571,5 @@ public abstract class AbstractCamelCatalog {
         }
         return sb.toString();
     }
-
-    // CHECKSTYLE:ON
 
 }

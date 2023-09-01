@@ -18,7 +18,6 @@ package org.apache.camel.model.errorhandler;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.ErrorHandlerFactory;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.Route;
 import org.apache.camel.model.ModelCamelContext;
 import org.apache.camel.support.CamelContextHelper;
@@ -68,7 +67,7 @@ public final class ErrorHandlerHelper {
                     // then fallback to the default error handler
                     // otherwise we could recursive loop forever (triggered by
                     // createErrorHandler method)
-                    answer = camelContext.adapt(ModelCamelContext.class).getModelReifierFactory().createDefaultErrorHandler();
+                    answer = ((ModelCamelContext) camelContext).getModelReifierFactory().createDefaultErrorHandler();
                 }
                 // inherit the error handlers from the other as they are to be
                 // shared
@@ -89,7 +88,7 @@ public final class ErrorHandlerHelper {
     }
 
     protected static ErrorHandlerFactory lookupErrorHandlerFactory(CamelContext camelContext) {
-        ErrorHandlerFactory answer = camelContext.adapt(ExtendedCamelContext.class).getErrorHandlerFactory();
+        ErrorHandlerFactory answer = camelContext.getCamelContextExtension().getErrorHandlerFactory();
         if (answer instanceof RefErrorHandlerDefinition) {
             RefErrorHandlerDefinition other = (RefErrorHandlerDefinition) answer;
             String otherRef = other.getRef();

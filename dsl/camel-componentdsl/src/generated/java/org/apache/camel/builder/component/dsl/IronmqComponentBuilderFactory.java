@@ -118,6 +118,42 @@ public interface IronmqComponentBuilderFactory {
             doSetProperty("autowiredEnabled", autowiredEnabled);
             return this;
         }
+        /**
+         * Used for enabling or disabling all consumer based health checks from
+         * this component.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: true
+         * Group: health
+         * 
+         * @param healthCheckConsumerEnabled the value to set
+         * @return the dsl builder
+         */
+        default IronmqComponentBuilder healthCheckConsumerEnabled(
+                boolean healthCheckConsumerEnabled) {
+            doSetProperty("healthCheckConsumerEnabled", healthCheckConsumerEnabled);
+            return this;
+        }
+        /**
+         * Used for enabling or disabling all producer based health checks from
+         * this component. Notice: Camel has by default disabled all producer
+         * based health-checks. You can turn on producer checks globally by
+         * setting camel.health.producersEnabled=true.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: true
+         * Group: health
+         * 
+         * @param healthCheckProducerEnabled the value to set
+         * @return the dsl builder
+         */
+        default IronmqComponentBuilder healthCheckProducerEnabled(
+                boolean healthCheckProducerEnabled) {
+            doSetProperty("healthCheckProducerEnabled", healthCheckProducerEnabled);
+            return this;
+        }
     }
 
     class IronmqComponentBuilderImpl
@@ -138,6 +174,8 @@ public interface IronmqComponentBuilderFactory {
             case "bridgeErrorHandler": ((IronMQComponent) component).setBridgeErrorHandler((boolean) value); return true;
             case "lazyStartProducer": ((IronMQComponent) component).setLazyStartProducer((boolean) value); return true;
             case "autowiredEnabled": ((IronMQComponent) component).setAutowiredEnabled((boolean) value); return true;
+            case "healthCheckConsumerEnabled": ((IronMQComponent) component).setHealthCheckConsumerEnabled((boolean) value); return true;
+            case "healthCheckProducerEnabled": ((IronMQComponent) component).setHealthCheckProducerEnabled((boolean) value); return true;
             default: return false;
             }
         }

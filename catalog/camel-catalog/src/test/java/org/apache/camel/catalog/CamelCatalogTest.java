@@ -17,6 +17,9 @@
 package org.apache.camel.catalog;
 
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -28,6 +31,7 @@ import org.apache.camel.tooling.model.ArtifactModel;
 import org.apache.camel.tooling.model.ComponentModel;
 import org.apache.camel.tooling.model.DataFormatModel;
 import org.apache.camel.tooling.model.LanguageModel;
+import org.apache.camel.tooling.model.ReleaseModel;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -161,12 +165,6 @@ public class CamelCatalogTest {
     @Test
     public void testXmlSchema() {
         String schema = catalog.springSchemaAsXml();
-        assertNotNull(schema);
-    }
-
-    @Test
-    public void testArchetypeCatalog() {
-        String schema = catalog.archetypeCatalogAsXml();
         assertNotNull(schema);
     }
 
@@ -1523,6 +1521,48 @@ public class CamelCatalogTest {
         am = catalog.modelFromMavenGAV("org.apache.camel", "camel-jms", null);
         Assertions.assertInstanceOf(ComponentModel.class, am);
         Assertions.assertEquals("Sent and receive messages to/from a JMS Queue or Topic.", am.getDescription());
+    }
+
+    @Test
+    public void loadFooResourceWithBarKind() throws IOException {
+        InputStream is = catalog.loadResource("bar", "foo.txt");
+        Assertions.assertNotNull(is);
+
+        String content = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+        Assertions.assertEquals("Hello Camel", content);
+    }
+
+    @Test
+    public void loadNotExistingResource() {
+        InputStream is = catalog.loadResource("bar", "not_exists");
+        Assertions.assertNull(is);
+    }
+
+    @Test
+    public void camelReleases() {
+        List<ReleaseModel> list = catalog.camelReleases();
+        Assertions.assertTrue(list.size() > 100);
+
+        ReleaseModel rel = list.stream().filter(r -> r.getVersion().equals("3.20.1")).findFirst().orElse(null);
+        Assertions.assertNotNull(rel);
+        Assertions.assertEquals("3.20.1", rel.getVersion());
+        Assertions.assertEquals("2023-01-07", rel.getDate());
+        Assertions.assertEquals("2023-12-21", rel.getEol());
+        Assertions.assertEquals("lts", rel.getKind());
+    }
+
+    @Test
+    public void camelQuarkusReleases() {
+        List<ReleaseModel> list = catalog.camelQuarkusReleases();
+        Assertions.assertTrue(list.size() > 20);
+
+        ReleaseModel rel = list.stream().filter(r -> r.getVersion().equals("2.13.2")).findFirst().orElse(null);
+        Assertions.assertNotNull(rel);
+        Assertions.assertEquals("2.13.2", rel.getVersion());
+        Assertions.assertEquals("2022-12-16", rel.getDate());
+        Assertions.assertEquals("2023-07-06", rel.getEol());
+        Assertions.assertEquals("lts", rel.getKind());
+        Assertions.assertEquals("11", rel.getJdk());
     }
 
 }

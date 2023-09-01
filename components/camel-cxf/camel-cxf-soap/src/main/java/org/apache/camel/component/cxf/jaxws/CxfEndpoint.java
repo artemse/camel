@@ -127,7 +127,7 @@ import static org.apache.camel.component.cxf.common.message.CxfConstants.SCHEME_
  * Expose SOAP WebServices using Apache CXF or connect to external WebServices using CXF WS client.
  */
 @UriEndpoint(firstVersion = "1.0.0", scheme = SCHEME_CXF, title = "CXF", syntax = "cxf:beanId:address",
-             category = { Category.SOAP, Category.WEBSERVICE }, headersClass = CxfConstants.class)
+             category = { Category.HTTP, Category.WEBSERVICE }, headersClass = CxfConstants.class)
 public class CxfEndpoint extends DefaultEndpoint implements AsyncEndpoint, HeaderFilterStrategyAware, Service, Cloneable {
 
     private static final Logger LOG = LoggerFactory.getLogger(CxfEndpoint.class);
@@ -367,14 +367,14 @@ public class CxfEndpoint extends DefaultEndpoint implements AsyncEndpoint, Heade
         }
         if (this.isSkipPayloadMessagePartCheck()) {
             if (sfb.getProperties() == null) {
-                sfb.setProperties(new HashMap<String, Object>());
+                sfb.setProperties(new HashMap<>());
             }
             sfb.getProperties().put("soap.no.validate.parts", Boolean.TRUE);
         }
 
         if (this.isSkipFaultLogging()) {
             if (sfb.getProperties() == null) {
-                sfb.setProperties(new HashMap<String, Object>());
+                sfb.setProperties(new HashMap<>());
             }
             sfb.getProperties().put(FaultListener.class.getName(), new NullFaultListener());
         }
@@ -563,21 +563,21 @@ public class CxfEndpoint extends DefaultEndpoint implements AsyncEndpoint, Heade
             authPolicy.setUserName(username);
             authPolicy.setPassword(password);
             if (factoryBean.getProperties() == null) {
-                factoryBean.setProperties(new HashMap<String, Object>());
+                factoryBean.setProperties(new HashMap<>());
             }
             factoryBean.getProperties().put(AuthorizationPolicy.class.getName(), authPolicy);
         }
 
         if (this.isSkipPayloadMessagePartCheck()) {
             if (factoryBean.getProperties() == null) {
-                factoryBean.setProperties(new HashMap<String, Object>());
+                factoryBean.setProperties(new HashMap<>());
             }
             factoryBean.getProperties().put("soap.no.validate.parts", Boolean.TRUE);
         }
 
         if (this.isSkipFaultLogging()) {
             if (factoryBean.getProperties() == null) {
-                factoryBean.setProperties(new HashMap<String, Object>());
+                factoryBean.setProperties(new HashMap<>());
             }
             factoryBean.getProperties().put(FaultListener.class.getName(), new NullFaultListener());
         }
@@ -984,10 +984,10 @@ public class CxfEndpoint extends DefaultEndpoint implements AsyncEndpoint, Heade
                         LOG.warn("Error creating Cxf Bus from SpringBootCamelContext: {} This exception will be ignored.",
                                 ex.getMessage(), ex);
                     }
-                    bus = CxfEndpointUtils.createBus(getCamelContext());
+                    bus = CxfEndpointUtils.createBus();
                 }
             } else {
-                bus = CxfEndpointUtils.createBus(getCamelContext());
+                bus = CxfEndpointUtils.createBus();
             }
             this.createBus = true;
             LOG.debug("Using DefaultBus {}", bus);

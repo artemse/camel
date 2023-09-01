@@ -16,6 +16,7 @@
  */
 package org.apache.camel.catalog;
 
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,7 @@ import org.apache.camel.tooling.model.EipModel;
 import org.apache.camel.tooling.model.LanguageModel;
 import org.apache.camel.tooling.model.MainModel;
 import org.apache.camel.tooling.model.OtherModel;
+import org.apache.camel.tooling.model.ReleaseModel;
 
 /**
  * Catalog of components, data formats, models (EIPs), languages, and more from this Apache Camel release.
@@ -322,13 +324,6 @@ public interface CamelCatalog {
     Set<String> findOtherLabels();
 
     /**
-     * Returns the Apache Camel Maven Archetype catalog in XML format.
-     *
-     * @return the catalog in XML
-     */
-    String archetypeCatalogAsXml();
-
-    /**
      * Returns the Camel Spring XML schema
      *
      * @return the spring XML schema
@@ -569,5 +564,24 @@ public interface CamelCatalog {
      * @return            the requested model or {@code null} in case it is not available in this {@link CamelCatalog}
      */
     ArtifactModel<?> modelFromMavenGAV(String groupId, String artifactId, String version);
+
+    /**
+     * Load resource from catalog classpath
+     *
+     * @param  kind The resource kind, ex. camel-jbang
+     * @param  name The resource name
+     * @return      An input stream for reading the resource; null if the resource could not be found
+     */
+    InputStream loadResource(String kind, String name);
+
+    /**
+     * Load all Camel releases (core and spring-boot) from catalog
+     */
+    List<ReleaseModel> camelReleases();
+
+    /**
+     * Load all Camel Quarkus releases from catalog
+     */
+    List<ReleaseModel> camelQuarkusReleases();
 
 }

@@ -22,7 +22,6 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
 import io.smallrye.faulttolerance.core.circuit.breaker.CircuitBreaker;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.Processor;
 import org.apache.camel.Route;
 import org.apache.camel.model.CircuitBreakerDefinition;
@@ -33,6 +32,7 @@ import org.apache.camel.reifier.ProcessorReifier;
 import org.apache.camel.spi.BeanIntrospection;
 import org.apache.camel.spi.ExtendedPropertyConfigurerGetter;
 import org.apache.camel.spi.PropertyConfigurer;
+import org.apache.camel.support.PluginHelper;
 import org.apache.camel.support.PropertyBindingSupport;
 import org.apache.camel.util.function.Suppliers;
 
@@ -65,7 +65,7 @@ public class FaultToleranceReifier extends ProcessorReifier<CircuitBreakerDefini
         FaultToleranceProcessor answer = new FaultToleranceProcessor(configuration, processor, fallback);
         // using any existing circuit breakers?
         if (config.getCircuitBreaker() != null) {
-            CircuitBreaker cb = mandatoryLookup(parseString(config.getCircuitBreaker()), CircuitBreaker.class);
+            CircuitBreaker<?> cb = mandatoryLookup(parseString(config.getCircuitBreaker()), CircuitBreaker.class);
             answer.setCircuitBreaker(cb);
         }
         configureBulkheadExecutorService(answer, config);
@@ -133,14 +133,14 @@ public class FaultToleranceReifier extends ProcessorReifier<CircuitBreakerDefini
     FaultToleranceConfigurationDefinition buildFaultToleranceConfiguration() throws Exception {
         Map<String, Object> properties = new HashMap<>();
 
-        final PropertyConfigurer configurer = camelContext.adapt(ExtendedCamelContext.class)
-                .getConfigurerResolver()
+        final PropertyConfigurer configurer = PluginHelper.getConfigurerResolver(camelContext)
                 .resolvePropertyConfigurer(FaultToleranceConfigurationDefinition.class.getName(), camelContext);
 
         // Extract properties from default configuration, the one configured on
         // camel context takes the precedence over those in the registry
         loadProperties(properties, Suppliers.firstNotNull(
-                () -> camelContext.getExtension(Model.class).getFaultToleranceConfiguration(null),
+                () -> camelContext.getCamelContextExtension().getContextPlugin(Model.class)
+                        .getFaultToleranceConfiguration(null),
                 () -> lookupByNameAndType(FaultToleranceConstants.DEFAULT_FAULT_TOLERANCE_CONFIGURATION_ID,
                         FaultToleranceConfigurationDefinition.class)),
                 configurer);
@@ -151,7 +151,8 @@ public class FaultToleranceReifier extends ProcessorReifier<CircuitBreakerDefini
             final String ref = parseString(definition.getConfiguration());
 
             loadProperties(properties, Suppliers.firstNotNull(
-                    () -> camelContext.getExtension(Model.class).getFaultToleranceConfiguration(ref),
+                    () -> camelContext.getCamelContextExtension().getContextPlugin(Model.class)
+                            .getFaultToleranceConfiguration(ref),
                     () -> mandatoryLookup(ref, FaultToleranceConfigurationDefinition.class)),
                     configurer);
         }
@@ -172,7 +173,7 @@ public class FaultToleranceReifier extends ProcessorReifier<CircuitBreakerDefini
     }
 
     private void loadProperties(Map<String, Object> properties, Optional<?> optional, PropertyConfigurer configurer) {
-        BeanIntrospection beanIntrospection = camelContext.adapt(ExtendedCamelContext.class).getBeanIntrospection();
+        BeanIntrospection beanIntrospection = PluginHelper.getBeanIntrospection(camelContext);
         optional.ifPresent(bean -> {
             if (configurer instanceof ExtendedPropertyConfigurerGetter) {
                 ExtendedPropertyConfigurerGetter getter = (ExtendedPropertyConfigurerGetter) configurer;

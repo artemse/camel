@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,11 +47,22 @@ import org.fusesource.jansi.AnsiConsole;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "log",
-                     description = "Tail logs from running Camel integrations")
+                     description = "Tail logs from running Camel integrations", sortOptions = false)
 public class CamelLogAction extends ActionBaseCommand {
 
     private static final int NAME_MAX_WIDTH = 25;
     private static final int NAME_MIN_WIDTH = 10;
+
+    public static class PrefixCompletionCandidates implements Iterable<String> {
+
+        public PrefixCompletionCandidates() {
+        }
+
+        @Override
+        public Iterator<String> iterator() {
+            return List.of("auto", "true", "false").iterator();
+        }
+    }
 
     @CommandLine.Parameters(description = "Name or pid of running Camel integration. (default selects all)", arity = "0..1")
     String name = "*";
@@ -66,7 +78,7 @@ public class CamelLogAction extends ActionBaseCommand {
                         description = "Keep following and outputting new log lines (use ctrl + c to exit).")
     boolean follow = true;
 
-    @CommandLine.Option(names = { "--prefix" }, defaultValue = "auto",
+    @CommandLine.Option(names = { "--prefix" }, defaultValue = "auto", completionCandidates = PrefixCompletionCandidates.class,
                         description = "Print prefix with running Camel integration name. auto=only prefix when running multiple integrations. true=always prefix. false=prefix off.")
     String prefix = "auto";
 
@@ -98,10 +110,7 @@ public class CamelLogAction extends ActionBaseCommand {
     }
 
     @Override
-    public Integer call() throws Exception {
-        // configure logging first
-        configureLoggingOff();
-
+    public Integer doCall() throws Exception {
         Map<Long, Row> rows = new LinkedHashMap<>();
 
         // find new pids
@@ -181,7 +190,7 @@ public class CamelLogAction extends ActionBaseCommand {
                     JsonObject root = loadStatus(ph.pid());
                     if (root != null) {
                         Row row = new Row();
-                        row.pid = "" + ph.pid();
+                        row.pid = Long.toString(ph.pid());
                         JsonObject context = (JsonObject) root.get("context");
                         if (context == null) {
                             return;

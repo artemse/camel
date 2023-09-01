@@ -45,6 +45,8 @@ public class AWS2S3EndpointConfigurer extends PropertyConfigurerSupport implemen
         case "batchSize": target.getConfiguration().setBatchSize(property(camelContext, int.class, value)); return true;
         case "bridgeerrorhandler":
         case "bridgeErrorHandler": target.setBridgeErrorHandler(property(camelContext, boolean.class, value)); return true;
+        case "buffersize":
+        case "bufferSize": target.getConfiguration().setBufferSize(property(camelContext, int.class, value)); return true;
         case "customeralgorithm":
         case "customerAlgorithm": target.getConfiguration().setCustomerAlgorithm(property(camelContext, java.lang.String.class, value)); return true;
         case "customerkeyid":
@@ -71,6 +73,8 @@ public class AWS2S3EndpointConfigurer extends PropertyConfigurerSupport implemen
         case "exchangePattern": target.setExchangePattern(property(camelContext, org.apache.camel.ExchangePattern.class, value)); return true;
         case "filename":
         case "fileName": target.getConfiguration().setFileName(property(camelContext, java.lang.String.class, value)); return true;
+        case "forcepathstyle":
+        case "forcePathStyle": target.getConfiguration().setForcePathStyle(property(camelContext, boolean.class, value)); return true;
         case "greedy": target.setGreedy(property(camelContext, boolean.class, value)); return true;
         case "ignorebody":
         case "ignoreBody": target.getConfiguration().setIgnoreBody(property(camelContext, boolean.class, value)); return true;
@@ -105,6 +109,8 @@ public class AWS2S3EndpointConfigurer extends PropertyConfigurerSupport implemen
         case "pollstrategy":
         case "pollStrategy": target.setPollStrategy(property(camelContext, org.apache.camel.spi.PollingConsumerPollStrategy.class, value)); return true;
         case "prefix": target.getConfiguration().setPrefix(property(camelContext, java.lang.String.class, value)); return true;
+        case "profilecredentialsname":
+        case "profileCredentialsName": target.getConfiguration().setProfileCredentialsName(property(camelContext, java.lang.String.class, value)); return true;
         case "proxyhost":
         case "proxyHost": target.getConfiguration().setProxyHost(property(camelContext, java.lang.String.class, value)); return true;
         case "proxyport":
@@ -149,6 +155,8 @@ public class AWS2S3EndpointConfigurer extends PropertyConfigurerSupport implemen
         case "useDefaultCredentialsProvider": target.getConfiguration().setUseDefaultCredentialsProvider(property(camelContext, boolean.class, value)); return true;
         case "usefixeddelay":
         case "useFixedDelay": target.setUseFixedDelay(property(camelContext, boolean.class, value)); return true;
+        case "useprofilecredentialsprovider":
+        case "useProfileCredentialsProvider": target.getConfiguration().setUseProfileCredentialsProvider(property(camelContext, boolean.class, value)); return true;
         case "usesses3":
         case "useSSES3": target.getConfiguration().setUseSSES3(property(camelContext, boolean.class, value)); return true;
         default: return false;
@@ -187,6 +195,8 @@ public class AWS2S3EndpointConfigurer extends PropertyConfigurerSupport implemen
         case "batchSize": return int.class;
         case "bridgeerrorhandler":
         case "bridgeErrorHandler": return boolean.class;
+        case "buffersize":
+        case "bufferSize": return int.class;
         case "customeralgorithm":
         case "customerAlgorithm": return java.lang.String.class;
         case "customerkeyid":
@@ -213,6 +223,8 @@ public class AWS2S3EndpointConfigurer extends PropertyConfigurerSupport implemen
         case "exchangePattern": return org.apache.camel.ExchangePattern.class;
         case "filename":
         case "fileName": return java.lang.String.class;
+        case "forcepathstyle":
+        case "forcePathStyle": return boolean.class;
         case "greedy": return boolean.class;
         case "ignorebody":
         case "ignoreBody": return boolean.class;
@@ -247,6 +259,8 @@ public class AWS2S3EndpointConfigurer extends PropertyConfigurerSupport implemen
         case "pollstrategy":
         case "pollStrategy": return org.apache.camel.spi.PollingConsumerPollStrategy.class;
         case "prefix": return java.lang.String.class;
+        case "profilecredentialsname":
+        case "profileCredentialsName": return java.lang.String.class;
         case "proxyhost":
         case "proxyHost": return java.lang.String.class;
         case "proxyport":
@@ -291,6 +305,8 @@ public class AWS2S3EndpointConfigurer extends PropertyConfigurerSupport implemen
         case "useDefaultCredentialsProvider": return boolean.class;
         case "usefixeddelay":
         case "useFixedDelay": return boolean.class;
+        case "useprofilecredentialsprovider":
+        case "useProfileCredentialsProvider": return boolean.class;
         case "usesses3":
         case "useSSES3": return boolean.class;
         default: return null;
@@ -325,6 +341,8 @@ public class AWS2S3EndpointConfigurer extends PropertyConfigurerSupport implemen
         case "batchSize": return target.getConfiguration().getBatchSize();
         case "bridgeerrorhandler":
         case "bridgeErrorHandler": return target.isBridgeErrorHandler();
+        case "buffersize":
+        case "bufferSize": return target.getConfiguration().getBufferSize();
         case "customeralgorithm":
         case "customerAlgorithm": return target.getConfiguration().getCustomerAlgorithm();
         case "customerkeyid":
@@ -351,6 +369,8 @@ public class AWS2S3EndpointConfigurer extends PropertyConfigurerSupport implemen
         case "exchangePattern": return target.getExchangePattern();
         case "filename":
         case "fileName": return target.getConfiguration().getFileName();
+        case "forcepathstyle":
+        case "forcePathStyle": return target.getConfiguration().isForcePathStyle();
         case "greedy": return target.isGreedy();
         case "ignorebody":
         case "ignoreBody": return target.getConfiguration().isIgnoreBody();
@@ -385,6 +405,8 @@ public class AWS2S3EndpointConfigurer extends PropertyConfigurerSupport implemen
         case "pollstrategy":
         case "pollStrategy": return target.getPollStrategy();
         case "prefix": return target.getConfiguration().getPrefix();
+        case "profilecredentialsname":
+        case "profileCredentialsName": return target.getConfiguration().getProfileCredentialsName();
         case "proxyhost":
         case "proxyHost": return target.getConfiguration().getProxyHost();
         case "proxyport":
@@ -429,6 +451,8 @@ public class AWS2S3EndpointConfigurer extends PropertyConfigurerSupport implemen
         case "useDefaultCredentialsProvider": return target.getConfiguration().isUseDefaultCredentialsProvider();
         case "usefixeddelay":
         case "useFixedDelay": return target.isUseFixedDelay();
+        case "useprofilecredentialsprovider":
+        case "useProfileCredentialsProvider": return target.getConfiguration().isUseProfileCredentialsProvider();
         case "usesses3":
         case "useSSES3": return target.getConfiguration().isUseSSES3();
         default: return null;

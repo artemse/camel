@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.apache.camel</groupId>
         <artifactId>camel-parent</artifactId>
-        <version>4.0.0-SNAPSHOT</version>
+        <version>4.1.0-SNAPSHOT</version>
         <relativePath>../parent</relativePath>
     </parent>
 
@@ -42,7 +42,6 @@
         <module>camel-dataformat</module>
         <module>camel-dataset</module>
         <module>camel-direct</module>
-        <module>camel-directvm</module>
         <module>camel-file</module>
         <module>camel-language</module>
         <module>camel-log</module>
@@ -53,7 +52,6 @@
         <module>camel-stub</module>
         <module>camel-timer</module>
         <module>camel-validator</module>
-        <module>camel-vm</module>
         <module>camel-xpath</module>
         <module>camel-xslt</module>
 
@@ -76,12 +74,12 @@
         <module>camel-service</module>
 
         <!-- regular modules in alphabetic order -->
+        <module>camel-activemq</module>
         <module>camel-amqp</module>
         <module>camel-arangodb</module>
         <module>camel-as2</module>
         <module>camel-asn1</module>
         <module>camel-asterisk</module>
-        <module>camel-atlasmap</module>
         <module>camel-atmosphere-websocket</module>
         <module>camel-atom</module>
         <module>camel-avro</module>
@@ -105,7 +103,6 @@
         <module>camel-coap</module>
         <module>camel-cometd</module>
         <module>camel-consul</module>
-        <module>camel-corda</module>
         <module>camel-couchbase</module>
         <module>camel-couchdb</module>
         <module>camel-crypto</module>
@@ -114,6 +111,7 @@
         <module>camel-datasonnet</module>
         <module>camel-debug</module>
         <module>camel-debezium</module>
+        <module>camel-dhis2</module>
         <module>camel-digitalocean</module>
         <module>camel-disruptor</module>
         <module>camel-djl</module>
@@ -152,7 +150,6 @@
         <module>camel-headersmap</module>
         <module>camel-hl7</module>
         <module>camel-huawei</module>
-        <module>camel-hyperledger-aries</module>
         <module>camel-ical</module>
         <module>camel-iec60870</module>
         <module>camel-ignite</module>
@@ -222,6 +219,7 @@
         <module>camel-netty</module>
         <module>camel-nitrite</module>
         <module>camel-oaipmh</module>
+        <module>camel-observation</module>
         <module>camel-ognl</module>
         <module>camel-olingo2</module>
         <module>camel-olingo4</module>
@@ -229,11 +227,13 @@
         <module>camel-opentelemetry</module>
         <module>camel-paho</module>
         <module>camel-paho-mqtt5</module>
+        <module>camel-parquet-avro</module>
         <module>camel-pdf</module>
         <module>camel-pg-replication-slot</module>
         <module>camel-pgevent</module>
         <module>camel-platform-http</module>
         <module>camel-platform-http-vertx</module>
+        <module>camel-platform-http-main</module>
         <module>camel-plc4x</module>
         <module>camel-printer</module>
         <module>camel-protobuf</module>
@@ -269,7 +269,6 @@
         <module>camel-snakeyaml</module>
         <module>camel-snmp</module>
         <module>camel-soap</module>
-        <module>camel-solr</module>
         <module>camel-splunk</module>
         <module>camel-splunk-hec</module>
         <module>camel-spring-batch</module>
@@ -286,7 +285,10 @@
         <module>camel-stream</module>
         <module>camel-stringtemplate</module>
         <module>camel-stitch</module>
+        <module>camel-swift</module>
         <module>camel-openapi-java</module>
+        <module>camel-opensearch</module>
+        <module>camel-optaplanner</module>
         <module>camel-syslog</module>
         <module>camel-tarfile</module>
         <module>camel-telegram</module>
@@ -303,7 +305,6 @@
         <module>camel-weather</module>
         <module>camel-web3j</module>
         <module>camel-webhook</module>
-        <module>camel-weka</module>
         <module>camel-whatsapp</module>
         <module>camel-wordpress</module>
         <module>camel-workday</module>
@@ -325,11 +326,16 @@
     </modules>
 
     <properties>
-
         <camel-prepare-component>true</camel-prepare-component>
+        <skipTests.aarch64 />
+        <skipITs.aarch64 />
+        <skipTests.ppc64le />
+        <skipITs.ppc64le />
+        <skipTests.s390x />
+        <skipITs.s390x />
     </properties>
-    
-    <dependencies>    
+
+    <dependencies>
         <!-- logging for testing -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
@@ -344,33 +350,6 @@
     </dependencies>
 
     <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>${maven-failsafe-plugin-version}</version>
-                    <executions>
-                        <execution>
-                            <id>integration-test</id>
-                            <phase>verify</phase>
-                            <goals>
-                                <goal>integration-test</goal>
-                                <goal>verify</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                    <configuration>
-                        <reuseForks>true</reuseForks>
-                        <forkedProcessTimeoutInSeconds>${camel.failsafe.forkTimeout}</forkedProcessTimeoutInSeconds>
-                        <redirectTestOutputToFile>false</redirectTestOutputToFile>
-                        <systemPropertyVariables>
-                            <visibleassertions.silence>true</visibleassertions.silence>
-                        </systemPropertyVariables>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.camel</groupId>
@@ -439,11 +418,127 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-            </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <!-- Platform-specific block list for tests. This is required because,
+            sometimes, containers or native components are not available on
+            certain platforms. Define the properties and set them as true on
+            the component poms to skip.
+         -->
+        <profile>
+            <id>Arm</id>
+            <activation>
+                <os>
+                    <arch>aarch64</arch>
+                </os>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skipTests>${skipTests.aarch64}</skipTests>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <configuration>
+                            <skipITs>${skipITs.aarch64}</skipITs>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>s390x</id>
+            <activation>
+                <os>
+                    <arch>s390x</arch>
+                </os>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skipTests>${skipTests.s390x}</skipTests>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <configuration>
+                            <skipITs>${skipITs.s390x}</skipITs>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>ppc64le</id>
+            <activation>
+                <os>
+                    <arch>ppc64le</arch>
+                </os>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skipTests>${skipTests.ppc64le}</skipTests>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <configuration>
+                            <skipITs>${skipITs.ppc64le}</skipITs>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>full</id>
+            <activation>
+                <property>
+                    <name>!quickly</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <configuration>
+                            <reuseForks>true</reuseForks>
+                            <forkedProcessTimeoutInSeconds>${camel.failsafe.forkTimeout}</forkedProcessTimeoutInSeconds>
+                            <redirectTestOutputToFile>false</redirectTestOutputToFile>
+                            <systemPropertyVariables>
+                                <visibleassertions.silence>true</visibleassertions.silence>
+                            </systemPropertyVariables>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>integration-test</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                    <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

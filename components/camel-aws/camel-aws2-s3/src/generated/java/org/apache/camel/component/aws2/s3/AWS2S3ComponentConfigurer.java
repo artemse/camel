@@ -48,6 +48,8 @@ public class AWS2S3ComponentConfigurer extends PropertyConfigurerSupport impleme
         case "batchSize": getOrCreateConfiguration(target).setBatchSize(property(camelContext, int.class, value)); return true;
         case "bridgeerrorhandler":
         case "bridgeErrorHandler": target.setBridgeErrorHandler(property(camelContext, boolean.class, value)); return true;
+        case "buffersize":
+        case "bufferSize": getOrCreateConfiguration(target).setBufferSize(property(camelContext, int.class, value)); return true;
         case "configuration": target.setConfiguration(property(camelContext, org.apache.camel.component.aws2.s3.AWS2S3Configuration.class, value)); return true;
         case "customeralgorithm":
         case "customerAlgorithm": getOrCreateConfiguration(target).setCustomerAlgorithm(property(camelContext, java.lang.String.class, value)); return true;
@@ -70,6 +72,12 @@ public class AWS2S3ComponentConfigurer extends PropertyConfigurerSupport impleme
         case "doneFileName": getOrCreateConfiguration(target).setDoneFileName(property(camelContext, java.lang.String.class, value)); return true;
         case "filename":
         case "fileName": getOrCreateConfiguration(target).setFileName(property(camelContext, java.lang.String.class, value)); return true;
+        case "forcepathstyle":
+        case "forcePathStyle": getOrCreateConfiguration(target).setForcePathStyle(property(camelContext, boolean.class, value)); return true;
+        case "healthcheckconsumerenabled":
+        case "healthCheckConsumerEnabled": target.setHealthCheckConsumerEnabled(property(camelContext, boolean.class, value)); return true;
+        case "healthcheckproducerenabled":
+        case "healthCheckProducerEnabled": target.setHealthCheckProducerEnabled(property(camelContext, boolean.class, value)); return true;
         case "ignorebody":
         case "ignoreBody": getOrCreateConfiguration(target).setIgnoreBody(property(camelContext, boolean.class, value)); return true;
         case "includebody":
@@ -95,6 +103,8 @@ public class AWS2S3ComponentConfigurer extends PropertyConfigurerSupport impleme
         case "pojoRequest": getOrCreateConfiguration(target).setPojoRequest(property(camelContext, boolean.class, value)); return true;
         case "policy": getOrCreateConfiguration(target).setPolicy(property(camelContext, java.lang.String.class, value)); return true;
         case "prefix": getOrCreateConfiguration(target).setPrefix(property(camelContext, java.lang.String.class, value)); return true;
+        case "profilecredentialsname":
+        case "profileCredentialsName": getOrCreateConfiguration(target).setProfileCredentialsName(property(camelContext, java.lang.String.class, value)); return true;
         case "proxyhost":
         case "proxyHost": getOrCreateConfiguration(target).setProxyHost(property(camelContext, java.lang.String.class, value)); return true;
         case "proxyport":
@@ -122,6 +132,8 @@ public class AWS2S3ComponentConfigurer extends PropertyConfigurerSupport impleme
         case "useCustomerKey": getOrCreateConfiguration(target).setUseCustomerKey(property(camelContext, boolean.class, value)); return true;
         case "usedefaultcredentialsprovider":
         case "useDefaultCredentialsProvider": getOrCreateConfiguration(target).setUseDefaultCredentialsProvider(property(camelContext, boolean.class, value)); return true;
+        case "useprofilecredentialsprovider":
+        case "useProfileCredentialsProvider": getOrCreateConfiguration(target).setUseProfileCredentialsProvider(property(camelContext, boolean.class, value)); return true;
         case "usesses3":
         case "useSSES3": getOrCreateConfiguration(target).setUseSSES3(property(camelContext, boolean.class, value)); return true;
         default: return false;
@@ -156,6 +168,8 @@ public class AWS2S3ComponentConfigurer extends PropertyConfigurerSupport impleme
         case "batchSize": return int.class;
         case "bridgeerrorhandler":
         case "bridgeErrorHandler": return boolean.class;
+        case "buffersize":
+        case "bufferSize": return int.class;
         case "configuration": return org.apache.camel.component.aws2.s3.AWS2S3Configuration.class;
         case "customeralgorithm":
         case "customerAlgorithm": return java.lang.String.class;
@@ -178,6 +192,12 @@ public class AWS2S3ComponentConfigurer extends PropertyConfigurerSupport impleme
         case "doneFileName": return java.lang.String.class;
         case "filename":
         case "fileName": return java.lang.String.class;
+        case "forcepathstyle":
+        case "forcePathStyle": return boolean.class;
+        case "healthcheckconsumerenabled":
+        case "healthCheckConsumerEnabled": return boolean.class;
+        case "healthcheckproducerenabled":
+        case "healthCheckProducerEnabled": return boolean.class;
         case "ignorebody":
         case "ignoreBody": return boolean.class;
         case "includebody":
@@ -203,6 +223,8 @@ public class AWS2S3ComponentConfigurer extends PropertyConfigurerSupport impleme
         case "pojoRequest": return boolean.class;
         case "policy": return java.lang.String.class;
         case "prefix": return java.lang.String.class;
+        case "profilecredentialsname":
+        case "profileCredentialsName": return java.lang.String.class;
         case "proxyhost":
         case "proxyHost": return java.lang.String.class;
         case "proxyport":
@@ -230,6 +252,8 @@ public class AWS2S3ComponentConfigurer extends PropertyConfigurerSupport impleme
         case "useCustomerKey": return boolean.class;
         case "usedefaultcredentialsprovider":
         case "useDefaultCredentialsProvider": return boolean.class;
+        case "useprofilecredentialsprovider":
+        case "useProfileCredentialsProvider": return boolean.class;
         case "usesses3":
         case "useSSES3": return boolean.class;
         default: return null;
@@ -260,6 +284,8 @@ public class AWS2S3ComponentConfigurer extends PropertyConfigurerSupport impleme
         case "batchSize": return getOrCreateConfiguration(target).getBatchSize();
         case "bridgeerrorhandler":
         case "bridgeErrorHandler": return target.isBridgeErrorHandler();
+        case "buffersize":
+        case "bufferSize": return getOrCreateConfiguration(target).getBufferSize();
         case "configuration": return target.getConfiguration();
         case "customeralgorithm":
         case "customerAlgorithm": return getOrCreateConfiguration(target).getCustomerAlgorithm();
@@ -282,6 +308,12 @@ public class AWS2S3ComponentConfigurer extends PropertyConfigurerSupport impleme
         case "doneFileName": return getOrCreateConfiguration(target).getDoneFileName();
         case "filename":
         case "fileName": return getOrCreateConfiguration(target).getFileName();
+        case "forcepathstyle":
+        case "forcePathStyle": return getOrCreateConfiguration(target).isForcePathStyle();
+        case "healthcheckconsumerenabled":
+        case "healthCheckConsumerEnabled": return target.isHealthCheckConsumerEnabled();
+        case "healthcheckproducerenabled":
+        case "healthCheckProducerEnabled": return target.isHealthCheckProducerEnabled();
         case "ignorebody":
         case "ignoreBody": return getOrCreateConfiguration(target).isIgnoreBody();
         case "includebody":
@@ -307,6 +339,8 @@ public class AWS2S3ComponentConfigurer extends PropertyConfigurerSupport impleme
         case "pojoRequest": return getOrCreateConfiguration(target).isPojoRequest();
         case "policy": return getOrCreateConfiguration(target).getPolicy();
         case "prefix": return getOrCreateConfiguration(target).getPrefix();
+        case "profilecredentialsname":
+        case "profileCredentialsName": return getOrCreateConfiguration(target).getProfileCredentialsName();
         case "proxyhost":
         case "proxyHost": return getOrCreateConfiguration(target).getProxyHost();
         case "proxyport":
@@ -334,6 +368,8 @@ public class AWS2S3ComponentConfigurer extends PropertyConfigurerSupport impleme
         case "useCustomerKey": return getOrCreateConfiguration(target).isUseCustomerKey();
         case "usedefaultcredentialsprovider":
         case "useDefaultCredentialsProvider": return getOrCreateConfiguration(target).isUseDefaultCredentialsProvider();
+        case "useprofilecredentialsprovider":
+        case "useProfileCredentialsProvider": return getOrCreateConfiguration(target).isUseProfileCredentialsProvider();
         case "usesses3":
         case "useSSES3": return getOrCreateConfiguration(target).isUseSSES3();
         default: return null;

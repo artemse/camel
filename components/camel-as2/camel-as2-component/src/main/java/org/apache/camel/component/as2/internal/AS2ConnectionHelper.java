@@ -55,7 +55,8 @@ public final class AS2ConnectionHelper {
                 configuration.getAs2Version(), configuration.getUserAgent(), configuration.getClientFqdn(),
                 configuration.getTargetHostname(), configuration.getTargetPortNumber(), configuration.getHttpSocketTimeout(),
                 configuration.getHttpConnectionTimeout(), configuration.getHttpConnectionPoolSize(),
-                configuration.getHttpConnectionPoolTtl());
+                configuration.getHttpConnectionPoolTtl(), configuration.getSslContext(),
+                configuration.getHostnameVerifier());
     }
 
     /**
@@ -74,7 +75,7 @@ public final class AS2ConnectionHelper {
                         configuration.getServerFqdn(), configuration.getServerPortNumber(), configuration.getSigningAlgorithm(),
                         configuration.getSigningCertificateChain(), configuration.getSigningPrivateKey(),
                         configuration.getDecryptingPrivateKey(), configuration.getMdnMessageTemplate(),
-                        configuration.getValidateSigningCertificateChain());
+                        configuration.getValidateSigningCertificateChain(), configuration.getSslContext());
                 serverConnections.put(configuration.getServerPortNumber(), serverConnection);
             }
             return serverConnection;
@@ -91,9 +92,8 @@ public final class AS2ConnectionHelper {
                     conn.close();
                 } catch (Exception e) {
                     // ignore
-                    LOG.debug("Error stopping and closing AS2ServerConnection due to " + e.getMessage()
-                              + ". This exception is ignored",
-                            e);
+                    LOG.debug("Error stopping and closing AS2ServerConnection due to {}. This exception is ignored",
+                            e.getMessage(), e);
                 }
             }
         }

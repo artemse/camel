@@ -30,6 +30,7 @@ import com.github.freva.asciitable.Column;
 import com.github.freva.asciitable.HorizontalAlign;
 import com.github.freva.asciitable.OverflowBehaviour;
 import org.apache.camel.dsl.jbang.core.commands.CamelJBangMain;
+import org.apache.camel.dsl.jbang.core.common.PidNameAgeCompletionCandidates;
 import org.apache.camel.dsl.jbang.core.common.ProcessHelper;
 import org.apache.camel.health.HealthCheckHelper;
 import org.apache.camel.util.StringHelper;
@@ -39,10 +40,10 @@ import org.apache.camel.util.json.JsonObject;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
-@Command(name = "health", description = "Get health check status of running Camel integrations")
+@Command(name = "health", description = "Get health check status of running Camel integrations", sortOptions = false)
 public class ListHealth extends ProcessWatchCommand {
 
-    @CommandLine.Option(names = { "--sort" },
+    @CommandLine.Option(names = { "--sort" }, completionCandidates = PidNameAgeCompletionCandidates.class,
                         description = "Sort by pid, name or age", defaultValue = "pid")
     String sort;
 
@@ -75,7 +76,7 @@ public class ListHealth extends ProcessWatchCommand {
     }
 
     @Override
-    public Integer doCall() throws Exception {
+    public Integer doProcessWatchCall() throws Exception {
         final List<Row> rows = new ArrayList<>();
 
         // include stack-traces
@@ -101,7 +102,7 @@ public class ListHealth extends ProcessWatchCommand {
                         for (int i = 0; i < array.size(); i++) {
                             JsonObject o = (JsonObject) array.get(i);
                             Row row = new Row();
-                            row.pid = "" + ph.pid();
+                            row.pid = Long.toString(ph.pid());
                             row.uptime = extractSince(ph);
                             row.ago = TimeUtils.printSince(row.uptime);
                             row.name = context.getString("name");
@@ -152,13 +153,14 @@ public class ListHealth extends ProcessWatchCommand {
                                         row.sinceStartFailure = TimeUtils.printAge(delta);
                                     }
                                 }
-                                for (String k : d.keySet()) {
+                                for (Map.Entry<String, Object> entry : d.entrySet()) {
+                                    String k = entry.getKey();
                                     // gather custom details
                                     if (!HealthCheckHelper.isReservedKey(k)) {
                                         if (row.customMeta == null) {
                                             row.customMeta = new TreeMap<>();
                                         }
-                                        row.customMeta.put(k, d.get(k));
+                                        row.customMeta.put(k, entry.getValue());
                                     }
                                 }
                             }

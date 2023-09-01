@@ -25,7 +25,6 @@ import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.ExchangePropertyKey;
 import org.apache.camel.Expression;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.NoTypeConversionAvailableException;
 import org.apache.camel.Processor;
 import org.apache.camel.ResolveEndpointFailedException;
@@ -161,10 +160,10 @@ public class SendDynamicProcessor extends AsyncProcessorSupport implements IdAwa
                 prototype = false;
             }
             destinationExchangePattern = EndpointHelper.resolveExchangePatternFromUrl(endpoint.getEndpointUri());
-        } catch (Throwable e) {
+        } catch (Exception e) {
             if (isIgnoreInvalidEndpoint()) {
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug("Endpoint uri is invalid: " + recipient + ". This exception will be ignored.", e);
+                    LOG.debug("Endpoint uri is invalid: {}. This exception will be ignored.", recipient, e);
                 }
             } else {
                 exchange.setException(e);
@@ -185,7 +184,7 @@ public class SendDynamicProcessor extends AsyncProcessorSupport implements IdAwa
                 if (preProcessor != null) {
                     preProcessor.process(target);
                 }
-            } catch (Throwable t) {
+            } catch (Exception t) {
                 e.setException(t);
                 // restore previous MEP
                 target.setPattern(existingPattern);
@@ -202,7 +201,7 @@ public class SendDynamicProcessor extends AsyncProcessorSupport implements IdAwa
                         if (postProcessor != null) {
                             postProcessor.process(target);
                         }
-                    } catch (Throwable e) {
+                    } catch (Exception e) {
                         target.setException(e);
                     }
                     // stop endpoint if prototype as it was only used once
@@ -254,7 +253,7 @@ public class SendDynamicProcessor extends AsyncProcessorSupport implements IdAwa
             recipient = ((String) recipient).trim();
         }
         if (recipient != null) {
-            ExtendedCamelContext ecc = (ExtendedCamelContext) exchange.getContext();
+            CamelContext ecc = exchange.getContext();
             String uri;
             if (recipient instanceof String) {
                 uri = (String) recipient;
@@ -268,7 +267,7 @@ public class SendDynamicProcessor extends AsyncProcessorSupport implements IdAwa
                 throw new ResolveEndpointFailedException(uri, "Endpoint should include scheme:path");
             }
             // optimize and normalize endpoint
-            return ecc.normalizeUri(uri);
+            return ecc.getCamelContextExtension().normalizeUri(uri);
         }
         return null;
     }
@@ -280,8 +279,8 @@ public class SendDynamicProcessor extends AsyncProcessorSupport implements IdAwa
         if (recipient != null) {
             if (recipient instanceof NormalizedEndpointUri) {
                 NormalizedEndpointUri nu = (NormalizedEndpointUri) recipient;
-                ExtendedCamelContext ecc = (ExtendedCamelContext) exchange.getContext();
-                return ecc.hasEndpoint(nu);
+                CamelContext ecc = exchange.getContext();
+                return ecc.getCamelContextExtension().hasEndpoint(nu);
             } else {
                 String uri = recipient.toString();
                 return exchange.getContext().hasEndpoint(uri);
@@ -340,12 +339,12 @@ public class SendDynamicProcessor extends AsyncProcessorSupport implements IdAwa
                         }
                     }
                 }
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 // ignore
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug("Error creating optimised SendDynamicAwareResolver for uri: " + URISupport.sanitizeUri(uri)
-                              + " due to " + e.getMessage() + ". This exception is ignored",
-                            e);
+                    LOG.debug(
+                            "Error creating optimised SendDynamicAwareResolver for uri: {} due to {}. This exception is ignored",
+                            URISupport.sanitizeUri(uri), e.getMessage(), e);
                 }
             }
         }

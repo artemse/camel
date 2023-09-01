@@ -57,6 +57,16 @@ public interface BacklogTracerEventMessage {
     String getRouteId();
 
     /**
+     * Whether this event was from a route that is created from Rest DSL.
+     */
+    boolean isRest();
+
+    /**
+     * Whether this event was from a route that is created from route template or kamelet.
+     */
+    boolean isTemplate();
+
+    /**
      * Node id where the message is being routed to
      */
     String getToNode();
@@ -110,6 +120,12 @@ public interface BacklogTracerEventMessage {
      * The exception as JSon (exception type, message and stacktrace)
      */
     String getExceptionAsJSon();
+
+    /**
+     * The endpoint uri if this trace is either from a route input (from), or the exchange was sent to an endpoint such
+     * as (to, toD, wireTap) etc.
+     */
+    String getEndpointUri();
 
     /**
      * Dumps the event message as XML using the {@link #ROOT_TAG} as root tag.

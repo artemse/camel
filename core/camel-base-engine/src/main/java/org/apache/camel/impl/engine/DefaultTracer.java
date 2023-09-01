@@ -23,7 +23,6 @@ import org.apache.camel.CamelContextAware;
 import org.apache.camel.Exchange;
 import org.apache.camel.NamedNode;
 import org.apache.camel.NamedRoute;
-import org.apache.camel.Route;
 import org.apache.camel.spi.ExchangeFormatter;
 import org.apache.camel.spi.Tracer;
 import org.apache.camel.support.CamelContextHelper;
@@ -53,6 +52,8 @@ public class DefaultTracer extends ServiceSupport implements CamelContextAware, 
     private CamelContext camelContext;
     private boolean enabled = true;
     private boolean standby;
+    private boolean traceRests;
+    private boolean traceTemplates;
     private long traceCounter;
 
     private ExchangeFormatter exchangeFormatter;
@@ -65,7 +66,7 @@ public class DefaultTracer extends ServiceSupport implements CamelContextAware, 
         formatter.setShowExchangeId(true);
         formatter.setShowExchangePattern(false);
         formatter.setMultiline(false);
-        formatter.setShowHeaders(false);
+        formatter.setShowHeaders(true);
         formatter.setStyle(DefaultExchangeFormatter.OutputStyle.Default);
         setExchangeFormatter(formatter);
     }
@@ -131,11 +132,6 @@ public class DefaultTracer extends ServiceSupport implements CamelContextAware, 
         sb.append(data);
         String out = sb.toString();
         dumpTrace(out, route);
-    }
-
-    @Override
-    public void traceAfterRoute(Route route, Exchange exchange) {
-        // noop
     }
 
     @Override
@@ -210,6 +206,26 @@ public class DefaultTracer extends ServiceSupport implements CamelContextAware, 
     @Override
     public void setStandby(boolean standby) {
         this.standby = standby;
+    }
+
+    @Override
+    public boolean isTraceRests() {
+        return traceRests;
+    }
+
+    @Override
+    public void setTraceRests(boolean traceRests) {
+        this.traceRests = traceRests;
+    }
+
+    @Override
+    public boolean isTraceTemplates() {
+        return traceTemplates;
+    }
+
+    @Override
+    public void setTraceTemplates(boolean traceTemplates) {
+        this.traceTemplates = traceTemplates;
     }
 
     @Override

@@ -16,6 +16,8 @@ public class SqlServerConnectorEmbeddedDebeziumConfiguration
     private String messageKeyColumns;
     @UriParam(label = LABEL_NAME, defaultValue = "0")
     private int queryFetchSize = 0;
+    @UriParam(label = LABEL_NAME, defaultValue = "source")
+    private String signalEnabledChannels = "source";
     @UriParam(label = LABEL_NAME)
     private String databaseInstance;
     @UriParam(label = LABEL_NAME, defaultValue = "true")
@@ -40,8 +42,8 @@ public class SqlServerConnectorEmbeddedDebeziumConfiguration
     private String datatypePropagateSourceType;
     @UriParam(label = LABEL_NAME)
     private String databaseNames;
-    @UriParam(label = LABEL_NAME, defaultValue = "false")
-    private boolean sanitizeFieldNames = false;
+    @UriParam(label = LABEL_NAME, defaultValue = "disabled")
+    private String snapshotTablesOrderByRowCount = "disabled";
     @UriParam(label = LABEL_NAME)
     private String snapshotSelectStatementOverrides;
     @UriParam(label = LABEL_NAME, defaultValue = "0ms", javaType = "java.time.Duration")
@@ -54,6 +56,8 @@ public class SqlServerConnectorEmbeddedDebeziumConfiguration
     private String columnIncludeList;
     @UriParam(label = LABEL_NAME)
     private String columnPropagateSourceType;
+    @UriParam(label = LABEL_NAME, defaultValue = "-1")
+    private int errorsMaxRetries = -1;
     @UriParam(label = LABEL_NAME)
     private String tableExcludeList;
     @UriParam(label = LABEL_NAME)
@@ -79,6 +83,8 @@ public class SqlServerConnectorEmbeddedDebeziumConfiguration
     private boolean provideTransactionMetadata = false;
     @UriParam(label = LABEL_NAME, defaultValue = "false")
     private boolean schemaHistoryInternalStoreOnlyCapturedTablesDdl = false;
+    @UriParam(label = LABEL_NAME, defaultValue = "false")
+    private boolean schemaHistoryInternalStoreOnlyCapturedDatabasesDdl = false;
     @UriParam(label = LABEL_NAME)
     private String schemaHistoryInternalFileFilename;
     @UriParam(label = LABEL_NAME, defaultValue = "false")
@@ -92,6 +98,8 @@ public class SqlServerConnectorEmbeddedDebeziumConfiguration
     private String binaryHandlingMode = "bytes";
     @UriParam(label = LABEL_NAME, defaultValue = "false")
     private boolean includeSchemaComments = false;
+    @UriParam(label = LABEL_NAME, defaultValue = "io.debezium.connector.sqlserver.SqlServerSourceInfoStructMaker")
+    private String sourceinfoStructMaker = "io.debezium.connector.sqlserver.SqlServerSourceInfoStructMaker";
     @UriParam(label = LABEL_NAME, defaultValue = "true")
     private boolean tableIgnoreBuiltin = true;
     @UriParam(label = LABEL_NAME, defaultValue = "false")
@@ -102,6 +110,10 @@ public class SqlServerConnectorEmbeddedDebeziumConfiguration
     private long maxQueueSizeInBytes = 0;
     @UriParam(label = LABEL_NAME, defaultValue = "adaptive")
     private String timePrecisionMode = "adaptive";
+    @UriParam(label = LABEL_NAME, defaultValue = "5s", javaType = "java.time.Duration")
+    private long signalPollIntervalMs = 5000;
+    @UriParam(label = LABEL_NAME)
+    private String notificationEnabledChannels;
     @UriParam(label = LABEL_NAME, defaultValue = "fail")
     private String eventProcessingFailureHandlingMode = "fail";
     @UriParam(label = LABEL_NAME, defaultValue = "repeatable_read")
@@ -110,6 +122,8 @@ public class SqlServerConnectorEmbeddedDebeziumConfiguration
     private int snapshotMaxThreads = 1;
     @UriParam(label = LABEL_NAME, defaultValue = "1433")
     private int databasePort = 1433;
+    @UriParam(label = LABEL_NAME)
+    private String notificationSinkTopicName;
     @UriParam(label = LABEL_NAME, defaultValue = "io.debezium.storage.kafka.history.KafkaSchemaHistory")
     private String schemaHistoryInternal = "io.debezium.storage.kafka.history.KafkaSchemaHistory";
     @UriParam(label = LABEL_NAME, defaultValue = "0")
@@ -152,6 +166,18 @@ public class SqlServerConnectorEmbeddedDebeziumConfiguration
 
     public int getQueryFetchSize() {
         return queryFetchSize;
+    }
+
+    /**
+     * List of channels names that are enabled. Source channel is enabled by
+     * default
+     */
+    public void setSignalEnabledChannels(String signalEnabledChannels) {
+        this.signalEnabledChannels = signalEnabledChannels;
+    }
+
+    public String getSignalEnabledChannels() {
+        return signalEnabledChannels;
     }
 
     /**
@@ -305,14 +331,18 @@ public class SqlServerConnectorEmbeddedDebeziumConfiguration
     }
 
     /**
-     * Whether field names will be sanitized to Avro naming conventions
+     * Controls the order in which tables are processed in the initial snapshot.
+     * A `descending` value will order the tables by row count descending. A
+     * `ascending` value will order the tables by row count ascending. A value
+     * of `disabled` (the default) will disable ordering by row count.
      */
-    public void setSanitizeFieldNames(boolean sanitizeFieldNames) {
-        this.sanitizeFieldNames = sanitizeFieldNames;
+    public void setSnapshotTablesOrderByRowCount(
+            String snapshotTablesOrderByRowCount) {
+        this.snapshotTablesOrderByRowCount = snapshotTablesOrderByRowCount;
     }
 
-    public boolean isSanitizeFieldNames() {
-        return sanitizeFieldNames;
+    public String getSnapshotTablesOrderByRowCount() {
+        return snapshotTablesOrderByRowCount;
     }
 
     /**
@@ -411,6 +441,18 @@ public class SqlServerConnectorEmbeddedDebeziumConfiguration
     }
 
     /**
+     * The maximum number of retries on connection errors before failing (-1 =
+     * no limit, 0 = disabled, > 0 = num of retries).
+     */
+    public void setErrorsMaxRetries(int errorsMaxRetries) {
+        this.errorsMaxRetries = errorsMaxRetries;
+    }
+
+    public int getErrorsMaxRetries() {
+        return errorsMaxRetries;
+    }
+
+    /**
      * A comma-separated list of regular expressions that match the
      * fully-qualified names of tables to be excluded from monitoring
      */
@@ -472,11 +514,19 @@ public class SqlServerConnectorEmbeddedDebeziumConfiguration
     }
 
     /**
-     * The criteria for running a snapshot upon startup of the connector.
-     * Options include: 'initial' (the default) to specify the connector should
-     * run a snapshot only when no offsets are available for the logical server
-     * name; 'schema_only' to specify the connector should run a snapshot of the
-     * schema when no offsets are available for the logical server name. 
+     * The criteria for running a snapshot upon startup of the connector. Select
+     * one of the following snapshot options: 'initial' (default): If the
+     * connector does not detect any offsets for the logical server name, it
+     * runs a snapshot that captures the current full state of the configured
+     * tables. After the snapshot completes, the connector begins to stream
+     * changes from the transaction log.; 'initial_only': The connector performs
+     * a snapshot as it does for the 'initial' option, but after the connector
+     * completes the snapshot, it stops, and does not stream changes from the
+     * transaction log.; 'schema_only': If the connector does not detect any
+     * offsets for the logical server name, it runs a snapshot that captures
+     * only the schema (table structures), but not any table data. After the
+     * snapshot completes, the connector begins to stream changes from the
+     * transaction log.
      */
     public void setSnapshotMode(String snapshotMode) {
         this.snapshotMode = snapshotMode;
@@ -500,7 +550,8 @@ public class SqlServerConnectorEmbeddedDebeziumConfiguration
     }
 
     /**
-     * The maximum size of chunk for incremental snapshotting
+     * The maximum size of chunk (number of documents/rows) for incremental
+     * snapshotting
      */
     public void setIncrementalSnapshotChunkSize(int incrementalSnapshotChunkSize) {
         this.incrementalSnapshotChunkSize = incrementalSnapshotChunkSize;
@@ -558,6 +609,21 @@ public class SqlServerConnectorEmbeddedDebeziumConfiguration
 
     public boolean isSchemaHistoryInternalStoreOnlyCapturedTablesDdl() {
         return schemaHistoryInternalStoreOnlyCapturedTablesDdl;
+    }
+
+    /**
+     * Controls what DDL will Debezium store in database schema history. By
+     * default (true) only DDL that manipulates a table from captured
+     * schema/database will be stored. If set to false, then Debezium will store
+     * all incoming DDL statements.
+     */
+    public void setSchemaHistoryInternalStoreOnlyCapturedDatabasesDdl(
+            boolean schemaHistoryInternalStoreOnlyCapturedDatabasesDdl) {
+        this.schemaHistoryInternalStoreOnlyCapturedDatabasesDdl = schemaHistoryInternalStoreOnlyCapturedDatabasesDdl;
+    }
+
+    public boolean isSchemaHistoryInternalStoreOnlyCapturedDatabasesDdl() {
+        return schemaHistoryInternalStoreOnlyCapturedDatabasesDdl;
     }
 
     /**
@@ -652,6 +718,18 @@ public class SqlServerConnectorEmbeddedDebeziumConfiguration
     }
 
     /**
+     * The name of the SourceInfoStructMaker class that returns SourceInfo
+     * schema and struct.
+     */
+    public void setSourceinfoStructMaker(String sourceinfoStructMaker) {
+        this.sourceinfoStructMaker = sourceinfoStructMaker;
+    }
+
+    public String getSourceinfoStructMaker() {
+        return sourceinfoStructMaker;
+    }
+
+    /**
      * Flag specifying whether built-in tables should be ignored.
      */
     public void setTableIgnoreBuiltin(boolean tableIgnoreBuiltin) {
@@ -721,6 +799,30 @@ public class SqlServerConnectorEmbeddedDebeziumConfiguration
     }
 
     /**
+     * Interval for looking for new signals in registered channels, given in
+     * milliseconds. Defaults to 5 seconds.
+     */
+    public void setSignalPollIntervalMs(long signalPollIntervalMs) {
+        this.signalPollIntervalMs = signalPollIntervalMs;
+    }
+
+    public long getSignalPollIntervalMs() {
+        return signalPollIntervalMs;
+    }
+
+    /**
+     * List of notification channels names that are enabled.
+     */
+    public void setNotificationEnabledChannels(
+            String notificationEnabledChannels) {
+        this.notificationEnabledChannels = notificationEnabledChannels;
+    }
+
+    public String getNotificationEnabledChannels() {
+        return notificationEnabledChannels;
+    }
+
+    /**
      * Specify how failures during processing of events (i.e. when encountering
      * a corrupted event) should be handled, including: 'fail' (the default) an
      * exception indicating the problematic event and its position is raised,
@@ -786,6 +888,18 @@ public class SqlServerConnectorEmbeddedDebeziumConfiguration
     }
 
     /**
+     * The name of the topic for the notifications. This is required in case
+     * 'sink' is in the list of enabled channels
+     */
+    public void setNotificationSinkTopicName(String notificationSinkTopicName) {
+        this.notificationSinkTopicName = notificationSinkTopicName;
+    }
+
+    public String getNotificationSinkTopicName() {
+        return notificationSinkTopicName;
+    }
+
+    /**
      * The name of the SchemaHistory class that should be used to store and
      * recover database schema changes. The configuration properties for the
      * history are prefixed with the 'schema.history.internal.' string.
@@ -836,7 +950,10 @@ public class SqlServerConnectorEmbeddedDebeziumConfiguration
      * Specify how schema names should be adjusted for compatibility with the
      * message converter used by the connector, including: 'avro' replaces the
      * characters that cannot be used in the Avro type name with underscore;
-     * 'none' does not apply any adjustment (default)
+     * 'avro_unicode' replaces the underscore or characters that cannot be used
+     * in the Avro type name with corresponding unicode like _uxxxx. Note: _ is
+     * an escape sequence like backslash in Java;'none' does not apply any
+     * adjustment (default)
      */
     public void setSchemaNameAdjustmentMode(String schemaNameAdjustmentMode) {
         this.schemaNameAdjustmentMode = schemaNameAdjustmentMode;
@@ -863,6 +980,7 @@ public class SqlServerConnectorEmbeddedDebeziumConfiguration
         
         addPropertyIfNotNull(configBuilder, "message.key.columns", messageKeyColumns);
         addPropertyIfNotNull(configBuilder, "query.fetch.size", queryFetchSize);
+        addPropertyIfNotNull(configBuilder, "signal.enabled.channels", signalEnabledChannels);
         addPropertyIfNotNull(configBuilder, "database.instance", databaseInstance);
         addPropertyIfNotNull(configBuilder, "include.schema.changes", includeSchemaChanges);
         addPropertyIfNotNull(configBuilder, "heartbeat.action.query", heartbeatActionQuery);
@@ -875,13 +993,14 @@ public class SqlServerConnectorEmbeddedDebeziumConfiguration
         addPropertyIfNotNull(configBuilder, "database.user", databaseUser);
         addPropertyIfNotNull(configBuilder, "datatype.propagate.source.type", datatypePropagateSourceType);
         addPropertyIfNotNull(configBuilder, "database.names", databaseNames);
-        addPropertyIfNotNull(configBuilder, "sanitize.field.names", sanitizeFieldNames);
+        addPropertyIfNotNull(configBuilder, "snapshot.tables.order.by.row.count", snapshotTablesOrderByRowCount);
         addPropertyIfNotNull(configBuilder, "snapshot.select.statement.overrides", snapshotSelectStatementOverrides);
         addPropertyIfNotNull(configBuilder, "heartbeat.interval.ms", heartbeatIntervalMs);
         addPropertyIfNotNull(configBuilder, "incremental.snapshot.allow.schema.changes", incrementalSnapshotAllowSchemaChanges);
         addPropertyIfNotNull(configBuilder, "schema.history.internal.skip.unparseable.ddl", schemaHistoryInternalSkipUnparseableDdl);
         addPropertyIfNotNull(configBuilder, "column.include.list", columnIncludeList);
         addPropertyIfNotNull(configBuilder, "column.propagate.source.type", columnPropagateSourceType);
+        addPropertyIfNotNull(configBuilder, "errors.max.retries", errorsMaxRetries);
         addPropertyIfNotNull(configBuilder, "table.exclude.list", tableExcludeList);
         addPropertyIfNotNull(configBuilder, "database.password", databasePassword);
         addPropertyIfNotNull(configBuilder, "max.batch.size", maxBatchSize);
@@ -894,21 +1013,26 @@ public class SqlServerConnectorEmbeddedDebeziumConfiguration
         addPropertyIfNotNull(configBuilder, "snapshot.delay.ms", snapshotDelayMs);
         addPropertyIfNotNull(configBuilder, "provide.transaction.metadata", provideTransactionMetadata);
         addPropertyIfNotNull(configBuilder, "schema.history.internal.store.only.captured.tables.ddl", schemaHistoryInternalStoreOnlyCapturedTablesDdl);
+        addPropertyIfNotNull(configBuilder, "schema.history.internal.store.only.captured.databases.ddl", schemaHistoryInternalStoreOnlyCapturedDatabasesDdl);
         addPropertyIfNotNull(configBuilder, "schema.history.internal.file.filename", schemaHistoryInternalFileFilename);
         addPropertyIfNotNull(configBuilder, "tombstones.on.delete", tombstonesOnDelete);
         addPropertyIfNotNull(configBuilder, "topic.prefix", topicPrefix);
         addPropertyIfNotNull(configBuilder, "decimal.handling.mode", decimalHandlingMode);
         addPropertyIfNotNull(configBuilder, "binary.handling.mode", binaryHandlingMode);
         addPropertyIfNotNull(configBuilder, "include.schema.comments", includeSchemaComments);
+        addPropertyIfNotNull(configBuilder, "sourceinfo.struct.maker", sourceinfoStructMaker);
         addPropertyIfNotNull(configBuilder, "table.ignore.builtin", tableIgnoreBuiltin);
         addPropertyIfNotNull(configBuilder, "incremental.snapshot.option.recompile", incrementalSnapshotOptionRecompile);
         addPropertyIfNotNull(configBuilder, "snapshot.include.collection.list", snapshotIncludeCollectionList);
         addPropertyIfNotNull(configBuilder, "max.queue.size.in.bytes", maxQueueSizeInBytes);
         addPropertyIfNotNull(configBuilder, "time.precision.mode", timePrecisionMode);
+        addPropertyIfNotNull(configBuilder, "signal.poll.interval.ms", signalPollIntervalMs);
+        addPropertyIfNotNull(configBuilder, "notification.enabled.channels", notificationEnabledChannels);
         addPropertyIfNotNull(configBuilder, "event.processing.failure.handling.mode", eventProcessingFailureHandlingMode);
         addPropertyIfNotNull(configBuilder, "snapshot.isolation.mode", snapshotIsolationMode);
         addPropertyIfNotNull(configBuilder, "snapshot.max.threads", snapshotMaxThreads);
         addPropertyIfNotNull(configBuilder, "database.port", databasePort);
+        addPropertyIfNotNull(configBuilder, "notification.sink.topic.name", notificationSinkTopicName);
         addPropertyIfNotNull(configBuilder, "schema.history.internal", schemaHistoryInternal);
         addPropertyIfNotNull(configBuilder, "max.iteration.transactions", maxIterationTransactions);
         addPropertyIfNotNull(configBuilder, "column.exclude.list", columnExcludeList);

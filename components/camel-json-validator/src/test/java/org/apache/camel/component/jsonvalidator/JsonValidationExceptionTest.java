@@ -37,6 +37,11 @@ public class JsonValidationExceptionTest {
                 new JsonValidationException(null, null, errors).getMessage());
     }
 
+    @Test
+    void testErrorsEmpty() {
+        assertEquals(0, new JsonValidationException(null, null, new Exception()).getNumberOfErrors());
+    }
+
     private ValidationMessage createError(String msg) {
         return new ValidationMessage.Builder().format(new MessageFormat(msg)).build();
     }

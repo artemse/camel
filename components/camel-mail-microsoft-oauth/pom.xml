@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.apache.camel</groupId>
         <artifactId>components</artifactId>
-        <version>4.0.0-SNAPSHOT</version>
+        <version>4.1.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>camel-mail-microsoft-oauth</artifactId>
@@ -45,7 +45,8 @@
         <!--Microsoft Authentication Library for Java  -->
         <dependency>
             <groupId>com.microsoft.azure</groupId>
-            <artifactId>msal4j</artifactId>
+	    <artifactId>msal4j</artifactId>
+	    <version>${msal4j-version}</version>
         </dependency>
     </dependencies>
 

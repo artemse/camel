@@ -59,6 +59,10 @@ public class Sqs2ComponentConfigurer extends PropertyConfigurerSupport implement
         case "deleteIfFiltered": getOrCreateConfiguration(target).setDeleteIfFiltered(property(camelContext, boolean.class, value)); return true;
         case "extendmessagevisibility":
         case "extendMessageVisibility": getOrCreateConfiguration(target).setExtendMessageVisibility(property(camelContext, boolean.class, value)); return true;
+        case "healthcheckconsumerenabled":
+        case "healthCheckConsumerEnabled": target.setHealthCheckConsumerEnabled(property(camelContext, boolean.class, value)); return true;
+        case "healthcheckproducerenabled":
+        case "healthCheckProducerEnabled": target.setHealthCheckProducerEnabled(property(camelContext, boolean.class, value)); return true;
         case "kmsdatakeyreuseperiodseconds":
         case "kmsDataKeyReusePeriodSeconds": getOrCreateConfiguration(target).setKmsDataKeyReusePeriodSeconds(property(camelContext, java.lang.Integer.class, value)); return true;
         case "kmsmasterkeyid":
@@ -81,6 +85,8 @@ public class Sqs2ComponentConfigurer extends PropertyConfigurerSupport implement
         case "overrideendpoint":
         case "overrideEndpoint": getOrCreateConfiguration(target).setOverrideEndpoint(property(camelContext, boolean.class, value)); return true;
         case "policy": getOrCreateConfiguration(target).setPolicy(property(camelContext, java.lang.String.class, value)); return true;
+        case "profilecredentialsname":
+        case "profileCredentialsName": getOrCreateConfiguration(target).setProfileCredentialsName(property(camelContext, java.lang.String.class, value)); return true;
         case "protocol": getOrCreateConfiguration(target).setProtocol(property(camelContext, java.lang.String.class, value)); return true;
         case "proxyhost":
         case "proxyHost": getOrCreateConfiguration(target).setProxyHost(property(camelContext, java.lang.String.class, value)); return true;
@@ -107,6 +113,8 @@ public class Sqs2ComponentConfigurer extends PropertyConfigurerSupport implement
         case "uriEndpointOverride": getOrCreateConfiguration(target).setUriEndpointOverride(property(camelContext, java.lang.String.class, value)); return true;
         case "usedefaultcredentialsprovider":
         case "useDefaultCredentialsProvider": getOrCreateConfiguration(target).setUseDefaultCredentialsProvider(property(camelContext, boolean.class, value)); return true;
+        case "useprofilecredentialsprovider":
+        case "useProfileCredentialsProvider": getOrCreateConfiguration(target).setUseProfileCredentialsProvider(property(camelContext, boolean.class, value)); return true;
         case "visibilitytimeout":
         case "visibilityTimeout": getOrCreateConfiguration(target).setVisibilityTimeout(property(camelContext, java.lang.Integer.class, value)); return true;
         case "waittimeseconds":
@@ -154,6 +162,10 @@ public class Sqs2ComponentConfigurer extends PropertyConfigurerSupport implement
         case "deleteIfFiltered": return boolean.class;
         case "extendmessagevisibility":
         case "extendMessageVisibility": return boolean.class;
+        case "healthcheckconsumerenabled":
+        case "healthCheckConsumerEnabled": return boolean.class;
+        case "healthcheckproducerenabled":
+        case "healthCheckProducerEnabled": return boolean.class;
         case "kmsdatakeyreuseperiodseconds":
         case "kmsDataKeyReusePeriodSeconds": return java.lang.Integer.class;
         case "kmsmasterkeyid":
@@ -176,6 +188,8 @@ public class Sqs2ComponentConfigurer extends PropertyConfigurerSupport implement
         case "overrideendpoint":
         case "overrideEndpoint": return boolean.class;
         case "policy": return java.lang.String.class;
+        case "profilecredentialsname":
+        case "profileCredentialsName": return java.lang.String.class;
         case "protocol": return java.lang.String.class;
         case "proxyhost":
         case "proxyHost": return java.lang.String.class;
@@ -202,6 +216,8 @@ public class Sqs2ComponentConfigurer extends PropertyConfigurerSupport implement
         case "uriEndpointOverride": return java.lang.String.class;
         case "usedefaultcredentialsprovider":
         case "useDefaultCredentialsProvider": return boolean.class;
+        case "useprofilecredentialsprovider":
+        case "useProfileCredentialsProvider": return boolean.class;
         case "visibilitytimeout":
         case "visibilityTimeout": return java.lang.Integer.class;
         case "waittimeseconds":
@@ -245,6 +261,10 @@ public class Sqs2ComponentConfigurer extends PropertyConfigurerSupport implement
         case "deleteIfFiltered": return getOrCreateConfiguration(target).isDeleteIfFiltered();
         case "extendmessagevisibility":
         case "extendMessageVisibility": return getOrCreateConfiguration(target).isExtendMessageVisibility();
+        case "healthcheckconsumerenabled":
+        case "healthCheckConsumerEnabled": return target.isHealthCheckConsumerEnabled();
+        case "healthcheckproducerenabled":
+        case "healthCheckProducerEnabled": return target.isHealthCheckProducerEnabled();
         case "kmsdatakeyreuseperiodseconds":
         case "kmsDataKeyReusePeriodSeconds": return getOrCreateConfiguration(target).getKmsDataKeyReusePeriodSeconds();
         case "kmsmasterkeyid":
@@ -267,6 +287,8 @@ public class Sqs2ComponentConfigurer extends PropertyConfigurerSupport implement
         case "overrideendpoint":
         case "overrideEndpoint": return getOrCreateConfiguration(target).isOverrideEndpoint();
         case "policy": return getOrCreateConfiguration(target).getPolicy();
+        case "profilecredentialsname":
+        case "profileCredentialsName": return getOrCreateConfiguration(target).getProfileCredentialsName();
         case "protocol": return getOrCreateConfiguration(target).getProtocol();
         case "proxyhost":
         case "proxyHost": return getOrCreateConfiguration(target).getProxyHost();
@@ -293,6 +315,8 @@ public class Sqs2ComponentConfigurer extends PropertyConfigurerSupport implement
         case "uriEndpointOverride": return getOrCreateConfiguration(target).getUriEndpointOverride();
         case "usedefaultcredentialsprovider":
         case "useDefaultCredentialsProvider": return getOrCreateConfiguration(target).isUseDefaultCredentialsProvider();
+        case "useprofilecredentialsprovider":
+        case "useProfileCredentialsProvider": return getOrCreateConfiguration(target).isUseProfileCredentialsProvider();
         case "visibilitytimeout":
         case "visibilityTimeout": return getOrCreateConfiguration(target).getVisibilityTimeout();
         case "waittimeseconds":

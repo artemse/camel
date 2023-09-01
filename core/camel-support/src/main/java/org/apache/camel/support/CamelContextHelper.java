@@ -22,13 +22,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Component;
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.NamedNode;
 import org.apache.camel.NoSuchBeanException;
 import org.apache.camel.NoSuchEndpointException;
@@ -73,8 +71,7 @@ public final class CamelContextHelper {
      */
     public static Endpoint getMandatoryEndpoint(CamelContext camelContext, NormalizedEndpointUri uri)
             throws NoSuchEndpointException {
-        ExtendedCamelContext ecc = (ExtendedCamelContext) camelContext;
-        Endpoint endpoint = ecc.getEndpoint(uri);
+        Endpoint endpoint = camelContext.getCamelContextExtension().getEndpoint(uri);
         if (endpoint == null) {
             throw new NoSuchEndpointException(uri.getUri());
         } else {
@@ -88,8 +85,7 @@ public final class CamelContextHelper {
      */
     public static Endpoint getMandatoryPrototypeEndpoint(CamelContext camelContext, String uri)
             throws NoSuchEndpointException {
-        ExtendedCamelContext ecc = (ExtendedCamelContext) camelContext;
-        Endpoint endpoint = ecc.getPrototypeEndpoint(uri);
+        Endpoint endpoint = camelContext.getCamelContextExtension().getPrototypeEndpoint(uri);
         if (endpoint == null) {
             throw new NoSuchEndpointException(uri);
         } else {
@@ -103,8 +99,7 @@ public final class CamelContextHelper {
      */
     public static Endpoint getMandatoryPrototypeEndpoint(CamelContext camelContext, NormalizedEndpointUri uri)
             throws NoSuchEndpointException {
-        ExtendedCamelContext ecc = (ExtendedCamelContext) camelContext;
-        Endpoint endpoint = ecc.getPrototypeEndpoint(uri);
+        Endpoint endpoint = camelContext.getCamelContextExtension().getPrototypeEndpoint(uri);
         if (endpoint == null) {
             throw new NoSuchEndpointException(uri.getUri());
         } else {
@@ -283,26 +278,7 @@ public final class CamelContextHelper {
      * @throws IllegalArgumentException is thrown if the property is illegal
      */
     public static int getMaximumCachePoolSize(CamelContext camelContext) throws IllegalArgumentException {
-        if (camelContext != null) {
-            String s = camelContext.getGlobalOption(Exchange.MAXIMUM_CACHE_POOL_SIZE);
-            if (s != null) {
-                try {
-                    // we cannot use Camel type converters as they may not be ready this early
-                    Integer size = Integer.valueOf(s);
-                    if (size == null || size <= 0) {
-                        throw new IllegalArgumentException(
-                                "Property " + Exchange.MAXIMUM_CACHE_POOL_SIZE + " must be a positive number, was: " + s);
-                    }
-                    return size;
-                } catch (NumberFormatException e) {
-                    throw new IllegalArgumentException(
-                            "Property " + Exchange.MAXIMUM_CACHE_POOL_SIZE + " must be a positive number, was: " + s, e);
-                }
-            }
-        }
-
-        // 1000 is the default fallback
-        return 1000;
+        return getPositiveIntegerProperty(camelContext, Exchange.MAXIMUM_CACHE_POOL_SIZE);
     }
 
     /**
@@ -316,26 +292,7 @@ public final class CamelContextHelper {
      * @throws IllegalArgumentException is thrown if the property is illegal
      */
     public static int getMaximumEndpointCacheSize(CamelContext camelContext) throws IllegalArgumentException {
-        if (camelContext != null) {
-            String s = camelContext.getGlobalOption(Exchange.MAXIMUM_ENDPOINT_CACHE_SIZE);
-            if (s != null) {
-                // we cannot use Camel type converters as they may not be ready this early
-                try {
-                    int size = Integer.parseInt(s);
-                    if (size <= 0) {
-                        throw new IllegalArgumentException(
-                                "Property " + Exchange.MAXIMUM_ENDPOINT_CACHE_SIZE + " must be a positive number, was: " + s);
-                    }
-                    return size;
-                } catch (NumberFormatException e) {
-                    throw new IllegalArgumentException(
-                            "Property " + Exchange.MAXIMUM_ENDPOINT_CACHE_SIZE + " must be a positive number, was: " + s, e);
-                }
-            }
-        }
-
-        // 1000 is the default fallback
-        return 1000;
+        return getPositiveIntegerProperty(camelContext, Exchange.MAXIMUM_ENDPOINT_CACHE_SIZE);
     }
 
     /**
@@ -349,21 +306,7 @@ public final class CamelContextHelper {
      * @throws IllegalArgumentException is thrown if the property is illegal
      */
     public static int getMaximumSimpleCacheSize(CamelContext camelContext) throws IllegalArgumentException {
-        if (camelContext != null) {
-            String s = camelContext.getGlobalOption(Exchange.MAXIMUM_SIMPLE_CACHE_SIZE);
-            if (s != null) {
-                // we cannot use Camel type converters as they may not be ready this early
-                try {
-                    return Integer.parseInt(s);
-                } catch (NumberFormatException e) {
-                    throw new IllegalArgumentException(
-                            "Property " + Exchange.MAXIMUM_SIMPLE_CACHE_SIZE + " must be a positive number, was: " + s, e);
-                }
-            }
-        }
-
-        // 1000 is the default fallback
-        return 1000;
+        return getPositiveIntegerProperty(camelContext, Exchange.MAXIMUM_SIMPLE_CACHE_SIZE);
     }
 
     /**
@@ -377,21 +320,25 @@ public final class CamelContextHelper {
      * @throws IllegalArgumentException is thrown if the property is illegal
      */
     public static int getMaximumTransformerCacheSize(CamelContext camelContext) throws IllegalArgumentException {
+        return getPositiveIntegerProperty(camelContext, Exchange.MAXIMUM_TRANSFORMER_CACHE_SIZE);
+    }
+
+    private static int getPositiveIntegerProperty(CamelContext camelContext, String property) {
         if (camelContext != null) {
-            String s = camelContext.getGlobalOption(Exchange.MAXIMUM_TRANSFORMER_CACHE_SIZE);
+            String s = camelContext.getGlobalOption(property);
             if (s != null) {
                 // we cannot use Camel type converters as they may not be ready this early
                 try {
-                    Integer size = Integer.valueOf(s);
-                    if (size == null || size <= 0) {
+                    int size = Integer.parseInt(s);
+                    if (size <= 0) {
                         throw new IllegalArgumentException(
-                                "Property " + Exchange.MAXIMUM_TRANSFORMER_CACHE_SIZE + " must be a positive number, was: "
+                                "Property " + property + " must be a positive number, was: "
                                                            + s);
                     }
                     return size;
                 } catch (NumberFormatException e) {
                     throw new IllegalArgumentException(
-                            "Property " + Exchange.MAXIMUM_TRANSFORMER_CACHE_SIZE + " must be a positive number, was: " + s, e);
+                            "Property " + property + " must be a positive number, was: " + s, e);
                 }
             }
         }
@@ -411,26 +358,7 @@ public final class CamelContextHelper {
      * @throws IllegalArgumentException is thrown if the property is illegal
      */
     public static int getMaximumValidatorCacheSize(CamelContext camelContext) throws IllegalArgumentException {
-        if (camelContext != null) {
-            String s = camelContext.getGlobalOption(Exchange.MAXIMUM_VALIDATOR_CACHE_SIZE);
-            if (s != null) {
-                // we cannot use Camel type converters as they may not be ready this early
-                try {
-                    Integer size = Integer.valueOf(s);
-                    if (size == null || size <= 0) {
-                        throw new IllegalArgumentException(
-                                "Property " + Exchange.MAXIMUM_VALIDATOR_CACHE_SIZE + " must be a positive number, was: " + s);
-                    }
-                    return size;
-                } catch (NumberFormatException e) {
-                    throw new IllegalArgumentException(
-                            "Property " + Exchange.MAXIMUM_VALIDATOR_CACHE_SIZE + " must be a positive number, was: " + s, e);
-                }
-            }
-        }
-
-        // 1000 is the default fallback
-        return 1000;
+        return getPositiveIntegerProperty(camelContext, Exchange.MAXIMUM_VALIDATOR_CACHE_SIZE);
     }
 
     /**
@@ -565,7 +493,7 @@ public final class CamelContextHelper {
      * @return              the startup order, or <tt>0</tt> if not possible to determine
      */
     public static int getRouteStartupOrder(CamelContext camelContext, String routeId) {
-        for (RouteStartupOrder order : camelContext.adapt(ExtendedCamelContext.class).getRouteStartupOrder()) {
+        for (RouteStartupOrder order : camelContext.getCamelContextExtension().getRouteStartupOrder()) {
             if (order.getRoute().getId().equals(routeId)) {
                 return order.getStartupOrder();
             }
@@ -657,7 +585,7 @@ public final class CamelContextHelper {
         return camelContext.getComponentNames().stream()
                 .map(camelContext::getComponent)
                 .filter(predicate)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -670,7 +598,7 @@ public final class CamelContextHelper {
     public static List<Endpoint> getEndpoints(CamelContext camelContext, Predicate<Endpoint> predicate) {
         return camelContext.getEndpoints().stream()
                 .filter(predicate)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private static void validateRestConfigurationComponent(String component, String configurationComponent) {

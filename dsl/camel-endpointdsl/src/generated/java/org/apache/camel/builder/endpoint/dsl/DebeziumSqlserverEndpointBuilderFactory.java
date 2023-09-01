@@ -565,6 +565,40 @@ public interface DebeziumSqlserverEndpointBuilderFactory {
             return this;
         }
         /**
+         * The maximum number of retries on connection errors before failing (-1
+         * = no limit, 0 = disabled, 0 = num of retries).
+         * 
+         * The option is a: &lt;code&gt;int&lt;/code&gt; type.
+         * 
+         * Default: -1
+         * Group: sqlserver
+         * 
+         * @param errorsMaxRetries the value to set
+         * @return the dsl builder
+         */
+        default DebeziumSqlserverEndpointBuilder errorsMaxRetries(
+                int errorsMaxRetries) {
+            doSetProperty("errorsMaxRetries", errorsMaxRetries);
+            return this;
+        }
+        /**
+         * The maximum number of retries on connection errors before failing (-1
+         * = no limit, 0 = disabled, 0 = num of retries).
+         * 
+         * The option will be converted to a &lt;code&gt;int&lt;/code&gt; type.
+         * 
+         * Default: -1
+         * Group: sqlserver
+         * 
+         * @param errorsMaxRetries the value to set
+         * @return the dsl builder
+         */
+        default DebeziumSqlserverEndpointBuilder errorsMaxRetries(
+                String errorsMaxRetries) {
+            doSetProperty("errorsMaxRetries", errorsMaxRetries);
+            return this;
+        }
+        /**
          * Specify how failures during processing of events (i.e. when
          * encountering a corrupted event) should be handled, including: 'fail'
          * (the default) an exception indicating the problematic event and its
@@ -789,7 +823,8 @@ public interface DebeziumSqlserverEndpointBuilderFactory {
             return this;
         }
         /**
-         * The maximum size of chunk for incremental snapshotting.
+         * The maximum size of chunk (number of documents/rows) for incremental
+         * snapshotting.
          * 
          * The option is a: &lt;code&gt;int&lt;/code&gt; type.
          * 
@@ -805,7 +840,8 @@ public interface DebeziumSqlserverEndpointBuilderFactory {
             return this;
         }
         /**
-         * The maximum size of chunk for incremental snapshotting.
+         * The maximum size of chunk (number of documents/rows) for incremental
+         * snapshotting.
          * 
          * The option will be converted to a &lt;code&gt;int&lt;/code&gt; type.
          * 
@@ -1019,6 +1055,37 @@ public interface DebeziumSqlserverEndpointBuilderFactory {
             return this;
         }
         /**
+         * List of notification channels names that are enabled.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: sqlserver
+         * 
+         * @param notificationEnabledChannels the value to set
+         * @return the dsl builder
+         */
+        default DebeziumSqlserverEndpointBuilder notificationEnabledChannels(
+                String notificationEnabledChannels) {
+            doSetProperty("notificationEnabledChannels", notificationEnabledChannels);
+            return this;
+        }
+        /**
+         * The name of the topic for the notifications. This is required in case
+         * 'sink' is in the list of enabled channels.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: sqlserver
+         * 
+         * @param notificationSinkTopicName the value to set
+         * @return the dsl builder
+         */
+        default DebeziumSqlserverEndpointBuilder notificationSinkTopicName(
+                String notificationSinkTopicName) {
+            doSetProperty("notificationSinkTopicName", notificationSinkTopicName);
+            return this;
+        }
+        /**
          * Time to wait for new change events to appear after receiving no
          * events, given in milliseconds. Defaults to 500 ms.
          * 
@@ -1154,39 +1221,6 @@ public interface DebeziumSqlserverEndpointBuilderFactory {
             return this;
         }
         /**
-         * Whether field names will be sanitized to Avro naming conventions.
-         * 
-         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
-         * 
-         * Default: false
-         * Group: sqlserver
-         * 
-         * @param sanitizeFieldNames the value to set
-         * @return the dsl builder
-         */
-        default DebeziumSqlserverEndpointBuilder sanitizeFieldNames(
-                boolean sanitizeFieldNames) {
-            doSetProperty("sanitizeFieldNames", sanitizeFieldNames);
-            return this;
-        }
-        /**
-         * Whether field names will be sanitized to Avro naming conventions.
-         * 
-         * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
-         * type.
-         * 
-         * Default: false
-         * Group: sqlserver
-         * 
-         * @param sanitizeFieldNames the value to set
-         * @return the dsl builder
-         */
-        default DebeziumSqlserverEndpointBuilder sanitizeFieldNames(
-                String sanitizeFieldNames) {
-            doSetProperty("sanitizeFieldNames", sanitizeFieldNames);
-            return this;
-        }
-        /**
          * The name of the SchemaHistory class that should be used to store and
          * recover database schema changes. The configuration properties for the
          * history are prefixed with the 'schema.history.internal.' string.
@@ -1263,6 +1297,47 @@ public interface DebeziumSqlserverEndpointBuilderFactory {
         }
         /**
          * Controls what DDL will Debezium store in database schema history. By
+         * default (true) only DDL that manipulates a table from captured
+         * schema/database will be stored. If set to false, then Debezium will
+         * store all incoming DDL statements.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: false
+         * Group: sqlserver
+         * 
+         * @param schemaHistoryInternalStoreOnlyCapturedDatabasesDdl the value
+         * to set
+         * @return the dsl builder
+         */
+        default DebeziumSqlserverEndpointBuilder schemaHistoryInternalStoreOnlyCapturedDatabasesDdl(
+                boolean schemaHistoryInternalStoreOnlyCapturedDatabasesDdl) {
+            doSetProperty("schemaHistoryInternalStoreOnlyCapturedDatabasesDdl", schemaHistoryInternalStoreOnlyCapturedDatabasesDdl);
+            return this;
+        }
+        /**
+         * Controls what DDL will Debezium store in database schema history. By
+         * default (true) only DDL that manipulates a table from captured
+         * schema/database will be stored. If set to false, then Debezium will
+         * store all incoming DDL statements.
+         * 
+         * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
+         * type.
+         * 
+         * Default: false
+         * Group: sqlserver
+         * 
+         * @param schemaHistoryInternalStoreOnlyCapturedDatabasesDdl the value
+         * to set
+         * @return the dsl builder
+         */
+        default DebeziumSqlserverEndpointBuilder schemaHistoryInternalStoreOnlyCapturedDatabasesDdl(
+                String schemaHistoryInternalStoreOnlyCapturedDatabasesDdl) {
+            doSetProperty("schemaHistoryInternalStoreOnlyCapturedDatabasesDdl", schemaHistoryInternalStoreOnlyCapturedDatabasesDdl);
+            return this;
+        }
+        /**
+         * Controls what DDL will Debezium store in database schema history. By
          * default (false) Debezium will store all incoming DDL statements. If
          * set to true, then only DDL that manipulates a captured table will be
          * stored.
@@ -1306,7 +1381,10 @@ public interface DebeziumSqlserverEndpointBuilderFactory {
          * Specify how schema names should be adjusted for compatibility with
          * the message converter used by the connector, including: 'avro'
          * replaces the characters that cannot be used in the Avro type name
-         * with underscore; 'none' does not apply any adjustment (default).
+         * with underscore; 'avro_unicode' replaces the underscore or characters
+         * that cannot be used in the Avro type name with corresponding unicode
+         * like _uxxxx. Note: _ is an escape sequence like backslash in
+         * Java;'none' does not apply any adjustment (default).
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
@@ -1335,6 +1413,57 @@ public interface DebeziumSqlserverEndpointBuilderFactory {
         default DebeziumSqlserverEndpointBuilder signalDataCollection(
                 String signalDataCollection) {
             doSetProperty("signalDataCollection", signalDataCollection);
+            return this;
+        }
+        /**
+         * List of channels names that are enabled. Source channel is enabled by
+         * default.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Default: source
+         * Group: sqlserver
+         * 
+         * @param signalEnabledChannels the value to set
+         * @return the dsl builder
+         */
+        default DebeziumSqlserverEndpointBuilder signalEnabledChannels(
+                String signalEnabledChannels) {
+            doSetProperty("signalEnabledChannels", signalEnabledChannels);
+            return this;
+        }
+        /**
+         * Interval for looking for new signals in registered channels, given in
+         * milliseconds. Defaults to 5 seconds.
+         * 
+         * The option is a: &lt;code&gt;long&lt;/code&gt; type.
+         * 
+         * Default: 5s
+         * Group: sqlserver
+         * 
+         * @param signalPollIntervalMs the value to set
+         * @return the dsl builder
+         */
+        default DebeziumSqlserverEndpointBuilder signalPollIntervalMs(
+                long signalPollIntervalMs) {
+            doSetProperty("signalPollIntervalMs", signalPollIntervalMs);
+            return this;
+        }
+        /**
+         * Interval for looking for new signals in registered channels, given in
+         * milliseconds. Defaults to 5 seconds.
+         * 
+         * The option will be converted to a &lt;code&gt;long&lt;/code&gt; type.
+         * 
+         * Default: 5s
+         * Group: sqlserver
+         * 
+         * @param signalPollIntervalMs the value to set
+         * @return the dsl builder
+         */
+        default DebeziumSqlserverEndpointBuilder signalPollIntervalMs(
+                String signalPollIntervalMs) {
+            doSetProperty("signalPollIntervalMs", signalPollIntervalMs);
             return this;
         }
         /**
@@ -1541,11 +1670,18 @@ public interface DebeziumSqlserverEndpointBuilderFactory {
         }
         /**
          * The criteria for running a snapshot upon startup of the connector.
-         * Options include: 'initial' (the default) to specify the connector
-         * should run a snapshot only when no offsets are available for the
-         * logical server name; 'schema_only' to specify the connector should
-         * run a snapshot of the schema when no offsets are available for the
-         * logical server name.
+         * Select one of the following snapshot options: 'initial' (default): If
+         * the connector does not detect any offsets for the logical server
+         * name, it runs a snapshot that captures the current full state of the
+         * configured tables. After the snapshot completes, the connector begins
+         * to stream changes from the transaction log.; 'initial_only': The
+         * connector performs a snapshot as it does for the 'initial' option,
+         * but after the connector completes the snapshot, it stops, and does
+         * not stream changes from the transaction log.; 'schema_only': If the
+         * connector does not detect any offsets for the logical server name, it
+         * runs a snapshot that captures only the schema (table structures), but
+         * not any table data. After the snapshot completes, the connector
+         * begins to stream changes from the transaction log.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
@@ -1584,6 +1720,44 @@ public interface DebeziumSqlserverEndpointBuilderFactory {
         default DebeziumSqlserverEndpointBuilder snapshotSelectStatementOverrides(
                 String snapshotSelectStatementOverrides) {
             doSetProperty("snapshotSelectStatementOverrides", snapshotSelectStatementOverrides);
+            return this;
+        }
+        /**
+         * Controls the order in which tables are processed in the initial
+         * snapshot. A descending value will order the tables by row count
+         * descending. A ascending value will order the tables by row count
+         * ascending. A value of disabled (the default) will disable ordering by
+         * row count.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Default: disabled
+         * Group: sqlserver
+         * 
+         * @param snapshotTablesOrderByRowCount the value to set
+         * @return the dsl builder
+         */
+        default DebeziumSqlserverEndpointBuilder snapshotTablesOrderByRowCount(
+                String snapshotTablesOrderByRowCount) {
+            doSetProperty("snapshotTablesOrderByRowCount", snapshotTablesOrderByRowCount);
+            return this;
+        }
+        /**
+         * The name of the SourceInfoStructMaker class that returns SourceInfo
+         * schema and struct.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Default:
+         * io.debezium.connector.sqlserver.SqlServerSourceInfoStructMaker
+         * Group: sqlserver
+         * 
+         * @param sourceinfoStructMaker the value to set
+         * @return the dsl builder
+         */
+        default DebeziumSqlserverEndpointBuilder sourceinfoStructMaker(
+                String sourceinfoStructMaker) {
+            doSetProperty("sourceinfoStructMaker", sourceinfoStructMaker);
             return this;
         }
         /**
@@ -1886,7 +2060,7 @@ public interface DebeziumSqlserverEndpointBuilderFactory {
          * Debezium SQL Server Connector (camel-debezium-sqlserver)
          * Capture changes from an SQL Server database.
          * 
-         * Category: database,sql
+         * Category: database
          * Since: 3.0
          * Maven coordinates: org.apache.camel:camel-debezium-sqlserver
          * 
@@ -1899,7 +2073,7 @@ public interface DebeziumSqlserverEndpointBuilderFactory {
          * Debezium SQL Server Connector (camel-debezium-sqlserver)
          * Capture changes from an SQL Server database.
          * 
-         * Category: database,sql
+         * Category: database
          * Since: 3.0
          * Maven coordinates: org.apache.camel:camel-debezium-sqlserver
          * 
@@ -1919,7 +2093,7 @@ public interface DebeziumSqlserverEndpointBuilderFactory {
          * Debezium SQL Server Connector (camel-debezium-sqlserver)
          * Capture changes from an SQL Server database.
          * 
-         * Category: database,sql
+         * Category: database
          * Since: 3.0
          * Maven coordinates: org.apache.camel:camel-debezium-sqlserver
          * 

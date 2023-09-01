@@ -20,12 +20,15 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.component.jms.AbstractSpringJMSTestSupport;
 import org.apache.camel.component.mock.MockEndpoint;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Tags;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * To demonstrate transacted with minimal configuration.
  */
+@Tags({ @Tag("not-parallel"), @Tag("spring"), @Tag("tx") })
 public class JMSTransactionErrorHandlerTest extends AbstractSpringJMSTestSupport {
 
     @Override
@@ -47,7 +50,7 @@ public class JMSTransactionErrorHandlerTest extends AbstractSpringJMSTestSupport
         // and not JMS doing the redelivery
         mock.message(0).header("JMSRedelivered").isEqualTo(false);
 
-        template.sendBody("activemq:queue:okay", "Hello World");
+        template.sendBody("activemq:queue:okay.JMSTransactionErrorHandlerTest", "Hello World");
 
         mock.assertIsSatisfied();
     }

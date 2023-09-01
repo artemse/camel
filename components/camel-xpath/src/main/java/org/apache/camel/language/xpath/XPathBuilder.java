@@ -770,8 +770,7 @@ public class XPathBuilder extends ServiceSupport
                         try {
                             // use the property placeholder resolver to lookup
                             // the property for us
-                            Object answer = exchange.get().getContext().resolvePropertyPlaceholders("{{" + propertyText + "}}");
-                            return answer;
+                            return exchange.get().getContext().resolvePropertyPlaceholders("{{" + propertyText + "}}");
                         } catch (Exception e) {
                             throw new XPathFunctionException(e);
                         }
@@ -809,8 +808,7 @@ public class XPathBuilder extends ServiceSupport
                         String exprText = exchange.get().getContext().getTypeConverter().convertTo(String.class, value);
                         Language simple = exchange.get().getContext().resolveLanguage("simple");
                         Expression exp = simple.createExpression(exprText);
-                        Object answer = exp.evaluate(exchange.get(), Object.class);
-                        return answer;
+                        return exp.evaluate(exchange.get(), Object.class);
                     }
                 }
                 return null;
@@ -1410,8 +1408,9 @@ public class XPathBuilder extends ServiceSupport
                         }
                     }
                 } catch (Exception e) {
-                    LOG.warn("Attempted to create Saxon XPathFactory by creating a new instance of " + SAXON_FACTORY_CLASS_NAME
-                             + " failed. Will fallback and create XPathFactory using JDK API. This exception is ignored (stacktrace in DEBUG logging level).");
+                    LOG.warn("Attempted to create Saxon XPathFactory by creating a new instance of {}" +
+                             " failed. Will fallback and create XPathFactory using JDK API. This exception is ignored (stacktrace in DEBUG logging level).",
+                            SAXON_FACTORY_CLASS_NAME);
                     LOG.debug("Error creating Saxon XPathFactory. This exception is ignored.", e);
                 }
             }

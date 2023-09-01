@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.apache.camel</groupId>
         <artifactId>components</artifactId>
-        <version>4.0.0-SNAPSHOT</version>
+        <version>4.1.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>camel-soap</artifactId>
@@ -32,6 +32,7 @@
     <description>Camel SOAP support</description>
 
     <properties>
+        <camel.surefire.fork.additional-vmargs>--add-opens java.xml/com.sun.org.apache.xerces.internal.dom=ALL-UNNAMED --add-opens java.xml/com.sun.org.apache.xerces.internal.jaxp=ALL-UNNAMED --add-opens java.xml/com.sun.org.apache.xerces.internal.util=ALL-UNNAMED</camel.surefire.fork.additional-vmargs>
     </properties>
 
     <dependencies>
@@ -48,19 +49,36 @@
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
+            <version>${jaxb-impl-version}</version>
         </dependency>
         <dependency>
             <groupId>jakarta.xml.ws</groupId>
             <artifactId>jakarta.xml.ws-api</artifactId>
+            <version>${jakarta-xml-ws-api-version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.xml.bind</groupId>
+                    <artifactId>jaxb-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>jakarta.jws</groupId>
             <artifactId>jakarta.jws-api</artifactId>
+            <version>${jakarta-jws-api-version}</version>
         </dependency>
         <dependency>
             <groupId>com.sun.xml.messaging.saaj</groupId>
             <artifactId>saaj-impl</artifactId>
-        </dependency>
+            <version>3.0.2</version>
+            <exclusions>
+                <exclusion>
+                   <!--Get dependency from jaxb-runtime-->
+                   <groupId>org.jvnet.staxex</groupId>
+                   <artifactId>stax-ex</artifactId>
+                 </exclusion>
+            </exclusions>
+         </dependency>
 
         <!-- test dependencies -->
         <dependency>
@@ -91,6 +109,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
+            <version>${spring-version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -118,8 +137,6 @@
                             <goal>xsdtojava-tests</goal>
                         </goals>
                         <configuration>
-                            <fork>${cxf.codegenplugin.forkmode}</fork>
-                            <additionalJvmArgs>${cxf.xjc.jvmArgs}</additionalJvmArgs>
                             <testSourceRoot>${basedir}/target/generated/src/test/java</testSourceRoot>
                             <xsdOptions>
                                 <xsdOption>
@@ -147,8 +164,6 @@
                         <id>generate-sources</id>
                         <phase>generate-sources</phase>
                         <configuration>
-                            <fork>${cxf.codegenplugin.forkmode}</fork>
-                            <additionalJvmArgs>${cxf.xjc.jvmArgs}</additionalJvmArgs>
                             <sourceRoot>${basedir}/target/xjc</sourceRoot>
                             <extensions>
                                 <extension>net.java.dev.jaxb2-commons:jaxb-fluent-api:2.1.8</extension>
@@ -188,8 +203,6 @@
                         <id>generate-sources-wsdl</id>
                         <phase>generate-sources</phase>
                         <configuration>
-                            <fork>${cxf.codegenplugin.forkmode}</fork>
-                            <additionalJvmArgs>${cxf.codegen.jvmArgs}</additionalJvmArgs>
                             <testSourceRoot>${basedir}/target/generated/src/test/java</testSourceRoot>
                             <defaultOptions>
                                 <frontEnd>jaxws</frontEnd>
@@ -242,23 +255,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <profiles>
-        <profile>
-            <id>jdk17-build</id>
-            <activation>
-                <jdk>[17,)</jdk>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <argLine>--add-opens java.xml/com.sun.org.apache.xerces.internal.dom=ALL-UNNAMED --add-opens java.xml/com.sun.org.apache.xerces.internal.jaxp=ALL-UNNAMED --add-opens java.xml/com.sun.org.apache.xerces.internal.util=ALL-UNNAMED</argLine>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>

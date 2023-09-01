@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.apache.camel</groupId>
         <artifactId>camel-cxf-parent</artifactId>
-        <version>4.0.0-SNAPSHOT</version>
+        <version>4.1.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>camel-cxf-rest</artifactId>
@@ -33,7 +33,8 @@
     <description>Camel CXF REST support</description>
 
     <properties>
-
+        <camel.surefire.fork.vmargs>--add-opens java.xml/com.sun.org.apache.xerces.internal.dom=ALL-UNNAMED --add-opens java.xml/com.sun.org.apache.xerces.internal.jaxp=ALL-UNNAMED --add-opens java.xml/com.sun.org.apache.xerces.internal.util=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED</camel.surefire.fork.vmargs>
+        <camel.surefire.forkTimeout>300</camel.surefire.forkTimeout>
     </properties>
 
     <dependencies>
@@ -63,14 +64,17 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+            <version>${cxf-version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-client</artifactId>
+            <version>${cxf-version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-features-logging</artifactId>
+            <version>${cxf-version}</version>
         </dependency>
 
 
@@ -91,7 +95,7 @@
             <artifactId>camel-xpath</artifactId>
             <scope>test</scope>
         </dependency>
-       
+
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-test-junit5</artifactId>
@@ -116,12 +120,14 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-features-clustering</artifactId>
+            <version>${cxf-version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
+            <version>${cxf-version}</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -158,14 +164,9 @@
 
 
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpmime</artifactId>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+            <artifactId>httpclient5</artifactId>
+            <version>${httpclient-version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -178,6 +179,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
+            <version>${mockito-version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -197,18 +199,13 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-rs-extension-providers</artifactId>
+            <version>${cxf-version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jettison</groupId>
             <artifactId>jettison</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>${commons-lang3-version}</version>
+            <version>${jettison-version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -235,21 +232,6 @@
                 </excludes>
             </resource>
         </resources>
-        <plugins>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <childDelegation>false</childDelegation>
-                    <forkedProcessTimeoutInSeconds>300</forkedProcessTimeoutInSeconds>
-                    <reportFormat>brief</reportFormat>
-                    <useFile>false</useFile>
-                    <runOrder>alphabetical</runOrder>
-                    <!--parallel>classes</parallel>
-                    <perCoreThreadCount>true</perCoreThreadCount>
-                    <threadCount>2</threadCount-->
-                </configuration>
-            </plugin>
-        </plugins>
     </build>
 
     <profiles>
@@ -269,24 +251,9 @@
                 <dependency>
                     <groupId>com.sun.xml.parsers</groupId>
                     <artifactId>jaxp-ri</artifactId>
+                    <version>${jaxp-ri-version}</version>
                 </dependency>
             </dependencies>
-        </profile>
-        <profile>
-            <id>jdk17-build</id>
-            <activation>
-                <jdk>[17,)</jdk>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <argLine>--add-opens java.xml/com.sun.org.apache.xerces.internal.dom=ALL-UNNAMED --add-opens java.xml/com.sun.org.apache.xerces.internal.jaxp=ALL-UNNAMED --add-opens java.xml/com.sun.org.apache.xerces.internal.util=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED</argLine>
-                        </configuration>
-                    </plugin>
-                </plugins>
-           </build>
         </profile>
     </profiles>
 </project>

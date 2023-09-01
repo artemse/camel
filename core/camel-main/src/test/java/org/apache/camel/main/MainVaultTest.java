@@ -48,7 +48,36 @@ public class MainVaultTest {
         Assertions.assertEquals("myKey", cfg.getAccessKey());
         Assertions.assertEquals("mySecret", cfg.getSecretKey());
         Assertions.assertEquals("myRegion", cfg.getRegion());
-        Assertions.assertEquals(false, cfg.isDefaultCredentialsProvider());
+        Assertions.assertFalse(cfg.isDefaultCredentialsProvider());
+
+        main.stop();
+    }
+
+    @Test
+    public void testMainProfileAws() throws Exception {
+        Main main = new Main();
+
+        main.addInitialProperty("camel.vault.aws.accessKey", "myKey");
+        main.addInitialProperty("camel.vault.aws.secretKey", "mySecret");
+        main.addInitialProperty("camel.vault.aws.region", "myRegion");
+        main.addInitialProperty("camel.vault.aws.defaultCredentialsProvider", "false");
+        main.addInitialProperty("camel.vault.aws.profileCredentialsProvider", "true");
+        main.addInitialProperty("camel.vault.aws.profileName", "jack");
+
+        main.start();
+
+        CamelContext context = main.getCamelContext();
+        assertNotNull(context);
+
+        AwsVaultConfiguration cfg = context.getVaultConfiguration().aws();
+        assertNotNull(cfg);
+
+        Assertions.assertEquals("myKey", cfg.getAccessKey());
+        Assertions.assertEquals("mySecret", cfg.getSecretKey());
+        Assertions.assertEquals("myRegion", cfg.getRegion());
+        Assertions.assertFalse(cfg.isDefaultCredentialsProvider());
+        Assertions.assertTrue(cfg.isProfileCredentialsProvider());
+        Assertions.assertEquals("jack", cfg.getProfileName());
 
         main.stop();
     }
@@ -74,7 +103,37 @@ public class MainVaultTest {
         Assertions.assertEquals("myKey", cfg.getAccessKey());
         Assertions.assertEquals("mySecret", cfg.getSecretKey());
         Assertions.assertEquals("myRegion", cfg.getRegion());
-        Assertions.assertEquals(false, cfg.isDefaultCredentialsProvider());
+        Assertions.assertFalse(cfg.isDefaultCredentialsProvider());
+
+        main.stop();
+    }
+
+    @Test
+    public void testMainAwsProfileFluent() throws Exception {
+        Main main = new Main();
+        main.configure().vault().aws()
+                .withAccessKey("myKey")
+                .withSecretKey("mySecret")
+                .withRegion("myRegion")
+                .withDefaultCredentialsProvider(false)
+                .withProfileCredentialsProvider(true)
+                .withProfileName("jack")
+                .end();
+
+        main.start();
+
+        CamelContext context = main.getCamelContext();
+        assertNotNull(context);
+
+        AwsVaultConfiguration cfg = context.getVaultConfiguration().aws();
+        assertNotNull(cfg);
+
+        Assertions.assertEquals("myKey", cfg.getAccessKey());
+        Assertions.assertEquals("mySecret", cfg.getSecretKey());
+        Assertions.assertEquals("myRegion", cfg.getRegion());
+        Assertions.assertFalse(cfg.isDefaultCredentialsProvider());
+        Assertions.assertTrue(cfg.isProfileCredentialsProvider());
+        Assertions.assertEquals("jack", cfg.getProfileName());
 
         main.stop();
     }
@@ -96,7 +155,7 @@ public class MainVaultTest {
 
         Assertions.assertEquals("file:////myKey", cfg.getServiceAccountKey());
         Assertions.assertEquals("gcp-project", cfg.getProjectId());
-        Assertions.assertEquals(false, cfg.isUseDefaultInstance());
+        Assertions.assertFalse(cfg.isUseDefaultInstance());
         main.stop();
     }
 
@@ -118,7 +177,7 @@ public class MainVaultTest {
 
         Assertions.assertEquals("file:////myKey", cfg.getServiceAccountKey());
         Assertions.assertEquals("gcp-project", cfg.getProjectId());
-        Assertions.assertEquals(false, cfg.isUseDefaultInstance());
+        Assertions.assertFalse(cfg.isUseDefaultInstance());
         main.stop();
     }
 

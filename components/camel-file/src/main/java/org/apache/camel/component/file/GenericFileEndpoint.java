@@ -439,10 +439,10 @@ public abstract class GenericFileEndpoint<T> extends ScheduledPollEndpoint imple
     private Pattern includePattern;
     private Pattern excludePattern;
 
-    public GenericFileEndpoint() {
+    protected GenericFileEndpoint() {
     }
 
-    public GenericFileEndpoint(String endpointUri, Component component) {
+    protected GenericFileEndpoint(String endpointUri, Component component) {
         super(endpointUri, component);
     }
 
@@ -459,6 +459,10 @@ public abstract class GenericFileEndpoint<T> extends ScheduledPollEndpoint imple
     public abstract char getFileSeparator();
 
     public abstract boolean isAbsolute(String name);
+
+    public boolean isHiddenFilesEnabled() {
+        return false;
+    }
 
     /**
      * Return the file name that will be auto-generated for the given message if none is provided

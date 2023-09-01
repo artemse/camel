@@ -21,19 +21,17 @@ public class DebeziumMongodbEndpointUriFactory extends org.apache.camel.support.
     private static final Set<String> SECRET_PROPERTY_NAMES;
     private static final Set<String> MULTI_VALUE_PREFIXES;
     static {
-        Set<String> props = new HashSet<>(64);
+        Set<String> props = new HashSet<>(65);
         props.add("additionalProperties");
         props.add("bridgeErrorHandler");
         props.add("captureMode");
         props.add("collectionExcludeList");
         props.add("collectionIncludeList");
-        props.add("connectBackoffInitialDelayMs");
-        props.add("connectBackoffMaxDelayMs");
-        props.add("connectMaxAttempts");
         props.add("converters");
         props.add("cursorMaxAwaitTimeMs");
         props.add("databaseExcludeList");
         props.add("databaseIncludeList");
+        props.add("errorsMaxRetries");
         props.add("eventProcessingFailureHandlingMode");
         props.add("exceptionHandler");
         props.add("exchangePattern");
@@ -48,10 +46,9 @@ public class DebeziumMongodbEndpointUriFactory extends org.apache.camel.support.
         props.add("maxQueueSizeInBytes");
         props.add("mongodbAuthsource");
         props.add("mongodbConnectTimeoutMs");
+        props.add("mongodbConnectionMode");
         props.add("mongodbConnectionString");
         props.add("mongodbHeartbeatFrequencyMs");
-        props.add("mongodbHosts");
-        props.add("mongodbMembersAutoDiscover");
         props.add("mongodbPassword");
         props.add("mongodbPollIntervalMs");
         props.add("mongodbServerSelectionTimeoutMs");
@@ -60,6 +57,8 @@ public class DebeziumMongodbEndpointUriFactory extends org.apache.camel.support.
         props.add("mongodbSslInvalidHostnameAllowed");
         props.add("mongodbUser");
         props.add("name");
+        props.add("notificationEnabledChannels");
+        props.add("notificationSinkTopicName");
         props.add("offsetCommitPolicy");
         props.add("offsetCommitTimeoutMs");
         props.add("offsetFlushIntervalMs");
@@ -72,10 +71,11 @@ public class DebeziumMongodbEndpointUriFactory extends org.apache.camel.support.
         props.add("provideTransactionMetadata");
         props.add("queryFetchSize");
         props.add("retriableRestartConnectorWaitMs");
-        props.add("sanitizeFieldNames");
         props.add("schemaHistoryInternalFileFilename");
         props.add("schemaNameAdjustmentMode");
         props.add("signalDataCollection");
+        props.add("signalEnabledChannels");
+        props.add("signalPollIntervalMs");
         props.add("skippedOperations");
         props.add("snapshotCollectionFilterOverrides");
         props.add("snapshotDelayMs");
@@ -83,6 +83,7 @@ public class DebeziumMongodbEndpointUriFactory extends org.apache.camel.support.
         props.add("snapshotIncludeCollectionList");
         props.add("snapshotMaxThreads");
         props.add("snapshotMode");
+        props.add("sourceinfoStructMaker");
         props.add("tombstonesOnDelete");
         props.add("topicNamingStrategy");
         props.add("topicPrefix");

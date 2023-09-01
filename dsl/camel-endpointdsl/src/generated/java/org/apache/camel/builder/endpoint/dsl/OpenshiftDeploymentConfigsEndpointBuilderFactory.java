@@ -108,6 +108,21 @@ public interface OpenshiftDeploymentConfigsEndpointBuilderFactory {
             return this;
         }
         /**
+         * The namespace.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: common
+         * 
+         * @param namespace the value to set
+         * @return the dsl builder
+         */
+        default OpenshiftDeploymentConfigsEndpointConsumerBuilder namespace(
+                String namespace) {
+            doSetProperty("namespace", namespace);
+            return this;
+        }
+        /**
          * The port name, used for ServiceCall EIP.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -241,21 +256,6 @@ public interface OpenshiftDeploymentConfigsEndpointBuilderFactory {
         default OpenshiftDeploymentConfigsEndpointConsumerBuilder labelValue(
                 String labelValue) {
             doSetProperty("labelValue", labelValue);
-            return this;
-        }
-        /**
-         * The namespace.
-         * 
-         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
-         * 
-         * Group: consumer
-         * 
-         * @param namespace the value to set
-         * @return the dsl builder
-         */
-        default OpenshiftDeploymentConfigsEndpointConsumerBuilder namespace(
-                String namespace) {
-            doSetProperty("namespace", namespace);
             return this;
         }
         /**
@@ -736,6 +736,21 @@ public interface OpenshiftDeploymentConfigsEndpointBuilderFactory {
             return this;
         }
         /**
+         * The namespace.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: common
+         * 
+         * @param namespace the value to set
+         * @return the dsl builder
+         */
+        default OpenshiftDeploymentConfigsEndpointProducerBuilder namespace(
+                String namespace) {
+            doSetProperty("namespace", namespace);
+            return this;
+        }
+        /**
          * The port name, used for ServiceCall EIP.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -1146,6 +1161,21 @@ public interface OpenshiftDeploymentConfigsEndpointBuilderFactory {
             return this;
         }
         /**
+         * The namespace.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: common
+         * 
+         * @param namespace the value to set
+         * @return the dsl builder
+         */
+        default OpenshiftDeploymentConfigsEndpointBuilder namespace(
+                String namespace) {
+            doSetProperty("namespace", namespace);
+            return this;
+        }
+        /**
          * The port name, used for ServiceCall EIP.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -1426,7 +1456,7 @@ public interface OpenshiftDeploymentConfigsEndpointBuilderFactory {
          * Perform operations on Openshift Deployment Configs and get notified
          * on Deployment Config changes.
          * 
-         * Category: container,cloud,paas
+         * Category: container,cloud
          * Since: 3.18
          * Maven coordinates: org.apache.camel:camel-kubernetes
          * 
@@ -1440,7 +1470,7 @@ public interface OpenshiftDeploymentConfigsEndpointBuilderFactory {
          * Perform operations on Openshift Deployment Configs and get notified
          * on Deployment Config changes.
          * 
-         * Category: container,cloud,paas
+         * Category: container,cloud
          * Since: 3.18
          * Maven coordinates: org.apache.camel:camel-kubernetes
          * 
@@ -1461,7 +1491,7 @@ public interface OpenshiftDeploymentConfigsEndpointBuilderFactory {
          * Perform operations on Openshift Deployment Configs and get notified
          * on Deployment Config changes.
          * 
-         * Category: container,cloud,paas
+         * Category: container,cloud
          * Since: 3.18
          * Maven coordinates: org.apache.camel:camel-kubernetes
          * 

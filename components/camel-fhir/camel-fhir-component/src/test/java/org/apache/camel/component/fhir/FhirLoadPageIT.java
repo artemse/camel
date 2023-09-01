@@ -33,6 +33,7 @@ import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Patient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +44,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * Test class for {@link org.apache.camel.component.fhir.api.FhirLoadPage} APIs. The class source won't be generated
  * again if the generator MOJO finds it under src/test/java.
  */
+@DisabledIfSystemProperty(named = "ci.env.name", matches = "apache.org",
+                          disabledReason = "Apache CI nodes are too resource constrained for this test - see CAMEL-19659")
 public class FhirLoadPageIT extends AbstractFhirTestSupport {
 
     private static final Logger LOG = LoggerFactory.getLogger(FhirLoadPageIT.class);
@@ -67,7 +70,7 @@ public class FhirLoadPageIT extends AbstractFhirTestSupport {
 
         IBaseBundle result = requestBodyAndHeaders("direct://BY_URL", null, headers);
 
-        LOG.debug("byUrl: " + result);
+        LOG.debug("byUrl: {}", result);
         assertNotNull(result, "byUrl result");
     }
 
@@ -83,7 +86,7 @@ public class FhirLoadPageIT extends AbstractFhirTestSupport {
         Bundle result = requestBody("direct://NEXT", bundle);
 
         assertNotNull(result, "next result");
-        LOG.debug("next: " + result);
+        LOG.debug("next: {}", result);
     }
 
     @Test
@@ -101,7 +104,7 @@ public class FhirLoadPageIT extends AbstractFhirTestSupport {
         // using org.hl7.fhir.instance.model.api.IBaseBundle message body for single parameter "bundle"
         Bundle result = requestBody("direct://PREVIOUS", bundle);
 
-        LOG.debug("previous: " + result);
+        LOG.debug("previous: {}", result);
         assertNotNull(result, "previous result");
     }
 
@@ -122,7 +125,7 @@ public class FhirLoadPageIT extends AbstractFhirTestSupport {
         // using org.hl7.fhir.instance.model.api.IBaseBundle message body for single parameter "bundle"
         Bundle result = requestBodyAndHeaders("direct://PREVIOUS", bundle, headers);
 
-        LOG.debug("previous: " + result);
+        LOG.debug("previous: {}", result);
         assertNotNull(result, "previous result");
     }
 

@@ -43,7 +43,7 @@ public final class FileUtil {
      */
     private static final String USER_DIR_KEY = "user.dir";
     private static final File USER_DIR = new File(System.getProperty(USER_DIR_KEY));
-    private static boolean windowsOs = initWindowsOs();
+    private static final boolean IS_WINDOWS = initWindowsOs();
 
     private FileUtil() {
         // Utils method
@@ -80,7 +80,7 @@ public final class FileUtil {
      * Returns true, if the OS is windows
      */
     public static boolean isWindows() {
-        return windowsOs;
+        return IS_WINDOWS;
     }
 
     public static File createTempFile(String prefix, String suffix, File parentDir) throws IOException {
@@ -270,7 +270,7 @@ public final class FileUtil {
      * {@link java.io.File#separator}).
      */
     public static String compactPath(String path) {
-        return compactPath(path, "" + File.separatorChar);
+        return compactPath(path, String.valueOf(File.separatorChar));
     }
 
     /**
@@ -278,7 +278,7 @@ public final class FileUtil {
      *
      */
     public static String compactPath(String path, char separator) {
-        return compactPath(path, "" + separator);
+        return compactPath(path, String.valueOf(separator));
     }
 
     /**
@@ -345,9 +345,7 @@ public final class FileUtil {
             sb.append(":");
         }
 
-        for (int i = 0; i < cntSlashsAtStart; i++) {
-            sb.append(separator);
-        }
+        sb.append(String.valueOf(separator).repeat(cntSlashsAtStart));
 
         // now we build back using FIFO so need to use descending
         for (Iterator<String> it = stack.descendingIterator(); it.hasNext();) {

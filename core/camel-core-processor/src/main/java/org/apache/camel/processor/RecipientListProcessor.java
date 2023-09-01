@@ -33,7 +33,6 @@ import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.ExchangePropertyKey;
 import org.apache.camel.Expression;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.NoTypeConversionAvailableException;
 import org.apache.camel.Processor;
 import org.apache.camel.Producer;
@@ -82,7 +81,7 @@ public class RecipientListProcessor extends MulticastProcessor {
         private final int index;
         private final Endpoint endpoint;
         private final AsyncProducer producer;
-        private Processor prepared;
+        private final Processor prepared;
         private final Exchange exchange;
         private final ProducerCache producerCache;
         private final ExchangePattern pattern;
@@ -202,7 +201,7 @@ public class RecipientListProcessor extends MulticastProcessor {
         // optimize for recipient without need for using delimiter
         // (if its list/collection/array type)
         if (recipientList instanceof List) {
-            List col = (List) recipientList;
+            List<?> col = (List<?>) recipientList;
             int size = col.size();
             List<ProcessorExchangePair> result = new ArrayList<>(size);
             int index = 0;
@@ -212,7 +211,7 @@ public class RecipientListProcessor extends MulticastProcessor {
             }
             return result;
         } else if (recipientList instanceof Collection) {
-            Collection col = (Collection) recipientList;
+            Collection<?> col = (Collection<?>) recipientList;
             int size = col.size();
             List<ProcessorExchangePair> result = new ArrayList<>(size);
             int index = 0;
@@ -335,7 +334,7 @@ public class RecipientListProcessor extends MulticastProcessor {
             recipient = ((String) recipient).trim();
         }
         if (recipient != null) {
-            ExtendedCamelContext ecc = (ExtendedCamelContext) exchange.getContext();
+            CamelContext ecc = exchange.getContext();
             String uri;
             if (recipient instanceof String) {
                 uri = (String) recipient;
@@ -344,7 +343,7 @@ public class RecipientListProcessor extends MulticastProcessor {
                 uri = ecc.getTypeConverter().mandatoryConvertTo(String.class, exchange, recipient);
             }
             // optimize and normalize endpoint
-            return ecc.normalizeUri(uri);
+            return ecc.getCamelContextExtension().normalizeUri(uri);
         }
         return null;
     }
@@ -354,10 +353,9 @@ public class RecipientListProcessor extends MulticastProcessor {
             return (Endpoint) recipient;
         }
         if (recipient != null) {
-            if (recipient instanceof NormalizedEndpointUri) {
-                NormalizedEndpointUri nu = (NormalizedEndpointUri) recipient;
-                ExtendedCamelContext ecc = (ExtendedCamelContext) exchange.getContext();
-                return ecc.hasEndpoint(nu);
+            if (recipient instanceof NormalizedEndpointUri nu) {
+                CamelContext ecc = exchange.getContext();
+                return ecc.getCamelContextExtension().hasEndpoint(nu);
             } else {
                 String uri = recipient.toString().trim();
                 return exchange.getContext().hasEndpoint(uri);

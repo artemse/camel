@@ -169,7 +169,7 @@ public class MockValueBuilder implements Expression, Predicate {
             Predicate predicate = PredicateBuilder.isEqualTo(expression, right);
             predicates.add(predicate);
         }
-        return in(predicates.toArray(new Predicate[predicates.size()]));
+        return in(predicates.toArray(new Predicate[0]));
     }
 
     public Predicate in(Predicate... predicates) {
@@ -221,7 +221,7 @@ public class MockValueBuilder implements Expression, Predicate {
     }
 
     public MockValueBuilder tokenize(String token, int group, boolean skipFirst) {
-        return tokenize(token, "" + group, skipFirst);
+        return tokenize(token, Integer.toString(group), skipFirst);
     }
 
     public MockValueBuilder tokenize(String token, String group, boolean skipFirst) {

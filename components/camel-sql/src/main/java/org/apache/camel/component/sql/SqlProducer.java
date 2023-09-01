@@ -17,6 +17,7 @@
 package org.apache.camel.component.sql;
 
 import java.sql.Connection;
+import java.sql.ParameterMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -97,7 +98,12 @@ public class SqlProducer extends DefaultProducer {
             sql = exchange.getIn().getBody(String.class);
         } else {
             String queryHeader = exchange.getIn().getHeader(SqlConstants.SQL_QUERY, String.class);
-            sql = queryHeader != null ? queryHeader : resolvedQuery;
+            if (queryHeader != null) {
+                String placeholder = getEndpoint().isUsePlaceholder() ? getEndpoint().getPlaceholder() : null;
+                sql = SqlHelper.resolvePlaceholders(queryHeader, placeholder);
+            } else {
+                sql = resolvedQuery;
+            }
         }
         final String preparedQuery
                 = sqlPrepareStatementStrategy.prepareQuery(sql, getEndpoint().isAllowNamedParameters(), exchange);
@@ -248,7 +254,8 @@ public class SqlProducer extends DefaultProducer {
         if (parametersCount > 0) {
             expected = parametersCount;
         } else {
-            expected = ps.getParameterMetaData() != null ? ps.getParameterMetaData().getParameterCount() : 0;
+            ParameterMetaData meta = ps.getParameterMetaData();
+            expected = meta != null ? meta.getParameterCount() : 0;
         }
 
         // only populate if really needed

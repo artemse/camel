@@ -26,6 +26,7 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 import java.time.Duration;
@@ -167,6 +168,11 @@ public class SftpOperations implements RemoteFileOperations<SftpRemoteFile> {
                 LOG.trace("Channel isn't connected, trying to recreate and connect.");
                 channel = (ChannelSftp) session.openChannel("sftp");
 
+                if (endpoint.getConfiguration().getFilenameEncoding() != null) {
+                    Charset ch = Charset.forName(endpoint.getConfiguration().getFilenameEncoding());
+                    LOG.trace("Using filename encoding: {}", ch);
+                    channel.setFilenameEncoding(ch);
+                }
                 if (endpoint.getConfiguration().getConnectTimeout() > 0) {
                     LOG.trace("Connecting use connectTimeout: {} ...", endpoint.getConfiguration().getConnectTimeout());
                     channel.connect(endpoint.getConfiguration().getConnectTimeout());
@@ -531,7 +537,7 @@ public class SftpOperations implements RemoteFileOperations<SftpRemoteFile> {
             channel.rename(from, to);
             return true;
         } catch (SftpException e) {
-            LOG.debug("Cannot rename file from: " + from + " to: " + to, e);
+            LOG.debug("Cannot rename file from: {} to: {}", from, to, e);
             throw new GenericFileOperationFailedException("Cannot rename file from: " + from + " to: " + to, e);
         }
     }
@@ -577,8 +583,10 @@ public class SftpOperations implements RemoteFileOperations<SftpRemoteFile> {
                     success = buildDirectoryChunks(directory);
                 }
 
-                // after creating directory, we may set chmod on the file
-                chmodOfDirectory(directory);
+                // only after successfully creating directory, we may set chmod on the file
+                if (success) {
+                    chmodOfDirectory(directory);
+                }
             }
         } catch (SftpException e) {
             throw new GenericFileOperationFailedException("Cannot build directory: " + directory, e);
@@ -619,8 +627,10 @@ public class SftpOperations implements RemoteFileOperations<SftpRemoteFile> {
                     // ignore keep trying to create the rest of the path
                 }
 
-                // after creating directory, we may set chmod on the file
-                chmodOfDirectory(directory);
+                // only after successfully creating directory, we may set chmod on the file
+                if (success) {
+                    chmodOfDirectory(directory);
+                }
             }
         }
 
@@ -1060,9 +1070,7 @@ public class SftpOperations implements RemoteFileOperations<SftpRemoteFile> {
         } catch (SftpException e) {
             createResultHeadersFromExchange(e, exchange);
             throw new GenericFileOperationFailedException("Cannot store file: " + name, e);
-        } catch (InvalidPayloadException e) {
-            throw new GenericFileOperationFailedException("Cannot store file: " + name, e);
-        } catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException | InvalidPayloadException e) {
             throw new GenericFileOperationFailedException("Cannot store file: " + name, e);
         } finally {
             IOHelper.close(is, "store: " + name, LOG);

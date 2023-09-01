@@ -176,11 +176,7 @@ public abstract class DefaultEndpoint extends ServiceSupport implements Endpoint
         if (isLenientProperties()) {
             // only use the endpoint uri without parameters as the properties are lenient
             String uri = getEndpointUri();
-            if (uri.indexOf('?') != -1) {
-                return StringHelper.before(uri, "?");
-            } else {
-                return uri;
-            }
+            return StringHelper.before(uri, "?", uri);
         } else {
             // use the full endpoint uri
             return getEndpointUri();
@@ -516,7 +512,7 @@ public abstract class DefaultEndpoint extends ServiceSupport implements Endpoint
                                     if (LOG.isDebugEnabled()) {
                                         LOG.debug(
                                                 "Autowired property: {} on endpoint: {} as exactly one instance of type: {} ({}) found in the registry",
-                                                name, toString(), type.getName(), value.getClass().getName());
+                                                name, this, type.getName(), value.getClass().getName());
                                     }
                                 }
                             }
@@ -525,15 +521,5 @@ public abstract class DefaultEndpoint extends ServiceSupport implements Endpoint
                 }
             }
         }
-    }
-
-    @Override
-    protected void doStart() throws Exception {
-        // noop
-    }
-
-    @Override
-    protected void doStop() throws Exception {
-        // noop
     }
 }

@@ -17,8 +17,10 @@
 package org.apache.camel.spi;
 
 import java.io.File;
+import java.util.Collection;
 
 import org.apache.camel.Exchange;
+import org.apache.camel.Message;
 import org.apache.camel.StaticService;
 import org.apache.camel.StreamCache;
 
@@ -113,6 +115,42 @@ public interface StreamCachingStrategy extends StaticService {
     void setEnabled(boolean enabled);
 
     boolean isEnabled();
+
+    /**
+     * To filter stream caching of a given set of allowed/denied classes. By default, all classes that are
+     * {@link java.io.InputStream} is allowed.
+     */
+    void setAllowClasses(Class<?>... classes);
+
+    /**
+     * To filter stream caching of a given set of allowed/denied classes. By default, all classes that are
+     * {@link java.io.InputStream} is allowed. Multiple class names can be separated by comma.
+     */
+    void setAllowClasses(String names);
+
+    /**
+     * To filter stream caching of a given set of allowed/denied classes. By default, all classes that are
+     * {@link java.io.InputStream} is allowed.
+     */
+    Collection<Class<?>> getAllowClasses();
+
+    /**
+     * To filter stream caching of a given set of allowed/denied classes. By default, all classes that are
+     * {@link java.io.InputStream} is allowed.
+     */
+    void setDenyClasses(Class<?>... classes);
+
+    /**
+     * To filter stream caching of a given set of allowed/denied classes. By default, all classes that are
+     * {@link java.io.InputStream} is allowed. Multiple class names can be separated by comma.
+     */
+    void setDenyClasses(String names);
+
+    /**
+     * To filter stream caching of a given set of allowed/denied classes. By default, all classes that are
+     * {@link java.io.InputStream} is allowed.
+     */
+    Collection<Class<?>> getDenyClasses();
 
     /**
      * Enables spooling to disk.
@@ -234,5 +272,14 @@ public interface StreamCachingStrategy extends StaticService {
      *                  the body
      */
     StreamCache cache(Exchange exchange);
+
+    /**
+     * Caches the body aas a {@link StreamCache}.
+     *
+     * @param  message the message
+     * @return         the body cached as a {@link StreamCache}, or <tt>null</tt> if not possible or no need to cache
+     *                 the body
+     */
+    StreamCache cache(Message message);
 
 }

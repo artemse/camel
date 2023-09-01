@@ -275,9 +275,7 @@ public class RouteDefinition extends OutputDefinition<RouteDefinition>
      */
     @Override
     public RouteDefinition routeDescription(String description) {
-        DescriptionDefinition desc = new DescriptionDefinition();
-        desc.setText(description);
-        setDescription(desc);
+        setDescription(description);
         return this;
     }
 
@@ -425,7 +423,7 @@ public class RouteDefinition extends OutputDefinition<RouteDefinition>
      * @return       the builder
      */
     public RouteDefinition delayer(long delay) {
-        setDelayer("" + delay);
+        setDelayer(Long.toString(delay));
         return this;
     }
 
@@ -632,7 +630,7 @@ public class RouteDefinition extends OutputDefinition<RouteDefinition>
      * @param  clazz Class object of the input type
      * @return       the builder
      */
-    public RouteDefinition inputType(Class clazz) {
+    public RouteDefinition inputType(Class<?> clazz) {
         inputType = new InputTypeDefinition().javaClass(clazz).validate(false);
         return this;
     }
@@ -647,7 +645,7 @@ public class RouteDefinition extends OutputDefinition<RouteDefinition>
      * @param  clazz Class object of the input type
      * @return       the builder
      */
-    public RouteDefinition inputTypeWithValidate(Class clazz) {
+    public RouteDefinition inputTypeWithValidate(Class<?> clazz) {
         inputType = new InputTypeDefinition().javaClass(clazz).validate(true);
         return this;
     }
@@ -692,13 +690,13 @@ public class RouteDefinition extends OutputDefinition<RouteDefinition>
      * @param  clazz Class object of the output type
      * @return       the builder
      */
-    public RouteDefinition outputType(Class clazz) {
+    public RouteDefinition outputType(Class<?> clazz) {
         outputType = new OutputTypeDefinition().javaClass(clazz).validate(false);
         return this;
     }
 
     /**
-     * Declare the expected data type of the ouput message by Java class with content validation enabled. If the actual
+     * Declare the expected data type of the output message by Java class with content validation enabled. If the actual
      * message type is different at runtime, camel look for a required {@link org.apache.camel.spi.Transformer} and
      * apply if exists, and then applies {@link org.apache.camel.spi.Validator} as well.
      *
@@ -707,7 +705,7 @@ public class RouteDefinition extends OutputDefinition<RouteDefinition>
      * @param  clazz Class object of the output type
      * @return       the builder
      */
-    public RouteDefinition outputTypeWithValidate(Class clazz) {
+    public RouteDefinition outputTypeWithValidate(Class<?> clazz) {
         outputType = new OutputTypeDefinition().javaClass(clazz).validate(true);
         return this;
     }
@@ -1088,14 +1086,14 @@ public class RouteDefinition extends OutputDefinition<RouteDefinition>
     }
 
     /**
-     * To control how to shutdown the route.
+     * To control how to shut down the route.
      */
     public String getShutdownRunningTask() {
         return shutdownRunningTask;
     }
 
     /**
-     * To control how to shutdown the route.
+     * To control how to shut down the route.
      */
     @XmlAttribute
     @Metadata(label = "advanced", javaType = "org.apache.camel.ShutdownRunningTask", defaultValue = "CompleteCurrentTaskOnly",
@@ -1121,6 +1119,13 @@ public class RouteDefinition extends OutputDefinition<RouteDefinition>
     }
 
     /**
+     * Is a custom error handler been set
+     */
+    boolean isErrorHandlerFactorySet() {
+        return errorHandlerFactory != null;
+    }
+
+    /**
      * Sets the error handler to use with processors created by this builder
      */
     @XmlTransient
@@ -1128,6 +1133,9 @@ public class RouteDefinition extends OutputDefinition<RouteDefinition>
         this.errorHandlerFactory = errorHandlerFactory;
     }
 
+    /**
+     * This route is created from REST DSL
+     */
     public void setRest(Boolean rest) {
         this.rest = rest;
     }
@@ -1204,6 +1212,16 @@ public class RouteDefinition extends OutputDefinition<RouteDefinition>
     @Metadata(label = "advanced")
     public void setRouteProperties(List<PropertyDefinition> routeProperties) {
         this.routeProperties = routeProperties;
+    }
+
+    @Override
+    public boolean isCreatedFromTemplate() {
+        return template != null && template;
+    }
+
+    @Override
+    public boolean isCreatedFromRest() {
+        return rest != null && rest;
     }
 
     // ****************************

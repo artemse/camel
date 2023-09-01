@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.apache.camel</groupId>
         <artifactId>components</artifactId>
-        <version>4.0.0-SNAPSHOT</version>
+        <version>4.1.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>camel-undertow</artifactId>
@@ -32,6 +32,7 @@
     <name>Camel :: Undertow</name>
 
     <properties>
+        <camel.surefire.fork.additional-vmargs>-Dio.undertow.client.https.disableEndpointIdentification=true</camel.surefire.fork.additional-vmargs>
     </properties>
 
     <dependencies>
@@ -75,11 +76,6 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-test-spring-junit5</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.camel</groupId>
-            <artifactId>camel-core-catalog</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -138,11 +134,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpmime</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.eclipse.jetty.http2</groupId>
             <artifactId>http2-client</artifactId>
             <version>${jetty-version}</version>
@@ -167,5 +158,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
 </project>

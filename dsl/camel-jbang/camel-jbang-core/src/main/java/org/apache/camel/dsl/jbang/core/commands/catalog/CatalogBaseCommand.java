@@ -16,6 +16,7 @@
  */
 package org.apache.camel.dsl.jbang.core.commands.catalog;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -30,8 +31,9 @@ import org.apache.camel.catalog.DefaultCamelCatalog;
 import org.apache.camel.dsl.jbang.core.commands.CamelCommand;
 import org.apache.camel.dsl.jbang.core.commands.CamelJBangMain;
 import org.apache.camel.dsl.jbang.core.common.CatalogLoader;
+import org.apache.camel.dsl.jbang.core.common.RuntimeCompletionCandidates;
 import org.apache.camel.dsl.jbang.core.common.VersionHelper;
-import org.apache.camel.main.download.MavenGav;
+import org.apache.camel.tooling.maven.MavenGav;
 import org.apache.camel.tooling.model.ArtifactModel;
 import org.apache.camel.util.json.Jsoner;
 import picocli.CommandLine;
@@ -39,14 +41,15 @@ import picocli.CommandLine;
 public abstract class CatalogBaseCommand extends CamelCommand {
 
     @CommandLine.Option(names = { "--camel-version" },
-                        description = "To run using a different Camel version than the default version.")
+                        description = "To use a different Camel version than the default version")
     String camelVersion;
 
-    @CommandLine.Option(names = { "--runtime" }, description = "Runtime (spring-boot, quarkus, or camel-main)")
+    @CommandLine.Option(names = { "--runtime" }, completionCandidates = RuntimeCompletionCandidates.class,
+                        description = "Runtime (spring-boot, quarkus, or camel-main)")
     String runtime;
 
     @CommandLine.Option(names = { "--quarkus-version" }, description = "Quarkus Platform version",
-                        defaultValue = "2.16.0.Final")
+                        defaultValue = "3.2.5.Final")
     String quarkusVersion;
 
     @CommandLine.Option(names = { "--repos" },
@@ -90,9 +93,6 @@ public abstract class CatalogBaseCommand extends CamelCommand {
     }
 
     CamelCatalog loadCatalog() throws Exception {
-        // configure logging first
-        configureLoggingOff();
-
         if ("spring-boot".equals(runtime)) {
             return CatalogLoader.loadSpringBootCatalog(repos, camelVersion);
         } else if ("quarkus".equals(runtime)) {
@@ -106,7 +106,7 @@ public abstract class CatalogBaseCommand extends CamelCommand {
     }
 
     @Override
-    public Integer call() throws Exception {
+    public Integer doCall() throws Exception {
         this.catalog = loadCatalog();
         List<Row> rows = collectRows();
 
@@ -204,9 +204,10 @@ public abstract class CatalogBaseCommand extends CamelCommand {
 
     static List<String> findComponentNames(CamelCatalog catalog) {
         List<String> answer = catalog.findComponentNames();
+        List<String> copy = new ArrayList<>(answer);
         // remove empty (spring boot catalog has a bug)
-        answer.removeIf(String::isBlank);
-        return answer;
+        copy.removeIf(String::isBlank);
+        return copy;
     }
 
     static class Row {

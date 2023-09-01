@@ -34,6 +34,8 @@ import org.apache.camel.RouteTemplateContext;
 import org.apache.camel.builder.EndpointConsumerBuilder;
 import org.apache.camel.spi.AsEndpointUri;
 import org.apache.camel.spi.Metadata;
+import org.apache.camel.spi.Resource;
+import org.apache.camel.spi.ResourceAware;
 
 /**
  * Defines a route template (parameterized routes)
@@ -42,7 +44,7 @@ import org.apache.camel.spi.Metadata;
 @XmlRootElement(name = "routeTemplate")
 @XmlType(propOrder = { "templateParameters", "templateBeans", "route" })
 @XmlAccessorType(XmlAccessType.FIELD)
-public class RouteTemplateDefinition extends OptionalIdentifiedDefinition {
+public class RouteTemplateDefinition extends OptionalIdentifiedDefinition<RouteTemplateDefinition> implements ResourceAware {
 
     @XmlTransient
     private Consumer<RouteTemplateContext> configurer;
@@ -55,6 +57,8 @@ public class RouteTemplateDefinition extends OptionalIdentifiedDefinition {
     private List<RouteTemplateBeanDefinition> templateBeans;
     @XmlElement(name = "route", required = true)
     private RouteDefinition route = new RouteDefinition();
+    @XmlTransient
+    private Resource resource;
 
     public List<RouteTemplateParameterDefinition> getTemplateParameters() {
         return templateParameters;
@@ -86,6 +90,14 @@ public class RouteTemplateDefinition extends OptionalIdentifiedDefinition {
 
     public Consumer<RouteTemplateContext> getConfigurer() {
         return configurer;
+    }
+
+    public Resource getResource() {
+        return resource;
+    }
+
+    public void setResource(Resource resource) {
+        this.resource = resource;
     }
 
     // Fluent API
@@ -129,10 +141,8 @@ public class RouteTemplateDefinition extends OptionalIdentifiedDefinition {
     }
 
     @Override
-    public RouteTemplateDefinition description(String text) {
-        DescriptionDefinition def = new DescriptionDefinition();
-        def.setText(text);
-        setDescription(def);
+    public RouteTemplateDefinition description(String description) {
+        setDescription(description);
         return this;
     }
 
@@ -389,7 +399,10 @@ public class RouteTemplateDefinition extends OptionalIdentifiedDefinition {
 
         // must set these first in this order
         copy.setErrorHandlerRef(route.getErrorHandlerRef());
-        copy.setErrorHandlerFactory(route.getErrorHandlerFactory());
+        if (route.isErrorHandlerFactorySet()) {
+            // only set factory if not already set
+            copy.setErrorHandlerFactory(route.getErrorHandlerFactory());
+        }
 
         // and then copy over the rest
         // (do not copy id as it is used for route template id)

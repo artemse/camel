@@ -78,7 +78,7 @@ public class Jt400Configuration {
          */
         SAME(MessageQueue.SAME);
 
-        private String jt400Value;
+        private final String jt400Value;
 
         private MessageAction(final String jt400Value) {
             this.jt400Value = jt400Value;
@@ -431,7 +431,7 @@ public class Jt400Configuration {
         AS400 system = null;
         try {
             if (LOG.isDebugEnabled()) {
-                LOG.debug("Getting an AS400 object for '{}' from {}.", systemName + '/' + userID, connectionPool);
+                LOG.debug("Getting an AS400 object for '{}/{}' from {}.", systemName, userID, connectionPool);
             }
 
             if (isSecured()) {

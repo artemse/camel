@@ -21,7 +21,7 @@ public class AWS2S3EndpointUriFactory extends org.apache.camel.support.component
     private static final Set<String> SECRET_PROPERTY_NAMES;
     private static final Set<String> MULTI_VALUE_PREFIXES;
     static {
-        Set<String> props = new HashSet<>(70);
+        Set<String> props = new HashSet<>(74);
         props.add("accessKey");
         props.add("amazonS3Client");
         props.add("amazonS3Presigner");
@@ -35,6 +35,7 @@ public class AWS2S3EndpointUriFactory extends org.apache.camel.support.component
         props.add("batchSize");
         props.add("bridgeErrorHandler");
         props.add("bucketNameOrArn");
+        props.add("bufferSize");
         props.add("customerAlgorithm");
         props.add("customerKeyId");
         props.add("customerKeyMD5");
@@ -49,6 +50,7 @@ public class AWS2S3EndpointUriFactory extends org.apache.camel.support.component
         props.add("exceptionHandler");
         props.add("exchangePattern");
         props.add("fileName");
+        props.add("forcePathStyle");
         props.add("greedy");
         props.add("ignoreBody");
         props.add("includeBody");
@@ -68,6 +70,7 @@ public class AWS2S3EndpointUriFactory extends org.apache.camel.support.component
         props.add("policy");
         props.add("pollStrategy");
         props.add("prefix");
+        props.add("profileCredentialsName");
         props.add("proxyHost");
         props.add("proxyPort");
         props.add("proxyProtocol");
@@ -91,6 +94,7 @@ public class AWS2S3EndpointUriFactory extends org.apache.camel.support.component
         props.add("useCustomerKey");
         props.add("useDefaultCredentialsProvider");
         props.add("useFixedDelay");
+        props.add("useProfileCredentialsProvider");
         props.add("useSSES3");
         PROPERTY_NAMES = Collections.unmodifiableSet(props);
         Set<String> secretProps = new HashSet<>(2);

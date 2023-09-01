@@ -83,8 +83,7 @@ public final class DefaultPooledExchange extends AbstractExchange implements Poo
         if (created > 0) {
             this.created = 0; // by setting to 0 we also flag that this exchange is done and needs to be reset to use again
             this.properties.clear();
-            // reset array by copying over from empty which is a very fast JVM optimized operation
-            System.arraycopy(EMPTY_INTERNAL_PROPERTIES, 0, this.internalProperties, 0, INTERNAL_LENGTH);
+            internalProperties.clear();
             if (this.safeCopyProperties != null) {
                 this.safeCopyProperties.clear();
             }
@@ -99,29 +98,15 @@ public final class DefaultPooledExchange extends AbstractExchange implements Poo
                 out.reset();
                 this.out = null;
             }
-            if (this.unitOfWork != null) {
-                this.unitOfWork.reset();
-            }
             this.exception = null;
             // reset pattern to original
             this.pattern = originalPattern;
-            if (this.onCompletions != null) {
-                this.onCompletions.clear();
-            }
             // do not reset endpoint/fromRouteId as it would be the same consumer/endpoint again
-            this.externalRedelivered = null;
-            this.historyNodeId = null;
-            this.historyNodeLabel = null;
-            this.transacted = false;
             this.routeStop = false;
             this.rollbackOnly = false;
             this.rollbackOnlyLast = false;
-            this.notifyEvent = false;
-            this.interrupted = false;
-            this.interruptable = true;
-            this.redeliveryExhausted = false;
-            this.errorHandlerHandled = null;
-            this.streamCacheDisabled = false;
+
+            getExchangeExtension().reset();
 
             if (onDone != null) {
                 onDone.onDone(this);

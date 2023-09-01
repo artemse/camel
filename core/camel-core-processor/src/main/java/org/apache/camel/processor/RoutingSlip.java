@@ -25,9 +25,7 @@ import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePropertyKey;
 import org.apache.camel.Expression;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.FailedToCreateProducerException;
-import org.apache.camel.Message;
 import org.apache.camel.NoTypeConversionAvailableException;
 import org.apache.camel.Route;
 import org.apache.camel.Traceable;
@@ -289,7 +287,7 @@ public class RoutingSlip extends AsyncProcessorSupport implements Traceable, IdA
                 FailedToCreateProducerException e = current.getException(FailedToCreateProducerException.class);
                 if (e != null) {
                     if (LOG.isDebugEnabled()) {
-                        LOG.debug("Endpoint uri is invalid: " + endpoint + ". This exception will be ignored.", e);
+                        LOG.debug("Endpoint uri is invalid: {}. This exception will be ignored.", endpoint, e);
                     }
                     current.setException(null);
                 }
@@ -326,7 +324,7 @@ public class RoutingSlip extends AsyncProcessorSupport implements Traceable, IdA
             recipient = ((String) recipient).trim();
         }
         if (recipient != null) {
-            ExtendedCamelContext ecc = (ExtendedCamelContext) exchange.getContext();
+            CamelContext ecc = exchange.getContext();
             String uri;
             if (recipient instanceof String) {
                 uri = (String) recipient;
@@ -335,7 +333,7 @@ public class RoutingSlip extends AsyncProcessorSupport implements Traceable, IdA
                 uri = ecc.getTypeConverter().mandatoryConvertTo(String.class, exchange, recipient);
             }
             // optimize and normalize endpoint
-            return ecc.normalizeUri(uri);
+            return ecc.getCamelContextExtension().normalizeUri(uri);
         }
         return null;
     }
@@ -347,8 +345,8 @@ public class RoutingSlip extends AsyncProcessorSupport implements Traceable, IdA
         if (recipient != null) {
             if (recipient instanceof NormalizedEndpointUri) {
                 NormalizedEndpointUri nu = (NormalizedEndpointUri) recipient;
-                ExtendedCamelContext ecc = (ExtendedCamelContext) exchange.getContext();
-                return ecc.hasEndpoint(nu);
+                CamelContext ecc = exchange.getContext();
+                return ecc.getCamelContextExtension().hasEndpoint(nu);
             } else {
                 String uri = recipient.toString();
                 return exchange.getContext().hasEndpoint(uri);
@@ -365,7 +363,7 @@ public class RoutingSlip extends AsyncProcessorSupport implements Traceable, IdA
                     : ExchangeHelper.resolveEndpoint(exchange, recipient);
         } catch (Exception e) {
             if (isIgnoreInvalidEndpoints()) {
-                LOG.debug("Endpoint uri is invalid: " + recipient + ". This exception will be ignored.", e);
+                LOG.debug("Endpoint uri is invalid: {}. This exception will be ignored.", recipient, e);
             } else {
                 throw e;
             }
@@ -462,7 +460,7 @@ public class RoutingSlip extends AsyncProcessorSupport implements Traceable, IdA
                                 FailedToCreateProducerException e = current.getException(FailedToCreateProducerException.class);
                                 if (e != null) {
                                     if (LOG.isDebugEnabled()) {
-                                        LOG.debug("Endpoint uri is invalid: " + endpoint + ". This exception will be ignored.",
+                                        LOG.debug("Endpoint uri is invalid: {}. This exception will be ignored.", endpoint,
                                                 e);
                                     }
                                     current.setException(null);
@@ -528,7 +526,7 @@ public class RoutingSlip extends AsyncProcessorSupport implements Traceable, IdA
 
                         // copy results back to the original exchange
                         ExchangeHelper.copyResults(original, current);
-                    } catch (Throwable e) {
+                    } catch (Exception e) {
                         ex.setException(e);
                     }
 
@@ -567,13 +565,6 @@ public class RoutingSlip extends AsyncProcessorSupport implements Traceable, IdA
 
     public EndpointUtilizationStatistics getEndpointUtilizationStatistics() {
         return producerCache.getEndpointUtilizationStatistics();
-    }
-
-    /**
-     * Returns the outbound message if available. Otherwise return the inbound message.
-     */
-    private Message getResultMessage(Exchange exchange) {
-        return exchange.getMessage();
     }
 
     /**

@@ -146,10 +146,10 @@ public class SpringRabbitMQEndpoint extends DefaultEndpoint implements AsyncEndp
                             + " handles the reply message. You can also use this option if you want to use Camel as a proxy between different"
                             + " message brokers and you want to route message from one system to another.")
     private boolean disableReplyTo;
-    @UriParam(label = "producer", javaType = "java.time.Duration", defaultValue = "5000",
+    @UriParam(label = "producer", javaType = "java.time.Duration", defaultValue = "30000",
               description = "Specify the timeout in milliseconds to be used when waiting for a reply message when doing request/reply (InOut) messaging."
-                            + " The default value is 5 seconds. A negative value indicates an indefinite timeout.")
-    private long replyTimeout = 5000;
+                            + " The default value is 30 seconds. A negative value indicates an indefinite timeout (Beware that this will cause a memory leak if a reply is not received).")
+    private long replyTimeout = 30000;
     @UriParam(label = "producer", javaType = "java.time.Duration", defaultValue = "5000",
               description = "Specify the timeout in milliseconds to be used when waiting for a message sent to be confirmed by RabbitMQ when doing send only messaging (InOnly)."
                             + " The default value is 5 seconds. A negative value indicates an indefinite timeout.")
@@ -161,6 +161,9 @@ public class SpringRabbitMQEndpoint extends DefaultEndpoint implements AsyncEndp
     @UriParam(label = "producer", defaultValue = "false",
               description = "Use a separate connection for publishers and consumers")
     private boolean usePublisherConnection;
+    @UriParam(label = "producer", defaultValue = "false",
+              description = "Whether to allow sending messages with no body. If this option is false and the message body is null, then an MessageConversionException is thrown.")
+    private boolean allowNullBody;
     @UriParam(defaultValue = "false", label = "advanced",
               description = "Sets whether synchronous processing should be strictly used")
     private boolean synchronous;
@@ -195,6 +198,14 @@ public class SpringRabbitMQEndpoint extends DefaultEndpoint implements AsyncEndp
     @Override
     public SpringRabbitMQComponent getComponent() {
         return (SpringRabbitMQComponent) super.getComponent();
+    }
+
+    @Override
+    protected void doInit() throws Exception {
+        if (allowNullBody) {
+            // need to wrap message converter in allow null
+            messageConverter = new AllowNullBodyMessageConverter(messageConverter);
+        }
     }
 
     public String getExchangeName() {
@@ -385,6 +396,14 @@ public class SpringRabbitMQEndpoint extends DefaultEndpoint implements AsyncEndp
         this.usePublisherConnection = usePublisherConnection;
     }
 
+    public boolean isAllowNullBody() {
+        return allowNullBody;
+    }
+
+    public void setAllowNullBody(boolean allowNullBody) {
+        this.allowNullBody = allowNullBody;
+    }
+
     public boolean isSynchronous() {
         return synchronous;
     }
@@ -550,9 +569,11 @@ public class SpringRabbitMQEndpoint extends DefaultEndpoint implements AsyncEndp
     public AsyncRabbitTemplate createInOutTemplate() {
         RabbitTemplate template = new RabbitTemplate(getConnectionFactory());
         template.setRoutingKey(routingKey);
-        template.setReplyTimeout(replyTimeout);
         template.setUsePublisherConnection(usePublisherConnection);
-        return new AsyncRabbitTemplate(template);
+        AsyncRabbitTemplate asyncTemplate = new AsyncRabbitTemplate(template);
+        // use receive timeout (for reply timeout) on the async template
+        asyncTemplate.setReceiveTimeout(replyTimeout);
+        return asyncTemplate;
     }
 
     public AbstractMessageListenerContainer createMessageListenerContainer() {

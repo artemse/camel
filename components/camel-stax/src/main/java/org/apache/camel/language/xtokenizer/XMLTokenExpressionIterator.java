@@ -210,7 +210,7 @@ public class XMLTokenExpressionIterator extends ExpressionAdapter implements Nam
                 String s = sl[i];
                 if (s.length() > 0) {
                     int d = s.indexOf(':');
-                    String pfx = d > 0 ? s.substring(0, d) : "";
+                    String pfx = StringHelper.before(s, ":", "");
                     this.splitpath[i] = new AttributedQName(
                             "*".equals(pfx) ? "*" : nsmap == null ? "" : nsmap.get(pfx), d > 0 ? s.substring(d + 1) : s, pfx);
                 }
@@ -406,8 +406,13 @@ public class XMLTokenExpressionIterator extends ExpressionAdapter implements Nam
                 sb.append(token, 0, stag.length() - (empty ? 2 : 1));
                 for (Entry<String, String> e : getCurrentNamespaceBindings().entrySet()) {
                     if (!skip.contains(e.getKey())) {
-                        sb.append(e.getKey().length() == 0 ? " xmlns" : " xmlns:")
-                                .append(e.getKey()).append("=").append(quote).append(e.getValue()).append(quote);
+                        boolean defaultNS = e.getKey() == null || e.getKey().length() == 0;
+                        if (defaultNS) {
+                            sb.append(" xmlns").append("=").append(quote).append(e.getValue()).append(quote);
+                        } else {
+                            sb.append(" xmlns:")
+                                    .append(e.getKey()).append("=").append(quote).append(e.getValue()).append(quote);
+                        }
                     }
                 }
                 sb.append(token, stag.length() - (empty ? 2 : 1), token.length());

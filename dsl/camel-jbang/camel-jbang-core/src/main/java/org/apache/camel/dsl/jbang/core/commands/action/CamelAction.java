@@ -20,7 +20,8 @@ import org.apache.camel.dsl.jbang.core.commands.CamelJBangMain;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "cmd",
-                     description = "Performs commands in the running Camel integrations, such as start/stop route, or change logging levels. (use cmd --help to see sub commands)")
+                     description = "Performs commands in the running Camel integrations, such as start/stop route, or change logging levels. (use cmd --help to see sub commands)",
+                     sortOptions = false)
 public class CamelAction extends ActionBaseCommand {
 
     public CamelAction(CamelJBangMain main) {
@@ -28,7 +29,7 @@ public class CamelAction extends ActionBaseCommand {
     }
 
     @Override
-    public Integer call() throws Exception {
+    public Integer doCall() throws Exception {
         new CommandLine(this).execute("--help");
         return 0;
     }

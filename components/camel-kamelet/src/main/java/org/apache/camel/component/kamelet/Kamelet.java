@@ -106,13 +106,13 @@ public final class Kamelet {
 
     public static void extractKameletProperties(CamelContext context, Map<String, Object> properties, String... elements) {
         PropertiesComponent pc = context.getPropertiesComponent();
-        StringBuffer prefixBuffer = new StringBuffer(Kamelet.PROPERTIES_PREFIX);
+        StringBuilder prefixBuffer = new StringBuilder(Kamelet.PROPERTIES_PREFIX);
 
         for (String element : elements) {
             if (element == null) {
                 continue;
             }
-            prefixBuffer.append(element + ".");
+            prefixBuffer.append(element).append('.');
 
             Properties prefixed = pc.loadProperties(Kamelet.startsWith(prefixBuffer.toString()));
             for (String name : prefixed.stringPropertyNames()) {

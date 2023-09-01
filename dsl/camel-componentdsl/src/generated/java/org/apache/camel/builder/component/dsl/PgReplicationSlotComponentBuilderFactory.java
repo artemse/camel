@@ -36,7 +36,7 @@ public interface PgReplicationSlotComponentBuilderFactory {
      * Poll for PostgreSQL Write-Ahead Log (WAL) records using Streaming
      * Replication Slots.
      * 
-     * Category: database,sql
+     * Category: database
      * Since: 3.0
      * Maven coordinates: org.apache.camel:camel-pg-replication-slot
      * 
@@ -95,6 +95,42 @@ public interface PgReplicationSlotComponentBuilderFactory {
             doSetProperty("autowiredEnabled", autowiredEnabled);
             return this;
         }
+        /**
+         * Used for enabling or disabling all consumer based health checks from
+         * this component.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: true
+         * Group: health
+         * 
+         * @param healthCheckConsumerEnabled the value to set
+         * @return the dsl builder
+         */
+        default PgReplicationSlotComponentBuilder healthCheckConsumerEnabled(
+                boolean healthCheckConsumerEnabled) {
+            doSetProperty("healthCheckConsumerEnabled", healthCheckConsumerEnabled);
+            return this;
+        }
+        /**
+         * Used for enabling or disabling all producer based health checks from
+         * this component. Notice: Camel has by default disabled all producer
+         * based health-checks. You can turn on producer checks globally by
+         * setting camel.health.producersEnabled=true.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: true
+         * Group: health
+         * 
+         * @param healthCheckProducerEnabled the value to set
+         * @return the dsl builder
+         */
+        default PgReplicationSlotComponentBuilder healthCheckProducerEnabled(
+                boolean healthCheckProducerEnabled) {
+            doSetProperty("healthCheckProducerEnabled", healthCheckProducerEnabled);
+            return this;
+        }
     }
 
     class PgReplicationSlotComponentBuilderImpl
@@ -114,6 +150,8 @@ public interface PgReplicationSlotComponentBuilderFactory {
             switch (name) {
             case "bridgeErrorHandler": ((PgReplicationSlotComponent) component).setBridgeErrorHandler((boolean) value); return true;
             case "autowiredEnabled": ((PgReplicationSlotComponent) component).setAutowiredEnabled((boolean) value); return true;
+            case "healthCheckConsumerEnabled": ((PgReplicationSlotComponent) component).setHealthCheckConsumerEnabled((boolean) value); return true;
+            case "healthCheckProducerEnabled": ((PgReplicationSlotComponent) component).setHealthCheckProducerEnabled((boolean) value); return true;
             default: return false;
             }
         }

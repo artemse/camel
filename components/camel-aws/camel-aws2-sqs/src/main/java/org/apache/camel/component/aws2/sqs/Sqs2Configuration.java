@@ -28,7 +28,7 @@ public class Sqs2Configuration implements Cloneable {
 
     // common properties
     private String queueName;
-    @UriParam
+    @UriParam(label = "advanced")
     @Metadata(autowired = true)
     private SqsClient amazonSQSClient;
     @UriParam(label = "security", secret = true)
@@ -41,17 +41,17 @@ public class Sqs2Configuration implements Cloneable {
     private String queueOwnerAWSAccountId;
     @UriParam
     private String region;
-    @UriParam(enums = "HTTP,HTTPS", defaultValue = "HTTPS")
+    @UriParam(label = "proxy", enums = "HTTP,HTTPS", defaultValue = "HTTPS")
     private Protocol proxyProtocol = Protocol.HTTPS;
     @UriParam(label = "proxy")
     private String proxyHost;
     @UriParam(label = "proxy")
     private Integer proxyPort;
-    @UriParam(defaultValue = "false")
+    @UriParam
     private boolean autoCreateQueue;
-    @UriParam(defaultValue = "false")
+    @UriParam(label = "security")
     private boolean trustAllCertificates;
-    @UriParam(defaultValue = "false")
+    @UriParam
     private boolean overrideEndpoint;
     @UriParam
     private String uriEndpointOverride;
@@ -107,6 +107,7 @@ public class Sqs2Configuration implements Cloneable {
     @UriParam(label = "queue")
     private Integer receiveMessageWaitTimeSeconds;
     @UriParam(label = "queue")
+    @Metadata(supportFileReference = true)
     private String policy;
     @UriParam(label = "queue")
     private String queueUrl;
@@ -119,8 +120,12 @@ public class Sqs2Configuration implements Cloneable {
     @UriParam(defaultValue = "https")
     private String protocol = "https";
 
-    @UriParam(defaultValue = "false")
+    @UriParam(label = "security")
     private boolean useDefaultCredentialsProvider;
+    @UriParam(label = "security")
+    private boolean useProfileCredentialsProvider;
+    @UriParam(label = "security")
+    private String profileCredentialsName;
 
     /**
      * Whether or not the queue is a FIFO queue
@@ -578,6 +583,17 @@ public class Sqs2Configuration implements Cloneable {
         this.useDefaultCredentialsProvider = useDefaultCredentialsProvider;
     }
 
+    /**
+     * Set whether the SQS client should expect to load credentials through a profile credentials provider.
+     */
+    public void setUseProfileCredentialsProvider(boolean useProfileCredentialsProvider) {
+        this.useProfileCredentialsProvider = useProfileCredentialsProvider;
+    }
+
+    public boolean isUseProfileCredentialsProvider() {
+        return useProfileCredentialsProvider;
+    }
+
     public String getBatchSeparator() {
         return batchSeparator;
     }
@@ -627,6 +643,17 @@ public class Sqs2Configuration implements Cloneable {
      */
     public void setUriEndpointOverride(String uriEndpointOverride) {
         this.uriEndpointOverride = uriEndpointOverride;
+    }
+
+    public String getProfileCredentialsName() {
+        return profileCredentialsName;
+    }
+
+    /**
+     * If using a profile credentials provider this parameter will set the profile name
+     */
+    public void setProfileCredentialsName(String profileCredentialsName) {
+        this.profileCredentialsName = profileCredentialsName;
     }
 
     // *************************************************

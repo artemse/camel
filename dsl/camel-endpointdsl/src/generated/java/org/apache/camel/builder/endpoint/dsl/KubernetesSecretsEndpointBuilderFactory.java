@@ -104,6 +104,20 @@ public interface KubernetesSecretsEndpointBuilderFactory {
             return this;
         }
         /**
+         * The namespace.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: producer
+         * 
+         * @param namespace the value to set
+         * @return the dsl builder
+         */
+        default KubernetesSecretsEndpointBuilder namespace(String namespace) {
+            doSetProperty("namespace", namespace);
+            return this;
+        }
+        /**
          * Producer operation to do on Kubernetes.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -436,7 +450,7 @@ public interface KubernetesSecretsEndpointBuilderFactory {
          * Kubernetes Secrets (camel-kubernetes)
          * Perform operations on Kubernetes Secrets.
          * 
-         * Category: container,cloud,paas
+         * Category: container,cloud
          * Since: 2.17
          * Maven coordinates: org.apache.camel:camel-kubernetes
          * 
@@ -449,7 +463,7 @@ public interface KubernetesSecretsEndpointBuilderFactory {
          * Kubernetes Secrets (camel-kubernetes)
          * Perform operations on Kubernetes Secrets.
          * 
-         * Category: container,cloud,paas
+         * Category: container,cloud
          * Since: 2.17
          * Maven coordinates: org.apache.camel:camel-kubernetes
          * 
@@ -468,7 +482,7 @@ public interface KubernetesSecretsEndpointBuilderFactory {
          * Kubernetes Secrets (camel-kubernetes)
          * Perform operations on Kubernetes Secrets.
          * 
-         * Category: container,cloud,paas
+         * Category: container,cloud
          * Since: 2.17
          * Maven coordinates: org.apache.camel:camel-kubernetes
          * 

@@ -816,9 +816,9 @@ public interface DebeziumMySqlEndpointBuilderFactory {
         }
         /**
          * Whether to use an encrypted connection to MySQL. Options include:
-         * 'disabled' (the default) to use an unencrypted connection;
-         * 'preferred' to establish a secure (encrypted) connection if the
-         * server supports secure connections, but fall back to an unencrypted
+         * 'disabled' to use an unencrypted connection; 'preferred' (the
+         * default) to establish a secure (encrypted) connection if the server
+         * supports secure connections, but fall back to an unencrypted
          * connection otherwise; 'required' to use a secure (encrypted)
          * connection, and fail if one cannot be established; 'verify_ca' like
          * 'required' but additionally verify the server TLS certificate against
@@ -829,7 +829,7 @@ public interface DebeziumMySqlEndpointBuilderFactory {
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
-         * Default: disabled
+         * Default: preferred
          * Group: mysql
          * 
          * @param databaseSslMode the value to set
@@ -964,6 +964,40 @@ public interface DebeziumMySqlEndpointBuilderFactory {
         default DebeziumMySqlEndpointBuilder enableTimeAdjuster(
                 String enableTimeAdjuster) {
             doSetProperty("enableTimeAdjuster", enableTimeAdjuster);
+            return this;
+        }
+        /**
+         * The maximum number of retries on connection errors before failing (-1
+         * = no limit, 0 = disabled, 0 = num of retries).
+         * 
+         * The option is a: &lt;code&gt;int&lt;/code&gt; type.
+         * 
+         * Default: -1
+         * Group: mysql
+         * 
+         * @param errorsMaxRetries the value to set
+         * @return the dsl builder
+         */
+        default DebeziumMySqlEndpointBuilder errorsMaxRetries(
+                int errorsMaxRetries) {
+            doSetProperty("errorsMaxRetries", errorsMaxRetries);
+            return this;
+        }
+        /**
+         * The maximum number of retries on connection errors before failing (-1
+         * = no limit, 0 = disabled, 0 = num of retries).
+         * 
+         * The option will be converted to a &lt;code&gt;int&lt;/code&gt; type.
+         * 
+         * Default: -1
+         * Group: mysql
+         * 
+         * @param errorsMaxRetries the value to set
+         * @return the dsl builder
+         */
+        default DebeziumMySqlEndpointBuilder errorsMaxRetries(
+                String errorsMaxRetries) {
+            doSetProperty("errorsMaxRetries", errorsMaxRetries);
             return this;
         }
         /**
@@ -1349,7 +1383,8 @@ public interface DebeziumMySqlEndpointBuilderFactory {
             return this;
         }
         /**
-         * The maximum size of chunk for incremental snapshotting.
+         * The maximum size of chunk (number of documents/rows) for incremental
+         * snapshotting.
          * 
          * The option is a: &lt;code&gt;int&lt;/code&gt; type.
          * 
@@ -1365,7 +1400,8 @@ public interface DebeziumMySqlEndpointBuilderFactory {
             return this;
         }
         /**
-         * The maximum size of chunk for incremental snapshotting.
+         * The maximum size of chunk (number of documents/rows) for incremental
+         * snapshotting.
          * 
          * The option will be converted to a &lt;code&gt;int&lt;/code&gt; type.
          * 
@@ -1542,6 +1578,37 @@ public interface DebeziumMySqlEndpointBuilderFactory {
             return this;
         }
         /**
+         * List of notification channels names that are enabled.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: mysql
+         * 
+         * @param notificationEnabledChannels the value to set
+         * @return the dsl builder
+         */
+        default DebeziumMySqlEndpointBuilder notificationEnabledChannels(
+                String notificationEnabledChannels) {
+            doSetProperty("notificationEnabledChannels", notificationEnabledChannels);
+            return this;
+        }
+        /**
+         * The name of the topic for the notifications. This is required in case
+         * 'sink' is in the list of enabled channels.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: mysql
+         * 
+         * @param notificationSinkTopicName the value to set
+         * @return the dsl builder
+         */
+        default DebeziumMySqlEndpointBuilder notificationSinkTopicName(
+                String notificationSinkTopicName) {
+            doSetProperty("notificationSinkTopicName", notificationSinkTopicName);
+            return this;
+        }
+        /**
          * Time to wait for new change events to appear after receiving no
          * events, given in milliseconds. Defaults to 500 ms.
          * 
@@ -1675,39 +1742,6 @@ public interface DebeziumMySqlEndpointBuilderFactory {
             return this;
         }
         /**
-         * Whether field names will be sanitized to Avro naming conventions.
-         * 
-         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
-         * 
-         * Default: false
-         * Group: mysql
-         * 
-         * @param sanitizeFieldNames the value to set
-         * @return the dsl builder
-         */
-        default DebeziumMySqlEndpointBuilder sanitizeFieldNames(
-                boolean sanitizeFieldNames) {
-            doSetProperty("sanitizeFieldNames", sanitizeFieldNames);
-            return this;
-        }
-        /**
-         * Whether field names will be sanitized to Avro naming conventions.
-         * 
-         * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
-         * type.
-         * 
-         * Default: false
-         * Group: mysql
-         * 
-         * @param sanitizeFieldNames the value to set
-         * @return the dsl builder
-         */
-        default DebeziumMySqlEndpointBuilder sanitizeFieldNames(
-                String sanitizeFieldNames) {
-            doSetProperty("sanitizeFieldNames", sanitizeFieldNames);
-            return this;
-        }
-        /**
          * The name of the SchemaHistory class that should be used to store and
          * recover database schema changes. The configuration properties for the
          * history are prefixed with the 'schema.history.internal.' string.
@@ -1784,6 +1818,47 @@ public interface DebeziumMySqlEndpointBuilderFactory {
         }
         /**
          * Controls what DDL will Debezium store in database schema history. By
+         * default (true) only DDL that manipulates a table from captured
+         * schema/database will be stored. If set to false, then Debezium will
+         * store all incoming DDL statements.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: true
+         * Group: mysql
+         * 
+         * @param schemaHistoryInternalStoreOnlyCapturedDatabasesDdl the value
+         * to set
+         * @return the dsl builder
+         */
+        default DebeziumMySqlEndpointBuilder schemaHistoryInternalStoreOnlyCapturedDatabasesDdl(
+                boolean schemaHistoryInternalStoreOnlyCapturedDatabasesDdl) {
+            doSetProperty("schemaHistoryInternalStoreOnlyCapturedDatabasesDdl", schemaHistoryInternalStoreOnlyCapturedDatabasesDdl);
+            return this;
+        }
+        /**
+         * Controls what DDL will Debezium store in database schema history. By
+         * default (true) only DDL that manipulates a table from captured
+         * schema/database will be stored. If set to false, then Debezium will
+         * store all incoming DDL statements.
+         * 
+         * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
+         * type.
+         * 
+         * Default: true
+         * Group: mysql
+         * 
+         * @param schemaHistoryInternalStoreOnlyCapturedDatabasesDdl the value
+         * to set
+         * @return the dsl builder
+         */
+        default DebeziumMySqlEndpointBuilder schemaHistoryInternalStoreOnlyCapturedDatabasesDdl(
+                String schemaHistoryInternalStoreOnlyCapturedDatabasesDdl) {
+            doSetProperty("schemaHistoryInternalStoreOnlyCapturedDatabasesDdl", schemaHistoryInternalStoreOnlyCapturedDatabasesDdl);
+            return this;
+        }
+        /**
+         * Controls what DDL will Debezium store in database schema history. By
          * default (false) Debezium will store all incoming DDL statements. If
          * set to true, then only DDL that manipulates a captured table will be
          * stored.
@@ -1827,7 +1902,10 @@ public interface DebeziumMySqlEndpointBuilderFactory {
          * Specify how schema names should be adjusted for compatibility with
          * the message converter used by the connector, including: 'avro'
          * replaces the characters that cannot be used in the Avro type name
-         * with underscore; 'none' does not apply any adjustment (default).
+         * with underscore; 'avro_unicode' replaces the underscore or characters
+         * that cannot be used in the Avro type name with corresponding unicode
+         * like _uxxxx. Note: _ is an escape sequence like backslash in
+         * Java;'none' does not apply any adjustment (default).
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
@@ -1856,6 +1934,57 @@ public interface DebeziumMySqlEndpointBuilderFactory {
         default DebeziumMySqlEndpointBuilder signalDataCollection(
                 String signalDataCollection) {
             doSetProperty("signalDataCollection", signalDataCollection);
+            return this;
+        }
+        /**
+         * List of channels names that are enabled. Source channel is enabled by
+         * default.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Default: source
+         * Group: mysql
+         * 
+         * @param signalEnabledChannels the value to set
+         * @return the dsl builder
+         */
+        default DebeziumMySqlEndpointBuilder signalEnabledChannels(
+                String signalEnabledChannels) {
+            doSetProperty("signalEnabledChannels", signalEnabledChannels);
+            return this;
+        }
+        /**
+         * Interval for looking for new signals in registered channels, given in
+         * milliseconds. Defaults to 5 seconds.
+         * 
+         * The option is a: &lt;code&gt;long&lt;/code&gt; type.
+         * 
+         * Default: 5s
+         * Group: mysql
+         * 
+         * @param signalPollIntervalMs the value to set
+         * @return the dsl builder
+         */
+        default DebeziumMySqlEndpointBuilder signalPollIntervalMs(
+                long signalPollIntervalMs) {
+            doSetProperty("signalPollIntervalMs", signalPollIntervalMs);
+            return this;
+        }
+        /**
+         * Interval for looking for new signals in registered channels, given in
+         * milliseconds. Defaults to 5 seconds.
+         * 
+         * The option will be converted to a &lt;code&gt;long&lt;/code&gt; type.
+         * 
+         * Default: 5s
+         * Group: mysql
+         * 
+         * @param signalPollIntervalMs the value to set
+         * @return the dsl builder
+         */
+        default DebeziumMySqlEndpointBuilder signalPollIntervalMs(
+                String signalPollIntervalMs) {
+            doSetProperty("signalPollIntervalMs", signalPollIntervalMs);
             return this;
         }
         /**
@@ -2062,17 +2191,28 @@ public interface DebeziumMySqlEndpointBuilderFactory {
         }
         /**
          * The criteria for running a snapshot upon startup of the connector.
-         * Options include: 'when_needed' to specify that the connector run a
-         * snapshot upon startup whenever it deems it necessary; 'schema_only'
-         * to only take a snapshot of the schema (table structures) but no
-         * actual data; 'initial' (the default) to specify the connector can run
-         * a snapshot only when no offsets are available for the logical server
-         * name; 'initial_only' same as 'initial' except the connector should
-         * stop after completing the snapshot and before it would normally read
-         * the binlog; and'never' to specify the connector should never run a
-         * snapshot and that upon first startup the connector should read from
-         * the beginning of the binlog. The 'never' mode should be used with
-         * care, and only when the binlog is known to contain all history.
+         * Select one of the following snapshot options: 'when_needed': On
+         * startup, the connector runs a snapshot if one is needed.;
+         * 'schema_only': If the connector does not detect any offsets for the
+         * logical server name, it runs a snapshot that captures only the schema
+         * (table structures), but not any table data. After the snapshot
+         * completes, the connector begins to stream changes from the binlog.;
+         * 'schema_only_recovery': The connector performs a snapshot that
+         * captures only the database schema history. The connector then
+         * transitions back to streaming. Use this setting to restore a
+         * corrupted or lost database schema history topic. Do not use if the
+         * database schema was modified after the connector stopped.; 'initial'
+         * (default): If the connector does not detect any offsets for the
+         * logical server name, it runs a snapshot that captures the current
+         * full state of the configured tables. After the snapshot completes,
+         * the connector begins to stream changes from the binlog.;
+         * 'initial_only': The connector performs a snapshot as it does for the
+         * 'initial' option, but after the connector completes the snapshot, it
+         * stops, and does not stream changes from the binlog.; 'never': The
+         * connector does not run a snapshot. Upon first startup, the connector
+         * immediately begins reading from the beginning of the binlog. The
+         * 'never' mode should be used with care, and only when the binlog is
+         * known to contain all history.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
@@ -2137,6 +2277,43 @@ public interface DebeziumMySqlEndpointBuilderFactory {
         default DebeziumMySqlEndpointBuilder snapshotSelectStatementOverrides(
                 String snapshotSelectStatementOverrides) {
             doSetProperty("snapshotSelectStatementOverrides", snapshotSelectStatementOverrides);
+            return this;
+        }
+        /**
+         * Controls the order in which tables are processed in the initial
+         * snapshot. A descending value will order the tables by row count
+         * descending. A ascending value will order the tables by row count
+         * ascending. A value of disabled (the default) will disable ordering by
+         * row count.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Default: disabled
+         * Group: mysql
+         * 
+         * @param snapshotTablesOrderByRowCount the value to set
+         * @return the dsl builder
+         */
+        default DebeziumMySqlEndpointBuilder snapshotTablesOrderByRowCount(
+                String snapshotTablesOrderByRowCount) {
+            doSetProperty("snapshotTablesOrderByRowCount", snapshotTablesOrderByRowCount);
+            return this;
+        }
+        /**
+         * The name of the SourceInfoStructMaker class that returns SourceInfo
+         * schema and struct.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Default: io.debezium.connector.mysql.MySqlSourceInfoStructMaker
+         * Group: mysql
+         * 
+         * @param sourceinfoStructMaker the value to set
+         * @return the dsl builder
+         */
+        default DebeziumMySqlEndpointBuilder sourceinfoStructMaker(
+                String sourceinfoStructMaker) {
+            doSetProperty("sourceinfoStructMaker", sourceinfoStructMaker);
             return this;
         }
         /**
@@ -2437,7 +2614,7 @@ public interface DebeziumMySqlEndpointBuilderFactory {
          * Debezium MySQL Connector (camel-debezium-mysql)
          * Capture changes from a MySQL database.
          * 
-         * Category: database,sql
+         * Category: database
          * Since: 3.0
          * Maven coordinates: org.apache.camel:camel-debezium-mysql
          * 
@@ -2450,7 +2627,7 @@ public interface DebeziumMySqlEndpointBuilderFactory {
          * Debezium MySQL Connector (camel-debezium-mysql)
          * Capture changes from a MySQL database.
          * 
-         * Category: database,sql
+         * Category: database
          * Since: 3.0
          * Maven coordinates: org.apache.camel:camel-debezium-mysql
          * 
@@ -2470,7 +2647,7 @@ public interface DebeziumMySqlEndpointBuilderFactory {
          * Debezium MySQL Connector (camel-debezium-mysql)
          * Capture changes from a MySQL database.
          * 
-         * Category: database,sql
+         * Category: database
          * Since: 3.0
          * Maven coordinates: org.apache.camel:camel-debezium-mysql
          * 

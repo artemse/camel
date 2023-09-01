@@ -22,13 +22,13 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.Endpoint;
 import org.apache.camel.spi.Metadata;
 import org.apache.camel.spi.annotations.Component;
-import org.apache.camel.support.DefaultComponent;
+import org.apache.camel.support.HealthCheckComponent;
 
 /**
  * For working with Amazon CloudWatch SDK v2.
  */
 @Component("aws2-cw")
-public class Cw2Component extends DefaultComponent {
+public class Cw2Component extends HealthCheckComponent {
 
     @Metadata
     private Cw2Configuration configuration = new Cw2Configuration();
@@ -55,10 +55,12 @@ public class Cw2Component extends DefaultComponent {
         // parameters
         setProperties(endpoint, parameters);
 
-        if (Boolean.FALSE.equals(configuration.isUseDefaultCredentialsProvider()) && configuration.getAmazonCwClient() == null
+        if (Boolean.FALSE.equals(configuration.isUseDefaultCredentialsProvider())
+                && Boolean.FALSE.equals(configuration.isUseProfileCredentialsProvider())
+                && configuration.getAmazonCwClient() == null
                 && (configuration.getAccessKey() == null || configuration.getSecretKey() == null)) {
             throw new IllegalArgumentException(
-                    "useDefaultCredentialsProvider is set to false, AmazonCwClient or accessKey and secretKey must be specified");
+                    "useDefaultCredentialsProvider is set to false, useProfileCredentialsProvider is set to false, AmazonCwClient or accessKey and secretKey must be specified");
         }
 
         return endpoint;

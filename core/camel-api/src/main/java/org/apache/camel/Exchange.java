@@ -123,6 +123,7 @@ public interface Exchange {
     @Deprecated
     String EXTERNAL_REDELIVERED = "CamelExternalRedelivered";
 
+    @Deprecated
     String FAILURE_HANDLED = "CamelFailureHandled";
     String FAILURE_ENDPOINT = "CamelFailureEndpoint";
     String FAILURE_ROUTE_ID = "CamelFailureRouteId";
@@ -246,9 +247,13 @@ public interface Exchange {
     String TIMER_PERIOD = "CamelTimerPeriod";
     String TIMER_TIME = "CamelTimerTime";
     String TO_ENDPOINT = "CamelToEndpoint";
+    @Deprecated
     String TRACE_EVENT = "CamelTraceEvent";
+    @Deprecated
     String TRACE_EVENT_NODE_ID = "CamelTraceEventNodeId";
+    @Deprecated
     String TRACE_EVENT_TIMESTAMP = "CamelTraceEventTimestamp";
+    @Deprecated
     String TRACE_EVENT_EXCHANGE = "CamelTraceEventExchange";
     @Deprecated
     String TRACING_HEADER_FORMAT = "CamelTracingHeaderFormat";
@@ -264,19 +269,6 @@ public interface Exchange {
     String XSLT_ERROR = "CamelXsltError";
     String XSLT_FATAL_ERROR = "CamelXsltFatalError";
     String XSLT_WARNING = "CamelXsltWarning";
-
-    /**
-     * Adapts this {@link org.apache.camel.Exchange} to the specialized type.
-     * <p/>
-     * For example to adapt to <tt>ExtendedExchange</tt>.
-     *
-     * This method is deprecated. Use the getter to {@link ExchangeExtension}.
-     *
-     * @param  type the type to adapt to
-     * @return      this {@link org.apache.camel.Exchange} adapted to the given type
-     */
-    @Deprecated
-    <T extends Exchange> T adapt(Class<T> type);
 
     /**
      * Returns the {@link ExchangePattern} (MEP) of this exchange.
@@ -347,17 +339,6 @@ public interface Exchange {
      * @return      the value of the given property or <tt>null</tt> if there is no property for the given name
      */
     Object getProperty(String name);
-
-    /**
-     * Returns a property associated with this exchange by name
-     *
-     * @param  name         the name of the property
-     * @param  defaultValue the default value to return if property was absent
-     * @return              the value of the given property or <tt>defaultValue</tt> if there is no property for the
-     *                      given name
-     */
-    @Deprecated
-    Object getProperty(String name, Object defaultValue);
 
     /**
      * Returns a property associated with this exchange by name and specifying the type required
@@ -683,6 +664,12 @@ public interface Exchange {
      */
     long getCreated();
 
+    /**
+     * Gets the {@link ExchangeExtension} that contains the extension points for internal exchange APIs. These APIs are
+     * intended for internal usage within Camel and end-users should avoid using them.
+     *
+     * @return the {@link ExchangeExtension} point for this exchange.
+     */
     ExchangeExtension getExchangeExtension();
 
 }

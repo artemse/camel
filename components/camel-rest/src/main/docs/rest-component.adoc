@@ -5,6 +5,7 @@
 :description: Expose REST services or call external REST services.
 :since: 2.14
 :supportlevel: Stable
+:tabs-sync-option:
 :component-header: Both producer and consumer are supported
 :core:
 //Manually maintained attributes
@@ -50,6 +51,7 @@ The following components support rest consumer (Rest DSL):
 * camel-jetty
 * camel-servlet
 * camel-undertow
+* camel-platform-http
 
 The following components support rest producer:
 

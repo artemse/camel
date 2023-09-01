@@ -40,6 +40,9 @@ public final class DefaultBacklogTracerEventMessage implements BacklogTracerEven
     private final String toNode;
     private final String exchangeId;
     private final String threadName;
+    private String endpointUri;
+    private final boolean rest;
+    private final boolean template;
     private final String messageAsXml;
     private final String messageAsJSon;
     private String exceptionAsXml;
@@ -49,6 +52,7 @@ public final class DefaultBacklogTracerEventMessage implements BacklogTracerEven
 
     public DefaultBacklogTracerEventMessage(boolean first, boolean last, long uid, long timestamp,
                                             String location, String routeId, String toNode, String exchangeId,
+                                            boolean rest, boolean template,
                                             String messageAsXml, String messageAsJSon) {
         this.watch = new StopWatch();
         this.first = first;
@@ -59,6 +63,8 @@ public final class DefaultBacklogTracerEventMessage implements BacklogTracerEven
         this.routeId = routeId;
         this.toNode = toNode;
         this.exchangeId = exchangeId;
+        this.rest = rest;
+        this.template = template;
         this.messageAsXml = messageAsXml;
         this.messageAsJSon = messageAsJSon;
         this.threadName = Thread.currentThread().getName();
@@ -100,6 +106,16 @@ public final class DefaultBacklogTracerEventMessage implements BacklogTracerEven
     @Override
     public String getRouteId() {
         return routeId;
+    }
+
+    @Override
+    public boolean isRest() {
+        return rest;
+    }
+
+    @Override
+    public boolean isTemplate() {
+        return template;
     }
 
     @Override
@@ -168,6 +184,14 @@ public final class DefaultBacklogTracerEventMessage implements BacklogTracerEven
         this.exceptionAsJSon = exceptionAsJSon;
     }
 
+    public String getEndpointUri() {
+        return endpointUri;
+    }
+
+    public void setEndpointUri(String endpointUri) {
+        this.endpointUri = endpointUri;
+    }
+
     @Override
     public String toString() {
         return "DefaultBacklogTracerEventMessage[" + exchangeId + " at " + toNode + "]";
@@ -183,15 +207,15 @@ public final class DefaultBacklogTracerEventMessage implements BacklogTracerEven
     @Override
     public String toXml(int indent) {
         StringBuilder prefix = new StringBuilder();
-        for (int i = 0; i < indent; i++) {
-            prefix.append(" ");
-        }
+        prefix.append(" ".repeat(indent));
 
         StringBuilder sb = new StringBuilder();
         sb.append(prefix).append("<").append(ROOT_TAG).append(">\n");
         sb.append(prefix).append("  <uid>").append(uid).append("</uid>\n");
         sb.append(prefix).append("  <first>").append(first).append("</first>\n");
         sb.append(prefix).append("  <last>").append(last).append("</last>\n");
+        sb.append(prefix).append("  <rest>").append(rest).append("</rest>\n");
+        sb.append(prefix).append("  <template>").append(template).append("</template>\n");
         String ts = new SimpleDateFormat(TIMESTAMP_FORMAT).format(timestamp);
         sb.append(prefix).append("  <timestamp>").append(ts).append("</timestamp>\n");
         sb.append(prefix).append("  <elapsed>").append(getElapsed()).append("</elapsed>\n");
@@ -203,6 +227,9 @@ public final class DefaultBacklogTracerEventMessage implements BacklogTracerEven
         }
         // route id is optional and we then use an empty value for no route id
         sb.append(prefix).append("  <routeId>").append(routeId != null ? routeId : "").append("</routeId>\n");
+        if (endpointUri != null) {
+            sb.append(prefix).append("  <endpointUri>").append(endpointUri).append("</endpointUri>\n");
+        }
         if (toNode != null) {
             sb.append(prefix).append("  <toNode>").append(toNode).append("</toNode>\n");
         } else {
@@ -234,8 +261,13 @@ public final class DefaultBacklogTracerEventMessage implements BacklogTracerEven
         jo.put("uid", uid);
         jo.put("first", first);
         jo.put("last", last);
+        jo.put("rest", rest);
+        jo.put("template", template);
         if (location != null) {
             jo.put("location", location);
+        }
+        if (endpointUri != null) {
+            jo.put("endpointUri", endpointUri);
         }
         if (routeId != null) {
             jo.put("routeId", routeId);

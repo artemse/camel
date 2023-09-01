@@ -135,8 +135,9 @@ public interface SqlStoredEndpointBuilderFactory {
             return this;
         }
         /**
-         * If set, will ignore the results of the template and use the existing
-         * IN message as the OUT message for the continuation of processing.
+         * If set, will ignore the results of the stored procedure template and
+         * use the existing IN message as the OUT message for the continuation
+         * of processing.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -151,8 +152,9 @@ public interface SqlStoredEndpointBuilderFactory {
             return this;
         }
         /**
-         * If set, will ignore the results of the template and use the existing
-         * IN message as the OUT message for the continuation of processing.
+         * If set, will ignore the results of the stored procedure template and
+         * use the existing IN message as the OUT message for the continuation
+         * of processing.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -187,9 +189,9 @@ public interface SqlStoredEndpointBuilderFactory {
             return this;
         }
         /**
-         * Whether to use the message body as the template and then headers for
-         * parameters. If this option is enabled then the template in the uri is
-         * not used.
+         * Whether to use the message body as the stored procedure template and
+         * then headers for parameters. If this option is enabled then the
+         * template in the uri is not used.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -205,9 +207,9 @@ public interface SqlStoredEndpointBuilderFactory {
             return this;
         }
         /**
-         * Whether to use the message body as the template and then headers for
-         * parameters. If this option is enabled then the template in the uri is
-         * not used.
+         * Whether to use the message body as the stored procedure template and
+         * then headers for parameters. If this option is enabled then the
+         * template in the uri is not used.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -329,7 +331,7 @@ public interface SqlStoredEndpointBuilderFactory {
          * SQL Stored Procedure (camel-sql)
          * Perform SQL queries as a JDBC Stored Procedures using Spring JDBC.
          * 
-         * Category: database,sql
+         * Category: database
          * Since: 2.17
          * Maven coordinates: org.apache.camel:camel-sql
          * 
@@ -342,14 +344,18 @@ public interface SqlStoredEndpointBuilderFactory {
          * SQL Stored Procedure (camel-sql)
          * Perform SQL queries as a JDBC Stored Procedures using Spring JDBC.
          * 
-         * Category: database,sql
+         * Category: database
          * Since: 2.17
          * Maven coordinates: org.apache.camel:camel-sql
          * 
          * Syntax: <code>sql-stored:template</code>
          * 
          * Path parameter: template (required)
-         * Sets the StoredProcedure template to perform
+         * Sets the stored procedure template to perform. You can externalize
+         * the template by using file: or classpath: as prefix and specify the
+         * location of the file.
+         * This option can also be loaded from an existing file, by prefixing
+         * with file: or classpath: followed by the location of the file.
          * 
          * @param path template
          * @return the dsl builder
@@ -361,14 +367,18 @@ public interface SqlStoredEndpointBuilderFactory {
          * SQL Stored Procedure (camel-sql)
          * Perform SQL queries as a JDBC Stored Procedures using Spring JDBC.
          * 
-         * Category: database,sql
+         * Category: database
          * Since: 2.17
          * Maven coordinates: org.apache.camel:camel-sql
          * 
          * Syntax: <code>sql-stored:template</code>
          * 
          * Path parameter: template (required)
-         * Sets the StoredProcedure template to perform
+         * Sets the stored procedure template to perform. You can externalize
+         * the template by using file: or classpath: as prefix and specify the
+         * location of the file.
+         * This option can also be loaded from an existing file, by prefixing
+         * with file: or classpath: followed by the location of the file.
          * 
          * @param componentName to use a custom component name for the endpoint
          * instead of the default name

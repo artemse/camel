@@ -36,7 +36,7 @@ public interface MybatisComponentBuilderFactory {
      * Performs a query, poll, insert, update or delete in a relational database
      * using MyBatis.
      * 
-     * Category: database,sql
+     * Category: database
      * Since: 2.7
      * Maven coordinates: org.apache.camel:camel-mybatis
      * 
@@ -55,6 +55,9 @@ public interface MybatisComponentBuilderFactory {
         /**
          * Location of MyBatis xml configuration file. The default value is:
          * SqlMapConfig.xml loaded from the classpath.
+         * 
+         * This option can also be loaded from an existing file, by prefixing
+         * with file: or classpath: followed by the location of the file.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
@@ -153,6 +156,42 @@ public interface MybatisComponentBuilderFactory {
             doSetProperty("sqlSessionFactory", sqlSessionFactory);
             return this;
         }
+        /**
+         * Used for enabling or disabling all consumer based health checks from
+         * this component.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: true
+         * Group: health
+         * 
+         * @param healthCheckConsumerEnabled the value to set
+         * @return the dsl builder
+         */
+        default MybatisComponentBuilder healthCheckConsumerEnabled(
+                boolean healthCheckConsumerEnabled) {
+            doSetProperty("healthCheckConsumerEnabled", healthCheckConsumerEnabled);
+            return this;
+        }
+        /**
+         * Used for enabling or disabling all producer based health checks from
+         * this component. Notice: Camel has by default disabled all producer
+         * based health-checks. You can turn on producer checks globally by
+         * setting camel.health.producersEnabled=true.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: true
+         * Group: health
+         * 
+         * @param healthCheckProducerEnabled the value to set
+         * @return the dsl builder
+         */
+        default MybatisComponentBuilder healthCheckProducerEnabled(
+                boolean healthCheckProducerEnabled) {
+            doSetProperty("healthCheckProducerEnabled", healthCheckProducerEnabled);
+            return this;
+        }
     }
 
     class MybatisComponentBuilderImpl
@@ -175,6 +214,8 @@ public interface MybatisComponentBuilderFactory {
             case "lazyStartProducer": ((MyBatisComponent) component).setLazyStartProducer((boolean) value); return true;
             case "autowiredEnabled": ((MyBatisComponent) component).setAutowiredEnabled((boolean) value); return true;
             case "sqlSessionFactory": ((MyBatisComponent) component).setSqlSessionFactory((org.apache.ibatis.session.SqlSessionFactory) value); return true;
+            case "healthCheckConsumerEnabled": ((MyBatisComponent) component).setHealthCheckConsumerEnabled((boolean) value); return true;
+            case "healthCheckProducerEnabled": ((MyBatisComponent) component).setHealthCheckProducerEnabled((boolean) value); return true;
             default: return false;
             }
         }

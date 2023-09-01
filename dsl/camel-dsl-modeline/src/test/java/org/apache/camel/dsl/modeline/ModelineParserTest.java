@@ -20,9 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.camel.CamelContext;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.spi.DependencyStrategy;
 import org.apache.camel.spi.ModelineFactory;
+import org.apache.camel.support.PluginHelper;
 import org.apache.camel.support.ResourceHelper;
 import org.apache.camel.test.junit5.CamelTestSupport;
 import org.junit.jupiter.api.Assertions;
@@ -33,7 +33,7 @@ public class ModelineParserTest extends CamelTestSupport {
     private final List<String> deps = new ArrayList<>();
 
     private ModelineFactory resolveModelineFactory(CamelContext camelContext) {
-        return camelContext.adapt(ExtendedCamelContext.class).getModelineFactory();
+        return PluginHelper.getModelineFactory(camelContext);
     }
 
     @Override

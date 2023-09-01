@@ -26,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonIgnoreProperties(ignoreUnknown = true, value = { "success", "error_message", "error_code" }, allowGetters = true)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class MessageRequest implements ZeebeMessage {
 
     private String name;
@@ -84,14 +84,12 @@ public class MessageRequest implements ZeebeMessage {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("MessageRequest{");
-        sb.append("name='").append(name).append('\'');
-        sb.append(", correlationKey='").append(correlationKey).append('\'');
-        sb.append(", timeToLive=").append(timeToLive);
-        sb.append(", messageId='").append(messageId).append('\'');
-        sb.append(", variables=").append(variables);
-        sb.append('}');
-        return sb.toString();
+        return "MessageRequest{" + "name='" + name + '\'' +
+               ", correlationKey='" + correlationKey + '\'' +
+               ", timeToLive=" + timeToLive +
+               ", messageId='" + messageId + '\'' +
+               ", variables=" + variables +
+               '}';
     }
 
     @Override

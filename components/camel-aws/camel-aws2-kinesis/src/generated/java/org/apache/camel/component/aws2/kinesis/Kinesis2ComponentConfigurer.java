@@ -32,6 +32,8 @@ public class Kinesis2ComponentConfigurer extends PropertyConfigurerSupport imple
         case "accessKey": getOrCreateConfiguration(target).setAccessKey(property(camelContext, java.lang.String.class, value)); return true;
         case "amazonkinesisclient":
         case "amazonKinesisClient": getOrCreateConfiguration(target).setAmazonKinesisClient(property(camelContext, software.amazon.awssdk.services.kinesis.KinesisClient.class, value)); return true;
+        case "asyncclient":
+        case "asyncClient": getOrCreateConfiguration(target).setAsyncClient(property(camelContext, boolean.class, value)); return true;
         case "autowiredenabled":
         case "autowiredEnabled": target.setAutowiredEnabled(property(camelContext, boolean.class, value)); return true;
         case "bridgeerrorhandler":
@@ -39,6 +41,10 @@ public class Kinesis2ComponentConfigurer extends PropertyConfigurerSupport imple
         case "cborenabled":
         case "cborEnabled": getOrCreateConfiguration(target).setCborEnabled(property(camelContext, boolean.class, value)); return true;
         case "configuration": target.setConfiguration(property(camelContext, org.apache.camel.component.aws2.kinesis.Kinesis2Configuration.class, value)); return true;
+        case "healthcheckconsumerenabled":
+        case "healthCheckConsumerEnabled": target.setHealthCheckConsumerEnabled(property(camelContext, boolean.class, value)); return true;
+        case "healthcheckproducerenabled":
+        case "healthCheckProducerEnabled": target.setHealthCheckProducerEnabled(property(camelContext, boolean.class, value)); return true;
         case "iteratortype":
         case "iteratorType": getOrCreateConfiguration(target).setIteratorType(property(camelContext, software.amazon.awssdk.services.kinesis.model.ShardIteratorType.class, value)); return true;
         case "lazystartproducer":
@@ -47,6 +53,8 @@ public class Kinesis2ComponentConfigurer extends PropertyConfigurerSupport imple
         case "maxResultsPerRequest": getOrCreateConfiguration(target).setMaxResultsPerRequest(property(camelContext, int.class, value)); return true;
         case "overrideendpoint":
         case "overrideEndpoint": getOrCreateConfiguration(target).setOverrideEndpoint(property(camelContext, boolean.class, value)); return true;
+        case "profilecredentialsname":
+        case "profileCredentialsName": getOrCreateConfiguration(target).setProfileCredentialsName(property(camelContext, java.lang.String.class, value)); return true;
         case "proxyhost":
         case "proxyHost": getOrCreateConfiguration(target).setProxyHost(property(camelContext, java.lang.String.class, value)); return true;
         case "proxyport":
@@ -68,6 +76,8 @@ public class Kinesis2ComponentConfigurer extends PropertyConfigurerSupport imple
         case "uriEndpointOverride": getOrCreateConfiguration(target).setUriEndpointOverride(property(camelContext, java.lang.String.class, value)); return true;
         case "usedefaultcredentialsprovider":
         case "useDefaultCredentialsProvider": getOrCreateConfiguration(target).setUseDefaultCredentialsProvider(property(camelContext, boolean.class, value)); return true;
+        case "useprofilecredentialsprovider":
+        case "useProfileCredentialsProvider": getOrCreateConfiguration(target).setUseProfileCredentialsProvider(property(camelContext, boolean.class, value)); return true;
         default: return false;
         }
     }
@@ -84,6 +94,8 @@ public class Kinesis2ComponentConfigurer extends PropertyConfigurerSupport imple
         case "accessKey": return java.lang.String.class;
         case "amazonkinesisclient":
         case "amazonKinesisClient": return software.amazon.awssdk.services.kinesis.KinesisClient.class;
+        case "asyncclient":
+        case "asyncClient": return boolean.class;
         case "autowiredenabled":
         case "autowiredEnabled": return boolean.class;
         case "bridgeerrorhandler":
@@ -91,6 +103,10 @@ public class Kinesis2ComponentConfigurer extends PropertyConfigurerSupport imple
         case "cborenabled":
         case "cborEnabled": return boolean.class;
         case "configuration": return org.apache.camel.component.aws2.kinesis.Kinesis2Configuration.class;
+        case "healthcheckconsumerenabled":
+        case "healthCheckConsumerEnabled": return boolean.class;
+        case "healthcheckproducerenabled":
+        case "healthCheckProducerEnabled": return boolean.class;
         case "iteratortype":
         case "iteratorType": return software.amazon.awssdk.services.kinesis.model.ShardIteratorType.class;
         case "lazystartproducer":
@@ -99,6 +115,8 @@ public class Kinesis2ComponentConfigurer extends PropertyConfigurerSupport imple
         case "maxResultsPerRequest": return int.class;
         case "overrideendpoint":
         case "overrideEndpoint": return boolean.class;
+        case "profilecredentialsname":
+        case "profileCredentialsName": return java.lang.String.class;
         case "proxyhost":
         case "proxyHost": return java.lang.String.class;
         case "proxyport":
@@ -120,6 +138,8 @@ public class Kinesis2ComponentConfigurer extends PropertyConfigurerSupport imple
         case "uriEndpointOverride": return java.lang.String.class;
         case "usedefaultcredentialsprovider":
         case "useDefaultCredentialsProvider": return boolean.class;
+        case "useprofilecredentialsprovider":
+        case "useProfileCredentialsProvider": return boolean.class;
         default: return null;
         }
     }
@@ -132,6 +152,8 @@ public class Kinesis2ComponentConfigurer extends PropertyConfigurerSupport imple
         case "accessKey": return getOrCreateConfiguration(target).getAccessKey();
         case "amazonkinesisclient":
         case "amazonKinesisClient": return getOrCreateConfiguration(target).getAmazonKinesisClient();
+        case "asyncclient":
+        case "asyncClient": return getOrCreateConfiguration(target).isAsyncClient();
         case "autowiredenabled":
         case "autowiredEnabled": return target.isAutowiredEnabled();
         case "bridgeerrorhandler":
@@ -139,6 +161,10 @@ public class Kinesis2ComponentConfigurer extends PropertyConfigurerSupport imple
         case "cborenabled":
         case "cborEnabled": return getOrCreateConfiguration(target).isCborEnabled();
         case "configuration": return target.getConfiguration();
+        case "healthcheckconsumerenabled":
+        case "healthCheckConsumerEnabled": return target.isHealthCheckConsumerEnabled();
+        case "healthcheckproducerenabled":
+        case "healthCheckProducerEnabled": return target.isHealthCheckProducerEnabled();
         case "iteratortype":
         case "iteratorType": return getOrCreateConfiguration(target).getIteratorType();
         case "lazystartproducer":
@@ -147,6 +173,8 @@ public class Kinesis2ComponentConfigurer extends PropertyConfigurerSupport imple
         case "maxResultsPerRequest": return getOrCreateConfiguration(target).getMaxResultsPerRequest();
         case "overrideendpoint":
         case "overrideEndpoint": return getOrCreateConfiguration(target).isOverrideEndpoint();
+        case "profilecredentialsname":
+        case "profileCredentialsName": return getOrCreateConfiguration(target).getProfileCredentialsName();
         case "proxyhost":
         case "proxyHost": return getOrCreateConfiguration(target).getProxyHost();
         case "proxyport":
@@ -168,6 +196,8 @@ public class Kinesis2ComponentConfigurer extends PropertyConfigurerSupport imple
         case "uriEndpointOverride": return getOrCreateConfiguration(target).getUriEndpointOverride();
         case "usedefaultcredentialsprovider":
         case "useDefaultCredentialsProvider": return getOrCreateConfiguration(target).isUseDefaultCredentialsProvider();
+        case "useprofilecredentialsprovider":
+        case "useProfileCredentialsProvider": return getOrCreateConfiguration(target).isUseProfileCredentialsProvider();
         default: return null;
         }
     }

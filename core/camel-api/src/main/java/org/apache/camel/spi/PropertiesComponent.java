@@ -164,6 +164,11 @@ public interface PropertiesComponent extends StaticService {
     void addLocation(String location);
 
     /**
+     * Gets the {@link PropertiesSourceFactory}.
+     */
+    PropertiesSourceFactory getPropertiesSourceFactory();
+
+    /**
      * Adds a custom {@link PropertiesSource} to use as source for loading and/or looking up property values.
      */
     void addPropertiesSource(PropertiesSource propertiesSource);
@@ -276,6 +281,15 @@ public interface PropertiesComponent extends StaticService {
      * @return         true if some properties was reloaded
      */
     boolean reloadProperties(String pattern);
+
+    /**
+     * Filters the given list of properties, by removing properties that are already loaded and have same key and value.
+     *
+     * If all properties are not changed then the properties will become empty.
+     *
+     * @param properties the given properties to filter.
+     */
+    void keepOnlyChangeProperties(Properties properties);
 
     /**
      * Adds the {@link PropertiesLookupListener}.

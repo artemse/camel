@@ -42,14 +42,16 @@ public class Sns2EndpointConfigurer extends PropertyConfigurerSupport implements
         case "overrideendpoint":
         case "overrideEndpoint": target.getConfiguration().setOverrideEndpoint(property(camelContext, boolean.class, value)); return true;
         case "policy": target.getConfiguration().setPolicy(property(camelContext, java.lang.String.class, value)); return true;
+        case "profilecredentialsname":
+        case "profileCredentialsName": target.getConfiguration().setProfileCredentialsName(property(camelContext, java.lang.String.class, value)); return true;
         case "proxyhost":
         case "proxyHost": target.getConfiguration().setProxyHost(property(camelContext, java.lang.String.class, value)); return true;
         case "proxyport":
         case "proxyPort": target.getConfiguration().setProxyPort(property(camelContext, java.lang.Integer.class, value)); return true;
         case "proxyprotocol":
         case "proxyProtocol": target.getConfiguration().setProxyProtocol(property(camelContext, software.amazon.awssdk.core.Protocol.class, value)); return true;
-        case "queueurl":
-        case "queueUrl": target.getConfiguration().setQueueUrl(property(camelContext, java.lang.String.class, value)); return true;
+        case "queuearn":
+        case "queueArn": target.getConfiguration().setQueueArn(property(camelContext, java.lang.String.class, value)); return true;
         case "region": target.getConfiguration().setRegion(property(camelContext, java.lang.String.class, value)); return true;
         case "secretkey":
         case "secretKey": target.getConfiguration().setSecretKey(property(camelContext, java.lang.String.class, value)); return true;
@@ -64,6 +66,8 @@ public class Sns2EndpointConfigurer extends PropertyConfigurerSupport implements
         case "uriEndpointOverride": target.getConfiguration().setUriEndpointOverride(property(camelContext, java.lang.String.class, value)); return true;
         case "usedefaultcredentialsprovider":
         case "useDefaultCredentialsProvider": target.getConfiguration().setUseDefaultCredentialsProvider(property(camelContext, boolean.class, value)); return true;
+        case "useprofilecredentialsprovider":
+        case "useProfileCredentialsProvider": target.getConfiguration().setUseProfileCredentialsProvider(property(camelContext, boolean.class, value)); return true;
         default: return false;
         }
     }
@@ -97,14 +101,16 @@ public class Sns2EndpointConfigurer extends PropertyConfigurerSupport implements
         case "overrideendpoint":
         case "overrideEndpoint": return boolean.class;
         case "policy": return java.lang.String.class;
+        case "profilecredentialsname":
+        case "profileCredentialsName": return java.lang.String.class;
         case "proxyhost":
         case "proxyHost": return java.lang.String.class;
         case "proxyport":
         case "proxyPort": return java.lang.Integer.class;
         case "proxyprotocol":
         case "proxyProtocol": return software.amazon.awssdk.core.Protocol.class;
-        case "queueurl":
-        case "queueUrl": return java.lang.String.class;
+        case "queuearn":
+        case "queueArn": return java.lang.String.class;
         case "region": return java.lang.String.class;
         case "secretkey":
         case "secretKey": return java.lang.String.class;
@@ -119,6 +125,8 @@ public class Sns2EndpointConfigurer extends PropertyConfigurerSupport implements
         case "uriEndpointOverride": return java.lang.String.class;
         case "usedefaultcredentialsprovider":
         case "useDefaultCredentialsProvider": return boolean.class;
+        case "useprofilecredentialsprovider":
+        case "useProfileCredentialsProvider": return boolean.class;
         default: return null;
         }
     }
@@ -148,14 +156,16 @@ public class Sns2EndpointConfigurer extends PropertyConfigurerSupport implements
         case "overrideendpoint":
         case "overrideEndpoint": return target.getConfiguration().isOverrideEndpoint();
         case "policy": return target.getConfiguration().getPolicy();
+        case "profilecredentialsname":
+        case "profileCredentialsName": return target.getConfiguration().getProfileCredentialsName();
         case "proxyhost":
         case "proxyHost": return target.getConfiguration().getProxyHost();
         case "proxyport":
         case "proxyPort": return target.getConfiguration().getProxyPort();
         case "proxyprotocol":
         case "proxyProtocol": return target.getConfiguration().getProxyProtocol();
-        case "queueurl":
-        case "queueUrl": return target.getConfiguration().getQueueUrl();
+        case "queuearn":
+        case "queueArn": return target.getConfiguration().getQueueArn();
         case "region": return target.getConfiguration().getRegion();
         case "secretkey":
         case "secretKey": return target.getConfiguration().getSecretKey();
@@ -170,6 +180,8 @@ public class Sns2EndpointConfigurer extends PropertyConfigurerSupport implements
         case "uriEndpointOverride": return target.getConfiguration().getUriEndpointOverride();
         case "usedefaultcredentialsprovider":
         case "useDefaultCredentialsProvider": return target.getConfiguration().isUseDefaultCredentialsProvider();
+        case "useprofilecredentialsprovider":
+        case "useProfileCredentialsProvider": return target.getConfiguration().isUseProfileCredentialsProvider();
         default: return null;
         }
     }

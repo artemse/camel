@@ -22,14 +22,14 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.Endpoint;
 import org.apache.camel.spi.Metadata;
 import org.apache.camel.spi.annotations.Component;
-import org.apache.camel.support.DefaultComponent;
+import org.apache.camel.support.HealthCheckComponent;
 import software.amazon.awssdk.regions.Region;
 
 /**
  * For working with Amazon SQS SDK v2.
  */
 @Component("aws2-sqs")
-public class Sqs2Component extends DefaultComponent {
+public class Sqs2Component extends HealthCheckComponent {
     @Metadata
     private Sqs2Configuration configuration = new Sqs2Configuration();
 
@@ -64,9 +64,11 @@ public class Sqs2Component extends DefaultComponent {
 
         //validation of client has to be done after endpoint initialization (in case that sqs client is autowired)
         // - covered by SqsDeadletterWithClientRegistryLocalstackIT
-        if (!configuration.isUseDefaultCredentialsProvider() && configuration.getAmazonSQSClient() == null
+        if (!configuration.isUseDefaultCredentialsProvider() && !configuration.isUseProfileCredentialsProvider()
+                && configuration.getAmazonSQSClient() == null
                 && (configuration.getAccessKey() == null || configuration.getSecretKey() == null)) {
-            throw new IllegalArgumentException("AmazonSQSClient or accessKey and secretKey must be specified.");
+            throw new IllegalArgumentException(
+                    "useDefaultCredentialsProvider is set to false, useProfileCredentialsProvider is set to false, AmazonSQSClient or accessKey and secretKey must be specified");
         }
         // Verify that visibilityTimeout is set if extendMessageVisibility is
         // set to true.

@@ -64,8 +64,7 @@ public class DatasonnetExpression extends ExpressionAdapter implements Expressio
     }
 
     public static DatasonnetExpression builder(String expression) {
-        DatasonnetExpression answer = new DatasonnetExpression(expression);
-        return answer;
+        return new DatasonnetExpression(expression);
     }
 
     public static DatasonnetExpression builder(String expression, Class<?> resultType) {
@@ -177,7 +176,7 @@ public class DatasonnetExpression extends ExpressionAdapter implements Expressio
                         }
                     });
                 } catch (IOException e) {
-                    LOG.warn("Unable to load DataSonnet library from: " + nextPath, e);
+                    LOG.warn("Unable to load DataSonnet library from: {}", nextPath, e);
                 }
             }
         }

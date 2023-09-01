@@ -39,8 +39,8 @@ import org.apache.camel.spi.Language;
 import org.apache.camel.spi.ManagementStrategy;
 import org.apache.camel.support.LoggerHelper;
 import org.apache.camel.util.ObjectHelper;
-import org.apache.camel.util.StopWatch;
 import org.apache.camel.util.StringHelper;
+import org.apache.camel.util.TimeUtils;
 import org.apache.camel.util.URISupport;
 
 @ManagedResource(description = "Managed BacklogDebugger")
@@ -122,11 +122,6 @@ public class ManagedBacklogDebugger implements ManagedBacklogDebuggerMBean {
     }
 
     @Override
-    public Set<String> getBreakpoints() {
-        return breakpoints();
-    }
-
-    @Override
     public Set<String> breakpoints() {
         return backlogDebugger.getBreakpoints();
     }
@@ -201,11 +196,6 @@ public class ManagedBacklogDebugger implements ManagedBacklogDebuggerMBean {
     }
 
     @Override
-    public Set<String> getSuspendedBreakpointNodeIds() {
-        return suspendedBreakpointNodeIds();
-    }
-
-    @Override
     public Set<String> suspendedBreakpointNodeIds() {
         return backlogDebugger.getSuspendedBreakpointNodeIds();
     }
@@ -248,11 +238,6 @@ public class ManagedBacklogDebugger implements ManagedBacklogDebuggerMBean {
     @Override
     public void setBodyIncludeFiles(boolean bodyIncludeFiles) {
         backlogDebugger.setBodyIncludeFiles(bodyIncludeFiles);
-    }
-
-    @Override
-    public String dumpTracedMessagesAsXml(String nodeId) {
-        return dumpTracedMessagesAsXml(nodeId, false);
     }
 
     @Override
@@ -377,8 +362,8 @@ public class ManagedBacklogDebugger implements ManagedBacklogDebuggerMBean {
 
     @Override
     public String messageHistoryOnBreakpointAsXml(String nodeId) {
-        StringBuffer messageHistoryBuffer = new StringBuffer();
-        messageHistoryBuffer.append("<messageHistory>\n");
+        StringBuilder messageHistoryBuilder = new StringBuilder();
+        messageHistoryBuilder.append("<messageHistory>\n");
 
         Exchange suspendedExchange = backlogDebugger.getSuspendedExchange(nodeId);
         if (suspendedExchange != null) {
@@ -398,9 +383,9 @@ public class ManagedBacklogDebugger implements ManagedBacklogDebuggerMBean {
                             + "]";
                 }
 
-                long elapsed = StopWatch.elapsedMillisSince(suspendedExchange.getCreated());
+                long elapsed = TimeUtils.elapsedMillisSince(suspendedExchange.getCreated());
 
-                messageHistoryBuffer
+                messageHistoryBuilder
                         .append("    <messageHistoryEntry")
                         .append(" location=\"").append(StringHelper.xmlEncode(loc)).append("\"")
                         .append(" routeId=\"").append(StringHelper.xmlEncode(routeId)).append("\"")
@@ -427,7 +412,7 @@ public class ManagedBacklogDebugger implements ManagedBacklogDebuggerMBean {
                     label = URISupport.sanitizeUri(StringHelper.limitLength(history.getNode().getLabel(), 100));
                     elapsed = history.getElapsed();
 
-                    messageHistoryBuffer
+                    messageHistoryBuilder
                             .append("    <messageHistoryEntry")
                             .append(" location=\"").append(StringHelper.xmlEncode(loc)).append("\"")
                             .append(" routeId=\"").append(StringHelper.xmlEncode(routeId)).append("\"")
@@ -438,8 +423,8 @@ public class ManagedBacklogDebugger implements ManagedBacklogDebuggerMBean {
                 }
             }
         }
-        messageHistoryBuffer.append("</messageHistory>\n");
-        return messageHistoryBuffer.toString();
+        messageHistoryBuilder.append("</messageHistory>\n");
+        return messageHistoryBuilder.toString();
     }
 
     @Override
@@ -475,7 +460,7 @@ public class ManagedBacklogDebugger implements ManagedBacklogDebuggerMBean {
                             // must always xml encode
                             sb.append(StringHelper.xmlEncode(xml));
                         }
-                    } catch (Throwable e) {
+                    } catch (Exception e) {
                         // ignore as the body is for logging purpose
                     }
                 }

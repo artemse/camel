@@ -42,7 +42,7 @@ public class ToDynamicDefinition extends NoOutputDefinition<ToDynamicDefinition>
     @Metadata(required = true)
     private String uri;
     @XmlAttribute
-    @Metadata(label = "advanced", javaType = "org.apache.camel.ExchangePattern", enums = "InOnly,InOut,InOptionalOut")
+    @Metadata(label = "advanced", javaType = "org.apache.camel.ExchangePattern", enums = "InOnly,InOut")
     private String pattern;
     @XmlAttribute
     @Metadata(label = "advanced", javaType = "java.lang.Integer")
@@ -121,7 +121,7 @@ public class ToDynamicDefinition extends NoOutputDefinition<ToDynamicDefinition>
      * producers when using this recipient list, when uris are reused.
      *
      * Beware that when using dynamic endpoints then it affects how well the cache can be utilized. If each dynamic
-     * endpoint is unique then its best to turn of caching by setting this to -1, which allows Camel to not cache both
+     * endpoint is unique then its best to turn off caching by setting this to -1, which allows Camel to not cache both
      * the producers and endpoints; they are regarded as prototype scoped and will be stopped and discarded after use.
      * This reduces memory usage as otherwise producers/endpoints are stored in memory in the caches.
      *
@@ -144,7 +144,7 @@ public class ToDynamicDefinition extends NoOutputDefinition<ToDynamicDefinition>
      * producers when using this recipient list, when uris are reused.
      *
      * Beware that when using dynamic endpoints then it affects how well the cache can be utilized. If each dynamic
-     * endpoint is unique then its best to turn of caching by setting this to -1, which allows Camel to not cache both
+     * endpoint is unique then its best to turn off caching by setting this to -1, which allows Camel to not cache both
      * the producers and endpoints; they are regarded as prototype scoped and will be stopped and discarded after use.
      * This reduces memory usage as otherwise producers/endpoints are stored in memory in the caches.
      *
@@ -164,18 +164,14 @@ public class ToDynamicDefinition extends NoOutputDefinition<ToDynamicDefinition>
     }
 
     /**
-     * Ignore the invalidate endpoint exception when try to create a producer with that endpoint
-     *
-     * @return the builder
+     * Whether to ignore invalid endpoint URIs and skip sending the message.
      */
     public ToDynamicDefinition ignoreInvalidEndpoint(boolean ignoreInvalidEndpoint) {
         return ignoreInvalidEndpoint(Boolean.toString(ignoreInvalidEndpoint));
     }
 
     /**
-     * Ignore the invalidate endpoint exception when try to create a producer with that endpoint
-     *
-     * @return the builder
+     * Whether to ignore invalid endpoint URIs and skip sending the message.
      */
     public ToDynamicDefinition ignoreInvalidEndpoint(String ignoreInvalidEndpoint) {
         setIgnoreInvalidEndpoint(ignoreInvalidEndpoint);

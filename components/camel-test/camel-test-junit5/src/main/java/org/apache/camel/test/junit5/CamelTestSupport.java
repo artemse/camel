@@ -27,7 +27,6 @@ import org.apache.camel.ConsumerTemplate;
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.apache.camel.Expression;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.FluentProducerTemplate;
 import org.apache.camel.Message;
 import org.apache.camel.NamedNode;
@@ -59,6 +58,7 @@ import org.apache.camel.spi.PropertiesSource;
 import org.apache.camel.spi.Registry;
 import org.apache.camel.support.BreakpointSupport;
 import org.apache.camel.support.EndpointHelper;
+import org.apache.camel.support.PluginHelper;
 import org.apache.camel.test.CamelRouteCoverageDumper;
 import org.apache.camel.util.StopWatch;
 import org.apache.camel.util.StringHelper;
@@ -95,13 +95,12 @@ public abstract class CamelTestSupport
      */
     public static final String ROUTE_COVERAGE_ENABLED = "CamelTestRouteCoverage";
 
-    // CHECKSTYLE:OFF
     private static final Logger LOG = LoggerFactory.getLogger(CamelTestSupport.class);
-    private static ThreadLocal<ModelCamelContext> threadCamelContext = new ThreadLocal<>();
-    private static ThreadLocal<ProducerTemplate> threadTemplate = new ThreadLocal<>();
-    private static ThreadLocal<FluentProducerTemplate> threadFluentTemplate = new ThreadLocal<>();
-    private static ThreadLocal<ConsumerTemplate> threadConsumer = new ThreadLocal<>();
-    private static ThreadLocal<Service> threadService = new ThreadLocal<>();
+    private static final ThreadLocal<ModelCamelContext> THREAD_CAMEL_CONTEXT = new ThreadLocal<>();
+    private static final ThreadLocal<ProducerTemplate> THREAD_TEMPLATE = new ThreadLocal<>();
+    private static final ThreadLocal<FluentProducerTemplate> THREAD_FLUENT_TEMPLATE = new ThreadLocal<>();
+    private static final ThreadLocal<ConsumerTemplate> THREAD_CONSUMER = new ThreadLocal<>();
+    private static final ThreadLocal<Service> THREAD_SERVICE = new ThreadLocal<>();
     protected Properties extra;
     protected volatile ModelCamelContext context;
     protected volatile ProducerTemplate template;
@@ -118,9 +117,8 @@ public abstract class CamelTestSupport
     private static final ThreadLocal<CamelTestSupport> INSTANCE = new ThreadLocal<>();
     private String currentTestName;
     private boolean isCreateCamelContextPerClass = false;
-    private CamelRouteCoverageDumper routeCoverageDumper = new CamelRouteCoverageDumper();
+    private final CamelRouteCoverageDumper routeCoverageDumper = new CamelRouteCoverageDumper();
     private ExtensionContext.Store globalStore;
-    // CHECKSTYLE:ON
 
     @Override
     public void afterTestExecution(ExtensionContext context) throws Exception {
@@ -338,7 +336,7 @@ public abstract class CamelTestSupport
      */
     public void setCamelContextService(Service service) {
         camelContextService = service;
-        threadService.set(camelContextService);
+        THREAD_SERVICE.set(camelContextService);
     }
 
     @BeforeEach
@@ -433,7 +431,7 @@ public abstract class CamelTestSupport
         }
 
         context = (ModelCamelContext) createCamelContext();
-        threadCamelContext.set(context);
+        THREAD_CAMEL_CONTEXT.set(context);
 
         assertNotNull(context, "No context found!");
 
@@ -463,19 +461,19 @@ public abstract class CamelTestSupport
         consumer = context.createConsumerTemplate();
         consumer.start();
 
-        threadTemplate.set(template);
-        threadFluentTemplate.set(fluentTemplate);
-        threadConsumer.set(consumer);
+        THREAD_TEMPLATE.set(template);
+        THREAD_FLUENT_TEMPLATE.set(fluentTemplate);
+        THREAD_CONSUMER.set(consumer);
 
         // enable auto mocking if enabled
         String pattern = isMockEndpoints();
         if (pattern != null) {
-            context.adapt(ExtendedCamelContext.class)
+            context.getCamelContextExtension()
                     .registerEndpointCallback(new InterceptSendToMockEndpointStrategy(pattern));
         }
         pattern = isMockEndpointsAndSkip();
         if (pattern != null) {
-            context.adapt(ExtendedCamelContext.class)
+            context.getCamelContextExtension()
                     .registerEndpointCallback(new InterceptSendToMockEndpointStrategy(pattern, true));
         }
 
@@ -507,7 +505,7 @@ public abstract class CamelTestSupport
         String exclude = getRouteFilterExcludePattern();
         if (include != null || exclude != null) {
             LOG.info("Route filtering pattern: include={}, exclude={}", include, exclude);
-            context.getExtension(Model.class).setRouteFilterPattern(include, exclude);
+            context.getCamelContextExtension().getContextPlugin(Model.class).setRouteFilterPattern(include, exclude);
         }
 
         // prepare for in-between tests
@@ -552,7 +550,7 @@ public abstract class CamelTestSupport
         for (final Map.Entry<String, String> entry : fromEndpoints.entrySet()) {
             AdviceWith.adviceWith(context.getRouteDefinition(entry.getKey()), context, new AdviceWithRouteBuilder() {
                 @Override
-                public void configure() throws Exception {
+                public void configure() {
                     replaceFromWith(entry.getValue());
                 }
             });
@@ -577,7 +575,8 @@ public abstract class CamelTestSupport
             String dir = "target/camel-route-coverage";
             String name = className + "-" + StringHelper.before(currentTestName, "(") + ".xml";
 
-            ManagedCamelContext mc = context != null ? context.getExtension(ManagedCamelContext.class) : null;
+            ManagedCamelContext mc
+                    = context != null ? context.getCamelContextExtension().getContextPlugin(ManagedCamelContext.class) : null;
             ManagedCamelContextMBean managedCamelContext = mc != null ? mc.getManagedCamelContext() : null;
             if (managedCamelContext == null) {
                 LOG.warn("Cannot dump route coverage to file as JMX is not enabled. "
@@ -603,8 +602,8 @@ public abstract class CamelTestSupport
     void tearDownCreateCamelContextPerClass() throws Exception {
         LOG.debug("tearDownCreateCamelContextPerClass()");
         TESTS.remove();
-        doStopTemplates(threadConsumer.get(), threadTemplate.get(), threadFluentTemplate.get());
-        doStopCamelContext(threadCamelContext.get(), threadService.get());
+        doStopTemplates(THREAD_CONSUMER.get(), THREAD_TEMPLATE.get(), THREAD_FLUENT_TEMPLATE.get());
+        doStopCamelContext(THREAD_CAMEL_CONTEXT.get(), THREAD_SERVICE.get());
         doPostTearDown();
         cleanupResources();
     }
@@ -670,11 +669,11 @@ public abstract class CamelTestSupport
     }
 
     protected void postProcessTest() throws Exception {
-        context = threadCamelContext.get();
-        template = threadTemplate.get();
-        fluentTemplate = threadFluentTemplate.get();
-        consumer = threadConsumer.get();
-        camelContextService = threadService.get();
+        context = THREAD_CAMEL_CONTEXT.get();
+        template = THREAD_TEMPLATE.get();
+        fluentTemplate = THREAD_FLUENT_TEMPLATE.get();
+        consumer = THREAD_CONSUMER.get();
+        camelContextService = THREAD_SERVICE.get();
         applyCamelPostProcessor();
     }
 
@@ -690,9 +689,9 @@ public abstract class CamelTestSupport
         boolean spring = hasClassAnnotation("org.springframework.boot.test.context.SpringBootTest",
                 "org.springframework.context.annotation.ComponentScan");
         if (!spring) {
-            context.getExtension(ExtendedCamelContext.class).getBeanPostProcessor().postProcessBeforeInitialization(this,
+            PluginHelper.getBeanPostProcessor(context).postProcessBeforeInitialization(this,
                     getClass().getName());
-            context.getExtension(ExtendedCamelContext.class).getBeanPostProcessor().postProcessAfterInitialization(this,
+            PluginHelper.getBeanPostProcessor(context).postProcessAfterInitialization(this,
                     getClass().getName());
         }
     }
@@ -718,14 +717,14 @@ public abstract class CamelTestSupport
 
     protected void doStopCamelContext(CamelContext context, Service camelContextService) {
         if (camelContextService != null) {
-            if (camelContextService == threadService.get()) {
-                threadService.remove();
+            if (camelContextService == THREAD_SERVICE.get()) {
+                THREAD_SERVICE.remove();
             }
             camelContextService.stop();
         } else {
             if (context != null) {
-                if (context == threadCamelContext.get()) {
-                    threadCamelContext.remove();
+                if (context == THREAD_CAMEL_CONTEXT.get()) {
+                    THREAD_CAMEL_CONTEXT.remove();
                 }
                 context.stop();
             }
@@ -735,20 +734,20 @@ public abstract class CamelTestSupport
     private static void doStopTemplates(
             ConsumerTemplate consumer, ProducerTemplate template, FluentProducerTemplate fluentTemplate) {
         if (consumer != null) {
-            if (consumer == threadConsumer.get()) {
-                threadConsumer.remove();
+            if (consumer == THREAD_CONSUMER.get()) {
+                THREAD_CONSUMER.remove();
             }
             consumer.stop();
         }
         if (template != null) {
-            if (template == threadTemplate.get()) {
-                threadTemplate.remove();
+            if (template == THREAD_TEMPLATE.get()) {
+                THREAD_TEMPLATE.remove();
             }
             template.stop();
         }
         if (fluentTemplate != null) {
-            if (fluentTemplate == threadFluentTemplate.get()) {
-                threadFluentTemplate.remove();
+            if (fluentTemplate == THREAD_FLUENT_TEMPLATE.get()) {
+                THREAD_FLUENT_TEMPLATE.remove();
             }
             fluentTemplate.stop();
         }
@@ -874,11 +873,7 @@ public abstract class CamelTestSupport
             throw RuntimeCamelException.wrapRuntimeException(e);
         }
         // strip query
-        int idx = n.indexOf('?');
-        if (idx != -1) {
-            n = n.substring(0, idx);
-        }
-        final String target = n;
+        final String target = StringHelper.before(n, "?", n);
 
         // lookup endpoints in registry and try to find it
         MockEndpoint found = (MockEndpoint) context.getEndpointRegistry().values().stream()

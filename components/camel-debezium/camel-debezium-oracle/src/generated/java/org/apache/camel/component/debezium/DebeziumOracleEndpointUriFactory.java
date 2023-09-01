@@ -21,7 +21,7 @@ public class DebeziumOracleEndpointUriFactory extends org.apache.camel.support.c
     private static final Set<String> SECRET_PROPERTY_NAMES;
     private static final Set<String> MULTI_VALUE_PREFIXES;
     static {
-        Set<String> props = new HashSet<>(96);
+        Set<String> props = new HashSet<>(107);
         props.add("additionalProperties");
         props.add("binaryHandlingMode");
         props.add("bridgeErrorHandler");
@@ -40,6 +40,7 @@ public class DebeziumOracleEndpointUriFactory extends org.apache.camel.support.c
         props.add("databaseUser");
         props.add("datatypePropagateSourceType");
         props.add("decimalHandlingMode");
+        props.add("errorsMaxRetries");
         props.add("eventProcessingFailureHandlingMode");
         props.add("exceptionHandler");
         props.add("exchangePattern");
@@ -66,6 +67,9 @@ public class DebeziumOracleEndpointUriFactory extends org.apache.camel.support.c
         props.add("logMiningBufferInfinispanCacheTransactions");
         props.add("logMiningBufferTransactionEventsThreshold");
         props.add("logMiningBufferType");
+        props.add("logMiningFlushTableName");
+        props.add("logMiningQueryFilterMode");
+        props.add("logMiningRestartConnection");
         props.add("logMiningScnGapDetectionGapSizeMin");
         props.add("logMiningScnGapDetectionTimeIntervalMaxMs");
         props.add("logMiningSessionMaxMs");
@@ -74,13 +78,16 @@ public class DebeziumOracleEndpointUriFactory extends org.apache.camel.support.c
         props.add("logMiningSleepTimeMaxMs");
         props.add("logMiningSleepTimeMinMs");
         props.add("logMiningStrategy");
-        props.add("logMiningTransactionRetentionHours");
+        props.add("logMiningTransactionRetentionMs");
         props.add("logMiningUsernameExcludeList");
+        props.add("logMiningUsernameIncludeList");
         props.add("maxBatchSize");
         props.add("maxQueueSize");
         props.add("maxQueueSizeInBytes");
         props.add("messageKeyColumns");
         props.add("name");
+        props.add("notificationEnabledChannels");
+        props.add("notificationSinkTopicName");
         props.add("offsetCommitPolicy");
         props.add("offsetCommitTimeoutMs");
         props.add("offsetFlushIntervalMs");
@@ -94,13 +101,15 @@ public class DebeziumOracleEndpointUriFactory extends org.apache.camel.support.c
         props.add("queryFetchSize");
         props.add("racNodes");
         props.add("retriableRestartConnectorWaitMs");
-        props.add("sanitizeFieldNames");
         props.add("schemaHistoryInternal");
         props.add("schemaHistoryInternalFileFilename");
         props.add("schemaHistoryInternalSkipUnparseableDdl");
+        props.add("schemaHistoryInternalStoreOnlyCapturedDatabasesDdl");
         props.add("schemaHistoryInternalStoreOnlyCapturedTablesDdl");
         props.add("schemaNameAdjustmentMode");
         props.add("signalDataCollection");
+        props.add("signalEnabledChannels");
+        props.add("signalPollIntervalMs");
         props.add("skippedOperations");
         props.add("snapshotDelayMs");
         props.add("snapshotEnhancePredicateScn");
@@ -111,6 +120,8 @@ public class DebeziumOracleEndpointUriFactory extends org.apache.camel.support.c
         props.add("snapshotMaxThreads");
         props.add("snapshotMode");
         props.add("snapshotSelectStatementOverrides");
+        props.add("snapshotTablesOrderByRowCount");
+        props.add("sourceinfoStructMaker");
         props.add("tableExcludeList");
         props.add("tableIncludeList");
         props.add("timePrecisionMode");

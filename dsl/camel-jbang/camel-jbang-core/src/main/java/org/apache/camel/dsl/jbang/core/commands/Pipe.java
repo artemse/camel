@@ -19,15 +19,16 @@ package org.apache.camel.dsl.jbang.core.commands;
 import java.nio.file.Path;
 import java.util.Stack;
 
+import org.apache.camel.dsl.jbang.core.common.LoggingLevelCompletionCandidates;
 import picocli.CommandLine;
 
-@CommandLine.Command(name = "pipe", description = "Run Camel integration in pipe and filters mode for terminal scripting")
-class Pipe extends CamelCommand {
+@CommandLine.Command(name = "pipe", description = "Run Camel integration in pipe and filters mode for terminal scripting",
+                     sortOptions = false)
+public class Pipe extends CamelCommand {
 
     @CommandLine.Parameters(description = "Name of file", arity = "1",
                             paramLabel = "<file>", parameterConsumer = FileConsumer.class)
     Path filePath; // Defined only for file path completion; the field never used
-
     String file;
 
     @CommandLine.Option(names = { "--max-messages" }, defaultValue = "0",
@@ -45,7 +46,8 @@ class Pipe extends CamelCommand {
                         description = "Can be used to turn on logging (logs to file in <user home>/.camel directory)")
     boolean logging;
 
-    @CommandLine.Option(names = { "--logging-level" }, defaultValue = "info", description = "Logging level")
+    @CommandLine.Option(names = { "--logging-level" }, completionCandidates = LoggingLevelCompletionCandidates.class,
+                        defaultValue = "info", description = "Logging level")
     String loggingLevel;
 
     @CommandLine.Option(names = { "--properties" },
@@ -61,7 +63,12 @@ class Pipe extends CamelCommand {
     }
 
     @Override
-    public Integer call() throws Exception {
+    public boolean disarrangeLogging() {
+        return false;
+    }
+
+    @Override
+    public Integer doCall() throws Exception {
         // remove leading ./ when calling a script in pipe mode
         if (file != null && file.startsWith("./")) {
             file = file.substring(2);
@@ -82,8 +89,7 @@ class Pipe extends CamelCommand {
     static class FileConsumer extends ParameterConsumer<Pipe> {
         @Override
         protected void doConsumeParameters(Stack<String> args, Pipe cmd) {
-            String arg = args.pop();
-            cmd.file = arg;
+            cmd.file = args.pop();
         }
     }
 

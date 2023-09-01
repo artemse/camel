@@ -33,8 +33,9 @@ import org.apache.camel.catalog.RuntimeProvider;
 import org.apache.camel.catalog.VersionManager;
 import org.apache.camel.main.KameletMain;
 import org.apache.camel.main.download.DependencyDownloaderClassLoader;
-import org.apache.camel.main.download.MavenArtifact;
+import org.apache.camel.main.download.DownloadException;
 import org.apache.camel.main.download.MavenDependencyDownloader;
+import org.apache.camel.tooling.maven.MavenArtifact;
 
 public final class CatalogLoader {
 
@@ -59,7 +60,8 @@ public final class CatalogLoader {
         try {
             main.setRepos(repos);
             // enable stub in silent mode so we do not use real components
-            main.setStub(true);
+            main.setSilent(true);
+            main.setStubPattern("*");
             main.start();
 
             // wrap downloaded catalog files in an isolated classloader
@@ -106,12 +108,21 @@ public final class CatalogLoader {
 
             // download camel-catalog for that specific version
             MavenDependencyDownloader downloader = main.getCamelContext().hasService(MavenDependencyDownloader.class);
-            MavenArtifact ma = downloader.downloadArtifact("org.apache.camel", "camel-catalog", version);
+            MavenArtifact ma;
+            String camelCatalogVersion = version;
+            try {
+                ma = downloader.downloadArtifact("org.apache.camel", "camel-catalog", camelCatalogVersion);
+            } catch (DownloadException ex) {
+                // fallback, in case camel spring boot version differ from camel version
+                camelCatalogVersion = answer.getCatalogVersion();
+                ma = downloader.downloadArtifact("org.apache.camel", "camel-catalog", camelCatalogVersion);
+            }
             if (ma != null) {
                 cl.addFile(ma.getFile());
             } else {
-                throw new IOException("Cannot download org.apache.camel:camel-catalog:" + version);
+                throw new IOException("Cannot download org.apache.camel:camel-catalog:" + camelCatalogVersion);
             }
+
             ma = downloader.downloadArtifact("org.apache.camel.springboot", "camel-catalog-provider-springboot", version);
             if (ma != null) {
                 cl.addFile(ma.getFile());
@@ -223,6 +234,11 @@ public final class CatalogLoader {
         @Override
         public void setClassLoader(ClassLoader classLoader) {
             this.classLoader = classLoader;
+        }
+
+        @Override
+        public ClassLoader getClassLoader() {
+            return classLoader;
         }
 
         @Override

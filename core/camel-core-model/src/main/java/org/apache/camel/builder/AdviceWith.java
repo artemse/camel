@@ -24,6 +24,8 @@ import org.apache.camel.model.Model;
 import org.apache.camel.model.ModelCamelContext;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.model.RoutesDefinition;
+import org.apache.camel.spi.ModelToXMLDumper;
+import org.apache.camel.support.PluginHelper;
 import org.apache.camel.util.ObjectHelper;
 import org.apache.camel.util.function.ThrowingConsumer;
 import org.slf4j.Logger;
@@ -197,8 +199,8 @@ public final class AdviceWith {
         ObjectHelper.notNull(builder, "RouteBuilder");
 
         LOG.debug("AdviceWith route before: {}", definition);
-        ExtendedCamelContext ecc = camelContext.adapt(ExtendedCamelContext.class);
-        Model model = camelContext.getExtension(Model.class);
+        ExtendedCamelContext ecc = camelContext.getCamelContextExtension();
+        Model model = camelContext.getCamelContextExtension().getContextPlugin(Model.class);
 
         // inject this route into the advice route builder so it can access this route
         // and offer features to manipulate the route directly
@@ -237,10 +239,11 @@ public final class AdviceWith {
         }
 
         String beforeAsXml = null;
+        final ModelToXMLDumper modelToXMLDumper = PluginHelper.getModelToXMLDumper(ecc);
         if (logRoutesAsXml && LOG.isInfoEnabled()) {
             try {
-                beforeAsXml = ecc.getModelToXMLDumper().dumpModelAsXml(camelContext, definition);
-            } catch (Throwable e) {
+                beforeAsXml = modelToXMLDumper.dumpModelAsXml(camelContext, definition);
+            } catch (Exception e) {
                 // ignore, it may be due jaxb is not on classpath etc
             }
         }
@@ -275,9 +278,9 @@ public final class AdviceWith {
 
         if (beforeAsXml != null && logRoutesAsXml && LOG.isInfoEnabled()) {
             try {
-                String afterAsXml = ecc.getModelToXMLDumper().dumpModelAsXml(camelContext, merged);
+                String afterAsXml = modelToXMLDumper.dumpModelAsXml(camelContext, merged);
                 LOG.info("Adviced route before/after as XML:\n{}\n\n{}", beforeAsXml, afterAsXml);
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 // ignore, it may be due jaxb is not on classpath etc
             }
         }
@@ -290,7 +293,7 @@ public final class AdviceWith {
     }
 
     private static RouteDefinition findRouteDefinition(CamelContext camelContext, Object routeId) {
-        ModelCamelContext mcc = camelContext.adapt(ModelCamelContext.class);
+        ModelCamelContext mcc = (ModelCamelContext) camelContext;
         if (mcc.getRouteDefinitions().isEmpty()) {
             throw new IllegalArgumentException("Cannot advice route as there are no routes");
         }

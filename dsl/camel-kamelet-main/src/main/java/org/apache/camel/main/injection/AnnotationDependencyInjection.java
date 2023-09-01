@@ -18,6 +18,8 @@ package org.apache.camel.main.injection;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
@@ -30,7 +32,6 @@ import org.apache.camel.CamelConfiguration;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Configuration;
 import org.apache.camel.Converter;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.NoSuchBeanException;
 import org.apache.camel.RuntimeCamelException;
@@ -39,8 +40,11 @@ import org.apache.camel.impl.engine.CamelPostProcessorHelper;
 import org.apache.camel.spi.CamelBeanPostProcessor;
 import org.apache.camel.spi.CamelBeanPostProcessorInjector;
 import org.apache.camel.spi.CompilePostProcessor;
+import org.apache.camel.spi.EventNotifier;
+import org.apache.camel.spi.ManagementStrategy;
 import org.apache.camel.spi.Registry;
 import org.apache.camel.spi.TypeConverterRegistry;
+import org.apache.camel.support.PluginHelper;
 import org.apache.camel.util.ObjectHelper;
 import org.apache.camel.util.ReflectionHelper;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -61,10 +65,11 @@ public final class AnnotationDependencyInjection {
 
     public static void initAnnotationBasedDependencyInjection(CamelContext context) {
         Registry registry = context.getRegistry();
-        CamelBeanPostProcessor cbbp = context.adapt(ExtendedCamelContext.class).getBeanPostProcessor();
+        CamelBeanPostProcessor cbbp = PluginHelper.getBeanPostProcessor(context);
 
         // camel / common
         registry.bind("CamelTypeConverterCompilePostProcessor", new TypeConverterCompilePostProcessor());
+        registry.bind("CamelEventNotifierCompilePostProcessor", new EventNotifierCompilePostProcessor());
         registry.bind("CamelBindToRegistryCompilePostProcessor", new BindToRegistryCompilePostProcessor());
         // spring
         registry.bind("SpringAnnotationCompilePostProcessor", new SpringAnnotationCompilePostProcessor());
@@ -97,6 +102,34 @@ public final class AnnotationDependencyInjection {
 
     }
 
+    private static class EventNotifierCompilePostProcessor implements CompilePostProcessor {
+
+        private final Map<String, EventNotifier> notifiers = new HashMap<>();
+
+        @Override
+        public void postCompile(CamelContext camelContext, String name, Class<?> clazz, byte[] byteCode, Object instance)
+                throws Exception {
+            if (instance == null) {
+                return;
+            }
+
+            if (instance instanceof EventNotifier) {
+                ManagementStrategy ms = camelContext.getManagementStrategy();
+                if (ms != null) {
+                    // remove previous instance
+                    EventNotifier old = notifiers.get(name);
+                    if (old != null) {
+                        ms.removeEventNotifier(old);
+                    }
+                    // and new notifier
+                    EventNotifier en = (EventNotifier) instance;
+                    ms.addEventNotifier(en);
+                    notifiers.put(name, en);
+                }
+            }
+        }
+    }
+
     private static class BindToRegistryCompilePostProcessor implements CompilePostProcessor {
 
         @Override
@@ -109,7 +142,7 @@ public final class AnnotationDependencyInjection {
             BindToRegistry bir = instance.getClass().getAnnotation(BindToRegistry.class);
             Configuration cfg = instance.getClass().getAnnotation(Configuration.class);
             if (bir != null || cfg != null || instance instanceof CamelConfiguration) {
-                CamelBeanPostProcessor bpp = camelContext.adapt(ExtendedCamelContext.class).getBeanPostProcessor();
+                CamelBeanPostProcessor bpp = PluginHelper.getBeanPostProcessor(camelContext);
                 if (bir != null && ObjectHelper.isNotEmpty(bir.value())) {
                     name = bir.value();
                 } else if (cfg != null && ObjectHelper.isNotEmpty(cfg.value())) {
@@ -279,7 +312,7 @@ public final class AnnotationDependencyInjection {
     private static void bindBean(CamelContext context, String name, Object instance, boolean postProcess) {
         // to support hot reloading of beans then we need to enable unbind mode in bean post processor
         Registry registry = context.getRegistry();
-        CamelBeanPostProcessor bpp = context.adapt(ExtendedCamelContext.class).getBeanPostProcessor();
+        CamelBeanPostProcessor bpp = PluginHelper.getBeanPostProcessor(context);
         bpp.setUnbindEnabled(true);
         try {
             // re-bind the bean to the registry

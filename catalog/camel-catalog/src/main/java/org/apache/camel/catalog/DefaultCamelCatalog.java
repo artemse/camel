@@ -16,7 +16,6 @@
  */
 package org.apache.camel.catalog;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -31,15 +30,7 @@ import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.PatternSyntaxException;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
-
-import org.w3c.dom.Document;
 
 import org.apache.camel.catalog.impl.AbstractCamelCatalog;
 import org.apache.camel.catalog.impl.CatalogHelper;
@@ -52,7 +43,10 @@ import org.apache.camel.tooling.model.JsonMapper;
 import org.apache.camel.tooling.model.LanguageModel;
 import org.apache.camel.tooling.model.MainModel;
 import org.apache.camel.tooling.model.OtherModel;
+import org.apache.camel.tooling.model.ReleaseModel;
+import org.apache.camel.util.json.JsonArray;
 import org.apache.camel.util.json.JsonObject;
+import org.apache.camel.util.json.Jsoner;
 
 /**
  * Default {@link CamelCatalog}.
@@ -60,9 +54,9 @@ import org.apache.camel.util.json.JsonObject;
 public class DefaultCamelCatalog extends AbstractCamelCatalog implements CamelCatalog {
 
     private static final String MODELS_CATALOG = "org/apache/camel/catalog/models.properties";
-    private static final String ARCHETYPES_CATALOG = "org/apache/camel/catalog/archetypes/archetype-catalog.xml";
     private static final String SCHEMAS_XML = "org/apache/camel/catalog/schemas";
     private static final String MAIN_DIR = "org/apache/camel/catalog/main";
+    private static final String BASE_RESOURCE_DIR = "org/apache/camel/catalog";
 
     private final VersionHelper version = new VersionHelper();
 
@@ -207,7 +201,7 @@ public class DefaultCamelCatalog extends AbstractCamelCatalog implements CamelCa
         return cache("findComponentNames", () -> Stream.of(runtimeProvider.findComponentNames(), extraComponents.keySet())
                 .flatMap(Collection::stream)
                 .sorted()
-                .collect(Collectors.toList()));
+                .toList());
     }
 
     @Override
@@ -215,7 +209,7 @@ public class DefaultCamelCatalog extends AbstractCamelCatalog implements CamelCa
         return cache("findDataFormatNames", () -> Stream.of(runtimeProvider.findDataFormatNames(), extraDataFormats.keySet())
                 .flatMap(Collection::stream)
                 .sorted()
-                .collect(Collectors.toList()));
+                .toList());
     }
 
     @Override
@@ -393,11 +387,6 @@ public class DefaultCamelCatalog extends AbstractCamelCatalog implements CamelCa
     }
 
     @Override
-    public String archetypeCatalogAsXml() {
-        return cache(ARCHETYPES_CATALOG, this::loadResource);
-    }
-
-    @Override
     public String springSchemaAsXml() {
         return cache(SCHEMAS_XML + "/camel-spring.xsd", this::loadResource);
     }
@@ -413,7 +402,7 @@ public class DefaultCamelCatalog extends AbstractCamelCatalog implements CamelCa
                 .map(this::componentJSonSchema)
                 .map(JsonMapper::deserialize)
                 .map(o -> o.get("component"))
-                .collect(Collectors.toList())));
+                .toList()));
     }
 
     @Override
@@ -422,7 +411,7 @@ public class DefaultCamelCatalog extends AbstractCamelCatalog implements CamelCa
                 .map(this::dataFormatJSonSchema)
                 .map(JsonMapper::deserialize)
                 .map(o -> o.get("dataformat"))
-                .collect(Collectors.toList())));
+                .toList()));
     }
 
     @Override
@@ -431,7 +420,7 @@ public class DefaultCamelCatalog extends AbstractCamelCatalog implements CamelCa
                 .map(this::languageJSonSchema)
                 .map(JsonMapper::deserialize)
                 .map(o -> o.get("language"))
-                .collect(Collectors.toList())));
+                .toList()));
     }
 
     @Override
@@ -440,7 +429,7 @@ public class DefaultCamelCatalog extends AbstractCamelCatalog implements CamelCa
                 .map(this::modelJSonSchema)
                 .map(JsonMapper::deserialize)
                 .map(o -> o.get("model"))
-                .collect(Collectors.toList())));
+                .toList()));
     }
 
     @Override
@@ -449,7 +438,7 @@ public class DefaultCamelCatalog extends AbstractCamelCatalog implements CamelCa
                 .map(this::otherJSonSchema)
                 .map(JsonMapper::deserialize)
                 .map(o -> o.get("other"))
-                .collect(Collectors.toList())));
+                .toList()));
     }
 
     @Override
@@ -457,11 +446,11 @@ public class DefaultCamelCatalog extends AbstractCamelCatalog implements CamelCa
         return cache("summaryAsJson", () -> {
             Map<String, Object> obj = new JsonObject();
             obj.put("version", getCatalogVersion());
-            obj.put("eips", findModelNames().size());
+            obj.put("models", findModelNames().size());
             obj.put("components", findComponentNames().size());
             obj.put("dataformats", findDataFormatNames().size());
             obj.put("languages", findLanguageNames().size());
-            obj.put("archetypes", getArchetypesCount());
+            obj.put("others", findOtherNames().size());
             return JsonMapper.serialize(obj);
         });
     }
@@ -495,30 +484,45 @@ public class DefaultCamelCatalog extends AbstractCamelCatalog implements CamelCa
         return null;
     }
 
+    @Override
+    public InputStream loadResource(String kind, String name) {
+        return versionManager.getResourceAsStream(BASE_RESOURCE_DIR + "/" + kind + "/" + name);
+    }
+
+    @Override
+    public List<ReleaseModel> camelReleases() {
+        return camelReleases("camel-releases.json");
+    }
+
+    @Override
+    public List<ReleaseModel> camelQuarkusReleases() {
+        return camelReleases("camel-quarkus-releases.json");
+    }
+
+    private List<ReleaseModel> camelReleases(String file) {
+        return cache(file, () -> {
+            try {
+                List<ReleaseModel> answer = new ArrayList<>();
+                InputStream is = loadResource("releases", file);
+                String json = CatalogHelper.loadText(is);
+                JsonArray arr = (JsonArray) Jsoner.deserialize(json);
+                for (Object o : arr) {
+                    JsonObject jo = (JsonObject) o;
+                    answer.add(JsonMapper.generateReleaseModel(jo));
+                }
+                return answer;
+            } catch (Exception e) {
+                return Collections.emptyList();
+            }
+        });
+    }
+
     private static boolean matchArtifact(ArtifactModel<?> am, String groupId, String artifactId, String version) {
         if (am == null) {
             return false;
         }
         return groupId.equals(am.getGroupId()) && artifactId.equals(am.getArtifactId())
                 && (version == null || version.isBlank() || version.equals(am.getVersion()));
-    }
-
-    private int getArchetypesCount() {
-        int archetypes = 0;
-        try {
-            String xml = archetypeCatalogAsXml();
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
-            dbf.setFeature("http://apache.org/xml/features/disallow-doctype-decl", Boolean.TRUE);
-            Document dom = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(xml.getBytes()));
-            Object val = XPathFactory.newInstance().newXPath().evaluate("count(/archetype-catalog/archetypes/archetype)", dom,
-                    XPathConstants.NUMBER);
-            double num = (double) val;
-            archetypes = (int) num;
-        } catch (Exception e) {
-            // ignore
-        }
-        return archetypes;
     }
 
     @SuppressWarnings("unchecked")
@@ -576,7 +580,5 @@ public class DefaultCamelCatalog extends AbstractCamelCatalog implements CamelCa
             return null;
         }
     }
-
-    // CHECKSTYLE:ON
 
 }

@@ -430,6 +430,10 @@ public final class JsonMapper {
 
     private static void parseOption(JsonObject mp, BaseOptionModel option, String name) {
         option.setName(name);
+        Integer idx = mp.getInteger("index");
+        if (idx != null) {
+            option.setIndex(idx);
+        }
         option.setKind(mp.getString("kind"));
         option.setDisplayName(mp.getString("displayName"));
         option.setGroup(mp.getString("group"));
@@ -453,6 +457,7 @@ public final class JsonMapper {
         option.setDescription(mp.getString("description"));
         option.setGetterMethod(mp.getString("getterMethod"));
         option.setSetterMethod(mp.getString("setterMethod"));
+        option.setSupportFileReference(mp.getBooleanOrDefault("supportFileReference", false));
     }
 
     private static void parseGroup(JsonObject mp, MainGroupModel option) {
@@ -463,7 +468,11 @@ public final class JsonMapper {
 
     public static JsonObject asJsonObject(List<? extends BaseOptionModel> options) {
         JsonObject json = new JsonObject();
-        options.forEach(option -> json.put(option.getName(), asJsonObject(option)));
+        for (int i = 0; i < options.size(); i++) {
+            var o = options.get(i);
+            o.setIndex(i);
+            json.put(o.getName(), asJsonObject(o));
+        }
         return json;
     }
 
@@ -507,6 +516,7 @@ public final class JsonMapper {
 
     public static JsonObject asJsonObject(BaseOptionModel option) {
         JsonObject prop = new JsonObject();
+        prop.put("index", option.getIndex());
         prop.put("kind", option.getKind());
         prop.put("displayName", option.getDisplayName());
         prop.put("group", option.getGroup());
@@ -524,6 +534,10 @@ public final class JsonMapper {
         prop.put("autowired", option.isAutowired());
         prop.put("secret", option.isSecret());
         prop.put("defaultValue", option.getDefaultValue());
+        if (option.isSupportFileReference()) {
+            // only include if supported to not regen all files
+            prop.put("supportFileReference", option.isSupportFileReference());
+        }
         prop.put("asPredicate", option.isAsPredicate());
         prop.put("configurationClass", option.getConfigurationClass());
         prop.put("configurationField", option.getConfigurationField());
@@ -604,6 +618,32 @@ public final class JsonMapper {
         }
         json.put("properties", props);
         return json;
+    }
+
+    public static JsonObject asJsonObject(ReleaseModel model) {
+        JsonObject json = new JsonObject();
+        json.put("version", model.getVersion());
+        json.put("date", model.getDate());
+        if (model.getEol() != null) {
+            json.put("eol", model.getEol());
+        }
+        if (model.getKind() != null) {
+            json.put("kind", model.getKind());
+        }
+        if (model.getJdk() != null) {
+            json.put("jdk", model.getJdk());
+        }
+        return json;
+    }
+
+    public static ReleaseModel generateReleaseModel(JsonObject obj) {
+        ReleaseModel model = new ReleaseModel();
+        model.setVersion(obj.getString("version"));
+        model.setDate(obj.getString("date"));
+        model.setEol(obj.getString("eol"));
+        model.setKind(obj.getString("kind"));
+        model.setJdk(obj.getString("jdk"));
+        return model;
     }
 
     public static String createJsonSchema(MainModel model) {

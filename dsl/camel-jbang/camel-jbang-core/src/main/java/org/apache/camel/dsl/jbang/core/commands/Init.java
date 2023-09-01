@@ -26,9 +26,10 @@ import java.util.StringJoiner;
 import org.apache.camel.CamelContext;
 import org.apache.camel.dsl.jbang.core.commands.catalog.KameletCatalogHelper;
 import org.apache.camel.dsl.jbang.core.common.ResourceDoesNotExist;
+import org.apache.camel.dsl.jbang.core.common.VersionHelper;
 import org.apache.camel.github.GistResourceResolver;
 import org.apache.camel.github.GitHubResourceResolver;
-import org.apache.camel.impl.lw.LightweightCamelContext;
+import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.spi.Resource;
 import org.apache.camel.util.FileUtil;
 import org.apache.camel.util.IOHelper;
@@ -41,41 +42,38 @@ import static org.apache.camel.dsl.jbang.core.common.GistHelper.fetchGistUrls;
 import static org.apache.camel.dsl.jbang.core.common.GitHubHelper.asGithubSingleUrl;
 import static org.apache.camel.dsl.jbang.core.common.GitHubHelper.fetchGithubUrls;
 
-@Command(name = "init", description = "Creates a new Camel integration")
-class Init extends CamelCommand {
+@Command(name = "init", description = "Creates a new Camel integration",
+         sortOptions = false)
+public class Init extends CamelCommand {
 
     @Parameters(description = "Name of integration file (or a github link)", arity = "1",
                 paramLabel = "<file>", parameterConsumer = FileConsumer.class)
     private Path filePath; // Defined only for file path completion; the field never used
-
     private String file;
+
+    @Option(names = {
+            "--dir",
+            "--directory" }, description = "Directory where the project will be saved", defaultValue = ".")
+    private String directory;
+
+    @Option(names = { "--from-kamelet" },
+            description = "To be used when extending an existing Kamelet")
+    private String fromKamelet;
+
+    @Option(names = {
+            "--kamelets-version" }, description = "Apache Camel Kamelets version")
+    private String kameletsVersion;
 
     @Option(names = { "--integration" },
             description = "When creating a yaml file should it be created as a Camel K Integration CRD")
     private boolean integration;
-
-    @Option(names = { "--from-kamelet" },
-            description = "To be used for extending an existing Kamelet")
-    private String fromKamelet;
-
-    @Option(names = {
-            "--kamelets-version" }, description = "Apache Camel Kamelets version", defaultValue = "3.20.1.1")
-    private String kameletsVersion;
-
-    @Option(names = {
-            "-dir",
-            "--directory" }, description = "Directory where the project will be saved", defaultValue = ".")
-    private String directory;
 
     public Init(CamelJBangMain main) {
         super(main);
     }
 
     @Override
-    public Integer call() throws Exception {
-        // configure logging first
-        configureLoggingOff();
-
+    public Integer doCall() throws Exception {
         // is the file referring to an existing file on github/gist
         // then we should download the file to local for use
         if (file.startsWith("https://github.com/")) {
@@ -98,6 +96,9 @@ class Init extends CamelCommand {
         InputStream is = null;
         if ("kamelet.yaml".equals(ext)) {
             if (fromKamelet != null) {
+                if (kameletsVersion == null) {
+                    kameletsVersion = VersionHelper.extractKameletsVersion();
+                }
                 // load existing kamelet
                 is = KameletCatalogHelper.loadKameletYamlSchema(fromKamelet, kameletsVersion);
             } else if (file.contains("source")) {
@@ -107,6 +108,9 @@ class Init extends CamelCommand {
             } else {
                 ext = "kamelet-action.yaml";
             }
+        } else if (ext != null && (ext.startsWith("camel.yaml") || ext.startsWith("camel.xml"))) {
+            // we allow xxx.camel.yaml / xxx.camel.xml
+            ext = ext.substring(6);
         }
 
         if (is == null) {
@@ -139,7 +143,6 @@ class Init extends CamelCommand {
             StringBuilder sb = new StringBuilder();
             String[] lines = content.split("\n");
             boolean top = true;
-            boolean ann = false;
             for (String line : lines) {
                 // remove top license header
                 if (top && line.startsWith("#")) {
@@ -177,7 +180,7 @@ class Init extends CamelCommand {
                 dir.mkdirs();
             }
 
-            CamelContext tiny = new LightweightCamelContext();
+            CamelContext tiny = new DefaultCamelContext();
             GitHubResourceResolver resolver = new GitHubResourceResolver();
             resolver.setCamelContext(tiny);
             for (String u : all.toString().split(",")) {
@@ -211,7 +214,7 @@ class Init extends CamelCommand {
                 dir.mkdirs();
             }
 
-            CamelContext tiny = new LightweightCamelContext();
+            CamelContext tiny = new DefaultCamelContext();
             GistResourceResolver resolver = new GistResourceResolver();
             resolver.setCamelContext(tiny);
             for (String u : all.toString().split(",")) {
@@ -234,8 +237,7 @@ class Init extends CamelCommand {
     static class FileConsumer extends ParameterConsumer<Init> {
         @Override
         protected void doConsumeParameters(Stack<String> args, Init cmd) {
-            String arg = args.pop();
-            cmd.file = arg;
+            cmd.file = args.pop();
         }
     }
 

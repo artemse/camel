@@ -1326,6 +1326,38 @@ public interface SqlEndpointBuilderFactory {
             return this;
         }
         /**
+         * Factory for creating RowMapper.
+         * 
+         * The option is a:
+         * &lt;code&gt;org.apache.camel.component.sql.RowMapperFactory&lt;/code&gt; type.
+         * 
+         * Group: advanced
+         * 
+         * @param rowMapperFactory the value to set
+         * @return the dsl builder
+         */
+        default AdvancedSqlEndpointConsumerBuilder rowMapperFactory(
+                org.apache.camel.component.sql.RowMapperFactory rowMapperFactory) {
+            doSetProperty("rowMapperFactory", rowMapperFactory);
+            return this;
+        }
+        /**
+         * Factory for creating RowMapper.
+         * 
+         * The option will be converted to a
+         * &lt;code&gt;org.apache.camel.component.sql.RowMapperFactory&lt;/code&gt; type.
+         * 
+         * Group: advanced
+         * 
+         * @param rowMapperFactory the value to set
+         * @return the dsl builder
+         */
+        default AdvancedSqlEndpointConsumerBuilder rowMapperFactory(
+                String rowMapperFactory) {
+            doSetProperty("rowMapperFactory", rowMapperFactory);
+            return this;
+        }
+        /**
          * Configures the Spring JdbcTemplate with the key/values from the Map.
          * 
          * The option is a: &lt;code&gt;java.util.Map&amp;lt;java.lang.String,
@@ -1900,6 +1932,38 @@ public interface SqlEndpointBuilderFactory {
             return this;
         }
         /**
+         * Factory for creating RowMapper.
+         * 
+         * The option is a:
+         * &lt;code&gt;org.apache.camel.component.sql.RowMapperFactory&lt;/code&gt; type.
+         * 
+         * Group: advanced
+         * 
+         * @param rowMapperFactory the value to set
+         * @return the dsl builder
+         */
+        default AdvancedSqlEndpointProducerBuilder rowMapperFactory(
+                org.apache.camel.component.sql.RowMapperFactory rowMapperFactory) {
+            doSetProperty("rowMapperFactory", rowMapperFactory);
+            return this;
+        }
+        /**
+         * Factory for creating RowMapper.
+         * 
+         * The option will be converted to a
+         * &lt;code&gt;org.apache.camel.component.sql.RowMapperFactory&lt;/code&gt; type.
+         * 
+         * Group: advanced
+         * 
+         * @param rowMapperFactory the value to set
+         * @return the dsl builder
+         */
+        default AdvancedSqlEndpointProducerBuilder rowMapperFactory(
+                String rowMapperFactory) {
+            doSetProperty("rowMapperFactory", rowMapperFactory);
+            return this;
+        }
+        /**
          * Configures the Spring JdbcTemplate with the key/values from the Map.
          * 
          * The option is a: &lt;code&gt;java.util.Map&amp;lt;java.lang.String,
@@ -2321,6 +2385,38 @@ public interface SqlEndpointBuilderFactory {
             return this;
         }
         /**
+         * Factory for creating RowMapper.
+         * 
+         * The option is a:
+         * &lt;code&gt;org.apache.camel.component.sql.RowMapperFactory&lt;/code&gt; type.
+         * 
+         * Group: advanced
+         * 
+         * @param rowMapperFactory the value to set
+         * @return the dsl builder
+         */
+        default AdvancedSqlEndpointBuilder rowMapperFactory(
+                org.apache.camel.component.sql.RowMapperFactory rowMapperFactory) {
+            doSetProperty("rowMapperFactory", rowMapperFactory);
+            return this;
+        }
+        /**
+         * Factory for creating RowMapper.
+         * 
+         * The option will be converted to a
+         * &lt;code&gt;org.apache.camel.component.sql.RowMapperFactory&lt;/code&gt; type.
+         * 
+         * Group: advanced
+         * 
+         * @param rowMapperFactory the value to set
+         * @return the dsl builder
+         */
+        default AdvancedSqlEndpointBuilder rowMapperFactory(
+                String rowMapperFactory) {
+            doSetProperty("rowMapperFactory", rowMapperFactory);
+            return this;
+        }
+        /**
          * Configures the Spring JdbcTemplate with the key/values from the Map.
          * 
          * The option is a: &lt;code&gt;java.util.Map&amp;lt;java.lang.String,
@@ -2399,7 +2495,7 @@ public interface SqlEndpointBuilderFactory {
          * SQL (camel-sql)
          * Perform SQL queries using Spring JDBC.
          * 
-         * Category: database,sql
+         * Category: database
          * Since: 1.4
          * Maven coordinates: org.apache.camel:camel-sql
          * 
@@ -2412,7 +2508,7 @@ public interface SqlEndpointBuilderFactory {
          * SQL (camel-sql)
          * Perform SQL queries using Spring JDBC.
          * 
-         * Category: database,sql
+         * Category: database
          * Since: 1.4
          * Maven coordinates: org.apache.camel:camel-sql
          * 
@@ -2421,6 +2517,8 @@ public interface SqlEndpointBuilderFactory {
          * Path parameter: query (required)
          * Sets the SQL query to perform. You can externalize the query by using
          * file: or classpath: as prefix and specify the location of the file.
+         * This option can also be loaded from an existing file, by prefixing
+         * with file: or classpath: followed by the location of the file.
          * 
          * @param path query
          * @return the dsl builder
@@ -2432,7 +2530,7 @@ public interface SqlEndpointBuilderFactory {
          * SQL (camel-sql)
          * Perform SQL queries using Spring JDBC.
          * 
-         * Category: database,sql
+         * Category: database
          * Since: 1.4
          * Maven coordinates: org.apache.camel:camel-sql
          * 
@@ -2441,6 +2539,8 @@ public interface SqlEndpointBuilderFactory {
          * Path parameter: query (required)
          * Sets the SQL query to perform. You can externalize the query by using
          * file: or classpath: as prefix and specify the location of the file.
+         * This option can also be loaded from an existing file, by prefixing
+         * with file: or classpath: followed by the location of the file.
          * 
          * @param componentName to use a custom component name for the endpoint
          * instead of the default name

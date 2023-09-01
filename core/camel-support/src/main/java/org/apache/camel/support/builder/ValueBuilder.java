@@ -29,7 +29,7 @@ import org.apache.camel.Predicate;
  * A builder of expressions or predicates based on values.
  */
 public class ValueBuilder implements Expression, Predicate {
-    private Expression expression;
+    private final Expression expression;
     private boolean not;
 
     public ValueBuilder(Expression expression) {
@@ -134,7 +134,7 @@ public class ValueBuilder implements Expression, Predicate {
             Predicate predicate = onNewPredicate(PredicateBuilder.isEqualTo(expression, right));
             predicates.add(predicate);
         }
-        return in(predicates.toArray(new Predicate[predicates.size()]));
+        return in(predicates.toArray(new Predicate[0]));
     }
 
     public Predicate in(Predicate... predicates) {
@@ -186,7 +186,7 @@ public class ValueBuilder implements Expression, Predicate {
     }
 
     public ValueBuilder tokenize(String token, int group, boolean skipFirst) {
-        return tokenize(token, "" + group, skipFirst);
+        return tokenize(token, Integer.toString(group), skipFirst);
     }
 
     public ValueBuilder tokenize(String token, String group, boolean skipFirst) {

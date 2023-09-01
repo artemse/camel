@@ -612,6 +612,40 @@ public interface DebeziumOracleEndpointBuilderFactory {
             return this;
         }
         /**
+         * The maximum number of retries on connection errors before failing (-1
+         * = no limit, 0 = disabled, 0 = num of retries).
+         * 
+         * The option is a: &lt;code&gt;int&lt;/code&gt; type.
+         * 
+         * Default: -1
+         * Group: oracle
+         * 
+         * @param errorsMaxRetries the value to set
+         * @return the dsl builder
+         */
+        default DebeziumOracleEndpointBuilder errorsMaxRetries(
+                int errorsMaxRetries) {
+            doSetProperty("errorsMaxRetries", errorsMaxRetries);
+            return this;
+        }
+        /**
+         * The maximum number of retries on connection errors before failing (-1
+         * = no limit, 0 = disabled, 0 = num of retries).
+         * 
+         * The option will be converted to a &lt;code&gt;int&lt;/code&gt; type.
+         * 
+         * Default: -1
+         * Group: oracle
+         * 
+         * @param errorsMaxRetries the value to set
+         * @return the dsl builder
+         */
+        default DebeziumOracleEndpointBuilder errorsMaxRetries(
+                String errorsMaxRetries) {
+            doSetProperty("errorsMaxRetries", errorsMaxRetries);
+            return this;
+        }
+        /**
          * Specify how failures during processing of events (i.e. when
          * encountering a corrupted event) should be handled, including: 'fail'
          * (the default) an exception indicating the problematic event and its
@@ -1237,6 +1271,87 @@ public interface DebeziumOracleEndpointBuilderFactory {
             return this;
         }
         /**
+         * The name of the flush table used by the connector, defaults to
+         * LOG_MINING_FLUSH.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Default: LOG_MINING_FLUSH
+         * Group: oracle
+         * 
+         * @param logMiningFlushTableName the value to set
+         * @return the dsl builder
+         */
+        default DebeziumOracleEndpointBuilder logMiningFlushTableName(
+                String logMiningFlushTableName) {
+            doSetProperty("logMiningFlushTableName", logMiningFlushTableName);
+            return this;
+        }
+        /**
+         * Specifies how the filter configuration is applied to the LogMiner
+         * database query. none - The query does not apply any schema or table
+         * filters, all filtering is at runtime by the connector. in - The query
+         * uses SQL in-clause expressions to specify the schema or table
+         * filters. regex - The query uses Oracle REGEXP_LIKE expressions to
+         * specify the schema or table filters.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Default: none
+         * Group: oracle
+         * 
+         * @param logMiningQueryFilterMode the value to set
+         * @return the dsl builder
+         */
+        default DebeziumOracleEndpointBuilder logMiningQueryFilterMode(
+                String logMiningQueryFilterMode) {
+            doSetProperty("logMiningQueryFilterMode", logMiningQueryFilterMode);
+            return this;
+        }
+        /**
+         * Debezium opens a database connection and keeps that connection open
+         * throughout the entire streaming phase. In some situations, this can
+         * lead to excessive SGA memory usage. By setting this option to 'true'
+         * (the default is 'false'), the connector will close and re-open a
+         * database connection after every detected log switch or if the
+         * log.mining.session.max.ms has been reached.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: false
+         * Group: oracle
+         * 
+         * @param logMiningRestartConnection the value to set
+         * @return the dsl builder
+         */
+        default DebeziumOracleEndpointBuilder logMiningRestartConnection(
+                boolean logMiningRestartConnection) {
+            doSetProperty("logMiningRestartConnection", logMiningRestartConnection);
+            return this;
+        }
+        /**
+         * Debezium opens a database connection and keeps that connection open
+         * throughout the entire streaming phase. In some situations, this can
+         * lead to excessive SGA memory usage. By setting this option to 'true'
+         * (the default is 'false'), the connector will close and re-open a
+         * database connection after every detected log switch or if the
+         * log.mining.session.max.ms has been reached.
+         * 
+         * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
+         * type.
+         * 
+         * Default: false
+         * Group: oracle
+         * 
+         * @param logMiningRestartConnection the value to set
+         * @return the dsl builder
+         */
+        default DebeziumOracleEndpointBuilder logMiningRestartConnection(
+                String logMiningRestartConnection) {
+            doSetProperty("logMiningRestartConnection", logMiningRestartConnection);
+            return this;
+        }
+        /**
          * Used for SCN gap detection, if the difference between current SCN and
          * previous end SCN is bigger than this value, and the time difference
          * of current SCN and previous end SCN is smaller than
@@ -1515,37 +1630,39 @@ public interface DebeziumOracleEndpointBuilderFactory {
             return this;
         }
         /**
-         * Hours to keep long running transactions in transaction buffer between
-         * log mining sessions. By default, all transactions are retained.
+         * Duration in milliseconds to keep long running transactions in
+         * transaction buffer between log mining sessions. By default, all
+         * transactions are retained.
          * 
          * The option is a: &lt;code&gt;long&lt;/code&gt; type.
          * 
-         * Default: 0
+         * Default: 0ms
          * Group: oracle
          * 
-         * @param logMiningTransactionRetentionHours the value to set
+         * @param logMiningTransactionRetentionMs the value to set
          * @return the dsl builder
          */
-        default DebeziumOracleEndpointBuilder logMiningTransactionRetentionHours(
-                long logMiningTransactionRetentionHours) {
-            doSetProperty("logMiningTransactionRetentionHours", logMiningTransactionRetentionHours);
+        default DebeziumOracleEndpointBuilder logMiningTransactionRetentionMs(
+                long logMiningTransactionRetentionMs) {
+            doSetProperty("logMiningTransactionRetentionMs", logMiningTransactionRetentionMs);
             return this;
         }
         /**
-         * Hours to keep long running transactions in transaction buffer between
-         * log mining sessions. By default, all transactions are retained.
+         * Duration in milliseconds to keep long running transactions in
+         * transaction buffer between log mining sessions. By default, all
+         * transactions are retained.
          * 
          * The option will be converted to a &lt;code&gt;long&lt;/code&gt; type.
          * 
-         * Default: 0
+         * Default: 0ms
          * Group: oracle
          * 
-         * @param logMiningTransactionRetentionHours the value to set
+         * @param logMiningTransactionRetentionMs the value to set
          * @return the dsl builder
          */
-        default DebeziumOracleEndpointBuilder logMiningTransactionRetentionHours(
-                String logMiningTransactionRetentionHours) {
-            doSetProperty("logMiningTransactionRetentionHours", logMiningTransactionRetentionHours);
+        default DebeziumOracleEndpointBuilder logMiningTransactionRetentionMs(
+                String logMiningTransactionRetentionMs) {
+            doSetProperty("logMiningTransactionRetentionMs", logMiningTransactionRetentionMs);
             return this;
         }
         /**
@@ -1561,6 +1678,21 @@ public interface DebeziumOracleEndpointBuilderFactory {
         default DebeziumOracleEndpointBuilder logMiningUsernameExcludeList(
                 String logMiningUsernameExcludeList) {
             doSetProperty("logMiningUsernameExcludeList", logMiningUsernameExcludeList);
+            return this;
+        }
+        /**
+         * Comma separated list of usernames to include from LogMiner query.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: oracle
+         * 
+         * @param logMiningUsernameIncludeList the value to set
+         * @return the dsl builder
+         */
+        default DebeziumOracleEndpointBuilder logMiningUsernameIncludeList(
+                String logMiningUsernameIncludeList) {
+            doSetProperty("logMiningUsernameIncludeList", logMiningUsernameIncludeList);
             return this;
         }
         /**
@@ -1687,6 +1819,37 @@ public interface DebeziumOracleEndpointBuilderFactory {
             return this;
         }
         /**
+         * List of notification channels names that are enabled.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: oracle
+         * 
+         * @param notificationEnabledChannels the value to set
+         * @return the dsl builder
+         */
+        default DebeziumOracleEndpointBuilder notificationEnabledChannels(
+                String notificationEnabledChannels) {
+            doSetProperty("notificationEnabledChannels", notificationEnabledChannels);
+            return this;
+        }
+        /**
+         * The name of the topic for the notifications. This is required in case
+         * 'sink' is in the list of enabled channels.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: oracle
+         * 
+         * @param notificationSinkTopicName the value to set
+         * @return the dsl builder
+         */
+        default DebeziumOracleEndpointBuilder notificationSinkTopicName(
+                String notificationSinkTopicName) {
+            doSetProperty("notificationSinkTopicName", notificationSinkTopicName);
+            return this;
+        }
+        /**
          * Time to wait for new change events to appear after receiving no
          * events, given in milliseconds. Defaults to 500 ms.
          * 
@@ -1754,11 +1917,12 @@ public interface DebeziumOracleEndpointBuilderFactory {
         }
         /**
          * The maximum number of records that should be loaded into memory while
-         * streaming. A value of '0' uses the default JDBC fetch size.
+         * streaming. A value of '0' uses the default JDBC fetch size, defaults
+         * to '2000'.
          * 
          * The option is a: &lt;code&gt;int&lt;/code&gt; type.
          * 
-         * Default: 0
+         * Default: 10000
          * Group: oracle
          * 
          * @param queryFetchSize the value to set
@@ -1770,11 +1934,12 @@ public interface DebeziumOracleEndpointBuilderFactory {
         }
         /**
          * The maximum number of records that should be loaded into memory while
-         * streaming. A value of '0' uses the default JDBC fetch size.
+         * streaming. A value of '0' uses the default JDBC fetch size, defaults
+         * to '2000'.
          * 
          * The option will be converted to a &lt;code&gt;int&lt;/code&gt; type.
          * 
-         * Default: 0
+         * Default: 10000
          * Group: oracle
          * 
          * @param queryFetchSize the value to set
@@ -1831,39 +1996,6 @@ public interface DebeziumOracleEndpointBuilderFactory {
         default DebeziumOracleEndpointBuilder retriableRestartConnectorWaitMs(
                 String retriableRestartConnectorWaitMs) {
             doSetProperty("retriableRestartConnectorWaitMs", retriableRestartConnectorWaitMs);
-            return this;
-        }
-        /**
-         * Whether field names will be sanitized to Avro naming conventions.
-         * 
-         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
-         * 
-         * Default: false
-         * Group: oracle
-         * 
-         * @param sanitizeFieldNames the value to set
-         * @return the dsl builder
-         */
-        default DebeziumOracleEndpointBuilder sanitizeFieldNames(
-                boolean sanitizeFieldNames) {
-            doSetProperty("sanitizeFieldNames", sanitizeFieldNames);
-            return this;
-        }
-        /**
-         * Whether field names will be sanitized to Avro naming conventions.
-         * 
-         * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
-         * type.
-         * 
-         * Default: false
-         * Group: oracle
-         * 
-         * @param sanitizeFieldNames the value to set
-         * @return the dsl builder
-         */
-        default DebeziumOracleEndpointBuilder sanitizeFieldNames(
-                String sanitizeFieldNames) {
-            doSetProperty("sanitizeFieldNames", sanitizeFieldNames);
             return this;
         }
         /**
@@ -1943,6 +2075,47 @@ public interface DebeziumOracleEndpointBuilderFactory {
         }
         /**
          * Controls what DDL will Debezium store in database schema history. By
+         * default (true) only DDL that manipulates a table from captured
+         * schema/database will be stored. If set to false, then Debezium will
+         * store all incoming DDL statements.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: false
+         * Group: oracle
+         * 
+         * @param schemaHistoryInternalStoreOnlyCapturedDatabasesDdl the value
+         * to set
+         * @return the dsl builder
+         */
+        default DebeziumOracleEndpointBuilder schemaHistoryInternalStoreOnlyCapturedDatabasesDdl(
+                boolean schemaHistoryInternalStoreOnlyCapturedDatabasesDdl) {
+            doSetProperty("schemaHistoryInternalStoreOnlyCapturedDatabasesDdl", schemaHistoryInternalStoreOnlyCapturedDatabasesDdl);
+            return this;
+        }
+        /**
+         * Controls what DDL will Debezium store in database schema history. By
+         * default (true) only DDL that manipulates a table from captured
+         * schema/database will be stored. If set to false, then Debezium will
+         * store all incoming DDL statements.
+         * 
+         * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
+         * type.
+         * 
+         * Default: false
+         * Group: oracle
+         * 
+         * @param schemaHistoryInternalStoreOnlyCapturedDatabasesDdl the value
+         * to set
+         * @return the dsl builder
+         */
+        default DebeziumOracleEndpointBuilder schemaHistoryInternalStoreOnlyCapturedDatabasesDdl(
+                String schemaHistoryInternalStoreOnlyCapturedDatabasesDdl) {
+            doSetProperty("schemaHistoryInternalStoreOnlyCapturedDatabasesDdl", schemaHistoryInternalStoreOnlyCapturedDatabasesDdl);
+            return this;
+        }
+        /**
+         * Controls what DDL will Debezium store in database schema history. By
          * default (false) Debezium will store all incoming DDL statements. If
          * set to true, then only DDL that manipulates a captured table will be
          * stored.
@@ -1986,7 +2159,10 @@ public interface DebeziumOracleEndpointBuilderFactory {
          * Specify how schema names should be adjusted for compatibility with
          * the message converter used by the connector, including: 'avro'
          * replaces the characters that cannot be used in the Avro type name
-         * with underscore; 'none' does not apply any adjustment (default).
+         * with underscore; 'avro_unicode' replaces the underscore or characters
+         * that cannot be used in the Avro type name with corresponding unicode
+         * like _uxxxx. Note: _ is an escape sequence like backslash in
+         * Java;'none' does not apply any adjustment (default).
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
@@ -2015,6 +2191,57 @@ public interface DebeziumOracleEndpointBuilderFactory {
         default DebeziumOracleEndpointBuilder signalDataCollection(
                 String signalDataCollection) {
             doSetProperty("signalDataCollection", signalDataCollection);
+            return this;
+        }
+        /**
+         * List of channels names that are enabled. Source channel is enabled by
+         * default.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Default: source
+         * Group: oracle
+         * 
+         * @param signalEnabledChannels the value to set
+         * @return the dsl builder
+         */
+        default DebeziumOracleEndpointBuilder signalEnabledChannels(
+                String signalEnabledChannels) {
+            doSetProperty("signalEnabledChannels", signalEnabledChannels);
+            return this;
+        }
+        /**
+         * Interval for looking for new signals in registered channels, given in
+         * milliseconds. Defaults to 5 seconds.
+         * 
+         * The option is a: &lt;code&gt;long&lt;/code&gt; type.
+         * 
+         * Default: 5s
+         * Group: oracle
+         * 
+         * @param signalPollIntervalMs the value to set
+         * @return the dsl builder
+         */
+        default DebeziumOracleEndpointBuilder signalPollIntervalMs(
+                long signalPollIntervalMs) {
+            doSetProperty("signalPollIntervalMs", signalPollIntervalMs);
+            return this;
+        }
+        /**
+         * Interval for looking for new signals in registered channels, given in
+         * milliseconds. Defaults to 5 seconds.
+         * 
+         * The option will be converted to a &lt;code&gt;long&lt;/code&gt; type.
+         * 
+         * Default: 5s
+         * Group: oracle
+         * 
+         * @param signalPollIntervalMs the value to set
+         * @return the dsl builder
+         */
+        default DebeziumOracleEndpointBuilder signalPollIntervalMs(
+                String signalPollIntervalMs) {
+            doSetProperty("signalPollIntervalMs", signalPollIntervalMs);
             return this;
         }
         /**
@@ -2230,11 +2457,25 @@ public interface DebeziumOracleEndpointBuilderFactory {
         }
         /**
          * The criteria for running a snapshot upon startup of the connector.
-         * Options include: 'initial' (the default) to specify the connector
-         * should run a snapshot only when no offsets are available for the
-         * logical server name; 'schema_only' to specify the connector should
-         * run a snapshot of the schema when no offsets are available for the
-         * logical server name.
+         * Select one of the following snapshot options: 'always': The connector
+         * runs a snapshot every time that it starts. After the snapshot
+         * completes, the connector begins to stream changes from the redo
+         * logs.; 'initial' (default): If the connector does not detect any
+         * offsets for the logical server name, it runs a snapshot that captures
+         * the current full state of the configured tables. After the snapshot
+         * completes, the connector begins to stream changes from the redo logs.
+         * 'initial_only': The connector performs a snapshot as it does for the
+         * 'initial' option, but after the connector completes the snapshot, it
+         * stops, and does not stream changes from the redo logs.;
+         * 'schema_only': If the connector does not detect any offsets for the
+         * logical server name, it runs a snapshot that captures only the schema
+         * (table structures), but not any table data. After the snapshot
+         * completes, the connector begins to stream changes from the redo
+         * logs.; 'schema_only_recovery': The connector performs a snapshot that
+         * captures only the database schema history. The connector then
+         * transitions to streaming from the redo logs. Use this setting to
+         * restore a corrupted or lost database schema history topic. Do not use
+         * if the database schema was modified after the connector stopped.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
@@ -2272,6 +2513,43 @@ public interface DebeziumOracleEndpointBuilderFactory {
         default DebeziumOracleEndpointBuilder snapshotSelectStatementOverrides(
                 String snapshotSelectStatementOverrides) {
             doSetProperty("snapshotSelectStatementOverrides", snapshotSelectStatementOverrides);
+            return this;
+        }
+        /**
+         * Controls the order in which tables are processed in the initial
+         * snapshot. A descending value will order the tables by row count
+         * descending. A ascending value will order the tables by row count
+         * ascending. A value of disabled (the default) will disable ordering by
+         * row count.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Default: disabled
+         * Group: oracle
+         * 
+         * @param snapshotTablesOrderByRowCount the value to set
+         * @return the dsl builder
+         */
+        default DebeziumOracleEndpointBuilder snapshotTablesOrderByRowCount(
+                String snapshotTablesOrderByRowCount) {
+            doSetProperty("snapshotTablesOrderByRowCount", snapshotTablesOrderByRowCount);
+            return this;
+        }
+        /**
+         * The name of the SourceInfoStructMaker class that returns SourceInfo
+         * schema and struct.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Default: io.debezium.connector.oracle.OracleSourceInfoStructMaker
+         * Group: oracle
+         * 
+         * @param sourceinfoStructMaker the value to set
+         * @return the dsl builder
+         */
+        default DebeziumOracleEndpointBuilder sourceinfoStructMaker(
+                String sourceinfoStructMaker) {
+            doSetProperty("sourceinfoStructMaker", sourceinfoStructMaker);
             return this;
         }
         /**
@@ -2559,7 +2837,7 @@ public interface DebeziumOracleEndpointBuilderFactory {
          * Debezium Oracle Connector (camel-debezium-oracle)
          * Capture changes from a Oracle database.
          * 
-         * Category: database,sql
+         * Category: database
          * Since: 3.17
          * Maven coordinates: org.apache.camel:camel-debezium-oracle
          * 
@@ -2572,7 +2850,7 @@ public interface DebeziumOracleEndpointBuilderFactory {
          * Debezium Oracle Connector (camel-debezium-oracle)
          * Capture changes from a Oracle database.
          * 
-         * Category: database,sql
+         * Category: database
          * Since: 3.17
          * Maven coordinates: org.apache.camel:camel-debezium-oracle
          * 
@@ -2592,7 +2870,7 @@ public interface DebeziumOracleEndpointBuilderFactory {
          * Debezium Oracle Connector (camel-debezium-oracle)
          * Capture changes from a Oracle database.
          * 
-         * Category: database,sql
+         * Category: database
          * Since: 3.17
          * Maven coordinates: org.apache.camel:camel-debezium-oracle
          * 

@@ -40,12 +40,6 @@ public class RouteHealthCheck extends AbstractHealthCheck {
     }
 
     @Override
-    public boolean isLiveness() {
-        // this check is only for readiness
-        return false;
-    }
-
-    @Override
     protected void doCall(HealthCheckResultBuilder builder, Map<String, Object> options) {
         if (route.getId() != null) {
             final CamelContext context = route.getCamelContext();
@@ -62,11 +56,8 @@ public class RouteHealthCheck extends AbstractHealthCheck {
                     builder.message(String.format("Route %s has status %s", route.getId(), status.name()));
                 }
             } else {
-                if (!route.isAutoStartup()) {
-                    // if a route is configured to not to automatically start, then the
-                    // route is always up as it is externally managed.
-                    builder.up();
-                } else if (route.getRouteController() == null) {
+                if (route.getRouteController() == null
+                        && Boolean.TRUE == route.getProperties().getOrDefault(Route.SUPERVISED, Boolean.FALSE)) {
                     // the route has no route controller which mean it may be supervised and then failed
                     // all attempts and be exhausted, and if so then we are in unknown status
 
@@ -76,6 +67,13 @@ public class RouteHealthCheck extends AbstractHealthCheck {
                     if (route.getLastError() != null && route.getLastError().isUnhealthy()) {
                         builder.down();
                     }
+                } else if (!route.isAutoStartup()) {
+                    // if a route is configured to not to automatically start, then the
+                    // route is always up as it is externally managed.
+                    builder.up();
+                } else {
+                    // route in unknown state
+                    builder.unknown();
                 }
             }
         }

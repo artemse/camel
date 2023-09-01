@@ -25,16 +25,17 @@ import com.github.freva.asciitable.Column;
 import com.github.freva.asciitable.HorizontalAlign;
 import com.github.freva.asciitable.OverflowBehaviour;
 import org.apache.camel.dsl.jbang.core.commands.CamelJBangMain;
+import org.apache.camel.dsl.jbang.core.common.PidNameAgeCompletionCandidates;
 import org.apache.camel.dsl.jbang.core.common.ProcessHelper;
 import org.apache.camel.util.TimeUtils;
 import org.apache.camel.util.json.JsonObject;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
-@Command(name = "ps", description = "List running Camel integrations")
+@Command(name = "ps", description = "List running Camel integrations", sortOptions = false)
 public class ListProcess extends ProcessWatchCommand {
 
-    @CommandLine.Option(names = { "--sort" },
+    @CommandLine.Option(names = { "--sort" }, completionCandidates = PidNameAgeCompletionCandidates.class,
                         description = "Sort by pid, name or age", defaultValue = "pid")
     String sort;
 
@@ -46,7 +47,7 @@ public class ListProcess extends ProcessWatchCommand {
         super(main);
     }
 
-    protected Integer doCall() throws Exception {
+    protected Integer doProcessWatchCall() throws Exception {
         List<Row> rows = new ArrayList<>();
 
         List<Long> pids = findPids("*");
@@ -56,7 +57,7 @@ public class ListProcess extends ProcessWatchCommand {
                     JsonObject root = loadStatus(ph.pid());
                     if (root != null) {
                         Row row = new Row();
-                        row.pid = "" + ph.pid();
+                        row.pid = Long.toString(ph.pid());
                         row.uptime = extractSince(ph);
                         row.ago = TimeUtils.printSince(row.uptime);
                         JsonObject context = (JsonObject) root.get("context");

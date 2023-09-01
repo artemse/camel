@@ -178,82 +178,6 @@ public interface Translate2EndpointBuilderFactory {
             return this;
         }
         /**
-         * To define a proxy host when instantiating the Translate client.
-         * 
-         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
-         * 
-         * Group: producer
-         * 
-         * @param proxyHost the value to set
-         * @return the dsl builder
-         */
-        default Translate2EndpointBuilder proxyHost(String proxyHost) {
-            doSetProperty("proxyHost", proxyHost);
-            return this;
-        }
-        /**
-         * To define a proxy port when instantiating the Translate client.
-         * 
-         * The option is a: &lt;code&gt;java.lang.Integer&lt;/code&gt; type.
-         * 
-         * Group: producer
-         * 
-         * @param proxyPort the value to set
-         * @return the dsl builder
-         */
-        default Translate2EndpointBuilder proxyPort(Integer proxyPort) {
-            doSetProperty("proxyPort", proxyPort);
-            return this;
-        }
-        /**
-         * To define a proxy port when instantiating the Translate client.
-         * 
-         * The option will be converted to a
-         * &lt;code&gt;java.lang.Integer&lt;/code&gt; type.
-         * 
-         * Group: producer
-         * 
-         * @param proxyPort the value to set
-         * @return the dsl builder
-         */
-        default Translate2EndpointBuilder proxyPort(String proxyPort) {
-            doSetProperty("proxyPort", proxyPort);
-            return this;
-        }
-        /**
-         * To define a proxy protocol when instantiating the Translate client.
-         * 
-         * The option is a:
-         * &lt;code&gt;software.amazon.awssdk.core.Protocol&lt;/code&gt; type.
-         * 
-         * Default: HTTPS
-         * Group: producer
-         * 
-         * @param proxyProtocol the value to set
-         * @return the dsl builder
-         */
-        default Translate2EndpointBuilder proxyProtocol(
-                software.amazon.awssdk.core.Protocol proxyProtocol) {
-            doSetProperty("proxyProtocol", proxyProtocol);
-            return this;
-        }
-        /**
-         * To define a proxy protocol when instantiating the Translate client.
-         * 
-         * The option will be converted to a
-         * &lt;code&gt;software.amazon.awssdk.core.Protocol&lt;/code&gt; type.
-         * 
-         * Default: HTTPS
-         * Group: producer
-         * 
-         * @param proxyProtocol the value to set
-         * @return the dsl builder
-         */
-        default Translate2EndpointBuilder proxyProtocol(String proxyProtocol) {
-            doSetProperty("proxyProtocol", proxyProtocol);
-            return this;
-        }
-        /**
          * The region in which Translate client needs to work. When using this
          * parameter, the configuration will expect the lowercase name of the
          * region (for example ap-east-1) You'll need to use the name
@@ -299,34 +223,139 @@ public interface Translate2EndpointBuilderFactory {
             return this;
         }
         /**
-         * To use a existing configured AWS Translate as client.
+         * Set the overriding uri endpoint. This option needs to be used in
+         * combination with overrideEndpoint option.
          * 
-         * The option is a:
-         * &lt;code&gt;software.amazon.awssdk.services.translate.TranslateClient&lt;/code&gt; type.
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
          * Group: producer
          * 
-         * @param translateClient the value to set
+         * @param uriEndpointOverride the value to set
          * @return the dsl builder
          */
-        default Translate2EndpointBuilder translateClient(
-                software.amazon.awssdk.services.translate.TranslateClient translateClient) {
-            doSetProperty("translateClient", translateClient);
+        default Translate2EndpointBuilder uriEndpointOverride(
+                String uriEndpointOverride) {
+            doSetProperty("uriEndpointOverride", uriEndpointOverride);
             return this;
         }
         /**
-         * To use a existing configured AWS Translate as client.
+         * To define a proxy host when instantiating the Translate client.
          * 
-         * The option will be converted to a
-         * &lt;code&gt;software.amazon.awssdk.services.translate.TranslateClient&lt;/code&gt; type.
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
-         * Group: producer
+         * Group: proxy
          * 
-         * @param translateClient the value to set
+         * @param proxyHost the value to set
          * @return the dsl builder
          */
-        default Translate2EndpointBuilder translateClient(String translateClient) {
-            doSetProperty("translateClient", translateClient);
+        default Translate2EndpointBuilder proxyHost(String proxyHost) {
+            doSetProperty("proxyHost", proxyHost);
+            return this;
+        }
+        /**
+         * To define a proxy port when instantiating the Translate client.
+         * 
+         * The option is a: &lt;code&gt;java.lang.Integer&lt;/code&gt; type.
+         * 
+         * Group: proxy
+         * 
+         * @param proxyPort the value to set
+         * @return the dsl builder
+         */
+        default Translate2EndpointBuilder proxyPort(Integer proxyPort) {
+            doSetProperty("proxyPort", proxyPort);
+            return this;
+        }
+        /**
+         * To define a proxy port when instantiating the Translate client.
+         * 
+         * The option will be converted to a
+         * &lt;code&gt;java.lang.Integer&lt;/code&gt; type.
+         * 
+         * Group: proxy
+         * 
+         * @param proxyPort the value to set
+         * @return the dsl builder
+         */
+        default Translate2EndpointBuilder proxyPort(String proxyPort) {
+            doSetProperty("proxyPort", proxyPort);
+            return this;
+        }
+        /**
+         * To define a proxy protocol when instantiating the Translate client.
+         * 
+         * The option is a:
+         * &lt;code&gt;software.amazon.awssdk.core.Protocol&lt;/code&gt; type.
+         * 
+         * Default: HTTPS
+         * Group: proxy
+         * 
+         * @param proxyProtocol the value to set
+         * @return the dsl builder
+         */
+        default Translate2EndpointBuilder proxyProtocol(
+                software.amazon.awssdk.core.Protocol proxyProtocol) {
+            doSetProperty("proxyProtocol", proxyProtocol);
+            return this;
+        }
+        /**
+         * To define a proxy protocol when instantiating the Translate client.
+         * 
+         * The option will be converted to a
+         * &lt;code&gt;software.amazon.awssdk.core.Protocol&lt;/code&gt; type.
+         * 
+         * Default: HTTPS
+         * Group: proxy
+         * 
+         * @param proxyProtocol the value to set
+         * @return the dsl builder
+         */
+        default Translate2EndpointBuilder proxyProtocol(String proxyProtocol) {
+            doSetProperty("proxyProtocol", proxyProtocol);
+            return this;
+        }
+        /**
+         * Amazon AWS Access Key.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: security
+         * 
+         * @param accessKey the value to set
+         * @return the dsl builder
+         */
+        default Translate2EndpointBuilder accessKey(String accessKey) {
+            doSetProperty("accessKey", accessKey);
+            return this;
+        }
+        /**
+         * If using a profile credentials provider this parameter will set the
+         * profile name.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: security
+         * 
+         * @param profileCredentialsName the value to set
+         * @return the dsl builder
+         */
+        default Translate2EndpointBuilder profileCredentialsName(
+                String profileCredentialsName) {
+            doSetProperty("profileCredentialsName", profileCredentialsName);
+            return this;
+        }
+        /**
+         * Amazon AWS Secret Key.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: security
+         * 
+         * @param secretKey the value to set
+         * @return the dsl builder
+         */
+        default Translate2EndpointBuilder secretKey(String secretKey) {
+            doSetProperty("secretKey", secretKey);
             return this;
         }
         /**
@@ -336,7 +365,7 @@ public interface Translate2EndpointBuilderFactory {
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
          * Default: false
-         * Group: producer
+         * Group: security
          * 
          * @param trustAllCertificates the value to set
          * @return the dsl builder
@@ -354,7 +383,7 @@ public interface Translate2EndpointBuilderFactory {
          * type.
          * 
          * Default: false
-         * Group: producer
+         * Group: security
          * 
          * @param trustAllCertificates the value to set
          * @return the dsl builder
@@ -365,22 +394,6 @@ public interface Translate2EndpointBuilderFactory {
             return this;
         }
         /**
-         * Set the overriding uri endpoint. This option needs to be used in
-         * combination with overrideEndpoint option.
-         * 
-         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
-         * 
-         * Group: producer
-         * 
-         * @param uriEndpointOverride the value to set
-         * @return the dsl builder
-         */
-        default Translate2EndpointBuilder uriEndpointOverride(
-                String uriEndpointOverride) {
-            doSetProperty("uriEndpointOverride", uriEndpointOverride);
-            return this;
-        }
-        /**
          * Set whether the Translate client should expect to load credentials
          * through a default credentials provider or to expect static
          * credentials to be passed in.
@@ -388,7 +401,7 @@ public interface Translate2EndpointBuilderFactory {
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
          * Default: false
-         * Group: producer
+         * Group: security
          * 
          * @param useDefaultCredentialsProvider the value to set
          * @return the dsl builder
@@ -407,7 +420,7 @@ public interface Translate2EndpointBuilderFactory {
          * type.
          * 
          * Default: false
-         * Group: producer
+         * Group: security
          * 
          * @param useDefaultCredentialsProvider the value to set
          * @return the dsl builder
@@ -418,31 +431,38 @@ public interface Translate2EndpointBuilderFactory {
             return this;
         }
         /**
-         * Amazon AWS Access Key.
+         * Set whether the Translate client should expect to load credentials
+         * through a profile credentials provider.
          * 
-         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
+         * Default: false
          * Group: security
          * 
-         * @param accessKey the value to set
+         * @param useProfileCredentialsProvider the value to set
          * @return the dsl builder
          */
-        default Translate2EndpointBuilder accessKey(String accessKey) {
-            doSetProperty("accessKey", accessKey);
+        default Translate2EndpointBuilder useProfileCredentialsProvider(
+                boolean useProfileCredentialsProvider) {
+            doSetProperty("useProfileCredentialsProvider", useProfileCredentialsProvider);
             return this;
         }
         /**
-         * Amazon AWS Secret Key.
+         * Set whether the Translate client should expect to load credentials
+         * through a profile credentials provider.
          * 
-         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
+         * type.
          * 
+         * Default: false
          * Group: security
          * 
-         * @param secretKey the value to set
+         * @param useProfileCredentialsProvider the value to set
          * @return the dsl builder
          */
-        default Translate2EndpointBuilder secretKey(String secretKey) {
-            doSetProperty("secretKey", secretKey);
+        default Translate2EndpointBuilder useProfileCredentialsProvider(
+                String useProfileCredentialsProvider) {
+            doSetProperty("useProfileCredentialsProvider", useProfileCredentialsProvider);
             return this;
         }
     }
@@ -503,6 +523,38 @@ public interface Translate2EndpointBuilderFactory {
         default AdvancedTranslate2EndpointBuilder lazyStartProducer(
                 String lazyStartProducer) {
             doSetProperty("lazyStartProducer", lazyStartProducer);
+            return this;
+        }
+        /**
+         * To use a existing configured AWS Translate as client.
+         * 
+         * The option is a:
+         * &lt;code&gt;software.amazon.awssdk.services.translate.TranslateClient&lt;/code&gt; type.
+         * 
+         * Group: advanced
+         * 
+         * @param translateClient the value to set
+         * @return the dsl builder
+         */
+        default AdvancedTranslate2EndpointBuilder translateClient(
+                software.amazon.awssdk.services.translate.TranslateClient translateClient) {
+            doSetProperty("translateClient", translateClient);
+            return this;
+        }
+        /**
+         * To use a existing configured AWS Translate as client.
+         * 
+         * The option will be converted to a
+         * &lt;code&gt;software.amazon.awssdk.services.translate.TranslateClient&lt;/code&gt; type.
+         * 
+         * Group: advanced
+         * 
+         * @param translateClient the value to set
+         * @return the dsl builder
+         */
+        default AdvancedTranslate2EndpointBuilder translateClient(
+                String translateClient) {
+            doSetProperty("translateClient", translateClient);
             return this;
         }
     }

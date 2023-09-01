@@ -46,7 +46,7 @@ public class DefaultConsumerCache extends ServiceSupport implements ConsumerCach
 
     private EndpointUtilizationStatistics statistics;
     private boolean extendedStatistics;
-    private int maxCacheSize;
+    private final int maxCacheSize;
 
     public DefaultConsumerCache(Object source, CamelContext camelContext, int cacheSize) {
         this.source = source;
@@ -103,7 +103,7 @@ public class DefaultConsumerCache extends ServiceSupport implements ConsumerCach
                 statistics.onHit(endpoint.getEndpointUri());
             }
             return consumer;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new FailedToCreateConsumerException(endpoint, e);
         }
     }

@@ -21,11 +21,11 @@ import java.lang.reflect.Modifier;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.CamelContextAware;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.RuntimeCamelException;
 import org.apache.camel.spi.CamelBeanPostProcessor;
 import org.apache.camel.spi.Injector;
 import org.apache.camel.support.ObjectHelper;
+import org.apache.camel.support.PluginHelper;
 
 /**
  * A default implementation of {@link Injector} which just uses reflection to instantiate new objects using their zero
@@ -39,7 +39,7 @@ public class DefaultInjector implements Injector {
 
     public DefaultInjector(CamelContext context) {
         this.camelContext = context;
-        this.postProcessor = context.adapt(ExtendedCamelContext.class).getBeanPostProcessor();
+        this.postProcessor = PluginHelper.getBeanPostProcessor(camelContext);
     }
 
     @Override

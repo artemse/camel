@@ -24,7 +24,6 @@ import java.util.function.Supplier;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.spi.HeadersMapFactory;
 
 /**
@@ -47,7 +46,7 @@ public class DefaultMessage extends MessageSupport {
     }
 
     public DefaultMessage(CamelContext camelContext) {
-        this.camelContext = (ExtendedCamelContext) camelContext;
+        this.camelContext = camelContext;
         this.typeConverter = camelContext.getTypeConverter();
     }
 
@@ -284,13 +283,13 @@ public class DefaultMessage extends MessageSupport {
 
     @Override
     public void setHeaders(Map<String, Object> headers) {
-        HeadersMapFactory factory = camelContext.getHeadersMapFactory();
+        HeadersMapFactory factory = camelContext.getCamelContextExtension().getHeadersMapFactory();
         if (factory != null) {
             if (factory.isInstanceOf(headers)) {
                 this.headers = headers;
             } else {
                 // create a new map
-                this.headers = camelContext.getHeadersMapFactory().newMap(headers);
+                this.headers = camelContext.getCamelContextExtension().getHeadersMapFactory().newMap(headers);
             }
         } else {
             // should not really happen but some tests rely on using camel context that is not started
@@ -321,7 +320,7 @@ public class DefaultMessage extends MessageSupport {
     protected Map<String, Object> createHeaders() {
         Map<String, Object> map;
 
-        HeadersMapFactory factory = camelContext.getHeadersMapFactory();
+        HeadersMapFactory factory = camelContext.getCamelContextExtension().getHeadersMapFactory();
         if (factory != null) {
             map = factory.newMap();
         } else {
@@ -342,24 +341,9 @@ public class DefaultMessage extends MessageSupport {
     }
 
     /**
-     * A strategy for component specific messages to determine whether the message is redelivered or not.
-     * <p/>
-     * <b>Important: </b> It is not always possible to determine if the transacted is a redelivery or not, and therefore
-     * <tt>null</tt> is returned. Such an example would be a JDBC message. However JMS brokers provides details if a
-     * transacted message is redelivered.
-     *
-     * @return <tt>true</tt> if redelivered, <tt>false</tt> if not, <tt>null</tt> if not able to determine
-     */
-    protected Boolean isTransactedRedelivered() {
-        // return null by default
-        return null;
-    }
-
-    /**
      * Returns true if the headers have been mutated in some way
      */
     protected boolean hasPopulatedHeaders() {
         return headers != null;
     }
-
 }

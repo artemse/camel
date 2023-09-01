@@ -42,19 +42,15 @@ import org.apache.camel.util.ObjectHelper;
 import org.apache.camel.util.PropertiesHelper;
 import org.springframework.orm.jpa.LocalEntityManagerFactoryBean;
 import org.springframework.orm.jpa.SharedEntityManagerCreator;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * Store and retrieve Java objects from databases using Java Persistence API (JPA).
  */
 @UriEndpoint(firstVersion = "1.0.0", scheme = "jpa", title = "JPA", syntax = "jpa:entityType",
-             category = { Category.DATABASE, Category.SQL }, headersClass = JpaConstants.class)
+             category = { Category.DATABASE }, headersClass = JpaConstants.class)
 public class JpaEndpoint extends ScheduledPollEndpoint {
 
     private EntityManagerFactory entityManagerFactory;
-    private PlatformTransactionManager transactionManager;
     private TransactionStrategy transactionStrategy;
     private Expression producerExpression;
 
@@ -70,6 +66,8 @@ public class JpaEndpoint extends ScheduledPollEndpoint {
     private boolean sharedEntityManager;
     @UriParam(defaultValue = "-1")
     private int maximumResults = -1;
+    @UriParam(label = "producer", defaultValue = "-1")
+    private int firstResult = -1;
     @UriParam(label = "consumer", defaultValue = "true")
     private boolean consumeDelete = true;
     @UriParam(label = "consumer", defaultValue = "true")
@@ -110,6 +108,10 @@ public class JpaEndpoint extends ScheduledPollEndpoint {
     private Boolean useExecuteUpdate;
     @UriParam(label = "producer")
     private boolean findEntity;
+    @UriParam(label = "producer", defaultValue = "false")
+    private boolean singleResult;
+    @UriParam(label = "producer")
+    private String outputTarget;
 
     @UriParam(label = "advanced", prefix = "emf.", multiValue = true)
     private Map<String, Object> entityManagerProperties;
@@ -209,6 +211,17 @@ public class JpaEndpoint extends ScheduledPollEndpoint {
         this.maximumResults = maximumResults;
     }
 
+    public int getFirstResult() {
+        return firstResult;
+    }
+
+    /**
+     * Set the position of the first result to retrieve.
+     */
+    public void setFirstResult(int firstResult) {
+        this.firstResult = firstResult;
+    }
+
     public Class<?> getEntityType() {
         return entityType;
     }
@@ -232,26 +245,6 @@ public class JpaEndpoint extends ScheduledPollEndpoint {
      */
     public void setEntityManagerFactory(EntityManagerFactory entityManagerFactory) {
         this.entityManagerFactory = entityManagerFactory;
-    }
-
-    public PlatformTransactionManager getTransactionManager() {
-        if (transactionManager == null) {
-            if (transactionStrategy == null) {
-                DefaultTransactionStrategy defaultTransactionStrategy = createTransactionStrategy();
-                transactionStrategy = defaultTransactionStrategy;
-                transactionManager = defaultTransactionStrategy.getTransactionManager();
-            } else if (transactionStrategy instanceof DefaultTransactionStrategy) {
-                transactionManager = ((DefaultTransactionStrategy) transactionStrategy).getTransactionManager();
-            }
-        }
-        return transactionManager;
-    }
-
-    /**
-     * To use the {@link PlatformTransactionManager} for managing transactions.
-     */
-    public void setTransactionManager(PlatformTransactionManager transactionManager) {
-        this.transactionManager = transactionManager;
     }
 
     public TransactionStrategy getTransactionStrategy() {
@@ -544,6 +537,30 @@ public class JpaEndpoint extends ScheduledPollEndpoint {
         this.findEntity = findEntity;
     }
 
+    public boolean isSingleResult() {
+        return singleResult;
+    }
+
+    /**
+     * If enabled, a query or a find which would return no results or more than one result, will throw an exception
+     * instead.
+     */
+    public void setSingleResult(boolean singleResult) {
+        this.singleResult = singleResult;
+    }
+
+    public String getOutputTarget() {
+        return outputTarget;
+    }
+
+    /**
+     * To put the query (or find) result in a header or property instead of the body. If the value starts with the
+     * prefix "property:", put the result into the so named property, otherwise into the header.
+     */
+    public void setOutputTarget(String outputTarget) {
+        this.outputTarget = outputTarget;
+    }
+
     // Implementation methods
     // -------------------------------------------------------------------------
 
@@ -572,15 +589,8 @@ public class JpaEndpoint extends ScheduledPollEndpoint {
         }
     }
 
-    protected TransactionTemplate createTransactionTemplate() {
-        TransactionTemplate transactionTemplate = new TransactionTemplate(getTransactionManager());
-        transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
-        transactionTemplate.afterPropertiesSet();
-        return transactionTemplate;
-    }
-
     protected DefaultTransactionStrategy createTransactionStrategy() {
-        return new DefaultTransactionStrategy(transactionManager, getEntityManagerFactory());
+        return new DefaultTransactionStrategy(getCamelContext(), getEntityManagerFactory());
     }
 
     protected Expression createProducerExpression() {
@@ -614,9 +624,6 @@ public class JpaEndpoint extends ScheduledPollEndpoint {
         }
         if (transactionStrategy == null && getComponent() != null) {
             transactionStrategy = getComponent().getTransactionStrategy();
-        }
-        if (transactionManager == null && getComponent() != null) {
-            transactionManager = getComponent().getTransactionManager();
         }
     }
 }

@@ -55,6 +55,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
+import org.codehaus.plexus.build.BuildContext;
 import org.jboss.forge.roaster.Roaster;
 import org.jboss.forge.roaster._shade.org.eclipse.jdt.core.dom.ASTNode;
 import org.jboss.forge.roaster._shade.org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration;
@@ -62,7 +63,6 @@ import org.jboss.forge.roaster._shade.org.eclipse.jdt.core.dom.Javadoc;
 import org.jboss.forge.roaster.model.source.AnnotationElementSource;
 import org.jboss.forge.roaster.model.source.JavaAnnotationSource;
 import org.mvel2.templates.TemplateRuntime;
-import org.sonatype.plexus.build.incremental.BuildContext;
 
 import static org.apache.camel.tooling.util.PackageHelper.findCamelDirectory;
 
@@ -530,6 +530,7 @@ public class UpdateReadmeMojo extends AbstractGeneratorMojo {
             if (model.isDeprecated()) {
                 newLines.add(":deprecated: *deprecated*");
             }
+            newLines.add(":tabs-sync-option:");
             if (model instanceof ComponentModel) {
                 newLines.add(":component-header: " + generateComponentHeader((ComponentModel) model));
                 if (Arrays.asList(model.getLabel().split(",")).contains("core")) {
@@ -795,8 +796,7 @@ public class UpdateReadmeMojo extends AbstractGeneratorMojo {
     }
 
     private OtherModel generateOtherModel(String json) {
-        OtherModel other = JsonMapper.generateOtherModel(json);
-        return other;
+        return JsonMapper.generateOtherModel(json);
     }
 
     private DataFormatModel generateDataFormatModel(String json) {

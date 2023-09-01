@@ -26,7 +26,7 @@ import org.jolokia.jvmagent.client.util.VirtualMachineHandlerOperations;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
-@Command(name = "jolokia", description = "Attach Jolokia JVM Agent to a running Camel integration")
+@Command(name = "jolokia", description = "Attach Jolokia JVM Agent to a running Camel integration", sortOptions = false)
 public class Jolokia extends ProcessBaseCommand {
 
     @CommandLine.Parameters(description = "Name or pid of running Camel integration", arity = "1")
@@ -43,10 +43,7 @@ public class Jolokia extends ProcessBaseCommand {
     }
 
     @Override
-    public Integer call() throws Exception {
-        // configure logging first
-        configureLoggingOff();
-
+    public Integer doCall() throws Exception {
         List<Long> pids = findPids(name);
         if (pids.isEmpty()) {
             return 0;
@@ -61,11 +58,11 @@ public class Jolokia extends ProcessBaseCommand {
         try {
             OptionsAndArgs options;
             if (stop) {
-                options = new OptionsAndArgs(null, "stop", "" + pid);
+                options = new OptionsAndArgs(null, "stop", Long.toString(pid));
             } else {
                 // find a new free port to use when starting a new connection
                 long port = AvailablePortFinder.getNextAvailable(8778, 10000);
-                options = new OptionsAndArgs(null, "--port", "" + port, "start", "" + pid);
+                options = new OptionsAndArgs(null, "--port", Long.toString(port), "start", Long.toString(pid));
             }
             VirtualMachineHandlerOperations vmHandler = PlatformUtils.createVMAccess(options);
             CommandDispatcher dispatcher = new CommandDispatcher(options);

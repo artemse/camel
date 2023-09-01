@@ -31,30 +31,30 @@ public class Sns2Configuration implements Cloneable {
 
     // Common properties
     private String topicName;
-    @UriParam
+    @UriParam(label = "advanced")
     @Metadata(autowired = true)
     private SnsClient amazonSNSClient;
     @UriParam(label = "security", secret = true)
     private String accessKey;
     @UriParam(label = "security", secret = true)
     private String secretKey;
-    @UriParam(enums = "HTTP,HTTPS", defaultValue = "HTTPS")
+    @UriParam(label = "proxy", enums = "HTTP,HTTPS", defaultValue = "HTTPS")
     private Protocol proxyProtocol = Protocol.HTTPS;
-    @UriParam
+    @UriParam(label = "proxy")
     private String proxyHost;
-    @UriParam
+    @UriParam(label = "proxy")
     private Integer proxyPort;
     @UriParam
-    private String queueUrl;
+    private String queueArn;
     @UriParam
     private boolean subscribeSNStoSQS;
     @UriParam
     private String kmsMasterKeyId;
     @UriParam
     private boolean serverSideEncryptionEnabled;
-    @UriParam(defaultValue = "false")
+    @UriParam
     private boolean autoCreateTopic;
-    @UriParam(defaultValue = "false")
+    @UriParam
     private boolean overrideEndpoint;
     @UriParam
     private String uriEndpointOverride;
@@ -63,15 +63,20 @@ public class Sns2Configuration implements Cloneable {
     @UriParam
     private String subject;
     @UriParam
+    @Metadata(supportFileReference = true)
     private String policy;
     @UriParam
     private String messageStructure;
     @UriParam
     private String region;
-    @UriParam(defaultValue = "false")
+    @UriParam(label = "security")
     private boolean trustAllCertificates;
-    @UriParam(defaultValue = "false")
+    @UriParam(label = "security")
     private boolean useDefaultCredentialsProvider;
+    @UriParam(label = "security")
+    private boolean useProfileCredentialsProvider;
+    @UriParam(label = "security")
+    private String profileCredentialsName;
     @UriParam(label = "producer", javaType = "java.lang.String", enums = "useConstant,useExchangeId,usePropertyValue")
     private MessageGroupIdStrategy messageGroupIdStrategy;
     @UriParam(label = "producer", javaType = "java.lang.String", defaultValue = "useExchangeId",
@@ -212,15 +217,15 @@ public class Sns2Configuration implements Cloneable {
         this.region = region;
     }
 
-    public String getQueueUrl() {
-        return queueUrl;
+    public String getQueueArn() {
+        return queueArn;
     }
 
     /**
-     * The queueUrl to subscribe to
+     * The ARN endpoint to subscribe to
      */
-    public void setQueueUrl(String queueUrl) {
-        this.queueUrl = queueUrl;
+    public void setQueueArn(String queueArn) {
+        this.queueArn = queueArn;
     }
 
     public boolean isSubscribeSNStoSQS() {
@@ -288,6 +293,28 @@ public class Sns2Configuration implements Cloneable {
      */
     public void setUseDefaultCredentialsProvider(boolean useDefaultCredentialsProvider) {
         this.useDefaultCredentialsProvider = useDefaultCredentialsProvider;
+    }
+
+    /**
+     * Set whether the SNS client should expect to load credentials through a profile credentials provider.
+     */
+    public void setUseProfileCredentialsProvider(boolean useProfileCredentialsProvider) {
+        this.useProfileCredentialsProvider = useProfileCredentialsProvider;
+    }
+
+    public boolean isUseProfileCredentialsProvider() {
+        return useProfileCredentialsProvider;
+    }
+
+    public String getProfileCredentialsName() {
+        return profileCredentialsName;
+    }
+
+    /**
+     * If using a profile credentials provider this parameter will set the profile name
+     */
+    public void setProfileCredentialsName(String profileCredentialsName) {
+        this.profileCredentialsName = profileCredentialsName;
     }
 
     /**

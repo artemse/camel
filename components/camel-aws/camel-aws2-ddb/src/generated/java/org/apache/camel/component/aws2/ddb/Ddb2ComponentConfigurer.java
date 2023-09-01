@@ -39,6 +39,10 @@ public class Ddb2ComponentConfigurer extends PropertyConfigurerSupport implement
         case "consistentRead": getOrCreateConfiguration(target).setConsistentRead(property(camelContext, boolean.class, value)); return true;
         case "enabledinitialdescribetable":
         case "enabledInitialDescribeTable": getOrCreateConfiguration(target).setEnabledInitialDescribeTable(property(camelContext, boolean.class, value)); return true;
+        case "healthcheckconsumerenabled":
+        case "healthCheckConsumerEnabled": target.setHealthCheckConsumerEnabled(property(camelContext, boolean.class, value)); return true;
+        case "healthcheckproducerenabled":
+        case "healthCheckProducerEnabled": target.setHealthCheckProducerEnabled(property(camelContext, boolean.class, value)); return true;
         case "keyattributename":
         case "keyAttributeName": getOrCreateConfiguration(target).setKeyAttributeName(property(camelContext, java.lang.String.class, value)); return true;
         case "keyattributetype":
@@ -50,6 +54,8 @@ public class Ddb2ComponentConfigurer extends PropertyConfigurerSupport implement
         case "operation": getOrCreateConfiguration(target).setOperation(property(camelContext, org.apache.camel.component.aws2.ddb.Ddb2Operations.class, value)); return true;
         case "overrideendpoint":
         case "overrideEndpoint": getOrCreateConfiguration(target).setOverrideEndpoint(property(camelContext, boolean.class, value)); return true;
+        case "profilecredentialsname":
+        case "profileCredentialsName": getOrCreateConfiguration(target).setProfileCredentialsName(property(camelContext, java.lang.String.class, value)); return true;
         case "proxyhost":
         case "proxyHost": getOrCreateConfiguration(target).setProxyHost(property(camelContext, java.lang.String.class, value)); return true;
         case "proxyport":
@@ -67,6 +73,8 @@ public class Ddb2ComponentConfigurer extends PropertyConfigurerSupport implement
         case "uriEndpointOverride": getOrCreateConfiguration(target).setUriEndpointOverride(property(camelContext, java.lang.String.class, value)); return true;
         case "usedefaultcredentialsprovider":
         case "useDefaultCredentialsProvider": getOrCreateConfiguration(target).setUseDefaultCredentialsProvider(property(camelContext, boolean.class, value)); return true;
+        case "useprofilecredentialsprovider":
+        case "useProfileCredentialsProvider": getOrCreateConfiguration(target).setUseProfileCredentialsProvider(property(camelContext, boolean.class, value)); return true;
         case "writecapacity":
         case "writeCapacity": getOrCreateConfiguration(target).setWriteCapacity(property(camelContext, java.lang.Long.class, value)); return true;
         default: return false;
@@ -92,6 +100,10 @@ public class Ddb2ComponentConfigurer extends PropertyConfigurerSupport implement
         case "consistentRead": return boolean.class;
         case "enabledinitialdescribetable":
         case "enabledInitialDescribeTable": return boolean.class;
+        case "healthcheckconsumerenabled":
+        case "healthCheckConsumerEnabled": return boolean.class;
+        case "healthcheckproducerenabled":
+        case "healthCheckProducerEnabled": return boolean.class;
         case "keyattributename":
         case "keyAttributeName": return java.lang.String.class;
         case "keyattributetype":
@@ -103,6 +115,8 @@ public class Ddb2ComponentConfigurer extends PropertyConfigurerSupport implement
         case "operation": return org.apache.camel.component.aws2.ddb.Ddb2Operations.class;
         case "overrideendpoint":
         case "overrideEndpoint": return boolean.class;
+        case "profilecredentialsname":
+        case "profileCredentialsName": return java.lang.String.class;
         case "proxyhost":
         case "proxyHost": return java.lang.String.class;
         case "proxyport":
@@ -120,6 +134,8 @@ public class Ddb2ComponentConfigurer extends PropertyConfigurerSupport implement
         case "uriEndpointOverride": return java.lang.String.class;
         case "usedefaultcredentialsprovider":
         case "useDefaultCredentialsProvider": return boolean.class;
+        case "useprofilecredentialsprovider":
+        case "useProfileCredentialsProvider": return boolean.class;
         case "writecapacity":
         case "writeCapacity": return java.lang.Long.class;
         default: return null;
@@ -141,6 +157,10 @@ public class Ddb2ComponentConfigurer extends PropertyConfigurerSupport implement
         case "consistentRead": return getOrCreateConfiguration(target).isConsistentRead();
         case "enabledinitialdescribetable":
         case "enabledInitialDescribeTable": return getOrCreateConfiguration(target).isEnabledInitialDescribeTable();
+        case "healthcheckconsumerenabled":
+        case "healthCheckConsumerEnabled": return target.isHealthCheckConsumerEnabled();
+        case "healthcheckproducerenabled":
+        case "healthCheckProducerEnabled": return target.isHealthCheckProducerEnabled();
         case "keyattributename":
         case "keyAttributeName": return getOrCreateConfiguration(target).getKeyAttributeName();
         case "keyattributetype":
@@ -152,6 +172,8 @@ public class Ddb2ComponentConfigurer extends PropertyConfigurerSupport implement
         case "operation": return getOrCreateConfiguration(target).getOperation();
         case "overrideendpoint":
         case "overrideEndpoint": return getOrCreateConfiguration(target).isOverrideEndpoint();
+        case "profilecredentialsname":
+        case "profileCredentialsName": return getOrCreateConfiguration(target).getProfileCredentialsName();
         case "proxyhost":
         case "proxyHost": return getOrCreateConfiguration(target).getProxyHost();
         case "proxyport":
@@ -169,6 +191,8 @@ public class Ddb2ComponentConfigurer extends PropertyConfigurerSupport implement
         case "uriEndpointOverride": return getOrCreateConfiguration(target).getUriEndpointOverride();
         case "usedefaultcredentialsprovider":
         case "useDefaultCredentialsProvider": return getOrCreateConfiguration(target).isUseDefaultCredentialsProvider();
+        case "useprofilecredentialsprovider":
+        case "useProfileCredentialsProvider": return getOrCreateConfiguration(target).isUseProfileCredentialsProvider();
         case "writecapacity":
         case "writeCapacity": return getOrCreateConfiguration(target).getWriteCapacity();
         default: return null;

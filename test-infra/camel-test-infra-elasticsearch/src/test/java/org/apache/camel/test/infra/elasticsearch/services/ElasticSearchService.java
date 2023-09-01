@@ -17,13 +17,13 @@
 
 package org.apache.camel.test.infra.elasticsearch.services;
 
-import org.apache.camel.test.infra.common.services.TestService;
-import org.apache.camel.test.infra.common.services.TestServiceUtil;
-import org.junit.jupiter.api.extension.AfterAllCallback;
-import org.junit.jupiter.api.extension.BeforeAllCallback;
-import org.junit.jupiter.api.extension.ExtensionContext;
+import java.util.Optional;
 
-public interface ElasticSearchService extends BeforeAllCallback, AfterAllCallback, TestService {
+import javax.net.ssl.SSLContext;
+
+import org.apache.camel.test.infra.common.services.TestService;
+
+public interface ElasticSearchService extends TestService {
 
     int getPort();
 
@@ -33,13 +33,11 @@ public interface ElasticSearchService extends BeforeAllCallback, AfterAllCallbac
         return String.format("%s:%d", getElasticSearchHost(), getPort());
     }
 
-    @Override
-    default void beforeAll(ExtensionContext extensionContext) throws Exception {
-        TestServiceUtil.tryInitialize(this, extensionContext);
-    }
+    Optional<String> getCertificatePath();
 
-    @Override
-    default void afterAll(ExtensionContext extensionContext) throws Exception {
-        TestServiceUtil.tryShutdown(this, extensionContext);
-    }
+    Optional<SSLContext> getSslContext();
+
+    String getUsername();
+
+    String getPassword();
 }

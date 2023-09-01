@@ -46,11 +46,8 @@ import org.apache.camel.model.language.XQueryExpression;
 import org.apache.camel.reifier.AbstractReifier;
 import org.apache.camel.spi.Language;
 import org.apache.camel.spi.PropertiesComponent;
-import org.apache.camel.spi.PropertyConfigurer;
-import org.apache.camel.spi.PropertyConfigurerAware;
 import org.apache.camel.spi.ReifierStrategy;
 import org.apache.camel.support.ExpressionToPredicateAdapter;
-import org.apache.camel.support.PropertyBindingSupport;
 import org.apache.camel.support.ScriptHelper;
 import org.apache.camel.util.ObjectHelper;
 
@@ -283,22 +280,6 @@ public class ExpressionReifier<T extends ExpressionDefinition> extends AbstractR
                 definition.setExpression(text);
             }
         }
-    }
-
-    @Deprecated
-    protected void setProperties(Object target, Map<String, Object> properties) {
-        properties.entrySet().removeIf(e -> e.getValue() == null);
-
-        PropertyConfigurer configurer = null;
-        if (target instanceof PropertyConfigurerAware) {
-            configurer = ((PropertyConfigurerAware) target).getPropertyConfigurer(target);
-        } else if (target instanceof PropertyConfigurer) {
-            configurer = (PropertyConfigurer) target;
-        }
-        PropertyBindingSupport.build()
-                .withConfigurer(configurer)
-                .withIgnoreCase(true)
-                .bind(camelContext, target, properties);
     }
 
 }

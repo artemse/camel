@@ -43,9 +43,11 @@ import org.w3c.dom.Node;
 
 import net.sf.saxon.Configuration;
 import net.sf.saxon.lib.ModuleURIResolver;
+import net.sf.saxon.lib.ParseOptions;
 import net.sf.saxon.om.AllElementsSpaceStrippingRule;
 import net.sf.saxon.om.IgnorableSpaceStrippingRule;
 import net.sf.saxon.om.Item;
+import net.sf.saxon.om.NamespaceUri;
 import net.sf.saxon.om.SequenceIterator;
 import net.sf.saxon.om.StructuredQName;
 import net.sf.saxon.om.TreeInfo;
@@ -126,8 +128,8 @@ public abstract class XQueryBuilder implements Expression, Predicate, NamespaceA
         LOG.debug("Initializing XQueryBuilder {}", this);
         if (configuration == null) {
             configuration = new Configuration();
-            configuration.getParseOptions().setSpaceStrippingRule(isStripsAllWhiteSpace()
-                    ? AllElementsSpaceStrippingRule.getInstance() : IgnorableSpaceStrippingRule.getInstance());
+            configuration.setParseOptions(new ParseOptions().withSpaceStrippingRule(isStripsAllWhiteSpace()
+                    ? AllElementsSpaceStrippingRule.getInstance() : IgnorableSpaceStrippingRule.getInstance()));
             LOG.debug("Created new Configuration {}", configuration);
         } else {
             LOG.debug("Using existing Configuration {}", configuration);
@@ -151,7 +153,7 @@ public abstract class XQueryBuilder implements Expression, Predicate, NamespaceA
             boolean invalid = "xml".equals(prefix) || "xmlns".equals(prefix);
             if (!invalid) {
                 LOG.debug("Declaring namespace [prefix: {}, uri: {}]", prefix, uri);
-                staticQueryContext.declareNamespace(prefix, uri);
+                staticQueryContext.declareNamespace(prefix, NamespaceUri.of(uri));
                 staticQueryContext.setInheritNamespaces(true);
             }
         }
@@ -615,7 +617,7 @@ public abstract class XQueryBuilder implements Expression, Predicate, NamespaceA
                 TreeInfo doc = config.buildDocumentTree(source);
                 dynamicQueryContext.setContextItem(doc.getRootNode());
             } finally {
-                // can deal if is is null
+                // can deal if it is null
                 IOHelper.close(is);
             }
         }
@@ -731,7 +733,6 @@ public abstract class XQueryBuilder implements Expression, Predicate, NamespaceA
         }
     }
 
-    @SuppressWarnings("unchecked")
     protected Item getAsParameter(Object value) {
         if (value instanceof String) {
             return new StringValue((String) value);
@@ -746,7 +747,7 @@ public abstract class XQueryBuilder implements Expression, Predicate, NamespaceA
         } else if (value instanceof Float) {
             return FloatValue.makeFloatValue((float) value);
         } else {
-            return new ObjectValue(value);
+            return new ObjectValue<>(value);
         }
     }
 

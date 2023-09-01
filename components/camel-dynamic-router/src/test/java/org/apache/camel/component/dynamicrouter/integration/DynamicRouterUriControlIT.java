@@ -20,7 +20,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.ExchangePattern;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.Predicate;
 import org.apache.camel.builder.PredicateBuilder;
 import org.apache.camel.builder.RouteBuilder;
@@ -187,7 +186,7 @@ public class DynamicRouterUriControlIT extends CamelTestSupport {
 
     @Override
     protected CamelContext createCamelContext() throws Exception {
-        ExtendedCamelContext context = super.createCamelContext().adapt(ExtendedCamelContext.class);
+        CamelContext context = super.createCamelContext();
         context.addComponent(COMPONENT_SCHEME, new DynamicRouterComponent());
         return context;
     }

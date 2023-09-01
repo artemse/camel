@@ -30,7 +30,6 @@ import org.apache.camel.Category;
 import org.apache.camel.Component;
 import org.apache.camel.Consumer;
 import org.apache.camel.Exchange;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.MultipleConsumersSupport;
 import org.apache.camel.PollingConsumer;
 import org.apache.camel.Processor;
@@ -45,6 +44,7 @@ import org.apache.camel.spi.UriEndpoint;
 import org.apache.camel.spi.UriParam;
 import org.apache.camel.spi.UriPath;
 import org.apache.camel.support.DefaultEndpoint;
+import org.apache.camel.support.PluginHelper;
 import org.apache.camel.support.service.ServiceHelper;
 import org.apache.camel.util.URISupport;
 import org.slf4j.Logger;
@@ -55,7 +55,7 @@ import org.slf4j.LoggerFactory;
  */
 @ManagedResource(description = "Managed SedaEndpoint")
 @UriEndpoint(firstVersion = "1.1.0", scheme = "seda", title = "SEDA", syntax = "seda:name",
-             category = { Category.CORE, Category.ENDPOINT })
+             category = { Category.CORE, Category.MESSAGING })
 public class SedaEndpoint extends DefaultEndpoint implements AsyncEndpoint, BrowsableEndpoint, MultipleConsumersSupport {
 
     private static final Logger LOG = LoggerFactory.getLogger(SedaEndpoint.class);
@@ -70,7 +70,7 @@ public class SedaEndpoint extends DefaultEndpoint implements AsyncEndpoint, Brow
     @Metadata(required = true)
     private String name;
     @UriParam(label = "advanced", description = "Define the queue instance which will be used by the endpoint")
-    private BlockingQueue queue;
+    private BlockingQueue<Exchange> queue;
     @UriParam(defaultValue = "" + SedaConstants.QUEUE_SIZE)
     private int size = SedaConstants.QUEUE_SIZE;
 
@@ -209,14 +209,16 @@ public class SedaEndpoint extends DefaultEndpoint implements AsyncEndpoint, Brow
     }
 
     /**
-     * Get's the {@link QueueReference} for the this endpoint.
+     * Gets the {@link QueueReference} for this endpoint.
      *
      * @return the reference, or <tt>null</tt> if no queue reference exists.
      */
-    public synchronized QueueReference getQueueReference() {
+    public QueueReference getQueueReference() {
         String key = getComponent().getQueueKey(getEndpointUri());
-        QueueReference ref = getComponent().getQueueReference(key);
-        return ref;
+
+        synchronized (this) {
+            return getComponent().getQueueReference(key);
+        }
     }
 
     protected synchronized AsyncProcessor getConsumerMulticastProcessor() {
@@ -255,10 +257,19 @@ public class SedaEndpoint extends DefaultEndpoint implements AsyncEndpoint, Brow
             // create multicast processor
             multicastStarted = false;
 
-            consumerMulticastProcessor = (AsyncProcessor) getCamelContext().adapt(ExtendedCamelContext.class)
-                    .getProcessorFactory().createProcessor(getCamelContext(), "MulticastProcessor",
+            consumerMulticastProcessor = (AsyncProcessor) PluginHelper.getProcessorFactory(getCamelContext())
+                    .createProcessor(getCamelContext(), "MulticastProcessor",
                             new Object[] { processors, multicastExecutor, false });
         }
+    }
+
+    void setName(String name) {
+        this.name = name;
+    }
+
+    @ManagedAttribute(description = "Queue name")
+    public String getName() {
+        return name;
     }
 
     /**

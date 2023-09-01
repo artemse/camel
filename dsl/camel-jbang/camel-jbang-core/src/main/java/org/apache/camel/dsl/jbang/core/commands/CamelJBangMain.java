@@ -25,10 +25,13 @@ import org.apache.camel.dsl.jbang.core.commands.action.CamelGCAction;
 import org.apache.camel.dsl.jbang.core.commands.action.CamelLogAction;
 import org.apache.camel.dsl.jbang.core.commands.action.CamelReloadAction;
 import org.apache.camel.dsl.jbang.core.commands.action.CamelResetStatsAction;
+import org.apache.camel.dsl.jbang.core.commands.action.CamelRouteDumpAction;
 import org.apache.camel.dsl.jbang.core.commands.action.CamelRouteStartAction;
 import org.apache.camel.dsl.jbang.core.commands.action.CamelRouteStopAction;
+import org.apache.camel.dsl.jbang.core.commands.action.CamelSendAction;
 import org.apache.camel.dsl.jbang.core.commands.action.CamelSourceAction;
 import org.apache.camel.dsl.jbang.core.commands.action.CamelSourceTop;
+import org.apache.camel.dsl.jbang.core.commands.action.CamelStubAction;
 import org.apache.camel.dsl.jbang.core.commands.action.CamelThreadDump;
 import org.apache.camel.dsl.jbang.core.commands.action.CamelTraceAction;
 import org.apache.camel.dsl.jbang.core.commands.action.LoggerAction;
@@ -40,6 +43,11 @@ import org.apache.camel.dsl.jbang.core.commands.catalog.CatalogDoc;
 import org.apache.camel.dsl.jbang.core.commands.catalog.CatalogKamelet;
 import org.apache.camel.dsl.jbang.core.commands.catalog.CatalogLanguage;
 import org.apache.camel.dsl.jbang.core.commands.catalog.CatalogOther;
+import org.apache.camel.dsl.jbang.core.commands.config.ConfigCommand;
+import org.apache.camel.dsl.jbang.core.commands.config.ConfigGet;
+import org.apache.camel.dsl.jbang.core.commands.config.ConfigList;
+import org.apache.camel.dsl.jbang.core.commands.config.ConfigSet;
+import org.apache.camel.dsl.jbang.core.commands.config.ConfigUnset;
 import org.apache.camel.dsl.jbang.core.commands.process.CamelContextStatus;
 import org.apache.camel.dsl.jbang.core.commands.process.CamelContextTop;
 import org.apache.camel.dsl.jbang.core.commands.process.CamelCount;
@@ -62,6 +70,11 @@ import org.apache.camel.dsl.jbang.core.commands.process.ListProcess;
 import org.apache.camel.dsl.jbang.core.commands.process.ListService;
 import org.apache.camel.dsl.jbang.core.commands.process.ListVault;
 import org.apache.camel.dsl.jbang.core.commands.process.StopProcess;
+import org.apache.camel.dsl.jbang.core.commands.version.VersionCommand;
+import org.apache.camel.dsl.jbang.core.commands.version.VersionGet;
+import org.apache.camel.dsl.jbang.core.commands.version.VersionList;
+import org.apache.camel.dsl.jbang.core.commands.version.VersionSet;
+import org.apache.camel.dsl.jbang.core.common.CommandLineHelper;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
@@ -78,6 +91,7 @@ public class CamelJBangMain implements Callable<Integer> {
                 .addSubcommand("ps", new CommandLine(new ListProcess(main)))
                 .addSubcommand("stop", new CommandLine(new StopProcess(main)))
                 .addSubcommand("trace", new CommandLine(new CamelTraceAction(main)))
+                .addSubcommand("transform", new CommandLine(new Transform(main)))
                 .addSubcommand("get", new CommandLine(new CamelStatus(main))
                         .addSubcommand("context", new CommandLine(new CamelContextStatus(main)))
                         .addSubcommand("route", new CommandLine(new CamelRouteStatus(main)))
@@ -93,6 +107,7 @@ public class CamelJBangMain implements Callable<Integer> {
                         .addSubcommand("metric", new CommandLine(new ListMetric(main)))
                         .addSubcommand("service", new CommandLine(new ListService(main)))
                         .addSubcommand("source", new CommandLine(new CamelSourceAction(main)))
+                        .addSubcommand("route-dump", new CommandLine(new CamelRouteDumpAction(main)))
                         .addSubcommand("vault", new CommandLine(new ListVault(main))))
                 .addSubcommand("top", new CommandLine(new CamelTop(main))
                         .addSubcommand("context", new CommandLine(new CamelContextTop(main)))
@@ -104,6 +119,8 @@ public class CamelJBangMain implements Callable<Integer> {
                         .addSubcommand("stop-route", new CommandLine(new CamelRouteStopAction(main)))
                         .addSubcommand("reset-stats", new CommandLine(new CamelResetStatsAction(main)))
                         .addSubcommand("reload", new CommandLine(new CamelReloadAction(main)))
+                        .addSubcommand("send", new CommandLine(new CamelSendAction(main)))
+                        .addSubcommand("stub", new CommandLine(new CamelStubAction(main)))
                         .addSubcommand("thread-dump", new CommandLine(new CamelThreadDump(main)))
                         .addSubcommand("logger", new CommandLine(new LoggerAction(main)))
                         .addSubcommand("gc", new CommandLine(new CamelGCAction(main))))
@@ -124,7 +141,16 @@ public class CamelJBangMain implements Callable<Integer> {
                 .addSubcommand("bind", new CommandLine(new Bind(main)))
                 .addSubcommand("pipe", new CommandLine(new Pipe(main)))
                 .addSubcommand("export", new CommandLine(new Export(main)))
-                .addSubcommand("completion", new CommandLine(new Complete(main)));
+                .addSubcommand("completion", new CommandLine(new Complete(main)))
+                .addSubcommand("config", new CommandLine(new ConfigCommand(main))
+                        .addSubcommand("list", new CommandLine(new ConfigList(main)))
+                        .addSubcommand("get", new CommandLine(new ConfigGet(main)))
+                        .addSubcommand("unset", new CommandLine(new ConfigUnset(main)))
+                        .addSubcommand("set", new CommandLine(new ConfigSet(main))))
+                .addSubcommand("version", new CommandLine(new VersionCommand(main))
+                        .addSubcommand("get", new CommandLine(new VersionGet(main)))
+                        .addSubcommand("set", new CommandLine(new VersionSet(main)))
+                        .addSubcommand("list", new CommandLine(new VersionList(main))));
 
         commandLine.getCommandSpec().versionProvider(() -> {
             CamelCatalog catalog = new DefaultCamelCatalog();
@@ -132,6 +158,7 @@ public class CamelJBangMain implements Callable<Integer> {
             return new String[] { v };
         });
 
+        CommandLineHelper.augmentWithUserConfiguration(commandLine, args);
         int exitCode = commandLine.execute(args);
         System.exit(exitCode);
     }

@@ -5,6 +5,7 @@
 :description: Send GraphQL queries and mutations to external systems.
 :since: 3.0
 :supportlevel: Stable
+:tabs-sync-option:
 :component-header: Only producer is supported
 //Manually maintained attributes
 :camel-spring-boot-name: graphql
@@ -149,7 +150,7 @@ mutation AddBook($bookInput: BookInput) {
 }
 ----
 
-[source,java
+[source,java]
 ----
 @BindToRegistry("addBookMutationVariables")
 public JsonObject addBookMutationVariables() {

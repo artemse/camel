@@ -26,6 +26,7 @@ import com.github.freva.asciitable.Column;
 import com.github.freva.asciitable.HorizontalAlign;
 import com.github.freva.asciitable.OverflowBehaviour;
 import org.apache.camel.dsl.jbang.core.commands.CamelJBangMain;
+import org.apache.camel.dsl.jbang.core.common.PidNameAgeCompletionCandidates;
 import org.apache.camel.dsl.jbang.core.common.ProcessHelper;
 import org.apache.camel.util.TimeUtils;
 import org.apache.camel.util.json.JsonObject;
@@ -33,13 +34,14 @@ import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
 @Command(name = "count",
-         description = "Get total and failed exchanges for running integrations")
+         description = "Get total and failed exchanges for running integrations",
+         sortOptions = false)
 public class CamelCount extends ProcessWatchCommand {
 
     @CommandLine.Parameters(description = "Name or pid of running Camel integration", arity = "0..1")
     String name = "*";
 
-    @CommandLine.Option(names = { "--sort" },
+    @CommandLine.Option(names = { "--sort" }, completionCandidates = PidNameAgeCompletionCandidates.class,
                         description = "Sort by pid, name or age", defaultValue = "pid")
     String sort;
 
@@ -56,7 +58,7 @@ public class CamelCount extends ProcessWatchCommand {
     }
 
     @Override
-    public Integer doCall() throws Exception {
+    public Integer doProcessWatchCall() throws Exception {
         List<Row> rows = new ArrayList<>();
 
         List<Long> pids = findPids(name);
@@ -75,7 +77,7 @@ public class CamelCount extends ProcessWatchCommand {
                         if ("CamelJBang".equals(row.name)) {
                             row.name = ProcessHelper.extractName(root, ph);
                         }
-                        row.pid = "" + ph.pid();
+                        row.pid = Long.toString(ph.pid());
                         row.age = TimeUtils.printSince(extractSince(ph));
                         Map<String, ?> stats = context.getMap("statistics");
                         if (stats != null) {

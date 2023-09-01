@@ -41,7 +41,6 @@ import javax.management.openmbean.TabularData;
 import javax.management.openmbean.TabularDataSupport;
 
 import org.apache.camel.CamelContext;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.ManagementStatisticsLevel;
 import org.apache.camel.Route;
 import org.apache.camel.RuntimeCamelException;
@@ -59,6 +58,7 @@ import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.spi.InflightRepository;
 import org.apache.camel.spi.ManagementStrategy;
 import org.apache.camel.spi.RoutePolicy;
+import org.apache.camel.support.PluginHelper;
 import org.apache.camel.util.ObjectHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -383,21 +383,47 @@ public class ManagedRoute extends ManagedPerformanceCounter implements TimerList
 
     @Override
     public String dumpRouteAsXml() throws Exception {
-        return dumpRouteAsXml(false, false);
+        return dumpRouteAsXml(false);
     }
 
     @Override
     public String dumpRouteAsXml(boolean resolvePlaceholders) throws Exception {
-        return dumpRouteAsXml(resolvePlaceholders, false);
+        return dumpRouteAsXml(resolvePlaceholders, true);
     }
 
     @Override
-    public String dumpRouteAsXml(boolean resolvePlaceholders, boolean resolveDelegateEndpoints) throws Exception {
+    public String dumpRouteAsXml(boolean resolvePlaceholders, boolean generatedIds) throws Exception {
         String id = route.getId();
-        RouteDefinition def = context.getExtension(Model.class).getRouteDefinition(id);
+        RouteDefinition def = context.getCamelContextExtension().getContextPlugin(Model.class).getRouteDefinition(id);
         if (def != null) {
-            ExtendedCamelContext ecc = context.adapt(ExtendedCamelContext.class);
-            return ecc.getModelToXMLDumper().dumpModelAsXml(context, def, resolvePlaceholders, resolveDelegateEndpoints);
+            return PluginHelper.getModelToXMLDumper(context).dumpModelAsXml(context, def, resolvePlaceholders, generatedIds);
+        }
+
+        return null;
+    }
+
+    @Override
+    public String dumpRouteAsYaml() throws Exception {
+        return dumpRouteAsYaml(false, false);
+    }
+
+    @Override
+    public String dumpRouteAsYaml(boolean resolvePlaceholders) throws Exception {
+        return dumpRouteAsYaml(resolvePlaceholders, false, true);
+    }
+
+    @Override
+    public String dumpRouteAsYaml(boolean resolvePlaceholders, boolean uriAsParameters) throws Exception {
+        return dumpRouteAsYaml(resolvePlaceholders, uriAsParameters, true);
+    }
+
+    @Override
+    public String dumpRouteAsYaml(boolean resolvePlaceholders, boolean uriAsParameters, boolean generatedIds) throws Exception {
+        String id = route.getId();
+        RouteDefinition def = context.getCamelContextExtension().getContextPlugin(Model.class).getRouteDefinition(id);
+        if (def != null) {
+            return PluginHelper.getModelToYAMLDumper(context).dumpModelAsYaml(context, def, resolvePlaceholders,
+                    uriAsParameters, generatedIds);
         }
 
         return null;
@@ -588,7 +614,7 @@ public class ManagedRoute extends ManagedPerformanceCounter implements TimerList
             processors.sort(new OrderProcessorMBeans());
 
             // grab route consumer
-            RouteDefinition rd = context.adapt(ModelCamelContext.class).getRouteDefinition(route.getRouteId());
+            RouteDefinition rd = ((ModelCamelContext) context).getRouteDefinition(route.getRouteId());
             if (rd != null) {
                 String id = rd.getRouteId();
                 int line = rd.getInput().getLineNumber();

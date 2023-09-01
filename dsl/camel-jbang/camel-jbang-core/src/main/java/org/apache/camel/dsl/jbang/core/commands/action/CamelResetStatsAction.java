@@ -25,7 +25,7 @@ import org.apache.camel.util.json.JsonObject;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "reset-stats",
-                     description = "Reset performance statistics")
+                     description = "Reset performance statistics", sortOptions = false)
 public class CamelResetStatsAction extends ActionBaseCommand {
 
     @CommandLine.Parameters(description = "Name or pid of running Camel integration. (default selects all)", arity = "0..1")
@@ -36,15 +36,12 @@ public class CamelResetStatsAction extends ActionBaseCommand {
     }
 
     @Override
-    public Integer call() throws Exception {
-        // configure logging first
-        configureLoggingOff();
-
+    public Integer doCall() throws Exception {
         List<Long> pids = findPids(name);
         for (long pid : pids) {
             JsonObject root = new JsonObject();
             root.put("action", "reset-stats");
-            File f = getActionFile("" + pid);
+            File f = getActionFile(Long.toString(pid));
             IOHelper.writeText(root.toJson(), f);
         }
 

@@ -22,7 +22,7 @@ import java.util.Objects;
 
 import org.apache.camel.component.as2.api.AS2Header;
 import org.apache.camel.component.as2.api.AS2MimeType;
-import org.apache.camel.component.as2.api.entity.ApplicationEDIEntity;
+import org.apache.camel.component.as2.api.entity.ApplicationEntity;
 import org.apache.camel.component.as2.api.entity.ApplicationPkcs7MimeCompressedDataEntity;
 import org.apache.camel.component.as2.api.entity.ApplicationPkcs7MimeEnvelopedDataEntity;
 import org.apache.camel.component.as2.api.entity.EntityParser;
@@ -65,13 +65,13 @@ public final class HttpMessageUtils {
     public static <T> T getEntity(HttpMessage message, Class<T> type) {
         ObjectHelper.notNull(message, "message");
         ObjectHelper.notNull(type, "type");
-        if (message instanceof HttpEntityEnclosingRequest) {
-            HttpEntity entity = ((HttpEntityEnclosingRequest) message).getEntity();
+        if (message instanceof HttpEntityEnclosingRequest httpEntityEnclosingRequest) {
+            HttpEntity entity = httpEntityEnclosingRequest.getEntity();
             if (entity != null && type.isInstance(entity)) {
                 return type.cast(entity);
             }
-        } else if (message instanceof HttpResponse) {
-            HttpEntity entity = ((HttpResponse) message).getEntity();
+        } else if (message instanceof HttpResponse httpResponse) {
+            HttpEntity entity = httpResponse.getEntity();
             if (entity != null && type.isInstance(entity)) {
                 type.cast(entity);
             }
@@ -127,7 +127,7 @@ public final class HttpMessageUtils {
         return null;
     }
 
-    public static ApplicationEDIEntity extractEdiPayload(HttpMessage message, DecrpytingAndSigningInfo decrpytingAndSigningInfo)
+    public static ApplicationEntity extractEdiPayload(HttpMessage message, DecrpytingAndSigningInfo decrpytingAndSigningInfo)
             throws HttpException {
 
         String contentTypeString = getHeaderValue(message, AS2Header.CONTENT_TYPE);
@@ -137,12 +137,12 @@ public final class HttpMessageUtils {
         ContentType contentType = ContentType.parse(contentTypeString);
 
         EntityParser.parseAS2MessageEntity(message);
-        ApplicationEDIEntity ediEntity = null;
+        ApplicationEntity ediEntity;
         switch (contentType.getMimeType().toLowerCase()) {
             case AS2MimeType.APPLICATION_EDIFACT:
             case AS2MimeType.APPLICATION_EDI_X12:
             case AS2MimeType.APPLICATION_EDI_CONSENT: {
-                ediEntity = getEntity(message, ApplicationEDIEntity.class);
+                ediEntity = getEntity(message, ApplicationEntity.class);
                 break;
             }
             case AS2MimeType.MULTIPART_SIGNED: {
@@ -176,10 +176,10 @@ public final class HttpMessageUtils {
 
     }
 
-    private static ApplicationEDIEntity extractEnvelopedData(
+    private static ApplicationEntity extractEnvelopedData(
             HttpMessage message, DecrpytingAndSigningInfo decrpytingAndSigningInfo)
             throws HttpException {
-        ApplicationEDIEntity ediEntity;
+        ApplicationEntity ediEntity;
         if (decrpytingAndSigningInfo.getDecryptingPrivateKey() == null) {
             throw new HttpException(
                     "Failed to extract EDI payload: private key can not be null for AS2 enveloped message");
@@ -193,10 +193,10 @@ public final class HttpMessageUtils {
         return ediEntity;
     }
 
-    private static ApplicationEDIEntity extractCompressedData(
+    private static ApplicationEntity extractCompressedData(
             HttpMessage message, DecrpytingAndSigningInfo decrpytingAndSigningInfo)
             throws HttpException {
-        ApplicationEDIEntity ediEntity;
+        ApplicationEntity ediEntity;
         ApplicationPkcs7MimeCompressedDataEntity compressedDataEntity
                 = getEntity(message, ApplicationPkcs7MimeCompressedDataEntity.class);
 
@@ -207,10 +207,10 @@ public final class HttpMessageUtils {
         return ediEntity;
     }
 
-    private static ApplicationEDIEntity extractMultipartSigned(
+    private static ApplicationEntity extractMultipartSigned(
             HttpMessage message, DecrpytingAndSigningInfo decrpytingAndSigningInfo)
             throws HttpException {
-        ApplicationEDIEntity ediEntity;
+        ApplicationEntity ediEntity;
         MultipartSignedEntity multipartSignedEntity = getEntity(message,
                 MultipartSignedEntity.class);
 
@@ -223,11 +223,9 @@ public final class HttpMessageUtils {
         }
 
         MimeEntity mimeEntity = multipartSignedEntity.getSignedDataEntity();
-        if (mimeEntity instanceof ApplicationEDIEntity) {
-            ediEntity = (ApplicationEDIEntity) mimeEntity;
-        } else if (mimeEntity instanceof ApplicationPkcs7MimeCompressedDataEntity) {
-            ApplicationPkcs7MimeCompressedDataEntity compressedDataEntity
-                    = (ApplicationPkcs7MimeCompressedDataEntity) mimeEntity;
+        if (mimeEntity instanceof ApplicationEntity) {
+            ediEntity = (ApplicationEntity) mimeEntity;
+        } else if (mimeEntity instanceof ApplicationPkcs7MimeCompressedDataEntity compressedDataEntity) {
             ediEntity = extractEdiPayloadFromCompressedEntity(compressedDataEntity, decrpytingAndSigningInfo);
         } else {
             throw new HttpException(
@@ -237,10 +235,10 @@ public final class HttpMessageUtils {
         return ediEntity;
     }
 
-    private static ApplicationEDIEntity extractEdiPayloadFromEnvelopedEntity(
+    private static ApplicationEntity extractEdiPayloadFromEnvelopedEntity(
             ApplicationPkcs7MimeEnvelopedDataEntity envelopedDataEntity, DecrpytingAndSigningInfo decrpytingAndSigningInfo)
             throws HttpException {
-        ApplicationEDIEntity ediEntity = null;
+        ApplicationEntity ediEntity;
 
         MimeEntity entity = envelopedDataEntity.getEncryptedEntity(decrpytingAndSigningInfo.getDecryptingPrivateKey());
         String contentTypeString = entity.getContentTypeValue();
@@ -253,7 +251,7 @@ public final class HttpMessageUtils {
             case AS2MimeType.APPLICATION_EDIFACT:
             case AS2MimeType.APPLICATION_EDI_X12:
             case AS2MimeType.APPLICATION_EDI_CONSENT: {
-                ediEntity = (ApplicationEDIEntity) entity;
+                ediEntity = (ApplicationEntity) entity;
                 break;
             }
             case AS2MimeType.MULTIPART_SIGNED: {
@@ -264,11 +262,9 @@ public final class HttpMessageUtils {
                 }
 
                 MimeEntity mimeEntity = multipartSignedEntity.getSignedDataEntity();
-                if (mimeEntity instanceof ApplicationEDIEntity) {
-                    ediEntity = (ApplicationEDIEntity) mimeEntity;
-                } else if (mimeEntity instanceof ApplicationPkcs7MimeCompressedDataEntity) {
-                    ApplicationPkcs7MimeCompressedDataEntity compressedDataEntity
-                            = (ApplicationPkcs7MimeCompressedDataEntity) mimeEntity;
+                if (mimeEntity instanceof ApplicationEntity) {
+                    ediEntity = (ApplicationEntity) mimeEntity;
+                } else if (mimeEntity instanceof ApplicationPkcs7MimeCompressedDataEntity compressedDataEntity) {
                     ediEntity = extractEdiPayloadFromCompressedEntity(compressedDataEntity, decrpytingAndSigningInfo);
                 } else {
 
@@ -298,10 +294,10 @@ public final class HttpMessageUtils {
         return ediEntity;
     }
 
-    public static ApplicationEDIEntity extractEdiPayloadFromCompressedEntity(
+    public static ApplicationEntity extractEdiPayloadFromCompressedEntity(
             ApplicationPkcs7MimeCompressedDataEntity compressedDataEntity, DecrpytingAndSigningInfo decrpytingAndSigningInfo)
             throws HttpException {
-        ApplicationEDIEntity ediEntity = null;
+        ApplicationEntity ediEntity;
 
         MimeEntity entity = compressedDataEntity.getCompressedEntity(new ZlibExpanderProvider());
         String contentTypeString = entity.getContentTypeValue();
@@ -314,7 +310,7 @@ public final class HttpMessageUtils {
             case AS2MimeType.APPLICATION_EDIFACT:
             case AS2MimeType.APPLICATION_EDI_X12:
             case AS2MimeType.APPLICATION_EDI_CONSENT: {
-                ediEntity = (ApplicationEDIEntity) entity;
+                ediEntity = (ApplicationEntity) entity;
                 break;
             }
             case AS2MimeType.MULTIPART_SIGNED: {
@@ -325,8 +321,8 @@ public final class HttpMessageUtils {
                 }
 
                 MimeEntity mimeEntity = multipartSignedEntity.getSignedDataEntity();
-                if (mimeEntity instanceof ApplicationEDIEntity) {
-                    ediEntity = (ApplicationEDIEntity) mimeEntity;
+                if (mimeEntity instanceof ApplicationEntity applicationEntity) {
+                    ediEntity = applicationEntity;
                 } else {
 
                     throw new HttpException(
@@ -345,8 +341,8 @@ public final class HttpMessageUtils {
     }
 
     public static class DecrpytingAndSigningInfo {
-        private Certificate[] validateSigningCertificateChain;
-        private PrivateKey decryptingPrivateKey;
+        private final Certificate[] validateSigningCertificateChain;
+        private final PrivateKey decryptingPrivateKey;
 
         public DecrpytingAndSigningInfo(Certificate[] validateSigningCertificateChain, PrivateKey decryptingPrivateKey) {
             this.validateSigningCertificateChain = validateSigningCertificateChain;

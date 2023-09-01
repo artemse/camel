@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.apache.camel</groupId>
         <artifactId>core</artifactId>
-        <version>4.0.0-SNAPSHOT</version>
+        <version>4.1.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>camel-management-api</artifactId>
@@ -57,7 +57,14 @@
         <dependency>
             <groupId>org.codehaus.woodstox</groupId>
             <artifactId>woodstox-core-asl</artifactId>
+            <version>${woodstox-version}</version>
             <scope>test</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>javax.xml.stream</groupId>
+                        <artifactId>stax-api</artifactId>
+                    </exclusion>
+                </exclusions>
         </dependency>
     </dependencies>
 
@@ -243,7 +250,14 @@
                 <dependency>
                     <groupId>org.codehaus.woodstox</groupId>
                     <artifactId>woodstox-core-asl</artifactId>
+                    <version>${woodstox-version}</version>
                     <scope>test</scope>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>javax.xml.stream</groupId>
+                            <artifactId>stax-api</artifactId>
+                        </exclusion>
+                    </exclusions>
                 </dependency>
             </dependencies>
         </profile>

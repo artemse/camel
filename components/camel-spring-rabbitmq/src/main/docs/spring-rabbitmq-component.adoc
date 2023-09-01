@@ -5,6 +5,7 @@
 :description: Send and receive messages from RabbitMQ using Spring RabbitMQ client.
 :since: 3.8
 :supportlevel: Stable
+:tabs-sync-option:
 :component-header: Both producer and consumer are supported
 //Manually maintained attributes
 :group: Spring
@@ -236,6 +237,22 @@ then using toD could for example be done as follows:
 ----
 from("direct:order")
   .toD("spring-rabbit:order-${header.orderType}");
+----
+
+== Manual Acknowledgement 
+
+If we need to manually acknowledge a message for some use case  we can
+do it by setting and acknowledgeMode to Manual and using the below snippet
+of code to get Channel and deliveryTag to manually acknowledge the message:
+
+[source,java]
+----
+from("spring-rabbitmq:%s?queues=%s&acknowledgeMode=MANUAL")
+    .process(exchange -> {
+        Channel channel = exchange.getProperty(SpringRabbitMQConstants.CHANNEL, Channel.class);
+        long deliveryTag = exchange.getMessage().getHeader(SpringRabbitMQConstants.DELIVERY_TAG, long.class);
+        channel.basicAck(deliveryTag, false);
+    })
 ----
 
 

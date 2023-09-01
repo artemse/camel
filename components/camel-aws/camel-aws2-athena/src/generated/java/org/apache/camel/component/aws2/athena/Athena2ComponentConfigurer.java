@@ -41,6 +41,10 @@ public class Athena2ComponentConfigurer extends PropertyConfigurerSupport implem
         case "delay": getOrCreateConfiguration(target).setDelay(property(camelContext, long.class, value)); return true;
         case "encryptionoption":
         case "encryptionOption": getOrCreateConfiguration(target).setEncryptionOption(property(camelContext, software.amazon.awssdk.services.athena.model.EncryptionOption.class, value)); return true;
+        case "healthcheckconsumerenabled":
+        case "healthCheckConsumerEnabled": target.setHealthCheckConsumerEnabled(property(camelContext, boolean.class, value)); return true;
+        case "healthcheckproducerenabled":
+        case "healthCheckProducerEnabled": target.setHealthCheckProducerEnabled(property(camelContext, boolean.class, value)); return true;
         case "includetrace":
         case "includeTrace": getOrCreateConfiguration(target).setIncludeTrace(property(camelContext, boolean.class, value)); return true;
         case "initialdelay":
@@ -60,6 +64,8 @@ public class Athena2ComponentConfigurer extends PropertyConfigurerSupport implem
         case "outputLocation": getOrCreateConfiguration(target).setOutputLocation(property(camelContext, java.lang.String.class, value)); return true;
         case "outputtype":
         case "outputType": getOrCreateConfiguration(target).setOutputType(property(camelContext, org.apache.camel.component.aws2.athena.Athena2OutputType.class, value)); return true;
+        case "profilecredentialsname":
+        case "profileCredentialsName": getOrCreateConfiguration(target).setProfileCredentialsName(property(camelContext, java.lang.String.class, value)); return true;
         case "proxyhost":
         case "proxyHost": getOrCreateConfiguration(target).setProxyHost(property(camelContext, java.lang.String.class, value)); return true;
         case "proxyport":
@@ -78,6 +84,8 @@ public class Athena2ComponentConfigurer extends PropertyConfigurerSupport implem
         case "secretKey": getOrCreateConfiguration(target).setSecretKey(property(camelContext, java.lang.String.class, value)); return true;
         case "usedefaultcredentialsprovider":
         case "useDefaultCredentialsProvider": getOrCreateConfiguration(target).setUseDefaultCredentialsProvider(property(camelContext, boolean.class, value)); return true;
+        case "useprofilecredentialsprovider":
+        case "useProfileCredentialsProvider": getOrCreateConfiguration(target).setUseProfileCredentialsProvider(property(camelContext, boolean.class, value)); return true;
         case "waittimeout":
         case "waitTimeout": getOrCreateConfiguration(target).setWaitTimeout(property(camelContext, long.class, value)); return true;
         case "workgroup":
@@ -107,6 +115,10 @@ public class Athena2ComponentConfigurer extends PropertyConfigurerSupport implem
         case "delay": return long.class;
         case "encryptionoption":
         case "encryptionOption": return software.amazon.awssdk.services.athena.model.EncryptionOption.class;
+        case "healthcheckconsumerenabled":
+        case "healthCheckConsumerEnabled": return boolean.class;
+        case "healthcheckproducerenabled":
+        case "healthCheckProducerEnabled": return boolean.class;
         case "includetrace":
         case "includeTrace": return boolean.class;
         case "initialdelay":
@@ -126,6 +138,8 @@ public class Athena2ComponentConfigurer extends PropertyConfigurerSupport implem
         case "outputLocation": return java.lang.String.class;
         case "outputtype":
         case "outputType": return org.apache.camel.component.aws2.athena.Athena2OutputType.class;
+        case "profilecredentialsname":
+        case "profileCredentialsName": return java.lang.String.class;
         case "proxyhost":
         case "proxyHost": return java.lang.String.class;
         case "proxyport":
@@ -144,6 +158,8 @@ public class Athena2ComponentConfigurer extends PropertyConfigurerSupport implem
         case "secretKey": return java.lang.String.class;
         case "usedefaultcredentialsprovider":
         case "useDefaultCredentialsProvider": return boolean.class;
+        case "useprofilecredentialsprovider":
+        case "useProfileCredentialsProvider": return boolean.class;
         case "waittimeout":
         case "waitTimeout": return long.class;
         case "workgroup":
@@ -169,6 +185,10 @@ public class Athena2ComponentConfigurer extends PropertyConfigurerSupport implem
         case "delay": return getOrCreateConfiguration(target).getDelay();
         case "encryptionoption":
         case "encryptionOption": return getOrCreateConfiguration(target).getEncryptionOption();
+        case "healthcheckconsumerenabled":
+        case "healthCheckConsumerEnabled": return target.isHealthCheckConsumerEnabled();
+        case "healthcheckproducerenabled":
+        case "healthCheckProducerEnabled": return target.isHealthCheckProducerEnabled();
         case "includetrace":
         case "includeTrace": return getOrCreateConfiguration(target).isIncludeTrace();
         case "initialdelay":
@@ -188,6 +208,8 @@ public class Athena2ComponentConfigurer extends PropertyConfigurerSupport implem
         case "outputLocation": return getOrCreateConfiguration(target).getOutputLocation();
         case "outputtype":
         case "outputType": return getOrCreateConfiguration(target).getOutputType();
+        case "profilecredentialsname":
+        case "profileCredentialsName": return getOrCreateConfiguration(target).getProfileCredentialsName();
         case "proxyhost":
         case "proxyHost": return getOrCreateConfiguration(target).getProxyHost();
         case "proxyport":
@@ -206,6 +228,8 @@ public class Athena2ComponentConfigurer extends PropertyConfigurerSupport implem
         case "secretKey": return getOrCreateConfiguration(target).getSecretKey();
         case "usedefaultcredentialsprovider":
         case "useDefaultCredentialsProvider": return getOrCreateConfiguration(target).isUseDefaultCredentialsProvider();
+        case "useprofilecredentialsprovider":
+        case "useProfileCredentialsProvider": return getOrCreateConfiguration(target).isUseProfileCredentialsProvider();
         case "waittimeout":
         case "waitTimeout": return getOrCreateConfiguration(target).getWaitTimeout();
         case "workgroup":

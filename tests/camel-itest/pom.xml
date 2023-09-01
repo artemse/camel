@@ -24,7 +24,7 @@
     <parent>
         <groupId>org.apache.camel</groupId>
         <artifactId>tests</artifactId>
-        <version>4.0.0-SNAPSHOT</version>
+        <version>4.1.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>camel-itest</artifactId>
@@ -76,6 +76,7 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-ws-security</artifactId>
+            <version>${cxf-version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -186,12 +187,14 @@
         <dependency>
             <groupId>org.apache.ftpserver</groupId>
             <artifactId>ftpserver-core</artifactId>
+            <version>${ftpserver-version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.ftpserver</groupId>
             <artifactId>ftplet-api</artifactId>
+            <version>${ftpserver-version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -207,12 +210,13 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
+            <version>${mockito-version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockftpserver</groupId>
             <artifactId>MockFtpServer</artifactId>
-            <version>2.5</version>
+            <version>3.1.0</version>
             <scope>test</scope>
         </dependency>
 
@@ -220,21 +224,31 @@
         <dependency>
             <groupId>org.apache.derby</groupId>
             <artifactId>derby</artifactId>
+            <version>${derby-version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derbytools</artifactId>
+            <version>${derby-version}</version>
+            <scope>test</scope>
+        </dependency>        
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-orm</artifactId>
+            <version>${spring-version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
+            <version>${spring-version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-tx</artifactId>
+            <version>${spring-version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -268,6 +282,7 @@
         <dependency>
             <groupId>org.apache.xbean</groupId>
             <artifactId>xbean-spring</artifactId>
+            <version>${xbean-spring-version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework</groupId>
@@ -279,6 +294,7 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
+            <version>${cxf-version}</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -319,9 +335,9 @@
 
         <!-- for http component tests -->
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>${httpclient4-version}</version>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+            <artifactId>httpclient5</artifactId>
+            <version>${httpclient-version}</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
@@ -393,18 +409,6 @@
             </plugin>
 
             <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <systemPropertyVariables>
-                        <derby.stream.error.file>target/derby.log</derby.stream.error.file>
-                    </systemPropertyVariables>
-                    <excludes>
-                        <!-- exclude doc tests as they dont work on CI server -->
-                        <exclude>**/*DocumentationTest.*</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-codegen-plugin</artifactId>
                 <executions>
@@ -412,8 +416,6 @@
                         <id>generate-test-sources</id>
                         <phase>generate-sources</phase>
                         <configuration>
-                            <fork>${cxf.codegenplugin.forkmode}</fork>
-                            <additionalJvmArgs>-Dlog4j.configurationFile=${project.basedir}/src/test/resources/log4j2.properties ${cxf.codegen.jvmArgs}</additionalJvmArgs>
                             <testSourceRoot>${basedir}/target/generated/src/test/java</testSourceRoot>
                             <wsdlOptions>
                                 <wsdlOption>
@@ -441,4 +443,30 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>full</id>
+            <activation>
+                <property>
+                    <name>!quickly</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <systemPropertyVariables>
+                                <derby.stream.error.file>target/derby.log</derby.stream.error.file>
+                            </systemPropertyVariables>
+                            <excludes>
+                                <!-- exclude doc tests as they dont work on CI server -->
+                                <exclude>**/*DocumentationTest.*</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

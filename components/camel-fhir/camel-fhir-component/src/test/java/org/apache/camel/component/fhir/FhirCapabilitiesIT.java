@@ -26,6 +26,7 @@ import org.apache.camel.component.fhir.internal.FhirCapabilitiesApiMethod;
 import org.hl7.fhir.r4.model.CapabilityStatement;
 import org.hl7.fhir.r4.model.Enumerations;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +37,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * Test class for {@link org.apache.camel.component.fhir.api.FhirCapabilities} APIs. The class source won't be generated
  * again if the generator MOJO finds it under src/test/java.
  */
+@DisabledIfSystemProperty(named = "ci.env.name", matches = "apache.org",
+                          disabledReason = "Apache CI nodes are too resource constrained for this test - see CAMEL-19659")
 public class FhirCapabilitiesIT extends AbstractFhirTestSupport {
 
     private static final Logger LOG = LoggerFactory.getLogger(FhirCapabilitiesIT.class);
@@ -46,7 +49,7 @@ public class FhirCapabilitiesIT extends AbstractFhirTestSupport {
     public void testOfType() {
         org.hl7.fhir.instance.model.api.IBaseConformance result = requestBody("direct://OF_TYPE", CapabilityStatement.class);
 
-        LOG.debug("ofType: " + result);
+        LOG.debug("ofType: {}", result);
         assertNotNull(result, "ofType result");
         assertEquals(Enumerations.PublicationStatus.ACTIVE, ((CapabilityStatement) result).getStatus());
     }
@@ -59,7 +62,7 @@ public class FhirCapabilitiesIT extends AbstractFhirTestSupport {
         org.hl7.fhir.instance.model.api.IBaseConformance result
                 = requestBodyAndHeaders("direct://OF_TYPE", CapabilityStatement.class, headers);
 
-        LOG.debug("ofType: " + result);
+        LOG.debug("ofType: {}", result);
         assertNotNull(result, "ofType result");
         assertEquals(Enumerations.PublicationStatus.ACTIVE, ((CapabilityStatement) result).getStatus());
     }

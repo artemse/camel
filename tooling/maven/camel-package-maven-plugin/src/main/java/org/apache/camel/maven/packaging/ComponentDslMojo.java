@@ -39,7 +39,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
-import org.sonatype.plexus.build.incremental.BuildContext;
+import org.codehaus.plexus.build.BuildContext;
 
 import static org.apache.camel.maven.packaging.generics.PackagePluginUtils.joinHeaderAndSource;
 import static org.apache.camel.tooling.util.PackageHelper.findCamelDirectory;
@@ -98,7 +98,7 @@ public class ComponentDslMojo extends AbstractGeneratorMojo {
      * The catalog directory where the component json files are
      */
     @Parameter(property = "camel.pmp.json-directory",
-               defaultValue = "${project.build.directory}/../../../catalog/camel-catalog/src/generated/resources/org/apache/camel/catalog/components")
+               defaultValue = "${project.basedir}/../../catalog/camel-catalog/src/generated/resources/org/apache/camel/catalog/components")
     protected File jsonDir;
 
     private transient String licenseHeader;

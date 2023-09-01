@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-//CHECKSTYLE:OFF
 package org.apache.camel.builder.endpoint;
 
 import java.util.List;
@@ -32,10 +31,10 @@ public interface EndpointBuilderFactory
             org.apache.camel.builder.endpoint.dsl.AS2EndpointBuilderFactory.AS2Builders,
             org.apache.camel.builder.endpoint.dsl.AWS2EC2EndpointBuilderFactory.AWS2EC2Builders,
             org.apache.camel.builder.endpoint.dsl.AWS2S3EndpointBuilderFactory.AWS2S3Builders,
+            org.apache.camel.builder.endpoint.dsl.ActiveMQEndpointBuilderFactory.ActiveMQBuilders,
             org.apache.camel.builder.endpoint.dsl.ArangoDbEndpointBuilderFactory.ArangoDbBuilders,
             org.apache.camel.builder.endpoint.dsl.AsteriskEndpointBuilderFactory.AsteriskBuilders,
             org.apache.camel.builder.endpoint.dsl.Athena2EndpointBuilderFactory.Athena2Builders,
-            org.apache.camel.builder.endpoint.dsl.AtlasMapEndpointBuilderFactory.AtlasMapBuilders,
             org.apache.camel.builder.endpoint.dsl.AtmosphereWebsocketEndpointBuilderFactory.AtmosphereWebsocketBuilders,
             org.apache.camel.builder.endpoint.dsl.AtomEndpointBuilderFactory.AtomBuilders,
             org.apache.camel.builder.endpoint.dsl.AvroEndpointBuilderFactory.AvroBuilders,
@@ -60,7 +59,6 @@ public interface EndpointBuilderFactory
             org.apache.camel.builder.endpoint.dsl.CometdEndpointBuilderFactory.CometdBuilders,
             org.apache.camel.builder.endpoint.dsl.ConsulEndpointBuilderFactory.ConsulBuilders,
             org.apache.camel.builder.endpoint.dsl.ControlBusEndpointBuilderFactory.ControlBusBuilders,
-            org.apache.camel.builder.endpoint.dsl.CordaEndpointBuilderFactory.CordaBuilders,
             org.apache.camel.builder.endpoint.dsl.CosmosDbEndpointBuilderFactory.CosmosDbBuilders,
             org.apache.camel.builder.endpoint.dsl.CouchDbEndpointBuilderFactory.CouchDbBuilders,
             org.apache.camel.builder.endpoint.dsl.CouchbaseEndpointBuilderFactory.CouchbaseBuilders,
@@ -82,10 +80,10 @@ public interface EndpointBuilderFactory
             org.apache.camel.builder.endpoint.dsl.DebeziumOracleEndpointBuilderFactory.DebeziumOracleBuilders,
             org.apache.camel.builder.endpoint.dsl.DebeziumPostgresEndpointBuilderFactory.DebeziumPostgresBuilders,
             org.apache.camel.builder.endpoint.dsl.DebeziumSqlserverEndpointBuilderFactory.DebeziumSqlserverBuilders,
+            org.apache.camel.builder.endpoint.dsl.Dhis2EndpointBuilderFactory.Dhis2Builders,
             org.apache.camel.builder.endpoint.dsl.DigitalOceanEndpointBuilderFactory.DigitalOceanBuilders,
             org.apache.camel.builder.endpoint.dsl.DigitalSignatureEndpointBuilderFactory.DigitalSignatureBuilders,
             org.apache.camel.builder.endpoint.dsl.DirectEndpointBuilderFactory.DirectBuilders,
-            org.apache.camel.builder.endpoint.dsl.DirectVmEndpointBuilderFactory.DirectVmBuilders,
             org.apache.camel.builder.endpoint.dsl.DisruptorEndpointBuilderFactory.DisruptorBuilders,
             org.apache.camel.builder.endpoint.dsl.DisruptorVmEndpointBuilderFactory.DisruptorVmBuilders,
             org.apache.camel.builder.endpoint.dsl.DnsEndpointBuilderFactory.DnsBuilders,
@@ -107,6 +105,7 @@ public interface EndpointBuilderFactory
             org.apache.camel.builder.endpoint.dsl.FhirEndpointBuilderFactory.FhirBuilders,
             org.apache.camel.builder.endpoint.dsl.FileEndpointBuilderFactory.FileBuilders,
             org.apache.camel.builder.endpoint.dsl.FileWatchEndpointBuilderFactory.FileWatchBuilders,
+            org.apache.camel.builder.endpoint.dsl.FilesEndpointBuilderFactory.FilesBuilders,
             org.apache.camel.builder.endpoint.dsl.FlatpackEndpointBuilderFactory.FlatpackBuilders,
             org.apache.camel.builder.endpoint.dsl.FlinkEndpointBuilderFactory.FlinkBuilders,
             org.apache.camel.builder.endpoint.dsl.FopEndpointBuilderFactory.FopBuilders,
@@ -150,7 +149,6 @@ public interface EndpointBuilderFactory
             org.apache.camel.builder.endpoint.dsl.HazelcastTopicEndpointBuilderFactory.HazelcastTopicBuilders,
             org.apache.camel.builder.endpoint.dsl.HdfsEndpointBuilderFactory.HdfsBuilders,
             org.apache.camel.builder.endpoint.dsl.HttpEndpointBuilderFactory.HttpBuilders,
-            org.apache.camel.builder.endpoint.dsl.HyperledgerAriesEndpointBuilderFactory.HyperledgerAriesBuilders,
             org.apache.camel.builder.endpoint.dsl.IAM2EndpointBuilderFactory.IAM2Builders,
             org.apache.camel.builder.endpoint.dsl.IAMEndpointBuilderFactory.IAMBuilders,
             org.apache.camel.builder.endpoint.dsl.IgniteCacheEndpointBuilderFactory.IgniteCacheBuilders,
@@ -243,9 +241,11 @@ public interface EndpointBuilderFactory
             org.apache.camel.builder.endpoint.dsl.OBSEndpointBuilderFactory.OBSBuilders,
             org.apache.camel.builder.endpoint.dsl.Olingo2EndpointBuilderFactory.Olingo2Builders,
             org.apache.camel.builder.endpoint.dsl.Olingo4EndpointBuilderFactory.Olingo4Builders,
+            org.apache.camel.builder.endpoint.dsl.OpensearchEndpointBuilderFactory.OpensearchBuilders,
             org.apache.camel.builder.endpoint.dsl.OpenshiftBuildConfigsEndpointBuilderFactory.OpenshiftBuildConfigsBuilders,
             org.apache.camel.builder.endpoint.dsl.OpenshiftBuildsEndpointBuilderFactory.OpenshiftBuildsBuilders,
             org.apache.camel.builder.endpoint.dsl.OpenshiftDeploymentConfigsEndpointBuilderFactory.OpenshiftDeploymentConfigsBuilders,
+            org.apache.camel.builder.endpoint.dsl.OptaPlannerEndpointBuilderFactory.OptaPlannerBuilders,
             org.apache.camel.builder.endpoint.dsl.PahoEndpointBuilderFactory.PahoBuilders,
             org.apache.camel.builder.endpoint.dsl.PahoMqtt5EndpointBuilderFactory.PahoMqtt5Builders,
             org.apache.camel.builder.endpoint.dsl.PdfEndpointBuilderFactory.PdfBuilders,
@@ -290,7 +290,6 @@ public interface EndpointBuilderFactory
             org.apache.camel.builder.endpoint.dsl.SmppEndpointBuilderFactory.SmppBuilders,
             org.apache.camel.builder.endpoint.dsl.SnmpEndpointBuilderFactory.SnmpBuilders,
             org.apache.camel.builder.endpoint.dsl.Sns2EndpointBuilderFactory.Sns2Builders,
-            org.apache.camel.builder.endpoint.dsl.SolrEndpointBuilderFactory.SolrBuilders,
             org.apache.camel.builder.endpoint.dsl.SplunkEndpointBuilderFactory.SplunkBuilders,
             org.apache.camel.builder.endpoint.dsl.SplunkHECEndpointBuilderFactory.SplunkHECBuilders,
             org.apache.camel.builder.endpoint.dsl.SpringBatchEndpointBuilderFactory.SpringBatchBuilders,
@@ -303,6 +302,7 @@ public interface EndpointBuilderFactory
             org.apache.camel.builder.endpoint.dsl.Sqs2EndpointBuilderFactory.Sqs2Builders,
             org.apache.camel.builder.endpoint.dsl.SshEndpointBuilderFactory.SshBuilders,
             org.apache.camel.builder.endpoint.dsl.StAXEndpointBuilderFactory.StAXBuilders,
+            org.apache.camel.builder.endpoint.dsl.StepFunctions2EndpointBuilderFactory.StepFunctions2Builders,
             org.apache.camel.builder.endpoint.dsl.StitchEndpointBuilderFactory.StitchBuilders,
             org.apache.camel.builder.endpoint.dsl.StompEndpointBuilderFactory.StompBuilders,
             org.apache.camel.builder.endpoint.dsl.StreamEndpointBuilderFactory.StreamBuilders,
@@ -313,6 +313,7 @@ public interface EndpointBuilderFactory
             org.apache.camel.builder.endpoint.dsl.ThriftEndpointBuilderFactory.ThriftBuilders,
             org.apache.camel.builder.endpoint.dsl.TikaEndpointBuilderFactory.TikaBuilders,
             org.apache.camel.builder.endpoint.dsl.TimerEndpointBuilderFactory.TimerBuilders,
+            org.apache.camel.builder.endpoint.dsl.Timestream2EndpointBuilderFactory.Timestream2Builders,
             org.apache.camel.builder.endpoint.dsl.Translate2EndpointBuilderFactory.Translate2Builders,
             org.apache.camel.builder.endpoint.dsl.TwilioEndpointBuilderFactory.TwilioBuilders,
             org.apache.camel.builder.endpoint.dsl.TwitterDirectMessageEndpointBuilderFactory.TwitterDirectMessageBuilders,
@@ -324,11 +325,9 @@ public interface EndpointBuilderFactory
             org.apache.camel.builder.endpoint.dsl.VertxEndpointBuilderFactory.VertxBuilders,
             org.apache.camel.builder.endpoint.dsl.VertxHttpEndpointBuilderFactory.VertxHttpBuilders,
             org.apache.camel.builder.endpoint.dsl.VertxWebsocketEndpointBuilderFactory.VertxWebsocketBuilders,
-            org.apache.camel.builder.endpoint.dsl.VmEndpointBuilderFactory.VmBuilders,
             org.apache.camel.builder.endpoint.dsl.WeatherEndpointBuilderFactory.WeatherBuilders,
             org.apache.camel.builder.endpoint.dsl.Web3jEndpointBuilderFactory.Web3jBuilders,
             org.apache.camel.builder.endpoint.dsl.WebhookEndpointBuilderFactory.WebhookBuilders,
-            org.apache.camel.builder.endpoint.dsl.WekaEndpointBuilderFactory.WekaBuilders,
             org.apache.camel.builder.endpoint.dsl.WhatsAppEndpointBuilderFactory.WhatsAppBuilders,
             org.apache.camel.builder.endpoint.dsl.WordpressEndpointBuilderFactory.WordpressBuilders,
             org.apache.camel.builder.endpoint.dsl.WorkdayEndpointBuilderFactory.WorkdayBuilders,
@@ -366,4 +365,3 @@ public interface EndpointBuilderFactory
         };
     }
 }
-//CHECKSTYLE:ON

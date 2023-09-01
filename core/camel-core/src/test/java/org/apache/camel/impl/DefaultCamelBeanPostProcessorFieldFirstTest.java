@@ -20,9 +20,9 @@ import java.util.Properties;
 
 import org.apache.camel.BindToRegistry;
 import org.apache.camel.ContextTestSupport;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.PropertyInject;
 import org.apache.camel.spi.CamelBeanPostProcessor;
+import org.apache.camel.support.PluginHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -57,7 +57,7 @@ public class DefaultCamelBeanPostProcessorFieldFirstTest extends ContextTestSupp
     @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
-        postProcessor = context.adapt(ExtendedCamelContext.class).getBeanPostProcessor();
+        postProcessor = PluginHelper.getBeanPostProcessor(context);
     }
 
     @BindToRegistry

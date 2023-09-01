@@ -21,17 +21,15 @@ public class GoogleDriveEndpointUriFactory extends org.apache.camel.support.comp
     private static final Set<String> SECRET_PROPERTY_NAMES;
     private static final Set<String> MULTI_VALUE_PREFIXES;
     static {
-        Set<String> props = new HashSet<>(51);
+        Set<String> props = new HashSet<>(48);
         props.add("accessToken");
         props.add("apiName");
-        props.add("appId");
         props.add("applicationName");
         props.add("backoffErrorThreshold");
         props.add("backoffIdleThreshold");
         props.add("backoffMultiplier");
         props.add("bridgeErrorHandler");
-        props.add("changeId");
-        props.add("childId");
+        props.add("channel");
         props.add("clientFactory");
         props.add("clientId");
         props.add("clientSecret");
@@ -41,11 +39,10 @@ public class GoogleDriveEndpointUriFactory extends org.apache.camel.support.comp
         props.add("delay");
         props.add("delegate");
         props.add("driveId");
-        props.add("email");
         props.add("exceptionHandler");
         props.add("exchangePattern");
+        props.add("file");
         props.add("fileId");
-        props.add("folderId");
         props.add("greedy");
         props.add("inBody");
         props.add("initialDelay");
@@ -53,10 +50,10 @@ public class GoogleDriveEndpointUriFactory extends org.apache.camel.support.comp
         props.add("mediaContent");
         props.add("methodName");
         props.add("mimeType");
-        props.add("parentId");
+        props.add("modifyLabelsRequest");
+        props.add("pageToken");
         props.add("permissionId");
         props.add("pollStrategy");
-        props.add("propertyKey");
         props.add("refreshToken");
         props.add("repeatCount");
         props.add("replyId");

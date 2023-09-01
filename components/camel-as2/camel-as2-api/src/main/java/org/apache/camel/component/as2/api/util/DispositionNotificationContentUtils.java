@@ -101,7 +101,7 @@ public final class DispositionNotificationContentUtils {
             for (int i = 0; i < elements.length; i++) {
                 Element element = elements[i];
                 if (i > 0) {
-                    builder.append("; " + element);
+                    builder.append("; ").append(element);
                 } else {
                     builder.append(element);
                 }
@@ -113,11 +113,11 @@ public final class DispositionNotificationContentUtils {
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder();
-            sb.append(name + ": ");
+            sb.append(name).append(": ");
             for (int i = 0; i < elements.length; i++) {
                 Element element = elements[i];
                 if (i > 0) {
-                    sb.append("; " + element);
+                    sb.append("; ").append(element);
                 } else {
                     sb.append(element);
                 }
@@ -246,9 +246,9 @@ public final class DispositionNotificationContentUtils {
                 dispositionMode,
                 dispositionType,
                 dispositionModifier,
-                failures.toArray(new String[failures.size()]),
-                errors.toArray(new String[errors.size()]),
-                warnings.toArray(new String[warnings.size()]),
+                failures.toArray(new String[0]),
+                errors.toArray(new String[0]),
+                warnings.toArray(new String[0]),
                 extensionFields,
                 receivedContentMic);
     }
@@ -270,7 +270,7 @@ public final class DispositionNotificationContentUtils {
             }
         }
 
-        return new Field(fieldName, elements.toArray(new Element[elements.size()]));
+        return new Field(fieldName, elements.toArray(new Element[0]));
     }
 
     public static Element parseDispositionFieldElement(CharArrayBuffer fieldLine, ParserCursor cursor) {
@@ -302,6 +302,6 @@ public final class DispositionNotificationContentUtils {
             }
         }
 
-        return new Element(value, parameters.toArray(new String[parameters.size()]));
+        return new Element(value, parameters.toArray(new String[0]));
     }
 }

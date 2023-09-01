@@ -393,14 +393,15 @@ public interface SedaEndpointBuilderFactory {
          * Define the queue instance which will be used by the endpoint.
          * 
          * The option is a:
-         * &lt;code&gt;java.util.concurrent.BlockingQueue&lt;/code&gt; type.
+         * &lt;code&gt;java.util.concurrent.BlockingQueue&amp;lt;org.apache.camel.Exchange&amp;gt;&lt;/code&gt; type.
          * 
          * Group: advanced
          * 
          * @param queue the value to set
          * @return the dsl builder
          */
-        default AdvancedSedaEndpointConsumerBuilder queue(BlockingQueue queue) {
+        default AdvancedSedaEndpointConsumerBuilder queue(
+                BlockingQueue<org.apache.camel.Exchange> queue) {
             doSetProperty("queue", queue);
             return this;
         }
@@ -408,7 +409,7 @@ public interface SedaEndpointBuilderFactory {
          * Define the queue instance which will be used by the endpoint.
          * 
          * The option will be converted to a
-         * &lt;code&gt;java.util.concurrent.BlockingQueue&lt;/code&gt; type.
+         * &lt;code&gt;java.util.concurrent.BlockingQueue&amp;lt;org.apache.camel.Exchange&amp;gt;&lt;/code&gt; type.
          * 
          * Group: advanced
          * 
@@ -796,14 +797,15 @@ public interface SedaEndpointBuilderFactory {
          * Define the queue instance which will be used by the endpoint.
          * 
          * The option is a:
-         * &lt;code&gt;java.util.concurrent.BlockingQueue&lt;/code&gt; type.
+         * &lt;code&gt;java.util.concurrent.BlockingQueue&amp;lt;org.apache.camel.Exchange&amp;gt;&lt;/code&gt; type.
          * 
          * Group: advanced
          * 
          * @param queue the value to set
          * @return the dsl builder
          */
-        default AdvancedSedaEndpointProducerBuilder queue(BlockingQueue queue) {
+        default AdvancedSedaEndpointProducerBuilder queue(
+                BlockingQueue<org.apache.camel.Exchange> queue) {
             doSetProperty("queue", queue);
             return this;
         }
@@ -811,7 +813,7 @@ public interface SedaEndpointBuilderFactory {
          * Define the queue instance which will be used by the endpoint.
          * 
          * The option will be converted to a
-         * &lt;code&gt;java.util.concurrent.BlockingQueue&lt;/code&gt; type.
+         * &lt;code&gt;java.util.concurrent.BlockingQueue&amp;lt;org.apache.camel.Exchange&amp;gt;&lt;/code&gt; type.
          * 
          * Group: advanced
          * 
@@ -884,14 +886,15 @@ public interface SedaEndpointBuilderFactory {
          * Define the queue instance which will be used by the endpoint.
          * 
          * The option is a:
-         * &lt;code&gt;java.util.concurrent.BlockingQueue&lt;/code&gt; type.
+         * &lt;code&gt;java.util.concurrent.BlockingQueue&amp;lt;org.apache.camel.Exchange&amp;gt;&lt;/code&gt; type.
          * 
          * Group: advanced
          * 
          * @param queue the value to set
          * @return the dsl builder
          */
-        default AdvancedSedaEndpointBuilder queue(BlockingQueue queue) {
+        default AdvancedSedaEndpointBuilder queue(
+                BlockingQueue<org.apache.camel.Exchange> queue) {
             doSetProperty("queue", queue);
             return this;
         }
@@ -899,7 +902,7 @@ public interface SedaEndpointBuilderFactory {
          * Define the queue instance which will be used by the endpoint.
          * 
          * The option will be converted to a
-         * &lt;code&gt;java.util.concurrent.BlockingQueue&lt;/code&gt; type.
+         * &lt;code&gt;java.util.concurrent.BlockingQueue&amp;lt;org.apache.camel.Exchange&amp;gt;&lt;/code&gt; type.
          * 
          * Group: advanced
          * 
@@ -918,7 +921,7 @@ public interface SedaEndpointBuilderFactory {
          * Asynchronously call another endpoint from any Camel Context in the
          * same JVM.
          * 
-         * Category: core,endpoint
+         * Category: core,messaging
          * Since: 1.1
          * Maven coordinates: org.apache.camel:camel-seda
          * 
@@ -938,7 +941,7 @@ public interface SedaEndpointBuilderFactory {
          * Asynchronously call another endpoint from any Camel Context in the
          * same JVM.
          * 
-         * Category: core,endpoint
+         * Category: core,messaging
          * Since: 1.1
          * Maven coordinates: org.apache.camel:camel-seda
          * 

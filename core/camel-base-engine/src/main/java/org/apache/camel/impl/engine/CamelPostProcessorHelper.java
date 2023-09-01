@@ -33,7 +33,6 @@ import org.apache.camel.Consumer;
 import org.apache.camel.ConsumerTemplate;
 import org.apache.camel.DelegateEndpoint;
 import org.apache.camel.Endpoint;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.FluentProducerTemplate;
 import org.apache.camel.IsSingleton;
 import org.apache.camel.MultipleConsumersSupport;
@@ -51,6 +50,7 @@ import org.apache.camel.spi.PropertiesComponent;
 import org.apache.camel.spi.PropertyConfigurer;
 import org.apache.camel.spi.Registry;
 import org.apache.camel.support.CamelContextHelper;
+import org.apache.camel.support.PluginHelper;
 import org.apache.camel.support.PropertyBindingSupport;
 import org.apache.camel.support.service.ServiceHelper;
 import org.apache.camel.util.ObjectHelper;
@@ -89,8 +89,7 @@ public class CamelPostProcessorHelper implements CamelContextAware {
         Consume consume = method.getAnnotation(Consume.class);
         if (consume != null) {
             LOG.debug("Creating a consumer for: {}", consume);
-            String uri = consume.value().isEmpty() ? consume.uri() : consume.value();
-            subscribeMethod(method, bean, beanName, uri, consume.property(), consume.predicate());
+            subscribeMethod(method, bean, beanName, consume.value(), consume.property(), consume.predicate());
         }
     }
 
@@ -192,11 +191,11 @@ public class CamelPostProcessorHelper implements CamelContextAware {
         // 2. then the getter with Endpoint as postfix
         // 3. then if start with on then try step 1 and 2 again, but omit the on prefix
         try {
-            Object value = getCamelContext().adapt(ExtendedCamelContext.class).getBeanIntrospection().getOrElseProperty(bean,
+            Object value = PluginHelper.getBeanIntrospection(getCamelContext()).getOrElseProperty(bean,
                     propertyName, null, false);
             if (value == null) {
                 // try endpoint as postfix
-                value = getCamelContext().adapt(ExtendedCamelContext.class).getBeanIntrospection().getOrElseProperty(bean,
+                value = PluginHelper.getBeanIntrospection(getCamelContext()).getOrElseProperty(bean,
                         propertyName + "Endpoint", null, false);
             }
             if (value == null && propertyName.startsWith("on")) {
@@ -255,8 +254,7 @@ public class CamelPostProcessorHelper implements CamelContextAware {
                     // lets create a proxy
                     try {
                         // use proxy service
-                        BeanProxyFactory factory
-                                = endpoint.getCamelContext().adapt(ExtendedCamelContext.class).getBeanProxyFactory();
+                        BeanProxyFactory factory = PluginHelper.getBeanProxyFactory(endpoint.getCamelContext());
                         return factory.createProxy(endpoint, binding, type);
                     } catch (Exception e) {
                         throw createProxyInstantiationRuntimeException(type, endpoint, e);
@@ -339,7 +337,7 @@ public class CamelPostProcessorHelper implements CamelContextAware {
                     }
                     return answer;
                 }
-                throw new NoSuchBeanException(name, type.getName());
+                throw new NoSuchBeanException(null, type.getName());
             } else if (found.size() > 1) {
                 throw new NoSuchBeanException(
                         "Found " + found.size() + " beans of type: " + type + ". Only one bean expected.");
@@ -353,7 +351,7 @@ public class CamelPostProcessorHelper implements CamelContextAware {
     }
 
     public Object getInjectionBeanConfigValue(Class<?> type, String name) {
-        ExtendedCamelContext ecc = (ExtendedCamelContext) getCamelContext();
+        CamelContext ecc = getCamelContext();
 
         // is it a map or properties
         boolean mapType = false;
@@ -378,7 +376,7 @@ public class CamelPostProcessorHelper implements CamelContextAware {
                 // attempt to create a new instance
                 try {
                     bean = ecc.getInjector().newInstance(type);
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     // ignore
                     return null;
                 }
@@ -420,7 +418,7 @@ public class CamelPostProcessorHelper implements CamelContextAware {
         String[] names = new String[] {
                 type.getName() + "-configurer", type.getSimpleName() + "-configurer", rootKey + "-configurer" };
         for (String n : names) {
-            configurer = ecc.getConfigurerResolver().resolvePropertyConfigurer(n, ecc);
+            configurer = PluginHelper.getConfigurerResolver(ecc).resolvePropertyConfigurer(n, ecc);
             if (configurer != null) {
                 break;
             }
@@ -592,8 +590,7 @@ public class CamelPostProcessorHelper implements CamelContextAware {
      */
     protected Producer createInjectionProducer(Endpoint endpoint, Object bean, String beanName) {
         try {
-            return endpoint.getCamelContext().adapt(ExtendedCamelContext.class).getDeferServiceFactory()
-                    .createProducer(endpoint);
+            return PluginHelper.getDeferServiceFactory(endpoint.getCamelContext()).createProducer(endpoint);
         } catch (Exception e) {
             throw RuntimeCamelException.wrapRuntimeCamelException(e);
         }

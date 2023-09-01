@@ -25,6 +25,7 @@ import org.apache.camel.model.LogDefinition
 import org.apache.camel.model.RouteTemplateDefinition
 import org.apache.camel.model.ToDefinition
 import org.apache.camel.spi.Resource
+import org.apache.camel.support.PluginHelper
 import org.junit.jupiter.api.Assertions
 
 class RouteTemplateTest extends YamlTestSupport {
@@ -53,7 +54,7 @@ class RouteTemplateTest extends YamlTestSupport {
 
     def "create template with beans (#resource.location)"(Resource resource) {
         setup:
-        context.routesLoader.loadRoutes(resource)
+        PluginHelper.getRoutesLoader(context).loadRoutes(resource)
 
         withMock('mock:result') {
             expectedMessageCount 1
@@ -344,9 +345,9 @@ class RouteTemplateTest extends YamlTestSupport {
                           uri: "direct:route"
                           steps:
                             - aggregate:
-                                aggregation-strategy: "{{myAgg}}"
-                                completion-size: 2
-                                correlation-expression:
+                                aggregationStrategy: "{{myAgg}}"
+                                completionSize: 2
+                                correlationExpression:
                                   header: "StockSymbol"
                                 steps:  
                                   - to: "mock:result"
@@ -389,9 +390,9 @@ class RouteTemplateTest extends YamlTestSupport {
                           uri: "direct:route"
                           steps:
                             - aggregate:
-                                aggregation-strategy: "{{myAgg}}"
-                                completion-size: 2
-                                correlation-expression:
+                                aggregationStrategy: "{{myAgg}}"
+                                completionSize: 2
+                                correlationExpression:
                                   header: "StockSymbol"
                                 steps:  
                                   - to: "mock:result"
@@ -455,18 +456,18 @@ class RouteTemplateTest extends YamlTestSupport {
         }
     }
 
-    def "create route-template with route"() {
+    def "create routeTemplate with route"() {
         setup:
         loadRoutes """
-                - route-template:
+                - routeTemplate:
                     id: "myTemplate"
                     parameters:
                       - name: "foo"
                       - name: "bar"
                     route:
-                      stream-caching: false
-                      message-history: true
-                      log-mask: true
+                      streamCaching: false
+                      messageHistory: true
+                      logMask: true
                       from:
                         uri: "direct:{{foo}}"
                         steps:
@@ -484,10 +485,10 @@ class RouteTemplateTest extends YamlTestSupport {
             }
     }
 
-    def "create route-template with prefix"() {
+    def "create routeTemplate with prefix"() {
         setup:
         loadRoutes """
-                - route-template:
+                - routeTemplate:
                     id: "myTemplate"
                     parameters:
                       - name: "foo"

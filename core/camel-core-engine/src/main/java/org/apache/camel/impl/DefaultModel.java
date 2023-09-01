@@ -28,13 +28,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 import org.apache.camel.CamelContext;
-import org.apache.camel.Component;
 import org.apache.camel.Exchange;
 import org.apache.camel.Expression;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.FailedToCreateRouteFromTemplateException;
 import org.apache.camel.NoSuchBeanException;
-import org.apache.camel.PropertyBindingException;
 import org.apache.camel.RouteTemplateContext;
 import org.apache.camel.model.BeanFactoryDefinition;
 import org.apache.camel.model.DataFormatDefinition;
@@ -59,6 +56,7 @@ import org.apache.camel.model.TemplatedRouteBeanDefinition;
 import org.apache.camel.model.TemplatedRouteDefinition;
 import org.apache.camel.model.TemplatedRouteParameterDefinition;
 import org.apache.camel.model.ToDefinition;
+import org.apache.camel.model.app.RegistryBeanDefinition;
 import org.apache.camel.model.cloud.ServiceCallConfigurationDefinition;
 import org.apache.camel.model.rest.RestDefinition;
 import org.apache.camel.model.transformer.TransformerDefinition;
@@ -66,7 +64,7 @@ import org.apache.camel.model.validator.ValidatorDefinition;
 import org.apache.camel.spi.ExchangeFactory;
 import org.apache.camel.spi.Language;
 import org.apache.camel.spi.ModelReifierFactory;
-import org.apache.camel.spi.PropertyConfigurer;
+import org.apache.camel.spi.NodeIdFactory;
 import org.apache.camel.spi.RouteTemplateLoaderListener;
 import org.apache.camel.spi.RouteTemplateParameterSource;
 import org.apache.camel.spi.ScriptingLanguage;
@@ -75,7 +73,6 @@ import org.apache.camel.support.PatternHelper;
 import org.apache.camel.support.PropertyBindingSupport;
 import org.apache.camel.support.RouteTemplateHelper;
 import org.apache.camel.support.ScriptHelper;
-import org.apache.camel.support.service.ServiceHelper;
 import org.apache.camel.util.AntPathMatcher;
 import org.apache.camel.util.ObjectHelper;
 import org.apache.camel.util.StringHelper;
@@ -95,6 +92,8 @@ public class DefaultModel implements Model {
     private Map<String, DataFormatDefinition> dataFormats = new HashMap<>();
     private List<TransformerDefinition> transformers = new ArrayList<>();
     private List<ValidatorDefinition> validators = new ArrayList<>();
+    // XML and YAML DSL allows to declare beans in the DSL
+    private List<RegistryBeanDefinition> beans = new ArrayList<>();
     private final Map<String, ServiceCallConfigurationDefinition> serviceCallConfigurations = new ConcurrentHashMap<>();
     private final Map<String, Resilience4jConfigurationDefinition> resilience4jConfigurations = new ConcurrentHashMap<>();
     private final Map<String, FaultToleranceConfigurationDefinition> faultToleranceConfigurations = new ConcurrentHashMap<>();
@@ -163,7 +162,7 @@ public class DefaultModel implements Model {
     @Override
     public synchronized RouteConfigurationDefinition getRouteConfigurationDefinition(String id) {
         for (RouteConfigurationDefinition def : routesConfigurations) {
-            if (def.idOrCreate(camelContext.adapt(ExtendedCamelContext.class).getNodeIdFactory()).equals(id)) {
+            if (def.idOrCreate(camelContext.getCamelContextExtension().getContextPlugin(NodeIdFactory.class)).equals(id)) {
                 return def;
             }
         }
@@ -221,14 +220,17 @@ public class DefaultModel implements Model {
                 if (from != null) {
                     String uri = from.getEndpointUri();
                     if (uri != null && uri.startsWith("rest:")) {
-                        ToDefinition to = (ToDefinition) r.getOutputs().get(0);
-                        String toUri = to.getEndpointUri();
-                        RouteDefinition toBeInlined = directs.get(toUri);
-                        if (toBeInlined != null) {
-                            toBeRemoved.add(toBeInlined);
-                            // inline by replacing the outputs
-                            r.getOutputs().clear();
-                            r.getOutputs().addAll(toBeInlined.getOutputs());
+                        ProcessorDefinition<?> def = r.getOutputs().get(0);
+                        if (def instanceof ToDefinition) {
+                            ToDefinition to = (ToDefinition) def;
+                            String toUri = to.getEndpointUri();
+                            RouteDefinition toBeInlined = directs.get(toUri);
+                            if (toBeInlined != null) {
+                                toBeRemoved.add(toBeInlined);
+                                // inline by replacing the outputs
+                                r.getOutputs().clear();
+                                r.getOutputs().addAll(toBeInlined.getOutputs());
+                            }
                         }
                     }
                 }
@@ -246,7 +248,7 @@ public class DefaultModel implements Model {
         }
 
         if (shouldStartRoutes()) {
-            getCamelContext().adapt(ModelCamelContext.class).startRouteDefinitions(list);
+            ((ModelCamelContext) getCamelContext()).startRouteDefinitions(list);
         }
     }
 
@@ -295,7 +297,7 @@ public class DefaultModel implements Model {
     @Override
     public synchronized RouteDefinition getRouteDefinition(String id) {
         for (RouteDefinition route : routeDefinitions) {
-            if (route.idOrCreate(camelContext.adapt(ExtendedCamelContext.class).getNodeIdFactory()).equals(id)) {
+            if (route.idOrCreate(camelContext.getCamelContextExtension().getContextPlugin(NodeIdFactory.class)).equals(id)) {
                 return route;
             }
         }
@@ -310,7 +312,7 @@ public class DefaultModel implements Model {
     @Override
     public RouteTemplateDefinition getRouteTemplateDefinition(String id) {
         for (RouteTemplateDefinition route : routeTemplateDefinitions) {
-            if (route.idOrCreate(camelContext.adapt(ExtendedCamelContext.class).getNodeIdFactory()).equals(id)) {
+            if (route.idOrCreate(camelContext.getCamelContextExtension().getContextPlugin(NodeIdFactory.class)).equals(id)) {
                 return route;
             }
         }
@@ -541,7 +543,10 @@ public class DefaultModel implements Model {
             throws Exception {
         final Map<String, Object> props = new HashMap<>();
         if (beanFactory.getProperties() != null) {
-            beanFactory.getProperties().forEach(p -> props.put(p.getKey(), p.getValue()));
+            props.putAll(beanFactory.getProperties());
+        }
+        if (beanFactory.getPropertyDefinitions() != null) {
+            beanFactory.getPropertyDefinitions().forEach(p -> props.put(p.getKey(), p.getValue()));
         }
         if (beanFactory.getBeanSupplier() != null) {
             if (props.isEmpty()) {
@@ -577,7 +582,7 @@ public class DefaultModel implements Model {
                     bindings.put("rtc", routeTemplateContext);
                     Object local = slan.evaluate(script, bindings, clazz);
                     if (!props.isEmpty()) {
-                        setPropertiesOnTarget(camelContext, local, props);
+                        PropertyBindingSupport.setPropertiesOnTarget(camelContext, local, props);
                     }
                     return local;
                 }));
@@ -586,7 +591,7 @@ public class DefaultModel implements Model {
                 // and memorize so the script is only evaluated once and the local bean is the same
                 // if a route template refers to the local bean multiple times
                 routeTemplateContext.bind(beanFactory.getName(), clazz, Suppliers.memorize(() -> {
-                    ExchangeFactory ef = camelContext.adapt(ExtendedCamelContext.class).getExchangeFactory();
+                    ExchangeFactory ef = camelContext.getCamelContextExtension().getExchangeFactory();
                     Exchange dummy = ef.create(false);
                     try {
                         String text = ScriptHelper.resolveOptionalExternalScript(camelContext, dummy, script);
@@ -594,7 +599,7 @@ public class DefaultModel implements Model {
                             Expression exp = lan.createExpression(text);
                             Object local = exp.evaluate(dummy, clazz);
                             if (!props.isEmpty()) {
-                                setPropertiesOnTarget(camelContext, local, props);
+                                PropertyBindingSupport.setPropertiesOnTarget(camelContext, local, props);
                             }
                             return local;
                         } else {
@@ -650,7 +655,7 @@ public class DefaultModel implements Model {
                             local = PropertyBindingSupport.newInstanceConstructorParameters(camelContext, clazz, params);
                         }
                         if (!props.isEmpty()) {
-                            setPropertiesOnTarget(camelContext, local, props);
+                            PropertyBindingSupport.setPropertiesOnTarget(camelContext, local, props);
                         }
                         return local;
                     } catch (Exception e) {
@@ -669,7 +674,7 @@ public class DefaultModel implements Model {
                         Suppliers.memorize(() -> {
                             Object local = camelContext.getInjector().newInstance(clazz);
                             if (!props.isEmpty()) {
-                                setPropertiesOnTarget(camelContext, local, props);
+                                PropertyBindingSupport.setPropertiesOnTarget(camelContext, local, props);
                             }
                             return local;
                         }));
@@ -692,68 +697,6 @@ public class DefaultModel implements Model {
             throw new IllegalArgumentException(
                     "Route template local bean: " + beanFactory.getName() + " has invalid type syntax: " + beanFactory.getType()
                                                + ". To refer to a class then prefix the value with #class such as: #class:fullyQualifiedClassName");
-        }
-    }
-
-    /**
-     * Sets the properties to the given target.
-     *
-     * @param context    the context into which the properties must be set.
-     * @param target     the object to which the properties must be set.
-     * @param properties the properties to set.
-     */
-    private static void setPropertiesOnTarget(CamelContext context, Object target, Map<String, Object> properties) {
-        ObjectHelper.notNull(context, "context");
-        ObjectHelper.notNull(target, "target");
-        ObjectHelper.notNull(properties, "properties");
-
-        if (target instanceof CamelContext) {
-            throw new UnsupportedOperationException("Configuring the Camel Context is not supported");
-        }
-
-        PropertyConfigurer configurer = null;
-        if (target instanceof Component) {
-            // the component needs to be initialized to have the configurer ready
-            ServiceHelper.initService(target);
-            configurer = ((Component) target).getComponentPropertyConfigurer();
-        }
-
-        if (configurer == null) {
-            // see if there is a configurer for it
-            configurer = context.adapt(ExtendedCamelContext.class)
-                    .getConfigurerResolver()
-                    .resolvePropertyConfigurer(target.getClass().getSimpleName(), context);
-        }
-
-        try {
-            PropertyBindingSupport.build()
-                    .withMandatory(true)
-                    .withRemoveParameters(false)
-                    .withConfigurer(configurer)
-                    .withIgnoreCase(true)
-                    .withFlattenProperties(true)
-                    .bind(context, target, properties);
-        } catch (PropertyBindingException e) {
-            String key = e.getOptionKey();
-            if (key == null) {
-                String prefix = e.getOptionPrefix();
-                if (prefix != null && !prefix.endsWith(".")) {
-                    prefix = "." + prefix;
-                }
-
-                key = prefix != null
-                        ? prefix + "." + e.getPropertyName()
-                        : e.getPropertyName();
-            }
-
-            // enrich the error with more precise details with option prefix and key
-            throw new PropertyBindingException(
-                    e.getTarget(),
-                    e.getPropertyName(),
-                    e.getValue(),
-                    null,
-                    key,
-                    e.getCause());
         }
     }
 
@@ -975,6 +918,18 @@ public class DefaultModel implements Model {
     @Override
     public void setModelReifierFactory(ModelReifierFactory modelReifierFactory) {
         this.modelReifierFactory = modelReifierFactory;
+    }
+
+    @Override
+    public void addRegistryBean(RegistryBeanDefinition bean) {
+        // remove exiting bean with same name to update
+        beans.removeIf(b -> bean.getName().equals(b.getName()));
+        beans.add(bean);
+    }
+
+    @Override
+    public List<RegistryBeanDefinition> getRegistryBeans() {
+        return beans;
     }
 
     /**

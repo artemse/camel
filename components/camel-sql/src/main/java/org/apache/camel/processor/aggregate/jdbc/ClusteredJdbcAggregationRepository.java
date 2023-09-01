@@ -70,19 +70,19 @@ public class ClusteredJdbcAggregationRepository extends JdbcAggregationRepositor
     public void remove(final CamelContext camelContext, final String correlationId, final Exchange exchange) {
         transactionTemplate.execute(new TransactionCallbackWithoutResult() {
             protected void doInTransactionWithoutResult(TransactionStatus status) {
-                final String key = correlationId;
                 final String confirmKey = exchange.getExchangeId();
                 final long version = exchange.getProperty(VERSION_PROPERTY, Long.class);
                 try {
-                    LOG.debug("Removing key {}", key);
+                    LOG.debug("Removing key {}", correlationId);
 
                     jdbcTemplate.update("DELETE FROM " + getRepositoryName() + " WHERE " + ID + " = ? AND " + VERSION + " = ?",
-                            key, version);
+                            correlationId, version);
 
                     insert(camelContext, confirmKey, exchange, getRepositoryNameCompleted(), version, true);
 
                 } catch (Exception e) {
-                    throw new RuntimeException("Error removing key " + key + " from repository " + getRepositoryName(), e);
+                    throw new RuntimeException(
+                            "Error removing key " + correlationId + " from repository " + getRepositoryName(), e);
                 }
             }
         });
@@ -124,9 +124,7 @@ public class ClusteredJdbcAggregationRepository extends JdbcAggregationRepositor
         }
         queryBuilder.append(") VALUES (");
 
-        for (int i = 0; i < totalParameterIndex - 1; i++) {
-            queryBuilder.append("?, ");
-        }
+        queryBuilder.append("?, ".repeat(totalParameterIndex - 1));
         queryBuilder.append("?)");
 
         String sql = queryBuilder.toString();

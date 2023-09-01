@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.function.BiFunction;
 
 import org.apache.camel.CamelContext;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.model.DataFormatDefinition;
 import org.apache.camel.model.Model;
 import org.apache.camel.model.dataformat.ASN1DataFormat;
@@ -50,6 +49,7 @@ import org.apache.camel.model.dataformat.JsonDataFormat;
 import org.apache.camel.model.dataformat.LZFDataFormat;
 import org.apache.camel.model.dataformat.MimeMultipartDataFormat;
 import org.apache.camel.model.dataformat.PGPDataFormat;
+import org.apache.camel.model.dataformat.ParquetAvroDataFormat;
 import org.apache.camel.model.dataformat.ProtobufDataFormat;
 import org.apache.camel.model.dataformat.RssDataFormat;
 import org.apache.camel.model.dataformat.SoapDataFormat;
@@ -73,6 +73,7 @@ import org.apache.camel.spi.PropertyConfigurer;
 import org.apache.camel.spi.PropertyConfigurerAware;
 import org.apache.camel.spi.ReifierStrategy;
 import org.apache.camel.support.CamelContextHelper;
+import org.apache.camel.support.PluginHelper;
 import org.apache.camel.support.PropertyBindingSupport;
 import org.apache.camel.util.ObjectHelper;
 import org.apache.camel.util.StringHelper;
@@ -134,7 +135,7 @@ public abstract class DataFormatReifier<T extends DataFormatDefinition> extends 
 
             // try to let resolver see if it can resolve it, its not always
             // possible
-            type = camelContext.getExtension(Model.class).resolveDataFormatDefinition(ref);
+            type = camelContext.getCamelContextExtension().getContextPlugin(Model.class).resolveDataFormatDefinition(ref);
 
             if (type == null) {
                 dataFormat = camelContext.resolveDataFormat(ref);
@@ -172,7 +173,6 @@ public abstract class DataFormatReifier<T extends DataFormatDefinition> extends 
         return answer;
     }
 
-    // CHECKSTYLE:OFF
     private static DataFormatReifier<? extends DataFormatDefinition> coreReifier(
             CamelContext camelContext, DataFormatDefinition definition) {
         if (definition instanceof ASN1DataFormat) {
@@ -221,6 +221,8 @@ public abstract class DataFormatReifier<T extends DataFormatDefinition> extends 
             return new LZFDataFormatReifier(camelContext, definition);
         } else if (definition instanceof MimeMultipartDataFormat) {
             return new MimeMultipartDataFormatReifier(camelContext, definition);
+        } else if (definition instanceof ParquetAvroDataFormat) {
+            return new ParquetAvroDataFormatReifier(camelContext, definition);
         } else if (definition instanceof PGPDataFormat) {
             return new PGPDataFormatReifier(camelContext, definition);
         } else if (definition instanceof ProtobufDataFormat) {
@@ -258,7 +260,6 @@ public abstract class DataFormatReifier<T extends DataFormatDefinition> extends 
         }
         return null;
     }
-    // CHECKSTYLE:ON
 
     public DataFormat createDataFormat() {
         DataFormat dataFormat = definition.getDataFormat();
@@ -333,7 +334,7 @@ public abstract class DataFormatReifier<T extends DataFormatDefinition> extends 
         }
         if (configurer == null) {
             String configurerName = name + "-dataformat-configurer";
-            configurer = camelContext.adapt(ExtendedCamelContext.class).getConfigurerResolver()
+            configurer = PluginHelper.getConfigurerResolver(camelContext)
                     .resolvePropertyConfigurer(configurerName, camelContext);
         }
         return configurer;

@@ -39,14 +39,15 @@ public class NettyHttpSimplePooledExchangeTest extends BaseNettyTest {
 
     @Override
     protected CamelContext createCamelContext() throws Exception {
-        ExtendedCamelContext ecc = (ExtendedCamelContext) super.createCamelContext();
+        CamelContext camelContext = super.createCamelContext();
+        ExtendedCamelContext ecc = camelContext.getCamelContextExtension();
 
         ecc.setExchangeFactory(new PooledExchangeFactory());
         ecc.setProcessorExchangeFactory(new PooledProcessorExchangeFactory());
         ecc.getExchangeFactory().setStatisticsEnabled(true);
         ecc.getProcessorExchangeFactory().setStatisticsEnabled(true);
 
-        return ecc;
+        return camelContext;
     }
 
     @Order(1)
@@ -63,7 +64,7 @@ public class NettyHttpSimplePooledExchangeTest extends BaseNettyTest {
 
         Awaitility.waitAtMost(2, TimeUnit.SECONDS).untilAsserted(() -> {
             PooledObjectFactory.Statistics stat
-                    = context.adapt(ExtendedCamelContext.class).getExchangeFactoryManager().getStatistics();
+                    = context.getCamelContextExtension().getExchangeFactoryManager().getStatistics();
             assertEquals(1, stat.getCreatedCounter());
             assertEquals(0, stat.getAcquiredCounter());
             assertEquals(1, stat.getReleasedCounter());
@@ -92,7 +93,7 @@ public class NettyHttpSimplePooledExchangeTest extends BaseNettyTest {
 
         Awaitility.waitAtMost(2, TimeUnit.SECONDS).untilAsserted(() -> {
             PooledObjectFactory.Statistics stat
-                    = context.adapt(ExtendedCamelContext.class).getExchangeFactoryManager().getStatistics();
+                    = context.getCamelContextExtension().getExchangeFactoryManager().getStatistics();
             assertEquals(1, stat.getCreatedCounter());
             assertEquals(2, stat.getAcquiredCounter());
             assertEquals(3, stat.getReleasedCounter());

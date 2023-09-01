@@ -33,19 +33,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class InOnlyPooledExchangeTest extends JmsTestSupport {
 
-    private static final String SJMS_QUEUE_NAME = "sjms:queue:in.only.consumer.queue";
+    private static final String SJMS_QUEUE_NAME = "sjms:queue:in.only.consumer.queue.InOnlyPooledExchangeTest";
     private static final String MOCK_RESULT = "mock:result";
 
     @Override
     protected CamelContext createCamelContext() throws Exception {
-        ExtendedCamelContext ecc = (ExtendedCamelContext) super.createCamelContext();
+        CamelContext camelContext = super.createCamelContext();
+        ExtendedCamelContext ecc = camelContext.getCamelContextExtension();
 
         ecc.setExchangeFactory(new PooledExchangeFactory());
         ecc.setProcessorExchangeFactory(new PooledProcessorExchangeFactory());
         ecc.getExchangeFactory().setStatisticsEnabled(true);
         ecc.getProcessorExchangeFactory().setStatisticsEnabled(true);
 
-        return ecc;
+        return camelContext;
     }
 
     @Test
@@ -61,7 +62,7 @@ public class InOnlyPooledExchangeTest extends JmsTestSupport {
 
         Awaitility.waitAtMost(2, TimeUnit.SECONDS).untilAsserted(() -> {
             PooledObjectFactory.Statistics stat
-                    = context.adapt(ExtendedCamelContext.class).getExchangeFactoryManager().getStatistics();
+                    = context.getCamelContextExtension().getExchangeFactoryManager().getStatistics();
             assertEquals(1, stat.getCreatedCounter());
             assertEquals(0, stat.getAcquiredCounter());
             assertEquals(1, stat.getReleasedCounter());
@@ -81,7 +82,7 @@ public class InOnlyPooledExchangeTest extends JmsTestSupport {
 
         Awaitility.waitAtMost(2, TimeUnit.SECONDS).untilAsserted(() -> {
             PooledObjectFactory.Statistics stat
-                    = context.adapt(ExtendedCamelContext.class).getExchangeFactoryManager().getStatistics();
+                    = context.getCamelContextExtension().getExchangeFactoryManager().getStatistics();
             assertEquals(1, stat.getCreatedCounter());
             assertEquals(1, stat.getAcquiredCounter());
             assertEquals(2, stat.getReleasedCounter());

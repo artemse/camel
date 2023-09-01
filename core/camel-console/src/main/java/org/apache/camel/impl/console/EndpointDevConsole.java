@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.apache.camel.Endpoint;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.spi.EndpointRegistry;
 import org.apache.camel.spi.RuntimeEndpointRegistry;
 import org.apache.camel.spi.annotations.DevConsole;
@@ -43,7 +42,7 @@ public class EndpointDevConsole extends AbstractDevConsole {
 
         // runtime registry is optional but if enabled we have additional statistics to use in output
         List<RuntimeEndpointRegistry.Statistic> stats = null;
-        RuntimeEndpointRegistry runtimeReg = getCamelContext().adapt(ExtendedCamelContext.class).getRuntimeEndpointRegistry();
+        RuntimeEndpointRegistry runtimeReg = getCamelContext().getRuntimeEndpointRegistry();
         if (runtimeReg != null) {
             stats = runtimeReg.getEndpointStatistics();
         }
@@ -54,12 +53,18 @@ public class EndpointDevConsole extends AbstractDevConsole {
         Collection<Endpoint> col = reg.getReadOnlyValues();
         if (!col.isEmpty()) {
             for (Endpoint e : col) {
+                boolean stub = e.getComponent().getClass().getSimpleName().equals("StubComponent");
+                String uri = e.toString();
+                if (!uri.startsWith("stub:") && stub) {
+                    // shadow-stub
+                    uri = uri + " (stub)";
+                }
                 var stat = findStats(stats, e.getEndpointUri());
                 if (stat.isPresent()) {
                     var st = stat.get();
-                    sb.append(String.format("\n    %s (direction: %s, usage: %s)", e, st.getDirection(), st.getHits()));
+                    sb.append(String.format("\n    %s (direction: %s, usage: %s)", uri, st.getDirection(), st.getHits()));
                 } else {
-                    sb.append(String.format("\n    %s", e));
+                    sb.append(String.format("\n    %s", uri));
                 }
             }
         }
@@ -74,7 +79,7 @@ public class EndpointDevConsole extends AbstractDevConsole {
 
         // runtime registry is optional but if enabled we have additional statistics to use in output
         List<RuntimeEndpointRegistry.Statistic> stats = null;
-        RuntimeEndpointRegistry runtimeReg = getCamelContext().adapt(ExtendedCamelContext.class).getRuntimeEndpointRegistry();
+        RuntimeEndpointRegistry runtimeReg = getCamelContext().getRuntimeEndpointRegistry();
         if (runtimeReg != null) {
             stats = runtimeReg.getEndpointStatistics();
         }
@@ -89,7 +94,9 @@ public class EndpointDevConsole extends AbstractDevConsole {
         Collection<Endpoint> col = reg.getReadOnlyValues();
         for (Endpoint e : col) {
             JsonObject jo = new JsonObject();
-            jo.put("uri", e.toString());
+            boolean stub = e.getComponent().getClass().getSimpleName().equals("StubComponent");
+            jo.put("uri", e.getEndpointUri());
+            jo.put("stub", stub);
             var stat = findStats(stats, e.getEndpointUri());
             if (stat.isPresent()) {
                 var st = stat.get();

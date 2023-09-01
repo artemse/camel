@@ -223,14 +223,6 @@ public abstract class TestSupport {
     }
 
     /**
-     * Asserts the Out message on the exchange contains the expected value
-     */
-    @Deprecated
-    public static Object assertOutMessageHeader(Exchange exchange, String name, Object expected) {
-        return assertMessageHeader(exchange.getMessage(), name, expected);
-    }
-
-    /**
      * Asserts that the given exchange has an OUT message of the given body value
      *
      * @param  exchange                the exchange which should have an OUT message
@@ -250,29 +242,6 @@ public abstract class TestSupport {
         assertEquals(expected, actual, "in body of: " + exchange);
 
         LOG.debug("Received response: {} with in: {}", exchange, exchange.getIn());
-    }
-
-    /**
-     * Asserts that the given exchange has an OUT message of the given body value
-     *
-     * @param  exchange                the exchange which should have an OUT message
-     * @param  expected                the expected value of the OUT message
-     * @throws InvalidPayloadException is thrown if the payload is not the expected class type
-     */
-    @Deprecated
-    public static void assertOutMessageBodyEquals(Exchange exchange, Object expected) throws InvalidPayloadException {
-        assertNotNull(exchange, "Should have a response exchange!");
-
-        Object actual;
-        if (expected == null) {
-            actual = exchange.getMessage().getMandatoryBody();
-            assertEquals(expected, actual, "output body of: " + exchange);
-        } else {
-            actual = exchange.getMessage().getMandatoryBody(expected.getClass());
-        }
-        assertEquals(expected, actual, "output body of: " + exchange);
-
-        LOG.debug("Received response: {} with out: {}", exchange, exchange.getMessage());
     }
 
     public static Object assertMessageHeader(Message message, String name, Object expected) {
@@ -624,19 +593,15 @@ public abstract class TestSupport {
      * <p/>
      * Uses <tt>java.version</tt> from the system properties to determine the version.
      *
-     * @param  version such as 1.6 or 6
+     * @param  version such as 17
      * @return         <tt>true</tt> if its that vendor.
      */
     public static boolean isJavaVersion(String version) {
-        if (version.contains(".")) { // before jdk 9
-            return Integer.parseInt(version.split("\\.")[1]) == getJavaMajorVersion();
-        } else {
-            return Integer.parseInt(version) == getJavaMajorVersion();
-        }
+        return Integer.parseInt(version) == getJavaMajorVersion();
     }
 
     /**
-     * Returns the current major Java version e.g 8.
+     * Returns the current major Java version e.g 17.
      * <p/>
      * Uses <tt>java.specification.version</tt> from the system properties to determine the major version.
      *
@@ -644,11 +609,7 @@ public abstract class TestSupport {
      */
     public static int getJavaMajorVersion() {
         String javaSpecVersion = System.getProperty("java.specification.version");
-        if (javaSpecVersion.contains(".")) { // before jdk 9
-            return Integer.parseInt(javaSpecVersion.split("\\.")[1]);
-        } else {
-            return Integer.parseInt(javaSpecVersion);
-        }
+        return Integer.parseInt(javaSpecVersion);
     }
 
     /**

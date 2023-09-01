@@ -34,7 +34,7 @@ public interface NettyComponentBuilderFactory {
      * Netty (camel-netty)
      * Socket level networking using TCP or UDP with Netty 4.x.
      * 
-     * Category: networking,tcp,udp
+     * Category: networking
      * Since: 2.14
      * Maven coordinates: org.apache.camel:camel-netty
      * 
@@ -958,6 +958,24 @@ public interface NettyComponentBuilderFactory {
             return this;
         }
         /**
+         * Path to unix domain socket to use instead of inet socket. Host and
+         * port parameters will not be used, however required. It is ok to set
+         * dummy values for them. Must be used with nativeTransport=true and
+         * clientMode=false.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: advanced
+         * 
+         * @param unixDomainSocketPath the value to set
+         * @return the dsl builder
+         */
+        default NettyComponentBuilder unixDomainSocketPath(
+                java.lang.String unixDomainSocketPath) {
+            doSetProperty("unixDomainSocketPath", unixDomainSocketPath);
+            return this;
+        }
+        /**
          * When netty works on nio mode, it uses default workerCount parameter
          * from Netty (which is cpu_core_threads x 2). User can use this option
          * to override the default workerCount from Netty.
@@ -1325,6 +1343,9 @@ public interface NettyComponentBuilderFactory {
          * by default from classpath, but you can prefix with classpath:, file:,
          * or http: to load the resource from different systems.
          * 
+         * This option can also be loaded from an existing file, by prefixing
+         * with file: or classpath: followed by the location of the file.
+         * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
          * Group: security
@@ -1428,6 +1449,7 @@ public interface NettyComponentBuilderFactory {
             case "sendBufferSize": getOrCreateConfiguration((NettyComponent) component).setSendBufferSize((int) value); return true;
             case "transferExchange": getOrCreateConfiguration((NettyComponent) component).setTransferExchange((boolean) value); return true;
             case "udpByteArrayCodec": getOrCreateConfiguration((NettyComponent) component).setUdpByteArrayCodec((boolean) value); return true;
+            case "unixDomainSocketPath": getOrCreateConfiguration((NettyComponent) component).setUnixDomainSocketPath((java.lang.String) value); return true;
             case "workerCount": getOrCreateConfiguration((NettyComponent) component).setWorkerCount((int) value); return true;
             case "workerGroup": getOrCreateConfiguration((NettyComponent) component).setWorkerGroup((io.netty.channel.EventLoopGroup) value); return true;
             case "allowDefaultCodec": getOrCreateConfiguration((NettyComponent) component).setAllowDefaultCodec((boolean) value); return true;

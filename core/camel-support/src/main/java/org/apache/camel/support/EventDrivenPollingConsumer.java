@@ -26,7 +26,6 @@ import org.apache.camel.Consumer;
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangeTimedOutException;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.IsSingleton;
 import org.apache.camel.PollingConsumerPollingStrategy;
 import org.apache.camel.PooledExchange;
@@ -210,8 +209,7 @@ public class EventDrivenPollingConsumer extends PollingConsumerSupport implement
         Exchange copy = ExchangeHelper.createCorrelatedCopy(exchange, handover, true);
 
         // we want the copy to have an uow
-        UnitOfWork uow = getEndpoint().getCamelContext().adapt(ExtendedCamelContext.class).getUnitOfWorkFactory()
-                .createUnitOfWork(copy);
+        UnitOfWork uow = PluginHelper.getUnitOfWorkFactory(getEndpoint().getCamelContext()).createUnitOfWork(copy);
         copy.getExchangeExtension().setUnitOfWork(uow);
 
         return copy;

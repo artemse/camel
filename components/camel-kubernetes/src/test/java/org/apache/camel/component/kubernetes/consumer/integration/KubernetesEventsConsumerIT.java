@@ -116,7 +116,7 @@ public class KubernetesEventsConsumerIT extends KubernetesTestSupport {
         exchange.getIn().setHeader(KubernetesConstants.KUBERNETES_EVENT_REASON, "Some Reason");
         exchange.getIn().setHeader(KubernetesConstants.KUBERNETES_EVENT_REPORTING_CONTROLLER, "Some-Reporting-Controller");
         exchange.getIn().setHeader(KubernetesConstants.KUBERNETES_EVENT_REPORTING_INSTANCE, "Some-Reporting-Instance");
-
+        exchange.getIn().setHeader(KubernetesConstants.KUBERNETES_EVENT_TIME, "2022-10-10T17:30:47.986439Z");
     }
 
     @Test
@@ -140,6 +140,7 @@ public class KubernetesEventsConsumerIT extends KubernetesTestSupport {
         assertEquals("Some Reason", evt.getReason());
         assertEquals("Some-Reporting-Controller", evt.getReportingController());
         assertEquals("Some-Reporting-Instance", evt.getReportingInstance());
+        assertEquals(new MicroTimeBuilder().withTime("2022-10-10T17:30:47.986439Z").build(), evt.getEventTime());
 
         mockResultEndpoint.assertIsSatisfied();
     }
@@ -222,8 +223,8 @@ public class KubernetesEventsConsumerIT extends KubernetesTestSupport {
         public void process(Exchange exchange) {
             Message in = exchange.getIn();
             Event event = exchange.getIn().getBody(Event.class);
-            log.info("Got event with event name: " + event.getMetadata().getName() + " and action "
-                     + in.getHeader(KubernetesConstants.KUBERNETES_EVENT_ACTION));
+            log.info("Got event with event name: {} and action {}", event.getMetadata().getName(),
+                    in.getHeader(KubernetesConstants.KUBERNETES_EVENT_ACTION));
         }
     }
 }

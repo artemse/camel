@@ -29,7 +29,6 @@ import org.apache.camel.AsyncProcessor;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePropertyKey;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.Message;
 import org.apache.camel.Navigate;
@@ -55,6 +54,7 @@ import org.apache.camel.support.CamelContextHelper;
 import org.apache.camel.support.EventHelper;
 import org.apache.camel.support.ExchangeHelper;
 import org.apache.camel.support.MessageHelper;
+import org.apache.camel.support.PluginHelper;
 import org.apache.camel.support.service.ServiceHelper;
 import org.apache.camel.util.ObjectHelper;
 import org.apache.camel.util.StopWatch;
@@ -86,7 +86,7 @@ public abstract class RedeliveryErrorHandler extends ErrorHandlerSupport
     protected AsyncProcessor outputAsync;
 
     // configuration
-    protected final ExtendedCamelContext camelContext;
+    protected final CamelContext camelContext;
     protected final ReactiveExecutor reactiveExecutor;
     protected final AsyncProcessorAwaitManager awaitManager;
     protected final ShutdownStrategy shutdownStrategy;
@@ -116,9 +116,9 @@ public abstract class RedeliveryErrorHandler extends ErrorHandlerSupport
         ObjectHelper.notNull(camelContext, "CamelContext", this);
         ObjectHelper.notNull(redeliveryPolicy, "RedeliveryPolicy", this);
 
-        this.camelContext = (ExtendedCamelContext) camelContext;
-        this.reactiveExecutor = camelContext.adapt(ExtendedCamelContext.class).getReactiveExecutor();
-        this.awaitManager = camelContext.adapt(ExtendedCamelContext.class).getAsyncProcessorAwaitManager();
+        this.camelContext = camelContext;
+        this.reactiveExecutor = camelContext.getCamelContextExtension().getReactiveExecutor();
+        this.awaitManager = PluginHelper.getAsyncProcessorAwaitManager(camelContext);
         this.shutdownStrategy = camelContext.getShutdownStrategy();
         this.redeliveryProcessor = redeliveryProcessor;
         this.deadLetter = deadLetter;
@@ -216,7 +216,7 @@ public abstract class RedeliveryErrorHandler extends ErrorHandlerSupport
                 reactiveExecutor.scheduleMain(task);
             }
             return false;
-        } catch (Throwable e) {
+        } catch (Exception e) {
             exchange.setException(e);
             callback.done(true);
             return true;
@@ -495,10 +495,22 @@ public abstract class RedeliveryErrorHandler extends ErrorHandlerSupport
                 for (Throwable t : suppressed) {
                     if (t == previous) {
                         found = true;
+                        break;
                     }
                 }
                 if (!found) {
-                    e.addSuppressed(previous);
+                    // okay before adding suppression then we must be sure its not referring to same method
+                    // which otherwise can lead to add the same exception over and over again
+                    StackTraceElement[] ste1 = e.getStackTrace();
+                    StackTraceElement[] ste2 = previous.getStackTrace();
+                    boolean same = false;
+                    if (ste1 != null && ste2 != null && ste1.length > 0 && ste2.length > 0) {
+                        same = ste1[0].getClassName().equals(ste2[0].getClassName())
+                                && ste1[0].getLineNumber() == ste2[0].getLineNumber();
+                    }
+                    if (!same) {
+                        e.addSuppressed(previous);
+                    }
                 }
             }
 
@@ -523,7 +535,7 @@ public abstract class RedeliveryErrorHandler extends ErrorHandlerSupport
                             onExceptionProcessor, exchange);
                 }
                 onExceptionProcessor.process(exchange);
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 // we dont not want new exception to override existing, so log it as a WARN
                 LOG.warn("Error during processing OnExceptionOccurred. This exception is ignored.", e);
             }
@@ -718,7 +730,7 @@ public abstract class RedeliveryErrorHandler extends ErrorHandlerSupport
 
             try {
                 doRun();
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 // unexpected exception during running so set exception and trigger callback
                 // (do not do taskFactory.release as that happens later)
                 exchange.setException(e);
@@ -879,7 +891,7 @@ public abstract class RedeliveryErrorHandler extends ErrorHandlerSupport
             }
 
             // emmit event we are doing redelivery
-            if (camelContext.isEventNotificationApplicable()) {
+            if (camelContext.getCamelContextExtension().isEventNotificationApplicable()) {
                 EventHelper.notifyExchangeRedelivery(exchange.getContext(), exchange, redeliveryCounter);
             }
 
@@ -917,7 +929,7 @@ public abstract class RedeliveryErrorHandler extends ErrorHandlerSupport
             exchange.getIn().removeHeader(Exchange.REDELIVERED);
             exchange.getIn().removeHeader(Exchange.REDELIVERY_COUNTER);
             exchange.getIn().removeHeader(Exchange.REDELIVERY_MAX_COUNTER);
-            exchange.removeProperty(ExchangePropertyKey.FAILURE_HANDLED);
+            exchange.getExchangeExtension().setFailureHandled(false);
             // keep the Exchange.EXCEPTION_CAUGHT as property so end user knows the caused exception
 
             // create log message
@@ -984,10 +996,22 @@ public abstract class RedeliveryErrorHandler extends ErrorHandlerSupport
                 for (Throwable t : suppressed) {
                     if (t == previous) {
                         found = true;
+                        break;
                     }
                 }
                 if (!found) {
-                    e.addSuppressed(previous);
+                    // okay before adding suppression then we must be sure its not referring to same method
+                    // which otherwise can lead to add the same exception over and over again
+                    StackTraceElement[] ste1 = e.getStackTrace();
+                    StackTraceElement[] ste2 = previous.getStackTrace();
+                    boolean same = false;
+                    if (ste1 != null && ste2 != null && ste1.length > 0 && ste2.length > 0) {
+                        same = ste1[0].getClassName().equals(ste2[0].getClassName())
+                                && ste1[0].getLineNumber() == ste2[0].getLineNumber();
+                    }
+                    if (!same) {
+                        e.addSuppressed(previous);
+                    }
                 }
             }
 
@@ -1060,7 +1084,7 @@ public abstract class RedeliveryErrorHandler extends ErrorHandlerSupport
                             onExceptionProcessor, exchange);
                 }
                 onExceptionProcessor.process(exchange);
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 // we dont not want new exception to override existing, so log it as a WARN
                 LOG.warn("Error during processing OnExceptionOccurred. This exception is ignored.", e);
             }
@@ -1084,7 +1108,7 @@ public abstract class RedeliveryErrorHandler extends ErrorHandlerSupport
             // run this synchronously as its just a Processor
             try {
                 onRedeliveryProcessor.process(exchange);
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 exchange.setException(e);
             }
             LOG.trace("Redelivery processor done");
@@ -1181,7 +1205,7 @@ public abstract class RedeliveryErrorHandler extends ErrorHandlerSupport
                 // fire event as we had a failure processor to handle it, which there is a event for
                 final boolean deadLetterChannel = processor == deadLetter;
 
-                if (camelContext.isEventNotificationApplicable()) {
+                if (camelContext.getCamelContextExtension().isEventNotificationApplicable()) {
                     EventHelper.notifyExchangeFailureHandling(exchange.getContext(), exchange, processor, deadLetterChannel,
                             deadLetterUri);
                 }
@@ -1193,7 +1217,7 @@ public abstract class RedeliveryErrorHandler extends ErrorHandlerSupport
                     try {
                         prepareExchangeAfterFailure(exchange, isDeadLetterChannel, shouldHandle, shouldContinue);
                         // fire event as we had a failure processor to handle it, which there is a event for
-                        if (camelContext.isEventNotificationApplicable()) {
+                        if (camelContext.getCamelContextExtension().isEventNotificationApplicable()) {
                             EventHelper.notifyExchangeFailureHandled(exchange.getContext(), exchange, processor,
                                     deadLetterChannel, deadLetterUri);
                         }
@@ -1422,9 +1446,8 @@ public abstract class RedeliveryErrorHandler extends ErrorHandlerSupport
                 if (msg == null) {
                     msg = "New exception " + ExchangeHelper.logIds(exchange);
                     // special for logging the new exception
-                    Throwable cause = e;
-                    if (cause != null) {
-                        msg = msg + " due: " + cause.getMessage();
+                    if (e != null) {
+                        msg = msg + " due: " + e.getMessage();
                     }
                 }
 
@@ -1620,7 +1643,7 @@ public abstract class RedeliveryErrorHandler extends ErrorHandlerSupport
         if (redeliveryEnabled) {
             if (executorService == null) {
                 // use default shared executor service
-                executorService = camelContext.adapt(ExtendedCamelContext.class).getErrorHandlerExecutorService();
+                executorService = PluginHelper.getErrorHandlerExecutorService(camelContext);
             }
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Using ExecutorService: {} for redeliveries on error handler: {}", executorService, this);
@@ -1637,7 +1660,7 @@ public abstract class RedeliveryErrorHandler extends ErrorHandlerSupport
         simpleTask = deadLetter == null && !redeliveryEnabled && (exceptionPolicies == null || exceptionPolicies.isEmpty())
                 && onPrepareProcessor == null;
 
-        boolean pooled = camelContext.adapt(ExtendedCamelContext.class).getExchangeFactory().isPooled();
+        boolean pooled = camelContext.getCamelContextExtension().getExchangeFactory().isPooled();
         if (pooled) {
             String id = output instanceof IdAware ? ((IdAware) output).getId() : output.toString();
             taskFactory = new PooledTaskFactory(id) {
@@ -1646,7 +1669,7 @@ public abstract class RedeliveryErrorHandler extends ErrorHandlerSupport
                     return simpleTask ? new SimpleTask() : new RedeliveryTask();
                 }
             };
-            int capacity = camelContext.adapt(ExtendedCamelContext.class).getExchangeFactory().getCapacity();
+            int capacity = camelContext.getCamelContextExtension().getExchangeFactory().getCapacity();
             taskFactory.setCapacity(capacity);
         } else {
             taskFactory = new PrototypeTaskFactory() {

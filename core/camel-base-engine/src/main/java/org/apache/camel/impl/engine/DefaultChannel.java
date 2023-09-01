@@ -26,7 +26,6 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.CamelContextAware;
 import org.apache.camel.Channel;
 import org.apache.camel.Exchange;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.NamedNode;
 import org.apache.camel.NamedRoute;
 import org.apache.camel.Processor;
@@ -41,6 +40,7 @@ import org.apache.camel.spi.MessageHistoryFactory;
 import org.apache.camel.spi.Tracer;
 import org.apache.camel.spi.WrapAwareProcessor;
 import org.apache.camel.support.OrderedComparator;
+import org.apache.camel.support.PluginHelper;
 import org.apache.camel.support.service.ServiceHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -196,7 +196,7 @@ public class DefaultChannel extends CamelInternalProcessor implements Channel {
         if (camelContext.isBacklogTracingStandby() || route.isBacklogTracing()) {
             // add jmx backlog tracer
             BacklogTracer backlogTracer = getOrCreateBacklogTracer(camelContext);
-            addAdvice(new BacklogTracerAdvice(backlogTracer, targetOutputDef, routeDefinition, first));
+            addAdvice(new BacklogTracerAdvice(camelContext, backlogTracer, targetOutputDef, routeDefinition, first));
         }
         if (route.isTracing() || camelContext.isTracingStandby()) {
             // add logger tracer
@@ -224,7 +224,7 @@ public class DefaultChannel extends CamelInternalProcessor implements Channel {
             }
             if (!(wrapped instanceof WrapAwareProcessor)) {
                 // wrap the target so it becomes a service and we can manage its lifecycle
-                wrapped = camelContext.adapt(ExtendedCamelContext.class).getInternalProcessorFactory()
+                wrapped = PluginHelper.getInternalProcessorFactory(camelContext)
                         .createWrapProcessor(wrapped, target);
             }
             target = wrapped;
@@ -276,13 +276,17 @@ public class DefaultChannel extends CamelInternalProcessor implements Channel {
             }
         }
         if (tracer == null) {
-            tracer = camelContext.getExtension(BacklogTracer.class);
+            tracer = camelContext.getCamelContextExtension().getContextPlugin(BacklogTracer.class);
         }
         if (tracer == null) {
             tracer = BacklogTracer.createTracer(camelContext);
             tracer.setEnabled(camelContext.isBacklogTracing() != null && camelContext.isBacklogTracing());
             tracer.setStandby(camelContext.isBacklogTracingStandby());
-            camelContext.setExtension(BacklogTracer.class, tracer);
+            // enable both rest/templates if templates is enabled (we only want 1 public option)
+            boolean restOrTemplates = camelContext.isBacklogTracingTemplates();
+            tracer.setTraceTemplates(restOrTemplates);
+            tracer.setTraceRests(restOrTemplates);
+            camelContext.getCamelContextExtension().addContextPlugin(BacklogTracer.class, tracer);
         }
         return tracer;
     }

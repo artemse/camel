@@ -36,7 +36,7 @@ public interface CouchbaseComponentBuilderFactory {
      * Query Couchbase Views with a poll strategy and/or perform various
      * operations against Couchbase databases.
      * 
-     * Category: database,nosql
+     * Category: database
      * Since: 2.19
      * Maven coordinates: org.apache.camel:camel-couchbase
      * 
@@ -119,6 +119,42 @@ public interface CouchbaseComponentBuilderFactory {
             doSetProperty("autowiredEnabled", autowiredEnabled);
             return this;
         }
+        /**
+         * Used for enabling or disabling all consumer based health checks from
+         * this component.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: true
+         * Group: health
+         * 
+         * @param healthCheckConsumerEnabled the value to set
+         * @return the dsl builder
+         */
+        default CouchbaseComponentBuilder healthCheckConsumerEnabled(
+                boolean healthCheckConsumerEnabled) {
+            doSetProperty("healthCheckConsumerEnabled", healthCheckConsumerEnabled);
+            return this;
+        }
+        /**
+         * Used for enabling or disabling all producer based health checks from
+         * this component. Notice: Camel has by default disabled all producer
+         * based health-checks. You can turn on producer checks globally by
+         * setting camel.health.producersEnabled=true.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: true
+         * Group: health
+         * 
+         * @param healthCheckProducerEnabled the value to set
+         * @return the dsl builder
+         */
+        default CouchbaseComponentBuilder healthCheckProducerEnabled(
+                boolean healthCheckProducerEnabled) {
+            doSetProperty("healthCheckProducerEnabled", healthCheckProducerEnabled);
+            return this;
+        }
     }
 
     class CouchbaseComponentBuilderImpl
@@ -139,6 +175,8 @@ public interface CouchbaseComponentBuilderFactory {
             case "bridgeErrorHandler": ((CouchbaseComponent) component).setBridgeErrorHandler((boolean) value); return true;
             case "lazyStartProducer": ((CouchbaseComponent) component).setLazyStartProducer((boolean) value); return true;
             case "autowiredEnabled": ((CouchbaseComponent) component).setAutowiredEnabled((boolean) value); return true;
+            case "healthCheckConsumerEnabled": ((CouchbaseComponent) component).setHealthCheckConsumerEnabled((boolean) value); return true;
+            case "healthCheckProducerEnabled": ((CouchbaseComponent) component).setHealthCheckProducerEnabled((boolean) value); return true;
             default: return false;
             }
         }

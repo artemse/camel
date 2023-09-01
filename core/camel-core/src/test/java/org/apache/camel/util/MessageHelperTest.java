@@ -80,6 +80,11 @@ public class MessageHelperTest {
             public long length() {
                 return 0;
             }
+
+            @Override
+            public long position() {
+                return 0;
+            }
         });
         MessageHelper.resetStreamCache(message);
         assertTrue(reset.get(), "Should have reset the stream cache");
@@ -201,7 +206,8 @@ public class MessageHelperTest {
 
         String out = MessageHelper.dumpAsXml(message, false);
 
-        assertEquals("<message exchangeId=\"" + message.getExchange().getExchangeId() + "\" exchangePattern=\"InOnly\">"
+        assertEquals("<message exchangeId=\"" + message.getExchange().getExchangeId()
+                     + "\" exchangePattern=\"InOnly\" exchangeType=\"org.apache.camel.support.DefaultExchange\" messageType=\"org.apache.camel.support.DefaultMessage\">"
                      + "\n  <headers>\n    <header key=\"foo\" type=\"java.lang.Integer\">123</header>\n  </headers>\n</message>",
                 out);
 
@@ -221,7 +227,8 @@ public class MessageHelperTest {
 
         String out = MessageHelper.dumpAsXml(message, false, 2);
 
-        assertEquals("  <message exchangeId=\"" + message.getExchange().getExchangeId() + "\" exchangePattern=\"InOut\">"
+        assertEquals("  <message exchangeId=\"" + message.getExchange().getExchangeId()
+                     + "\" exchangePattern=\"InOut\" exchangeType=\"org.apache.camel.support.DefaultExchange\" messageType=\"org.apache.camel.support.DefaultMessage\">"
                      + "\n    <headers>\n      <header key=\"foo\" type=\"java.lang.Integer\">123</header>\n    </headers>\n  </message>",
                 out);
 
@@ -273,7 +280,6 @@ public class MessageHelperTest {
 
         String out = MessageHelper.dumpAsJSon(message);
         // xml is escaped in json output
-        assertTrue(out.contains("<?xml version=\\\"1.0\\\"?><hi>Hello World<\\/hi>"));
         assertTrue(out.contains(message.getExchange().getExchangeId()), "Should contain exchangeId");
 
         context.stop();

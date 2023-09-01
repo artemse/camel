@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,13 +39,26 @@ import org.apache.camel.util.json.Jsoner;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
-@Command(name = "route-controller", description = "List status of route controller in a running Camel integration")
+@Command(name = "route-controller", description = "List status of route controller in a running Camel integration",
+         sortOptions = false)
 public class RouteControllerAction extends ActionWatchCommand {
 
-    @CommandLine.Parameters(description = "Name or pid of running Camel integration", arity = "1")
-    String name;
+    public static class IdStateCompletionCandidates implements Iterable<String> {
 
-    @CommandLine.Option(names = { "--sort" },
+        public IdStateCompletionCandidates() {
+        }
+
+        @Override
+        public Iterator<String> iterator() {
+            return List.of("id", "state").iterator();
+        }
+
+    }
+
+    @CommandLine.Parameters(description = "Name or pid of running Camel integration", arity = "0..1")
+    String name = "*";
+
+    @CommandLine.Option(names = { "--sort" }, completionCandidates = IdStateCompletionCandidates.class,
                         description = "Sort by id, or state", defaultValue = "id")
     String sort;
 
@@ -67,7 +81,7 @@ public class RouteControllerAction extends ActionWatchCommand {
     }
 
     @Override
-    public Integer doCall() throws Exception {
+    public Integer doWatchCall() throws Exception {
         List<Row> rows = new ArrayList<>();
 
         List<Long> pids = findPids(name);
@@ -87,13 +101,13 @@ public class RouteControllerAction extends ActionWatchCommand {
         this.pid = pids.get(0);
 
         // ensure output file is deleted before executing action
-        File outputFile = getOutputFile("" + pid);
+        File outputFile = getOutputFile(Long.toString(pid));
         FileUtil.deleteFile(outputFile);
 
         JsonObject root = new JsonObject();
         root.put("action", "route-controller");
         root.put("stacktrace", trace ? "true" : "false");
-        File f = getActionFile("" + pid);
+        File f = getActionFile(Long.toString(pid));
         try {
             IOHelper.writeText(root.toJson(), f);
         } catch (Exception e) {
@@ -134,7 +148,9 @@ public class RouteControllerAction extends ActionWatchCommand {
         // sort rows
         rows.sort(this::sortRow);
 
-        clearScreen();
+        if (watch) {
+            clearScreen();
+        }
         if (!rows.isEmpty()) {
             if (supervising) {
                 if (header) {
@@ -258,7 +274,7 @@ public class RouteControllerAction extends ActionWatchCommand {
 
     protected String getAttempts(Row r) {
         if (r.supervising != null) {
-            return "" + r.attempts;
+            return Long.toString(r.attempts);
         }
         return "";
     }
@@ -269,6 +285,7 @@ public class RouteControllerAction extends ActionWatchCommand {
             if (r.elapsed != null && !r.elapsed.isEmpty()) {
                 s += " (" + r.elapsed + ")";
             }
+            return s;
         }
         return "";
     }

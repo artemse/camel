@@ -18,14 +18,15 @@ package org.apache.camel.component.aws2.kinesis;
 
 import java.util.ArrayDeque;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.camel.AsyncCallback;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.component.aws2.kinesis.consumer.KinesisResumeAdapter;
-import org.apache.camel.health.HealthCheckHelper;
-import org.apache.camel.health.WritableHealthCheckRepository;
 import org.apache.camel.resume.ResumeAware;
 import org.apache.camel.resume.ResumeStrategy;
 import org.apache.camel.support.ScheduledBatchPollingConsumer;
@@ -33,40 +34,103 @@ import org.apache.camel.util.CastUtils;
 import org.apache.camel.util.ObjectHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import software.amazon.awssdk.services.kinesis.KinesisClient;
 import software.amazon.awssdk.services.kinesis.model.DescribeStreamRequest;
 import software.amazon.awssdk.services.kinesis.model.DescribeStreamResponse;
 import software.amazon.awssdk.services.kinesis.model.GetRecordsRequest;
 import software.amazon.awssdk.services.kinesis.model.GetRecordsResponse;
 import software.amazon.awssdk.services.kinesis.model.GetShardIteratorRequest;
 import software.amazon.awssdk.services.kinesis.model.GetShardIteratorResponse;
+import software.amazon.awssdk.services.kinesis.model.ListShardsRequest;
 import software.amazon.awssdk.services.kinesis.model.Record;
 import software.amazon.awssdk.services.kinesis.model.Shard;
 import software.amazon.awssdk.services.kinesis.model.ShardIteratorType;
 
 public class Kinesis2Consumer extends ScheduledBatchPollingConsumer implements ResumeAware<ResumeStrategy> {
-
     private static final Logger LOG = LoggerFactory.getLogger(Kinesis2Consumer.class);
 
-    private String currentShardIterator;
-    private boolean isShardClosed;
+    private KinesisConnection connection;
     private ResumeStrategy resumeStrategy;
 
-    private WritableHealthCheckRepository healthCheckRepository;
-    private Kinesis2ConsumerHealthCheck consumerHealthCheck;
+    private Map<String, String> currentShardIterators = new java.util.HashMap<>();
 
-    public Kinesis2Consumer(Kinesis2Endpoint endpoint, Processor processor) {
+    public Kinesis2Consumer(Kinesis2Endpoint endpoint,
+                            Processor processor) {
         super(endpoint, processor);
+    }
+
+    public KinesisConnection getConnection() {
+        return connection;
+    }
+
+    public void setConnection(KinesisConnection connection) {
+        this.connection = connection;
     }
 
     @Override
     protected int poll() throws Exception {
-        String shardIterator = getShardIterator();
+        var processedExchangeCount = new AtomicInteger(0);
+
+        if (!getEndpoint().getConfiguration().getShardId().isEmpty()) {
+            var request = DescribeStreamRequest
+                    .builder()
+                    .streamName(getEndpoint().getConfiguration().getStreamName())
+                    .build();
+            DescribeStreamResponse response;
+            if (getEndpoint().getConfiguration().isAsyncClient()) {
+                try {
+                    response = connection
+                            .getAsyncClient(getEndpoint())
+                            .describeStream(request)
+                            .get();
+                } catch (ExecutionException | InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                response = connection
+                        .getClient(getEndpoint())
+                        .describeStream(request);
+            }
+
+            var shard = response
+                    .streamDescription()
+                    .shards()
+                    .stream()
+                    .filter(shardItem -> shardItem
+                            .shardId()
+                            .equalsIgnoreCase(getEndpoint()
+                                    .getConfiguration()
+                                    .getShardId()))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalStateException("The shard can't be found"));
+
+            fetchAndPrepareRecordsForCamel(shard, connection, processedExchangeCount);
+
+        } else {
+            getShardList(connection)
+                    .parallelStream()
+                    .forEach(shard -> {
+                        fetchAndPrepareRecordsForCamel(shard, connection, processedExchangeCount);
+                    });
+        }
+
+        return processedExchangeCount.get();
+    }
+
+    private void fetchAndPrepareRecordsForCamel(
+            final Shard shard,
+            final KinesisConnection kinesisConnection,
+            AtomicInteger processedExchangeCount) {
+        String shardIterator;
+        try {
+            shardIterator = getShardIterator(shard, kinesisConnection);
+        } catch (ExecutionException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
         if (shardIterator == null) {
-            // probably closed. Returning 0 as nothing was processed
-
-            return 0;
+            // Unable to get an interator so shard must be closed
+            processedExchangeCount.set(0);
+            return;
         }
 
         GetRecordsRequest req = GetRecordsRequest
@@ -76,35 +140,39 @@ public class Kinesis2Consumer extends ScheduledBatchPollingConsumer implements R
                         .getConfiguration()
                         .getMaxResultsPerRequest())
                 .build();
-        GetRecordsResponse result = getClient().getRecords(req);
 
-        Queue<Exchange> exchanges = createExchanges(result.records());
-        int processedExchangeCount = processBatch(CastUtils.cast(exchanges));
+        GetRecordsResponse result;
+        if (getEndpoint().getConfiguration().isAsyncClient()) {
+            try {
+                result = kinesisConnection
+                        .getAsyncClient(getEndpoint())
+                        .getRecords(req)
+                        .get();
+            } catch (ExecutionException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            result = kinesisConnection
+                    .getClient(getEndpoint())
+                    .getRecords(req);
+        }
+
+        try {
+            Queue<Exchange> exchanges = createExchanges(result.records());
+            processedExchangeCount.getAndSet(processBatch(CastUtils.cast(exchanges)));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
         // May cache the last successful sequence number, and pass it to the
         // getRecords request. That way, on the next poll, we start from where
         // we left off, however, I don't know what happens to subsequent
         // exchanges when an earlier exchange fails.
+        updateShardIterator(shard, result.nextShardIterator());
+    }
 
-        currentShardIterator = result.nextShardIterator();
-        if (isShardClosed) {
-            switch (getEndpoint().getConfiguration().getShardClosed()) {
-                case ignore:
-                    LOG.warn("The shard {} is in closed state", currentShardIterator);
-                    break;
-                case silent:
-                    break;
-                case fail:
-                    LOG.info("Shard Iterator reaches CLOSE status:{} {}", getEndpoint().getConfiguration().getStreamName(),
-                            getEndpoint().getConfiguration().getShardId());
-                    throw new ReachedClosedStatusException(
-                            getEndpoint().getConfiguration().getStreamName(), getEndpoint().getConfiguration().getShardId());
-                default:
-                    throw new IllegalArgumentException("Unsupported shard closed strategy");
-            }
-        }
-
-        return processedExchangeCount;
+    private void updateShardIterator(Shard shard, String nextShardIterator) {
+        currentShardIterators.put(shard.shardId(), nextShardIterator);
     }
 
     @Override
@@ -121,66 +189,77 @@ public class Kinesis2Consumer extends ScheduledBatchPollingConsumer implements R
         return processedExchanges;
     }
 
-    private KinesisClient getClient() {
-        return getEndpoint().getClient();
-    }
-
     @Override
     public Kinesis2Endpoint getEndpoint() {
         return (Kinesis2Endpoint) super.getEndpoint();
     }
 
-    private String getShardIterator() {
+    private String getShardIterator(
+            final Shard shard,
+            final KinesisConnection kinesisConnection)
+            throws ExecutionException, InterruptedException {
         // either return a cached one or get a new one via a GetShardIterator
         // request.
-        if (currentShardIterator == null) {
-            String shardId;
 
-            // If ShardId supplied use it, else choose first one
-            if (!getEndpoint().getConfiguration().getShardId().isEmpty()) {
-                shardId = getEndpoint().getConfiguration().getShardId();
-                DescribeStreamRequest req1
-                        = DescribeStreamRequest.builder().streamName(getEndpoint().getConfiguration().getStreamName()).build();
-                DescribeStreamResponse res1 = getClient().describeStream(req1);
-                for (Shard shard : res1.streamDescription().shards()) {
-                    if (shard.shardId().equalsIgnoreCase(getEndpoint().getConfiguration().getShardId())) {
-                        isShardClosed = shard.sequenceNumberRange().endingSequenceNumber() != null;
-                    }
-                }
+        var shardId = shard.shardId();
 
-            } else {
-                DescribeStreamRequest req1
-                        = DescribeStreamRequest.builder().streamName(getEndpoint().getConfiguration().getStreamName()).build();
-                DescribeStreamResponse res1 = getClient().describeStream(req1);
-
-                List<Shard> shards = res1.streamDescription().shards();
-
-                if (shards.isEmpty()) {
-                    LOG.warn("There are no shards in the stream");
-                    return null;
-                }
-
-                shardId = shards.get(0).shardId();
-                isShardClosed = shards.get(0).sequenceNumberRange().endingSequenceNumber() != null;
+        if (currentShardIterators.get(shardId) == null) {
+            if (currentShardIterators.containsKey(shardId)) {
+                // There was previously a shardIterator but shard is now closed
+                handleClosedShard(shardId);
             }
-            LOG.debug("ShardId is: {}", shardId);
 
-            GetShardIteratorRequest.Builder req = GetShardIteratorRequest.builder()
+            GetShardIteratorRequest.Builder request = GetShardIteratorRequest.builder()
                     .streamName(getEndpoint().getConfiguration().getStreamName()).shardId(shardId)
                     .shardIteratorType(getEndpoint().getConfiguration().getIteratorType());
 
             if (hasSequenceNumber()) {
-                req.startingSequenceNumber(getEndpoint().getConfiguration().getSequenceNumber());
+                request.startingSequenceNumber(getEndpoint().getConfiguration().getSequenceNumber());
             }
 
-            resume(req);
+            resume(request);
 
-            GetShardIteratorResponse result = getClient().getShardIterator(req.build());
-            currentShardIterator = result.shardIterator();
+            GetShardIteratorResponse result;
+            if (getEndpoint().getConfiguration().isAsyncClient()) {
+                try {
+                    result = kinesisConnection
+                            .getAsyncClient(getEndpoint())
+                            .getShardIterator(request.build())
+                            .get();
+                } catch (ExecutionException | InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                result = kinesisConnection
+                        .getClient(getEndpoint())
+                        .getShardIterator(request.build());
+            }
+
+            currentShardIterators.put(shardId, result.shardIterator());
+            LOG.debug("Obtained new ShardIterator {} for shard {} on stream {}", result.shardIterator(), shardId,
+                    getEndpoint().getConfiguration().getStreamName());
         }
 
-        LOG.debug("Shard Iterator is: {}", currentShardIterator);
-        return currentShardIterator;
+        return currentShardIterators.get(shardId);
+    }
+
+    private void handleClosedShard(String shardId) {
+        switch (getEndpoint().getConfiguration().getShardClosed()) {
+            case ignore:
+                LOG.warn("The shard with id={} on stream {} reached CLOSE status",
+                        shardId, getEndpoint().getConfiguration().getStreamName());
+                break;
+            case silent:
+                break;
+            case fail:
+                LOG.info("The shard with id={} on stream {} reached CLOSE status",
+                        shardId, getEndpoint().getConfiguration().getStreamName());
+                throw new IllegalStateException(
+                        new ReachedClosedStatusException(
+                                getEndpoint().getConfiguration().getStreamName(), shardId));
+            default:
+                throw new IllegalArgumentException("Unsupported shard closed strategy");
+        }
     }
 
     private void resume(GetShardIteratorRequest.Builder req) {
@@ -209,6 +288,7 @@ public class Kinesis2Consumer extends ScheduledBatchPollingConsumer implements R
     }
 
     protected Exchange createExchange(Record dataRecord) {
+        LOG.debug("Received Kinesis record with partition_key={}", dataRecord.partitionKey());
         Exchange exchange = createExchange(true);
         exchange.getIn().setBody(dataRecord.data().asInputStream());
         exchange.getIn().setHeader(Kinesis2Constants.APPROX_ARRIVAL_TIME, dataRecord.approximateArrivalTimestamp());
@@ -241,15 +321,7 @@ public class Kinesis2Consumer extends ScheduledBatchPollingConsumer implements R
     protected void doStart() throws Exception {
         super.doStart();
 
-        healthCheckRepository = HealthCheckHelper.getHealthCheckRepository(
-                getEndpoint().getCamelContext(),
-                "components",
-                WritableHealthCheckRepository.class);
-
-        if (healthCheckRepository != null) {
-            consumerHealthCheck = new Kinesis2ConsumerHealthCheck(this, getRouteId());
-            healthCheckRepository.addHealthCheck(consumerHealthCheck);
-        }
+        ObjectHelper.notNull(connection, "connection", this);
 
         if (resumeStrategy != null) {
             resumeStrategy.loadCache();
@@ -259,4 +331,32 @@ public class Kinesis2Consumer extends ScheduledBatchPollingConsumer implements R
     protected Kinesis2Configuration getConfiguration() {
         return getEndpoint().getConfiguration();
     }
+
+    private List<Shard> getShardList(final KinesisConnection kinesisConnection) {
+        var request = ListShardsRequest
+                .builder()
+                .streamName(getEndpoint().getConfiguration().getStreamName())
+                .build();
+
+        List<Shard> shardList;
+        if (getEndpoint().getConfiguration().isAsyncClient()) {
+            try {
+                shardList = kinesisConnection
+                        .getAsyncClient(getEndpoint())
+                        .listShards(request)
+                        .get()
+                        .shards();
+            } catch (ExecutionException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            shardList = kinesisConnection
+                    .getClient(getEndpoint())
+                    .listShards(request)
+                    .shards();
+        }
+
+        return shardList;
+    }
+
 }

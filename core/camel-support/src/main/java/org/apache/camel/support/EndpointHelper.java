@@ -19,7 +19,6 @@ package org.apache.camel.support;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +30,6 @@ import org.apache.camel.DelegateEndpoint;
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePattern;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.NoSuchBeanException;
 import org.apache.camel.PollingConsumer;
 import org.apache.camel.Processor;
@@ -71,7 +69,7 @@ public final class EndpointHelper {
         // which is a little complex depending on the placeholder is from context-path or query parameters
         // in the uri string
         try {
-            uri = camelContext.adapt(ExtendedCamelContext.class).resolvePropertyPlaceholders(uri, true);
+            uri = camelContext.getCamelContextExtension().resolvePropertyPlaceholders(uri, true);
             if (uri == null || uri.isEmpty()) {
                 return uri;
             }
@@ -277,53 +275,6 @@ public final class EndpointHelper {
     }
 
     /**
-     * Sets the regular properties on the given bean
-     *
-     * @param      context    the camel context
-     * @param      bean       the bean
-     * @param      parameters parameters
-     * @throws     Exception  is thrown if setting property fails
-     * @deprecated            use PropertyBindingSupport
-     */
-    @Deprecated
-    public static void setProperties(CamelContext context, Object bean, Map<String, Object> parameters) throws Exception {
-        // use the property binding which can do more advanced configuration
-        PropertyBindingSupport.build().bind(context, bean, parameters);
-    }
-
-    /**
-     * Sets the reference properties on the given bean
-     * <p/>
-     * This is convention over configuration, setting all reference parameters (using
-     * {@link #isReferenceParameter(String)} by looking it up in registry and setting it on the bean if possible.
-     *
-     * @param      context    the camel context
-     * @param      bean       the bean
-     * @param      parameters parameters
-     * @throws     Exception  is thrown if setting property fails
-     * @deprecated            use PropertyBindingSupport
-     */
-    @Deprecated
-    public static void setReferenceProperties(CamelContext context, Object bean, Map<String, Object> parameters)
-            throws Exception {
-        Iterator<Map.Entry<String, Object>> it = parameters.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<String, Object> entry = it.next();
-            String name = entry.getKey();
-            Object v = entry.getValue();
-            String value = v != null ? v.toString() : null;
-            if (isReferenceParameter(value)) {
-                boolean hit = context.adapt(ExtendedCamelContext.class).getBeanIntrospection().setProperty(context,
-                        context.getTypeConverter(), bean, name, null, value, true, false, false);
-                if (hit) {
-                    // must remove as its a valid option and we could configure it
-                    it.remove();
-                }
-            }
-        }
-    }
-
-    /**
      * Is the given parameter a reference parameter (starting with a # char)
      *
      * @param  parameter the parameter
@@ -359,23 +310,17 @@ public final class EndpointHelper {
      * @throws NoSuchBeanException if object was not found in registry and <code>mandatory</code> is <code>true</code>.
      */
     public static <T> T resolveReferenceParameter(CamelContext context, String value, Class<T> type, boolean mandatory) {
+        Object answer = null;
         if (value.startsWith("#class:")) {
-            Object answer;
             try {
                 answer = createBean(context, value, type);
             } catch (Exception e) {
                 throw new NoSuchBeanException(value, e);
             }
-            if (mandatory && answer == null) {
-                throw new NoSuchBeanException(value);
-            }
-            return type.cast(answer);
         } else if (value.startsWith("#type:")) {
             try {
-                Object answer = null;
-
-                String valueNoHash = value.substring(6);
-                Class<?> clazz = context.getClassResolver().resolveMandatoryClass(valueNoHash);
+                value = value.substring(6);
+                Class<?> clazz = context.getClassResolver().resolveMandatoryClass(value);
                 Set<?> set = context.getRegistry().findByType(clazz);
                 if (set.size() == 1) {
                     answer = set.iterator().next();
@@ -383,25 +328,35 @@ public final class EndpointHelper {
                     throw new NoSuchBeanException(
                             value, "Found " + set.size() + " beans of type: " + clazz + ". Only 1 bean instance is supported.");
                 }
-                if (mandatory && answer == null) {
-                    throw new NoSuchBeanException(value);
-                }
-                if (answer != null) {
-                    answer = context.getTypeConverter().convertTo(type, answer);
-                }
-                return type.cast(answer);
             } catch (ClassNotFoundException e) {
                 throw new NoSuchBeanException(value, e);
             }
         } else {
-            String valueNoHash = value.replace("#bean:", "");
-            valueNoHash = valueNoHash.replace("#", "");
-            if (mandatory) {
-                return CamelContextHelper.mandatoryLookupAndConvert(context, valueNoHash, type);
-            } else {
-                return CamelContextHelper.lookupAndConvert(context, valueNoHash, type);
+            value = value.replace("#bean:", "");
+            value = value.replace("#", "");
+            // lookup first with type
+            answer = CamelContextHelper.lookup(context, value, type);
+            if (answer == null) {
+                // fallback to lookup by name
+                answer = CamelContextHelper.lookup(context, value);
             }
         }
+
+        if (mandatory && answer == null) {
+            if (type != null) {
+                throw new NoSuchBeanException(value, type.getTypeName());
+            } else {
+                throw new NoSuchBeanException(value);
+            }
+        }
+        if (answer != null) {
+            if (mandatory) {
+                answer = CamelContextHelper.convertTo(context, type, answer);
+            } else {
+                answer = CamelContextHelper.tryConvertTo(context, type, answer);
+            }
+        }
+        return (T) answer;
     }
 
     private static <T> T createBean(CamelContext camelContext, String name, Class<T> type) throws Exception {
@@ -570,8 +525,6 @@ public final class EndpointHelper {
             return ExchangePattern.InOnly;
         } else if (url.contains("exchangePattern=InOut")) {
             return ExchangePattern.InOut;
-        } else if (url.contains("exchangePattern=InOptionalOut")) {
-            return ExchangePattern.InOptionalOut;
         }
         return null;
     }

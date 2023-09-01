@@ -955,6 +955,9 @@ public interface NettyEndpointBuilderFactory {
          * by default from classpath, but you can prefix with classpath:, file:,
          * or http: to load the resource from different systems.
          * 
+         * This option can also be loaded from an existing file, by prefixing
+         * with file: or classpath: followed by the location of the file.
+         * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
          * Group: security
@@ -1826,6 +1829,24 @@ public interface NettyEndpointBuilderFactory {
         default AdvancedNettyEndpointConsumerBuilder udpByteArrayCodec(
                 String udpByteArrayCodec) {
             doSetProperty("udpByteArrayCodec", udpByteArrayCodec);
+            return this;
+        }
+        /**
+         * Path to unix domain socket to use instead of inet socket. Host and
+         * port parameters will not be used, however required. It is ok to set
+         * dummy values for them. Must be used with nativeTransport=true and
+         * clientMode=false.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: advanced
+         * 
+         * @param unixDomainSocketPath the value to set
+         * @return the dsl builder
+         */
+        default AdvancedNettyEndpointConsumerBuilder unixDomainSocketPath(
+                String unixDomainSocketPath) {
+            doSetProperty("unixDomainSocketPath", unixDomainSocketPath);
             return this;
         }
         /**
@@ -2722,6 +2743,9 @@ public interface NettyEndpointBuilderFactory {
          * Server side certificate keystore to be used for encryption. Is loaded
          * by default from classpath, but you can prefix with classpath:, file:,
          * or http: to load the resource from different systems.
+         * 
+         * This option can also be loaded from an existing file, by prefixing
+         * with file: or classpath: followed by the location of the file.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
@@ -3625,6 +3649,24 @@ public interface NettyEndpointBuilderFactory {
             return this;
         }
         /**
+         * Path to unix domain socket to use instead of inet socket. Host and
+         * port parameters will not be used, however required. It is ok to set
+         * dummy values for them. Must be used with nativeTransport=true and
+         * clientMode=false.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: advanced
+         * 
+         * @param unixDomainSocketPath the value to set
+         * @return the dsl builder
+         */
+        default AdvancedNettyEndpointProducerBuilder unixDomainSocketPath(
+                String unixDomainSocketPath) {
+            doSetProperty("unixDomainSocketPath", unixDomainSocketPath);
+            return this;
+        }
+        /**
          * When netty works on nio mode, it uses default workerCount parameter
          * from Netty (which is cpu_core_threads x 2). User can use this option
          * to override the default workerCount from Netty.
@@ -4443,6 +4485,9 @@ public interface NettyEndpointBuilderFactory {
          * by default from classpath, but you can prefix with classpath:, file:,
          * or http: to load the resource from different systems.
          * 
+         * This option can also be loaded from an existing file, by prefixing
+         * with file: or classpath: followed by the location of the file.
+         * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
          * Group: security
@@ -4830,6 +4875,24 @@ public interface NettyEndpointBuilderFactory {
             return this;
         }
         /**
+         * Path to unix domain socket to use instead of inet socket. Host and
+         * port parameters will not be used, however required. It is ok to set
+         * dummy values for them. Must be used with nativeTransport=true and
+         * clientMode=false.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: advanced
+         * 
+         * @param unixDomainSocketPath the value to set
+         * @return the dsl builder
+         */
+        default AdvancedNettyEndpointBuilder unixDomainSocketPath(
+                String unixDomainSocketPath) {
+            doSetProperty("unixDomainSocketPath", unixDomainSocketPath);
+            return this;
+        }
+        /**
          * When netty works on nio mode, it uses default workerCount parameter
          * from Netty (which is cpu_core_threads x 2). User can use this option
          * to override the default workerCount from Netty.
@@ -4905,7 +4968,7 @@ public interface NettyEndpointBuilderFactory {
          * Netty (camel-netty)
          * Socket level networking using TCP or UDP with Netty 4.x.
          * 
-         * Category: networking,tcp,udp
+         * Category: networking
          * Since: 2.14
          * Maven coordinates: org.apache.camel:camel-netty
          * 
@@ -4918,7 +4981,7 @@ public interface NettyEndpointBuilderFactory {
          * Netty (camel-netty)
          * Socket level networking using TCP or UDP with Netty 4.x.
          * 
-         * Category: networking,tcp,udp
+         * Category: networking
          * Since: 2.14
          * Maven coordinates: org.apache.camel:camel-netty
          * 
@@ -4945,7 +5008,7 @@ public interface NettyEndpointBuilderFactory {
          * Netty (camel-netty)
          * Socket level networking using TCP or UDP with Netty 4.x.
          * 
-         * Category: networking,tcp,udp
+         * Category: networking
          * Since: 2.14
          * Maven coordinates: org.apache.camel:camel-netty
          * 

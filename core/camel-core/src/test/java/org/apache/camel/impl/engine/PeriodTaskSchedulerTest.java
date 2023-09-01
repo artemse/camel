@@ -20,8 +20,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.camel.ContextTestSupport;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.spi.PeriodTaskScheduler;
+import org.apache.camel.support.PluginHelper;
 import org.apache.camel.support.TimerListenerManager;
 import org.apache.camel.support.service.ServiceSupport;
 import org.awaitility.Awaitility;
@@ -41,7 +41,7 @@ public class PeriodTaskSchedulerTest extends ContextTestSupport {
     public void testScheduler() throws Exception {
         counter.set(0);
 
-        PeriodTaskScheduler scheduler = context.adapt(ExtendedCamelContext.class).getPeriodTaskScheduler();
+        PeriodTaskScheduler scheduler = PluginHelper.getPeriodTaskScheduler(context);
         if (scheduler instanceof TimerListenerManager) {
             // speedup unit test
             ((TimerListenerManager) scheduler).setInterval(10);
@@ -58,7 +58,7 @@ public class PeriodTaskSchedulerTest extends ContextTestSupport {
 
         MyTask task = new MyTask();
 
-        PeriodTaskScheduler scheduler = context.adapt(ExtendedCamelContext.class).getPeriodTaskScheduler();
+        PeriodTaskScheduler scheduler = PluginHelper.getPeriodTaskScheduler(context);
         if (scheduler instanceof TimerListenerManager) {
             // speedup unit test
             ((TimerListenerManager) scheduler).setInterval(10);

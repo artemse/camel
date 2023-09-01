@@ -24,12 +24,13 @@ import ca.uhn.fhir.rest.client.api.IClientInterceptor;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.impl.GenericClient;
 import org.apache.camel.CamelContext;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.fhir.internal.FhirApiCollection;
 import org.apache.camel.component.fhir.internal.FhirCreateApiMethod;
 import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.support.PluginHelper;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -41,6 +42,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Test class for {@link FhirConfiguration} APIs.
  */
 @ExtendWith(MockitoExtension.class)
+@DisabledIfSystemProperty(named = "ci.env.name", matches = "apache.org",
+                          disabledReason = "Apache CI nodes are too resource constrained for this test - see CAMEL-19659")
 public class FhirConfigurationIT extends AbstractFhirTestSupport {
 
     private static final String PATH_PREFIX = FhirApiCollection.getCollection().getApiName(FhirCreateApiMethod.class).getName();
@@ -96,7 +99,7 @@ public class FhirConfigurationIT extends AbstractFhirTestSupport {
 
         assertTrue(interceptors.contains(this.mockClientInterceptor), "User defined IClientInterceptor not found");
 
-        long counter = context.adapt(ExtendedCamelContext.class).getBeanIntrospection().getInvokedCounter();
+        long counter = PluginHelper.getBeanIntrospection(context).getInvokedCounter();
         assertEquals(0, counter, "Should not use reflection");
     }
 

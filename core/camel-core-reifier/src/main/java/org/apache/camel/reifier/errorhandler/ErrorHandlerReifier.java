@@ -17,15 +17,11 @@
 package org.apache.camel.reifier.errorhandler;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiFunction;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.ErrorHandlerFactory;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.NamedNode;
 import org.apache.camel.Predicate;
@@ -48,6 +44,7 @@ import org.apache.camel.reifier.AbstractReifier;
 import org.apache.camel.spi.ErrorHandler;
 import org.apache.camel.spi.Language;
 import org.apache.camel.support.CamelContextHelper;
+import org.apache.camel.support.PluginHelper;
 import org.apache.camel.util.ObjectHelper;
 
 public abstract class ErrorHandlerReifier<T extends ErrorHandlerFactory> extends AbstractReifier {
@@ -55,7 +52,7 @@ public abstract class ErrorHandlerReifier<T extends ErrorHandlerFactory> extends
     private static final Map<Class<?>, BiFunction<Route, ErrorHandlerFactory, ErrorHandlerReifier<? extends ErrorHandlerFactory>>> ERROR_HANDLERS
             = new HashMap<>(0);
 
-    protected T definition;
+    protected final T definition;
 
     /**
      * Utility classes should not have a public constructor.
@@ -247,7 +244,7 @@ public abstract class ErrorHandlerReifier<T extends ErrorHandlerFactory> extends
         if (definition == null) {
             return null;
         }
-        Map<RedeliveryOption, String> policy = new HashMap<>();
+        Map<RedeliveryOption, String> policy = new EnumMap<>(RedeliveryOption.class);
         setOption(policy, RedeliveryOption.maximumRedeliveries, definition.getMaximumRedeliveries());
         setOption(policy, RedeliveryOption.redeliveryDelay, definition.getRedeliveryDelay(), "1000");
         setOption(policy, RedeliveryOption.asyncDelayedRedelivery, definition.getAsyncDelayedRedelivery());
@@ -481,7 +478,7 @@ public abstract class ErrorHandlerReifier<T extends ErrorHandlerFactory> extends
         }
         if (processor != null) {
             // must wrap the processor in an UoW
-            processor = camelContext.adapt(ExtendedCamelContext.class).getInternalProcessorFactory()
+            processor = PluginHelper.getInternalProcessorFactory(camelContext)
                     .addUnitOfWorkProcessorAdvice(camelContext, processor, route);
         }
         return processor;

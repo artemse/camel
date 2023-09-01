@@ -23,6 +23,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.camel.Component;
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.apache.camel.FailedToCreateConsumerException;
@@ -236,13 +237,10 @@ public abstract class ScheduledPollConsumer extends DefaultConsumer
                         cause = e;
                         done = true;
                     }
-                } catch (Throwable t) {
+                } catch (Exception t) {
                     cause = t;
                     done = true;
                 }
-            } catch (Throwable t) {
-                cause = t;
-                done = true;
             }
 
             if (cause != null && isRunAllowed()) {
@@ -252,7 +250,7 @@ public abstract class ScheduledPollConsumer extends DefaultConsumer
                     getExceptionHandler().handleException("Failed polling endpoint: " + getEndpoint()
                                                           + ". Will try again at next poll",
                             cause);
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     LOG.warn("Error handling exception. This exception will be ignored.", e);
                 }
             }
@@ -565,6 +563,11 @@ public abstract class ScheduledPollConsumer extends DefaultConsumer
     @Override
     protected void doInit() throws Exception {
         super.doInit();
+
+        Component component = getEndpoint().getComponent();
+        if (component instanceof HealthCheckComponent hcc) {
+            getHealthCheck().setEnabled(hcc.isHealthCheckConsumerEnabled());
+        }
 
         // validate that if backoff multiplier is in use, the threshold values is set correctly
         if (backoffMultiplier > 0) {

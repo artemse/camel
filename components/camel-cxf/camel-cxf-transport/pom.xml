@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.apache.camel</groupId>
         <artifactId>camel-cxf-parent</artifactId>
-        <version>4.0.0-SNAPSHOT</version>
+        <version>4.1.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>camel-cxf-transport</artifactId>
@@ -56,12 +56,14 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-bindings-soap</artifactId>
+            <version>${cxf-version}</version>
         </dependency>
 
 
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
+            <version>${jakarta-servlet-api-version}</version>
         </dependency>
 
         <!-- for testing -->
@@ -73,6 +75,7 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
+            <version>${cxf-version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -88,6 +91,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
+            <version>${mockito-version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -102,8 +106,6 @@
                         <id>generate-test-sources</id>
                         <phase>generate-sources</phase>
                         <configuration>
-                            <fork>${cxf.codegenplugin.forkmode}</fork>
-                            <additionalJvmArgs>${cxf.codegen.jvmArgs}</additionalJvmArgs>
                             <testSourceRoot>${basedir}/target/generated/src/test/java</testSourceRoot>
                             <defaultOptions>
                                 <frontEnd>jaxws</frontEnd>

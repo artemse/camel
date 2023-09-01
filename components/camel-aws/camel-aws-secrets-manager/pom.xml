@@ -17,14 +17,13 @@
     limitations under the License.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>org.apache.camel</groupId>
         <artifactId>camel-aws-parent</artifactId>
-        <version>4.0.0-SNAPSHOT</version>
+        <version>4.1.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>camel-aws-secrets-manager</artifactId>
@@ -35,6 +34,7 @@
 
     <properties>
         <camel.surefire.forkTimeout>1200</camel.surefire.forkTimeout>
+        <camel.surefire.fork.additional-vmargs>-Xmx2G</camel.surefire.fork.additional-vmargs>
     </properties>
 
     <dependencies>
@@ -76,11 +76,6 @@
             <artifactId>camel-test-spring-junit5</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.apache.camel</groupId>
-            <artifactId>camel-core-catalog</artifactId>
-            <scope>test</scope>
-        </dependency>
 
         <!-- test infra -->
         <dependency>
@@ -91,16 +86,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <argLine>${camel.surefire.fork.vmargs} -XX:+ExitOnOutOfMemoryError -Xmx2G</argLine>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>

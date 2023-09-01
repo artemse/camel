@@ -34,7 +34,7 @@ public interface SqlComponentBuilderFactory {
      * SQL (camel-sql)
      * Perform SQL queries using Spring JDBC.
      * 
-     * Category: database,sql
+     * Category: database
      * Since: 1.4
      * Maven coordinates: org.apache.camel:camel-sql
      * 
@@ -128,6 +128,22 @@ public interface SqlComponentBuilderFactory {
             return this;
         }
         /**
+         * Factory for creating RowMapper.
+         * 
+         * The option is a:
+         * &lt;code&gt;org.apache.camel.component.sql.RowMapperFactory&lt;/code&gt; type.
+         * 
+         * Group: advanced
+         * 
+         * @param rowMapperFactory the value to set
+         * @return the dsl builder
+         */
+        default SqlComponentBuilder rowMapperFactory(
+                org.apache.camel.component.sql.RowMapperFactory rowMapperFactory) {
+            doSetProperty("rowMapperFactory", rowMapperFactory);
+            return this;
+        }
+        /**
          * Sets whether to use placeholder and replace all placeholder
          * characters with sign in the SQL queries. This option is default true.
          * 
@@ -141,6 +157,42 @@ public interface SqlComponentBuilderFactory {
          */
         default SqlComponentBuilder usePlaceholder(boolean usePlaceholder) {
             doSetProperty("usePlaceholder", usePlaceholder);
+            return this;
+        }
+        /**
+         * Used for enabling or disabling all consumer based health checks from
+         * this component.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: true
+         * Group: health
+         * 
+         * @param healthCheckConsumerEnabled the value to set
+         * @return the dsl builder
+         */
+        default SqlComponentBuilder healthCheckConsumerEnabled(
+                boolean healthCheckConsumerEnabled) {
+            doSetProperty("healthCheckConsumerEnabled", healthCheckConsumerEnabled);
+            return this;
+        }
+        /**
+         * Used for enabling or disabling all producer based health checks from
+         * this component. Notice: Camel has by default disabled all producer
+         * based health-checks. You can turn on producer checks globally by
+         * setting camel.health.producersEnabled=true.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: true
+         * Group: health
+         * 
+         * @param healthCheckProducerEnabled the value to set
+         * @return the dsl builder
+         */
+        default SqlComponentBuilder healthCheckProducerEnabled(
+                boolean healthCheckProducerEnabled) {
+            doSetProperty("healthCheckProducerEnabled", healthCheckProducerEnabled);
             return this;
         }
     }
@@ -164,7 +216,10 @@ public interface SqlComponentBuilderFactory {
             case "bridgeErrorHandler": ((SqlComponent) component).setBridgeErrorHandler((boolean) value); return true;
             case "lazyStartProducer": ((SqlComponent) component).setLazyStartProducer((boolean) value); return true;
             case "autowiredEnabled": ((SqlComponent) component).setAutowiredEnabled((boolean) value); return true;
+            case "rowMapperFactory": ((SqlComponent) component).setRowMapperFactory((org.apache.camel.component.sql.RowMapperFactory) value); return true;
             case "usePlaceholder": ((SqlComponent) component).setUsePlaceholder((boolean) value); return true;
+            case "healthCheckConsumerEnabled": ((SqlComponent) component).setHealthCheckConsumerEnabled((boolean) value); return true;
+            case "healthCheckProducerEnabled": ((SqlComponent) component).setHealthCheckProducerEnabled((boolean) value); return true;
             default: return false;
             }
         }

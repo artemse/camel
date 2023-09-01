@@ -473,6 +473,59 @@ public interface VertxWebsocketEndpointBuilderFactory {
             return (AdvancedVertxWebsocketEndpointProducerBuilder) this;
         }
         /**
+         * Whether the WebSocket client should add the Origin header to the
+         * WebSocket handshake request.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: true
+         * Group: consumer
+         * 
+         * @param allowOriginHeader the value to set
+         * @return the dsl builder
+         */
+        default VertxWebsocketEndpointProducerBuilder allowOriginHeader(
+                boolean allowOriginHeader) {
+            doSetProperty("allowOriginHeader", allowOriginHeader);
+            return this;
+        }
+        /**
+         * Whether the WebSocket client should add the Origin header to the
+         * WebSocket handshake request.
+         * 
+         * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
+         * type.
+         * 
+         * Default: true
+         * Group: consumer
+         * 
+         * @param allowOriginHeader the value to set
+         * @return the dsl builder
+         */
+        default VertxWebsocketEndpointProducerBuilder allowOriginHeader(
+                String allowOriginHeader) {
+            doSetProperty("allowOriginHeader", allowOriginHeader);
+            return this;
+        }
+        /**
+         * The value of the Origin header that the WebSocket client should use
+         * on the WebSocket handshake request. When not specified, the WebSocket
+         * client will automatically determine the value for the Origin from the
+         * request URL.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: consumer
+         * 
+         * @param originHeaderUrl the value to set
+         * @return the dsl builder
+         */
+        default VertxWebsocketEndpointProducerBuilder originHeaderUrl(
+                String originHeaderUrl) {
+            doSetProperty("originHeaderUrl", originHeaderUrl);
+            return this;
+        }
+        /**
          * Sets customized options for configuring the WebSocket client used in
          * the producer.
          * 
@@ -523,9 +576,14 @@ public interface VertxWebsocketEndpointBuilderFactory {
             return this;
         }
         /**
-         * To send to all websocket subscribers. Can be used to configure on
-         * endpoint level, instead of having to use the
-         * VertxWebsocketConstants.SEND_TO_ALL header on the message.
+         * To send to all websocket subscribers. Can be used to configure at the
+         * endpoint level, instead of providing the
+         * VertxWebsocketConstants.SEND_TO_ALL header on the message. Note that
+         * when using this option, the host name specified for the
+         * vertx-websocket producer URI must match one used for an existing
+         * vertx-websocket consumer. Note that this option only applies when
+         * producing messages to endpoints hosted by the vertx-websocket
+         * consumer and not to an externally hosted WebSocket.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -541,9 +599,14 @@ public interface VertxWebsocketEndpointBuilderFactory {
             return this;
         }
         /**
-         * To send to all websocket subscribers. Can be used to configure on
-         * endpoint level, instead of having to use the
-         * VertxWebsocketConstants.SEND_TO_ALL header on the message.
+         * To send to all websocket subscribers. Can be used to configure at the
+         * endpoint level, instead of providing the
+         * VertxWebsocketConstants.SEND_TO_ALL header on the message. Note that
+         * when using this option, the host name specified for the
+         * vertx-websocket producer URI must match one used for an existing
+         * vertx-websocket consumer. Note that this option only applies when
+         * producing messages to endpoints hosted by the vertx-websocket
+         * consumer and not to an externally hosted WebSocket.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -715,7 +778,7 @@ public interface VertxWebsocketEndpointBuilderFactory {
          * Expose WebSocket endpoints and connect to remote WebSocket servers
          * using Vert.x
          * 
-         * Category: websocket
+         * Category: http,networking
          * Since: 3.5
          * Maven coordinates: org.apache.camel:camel-vertx-websocket
          * 
@@ -729,7 +792,7 @@ public interface VertxWebsocketEndpointBuilderFactory {
          * Expose WebSocket endpoints and connect to remote WebSocket servers
          * using Vert.x
          * 
-         * Category: websocket
+         * Category: http,networking
          * Since: 3.5
          * Maven coordinates: org.apache.camel:camel-vertx-websocket
          * 
@@ -756,7 +819,7 @@ public interface VertxWebsocketEndpointBuilderFactory {
          * Expose WebSocket endpoints and connect to remote WebSocket servers
          * using Vert.x
          * 
-         * Category: websocket
+         * Category: http,networking
          * Since: 3.5
          * Maven coordinates: org.apache.camel:camel-vertx-websocket
          * 
@@ -797,7 +860,9 @@ public interface VertxWebsocketEndpointBuilderFactory {
         /**
          * Sends the message to the client with the given connection key. You
          * can use a comma separated list of keys to send a message to multiple
-         * clients.
+         * clients. Note that this option only applies when producing messages
+         * to endpoints hosted by the vertx-websocket consumer and not to an
+         * externally hosted WebSocket.
          * 
          * The option is a: {@code String} type.
          * 
@@ -812,7 +877,9 @@ public interface VertxWebsocketEndpointBuilderFactory {
         /**
          * Sends the message to all clients which are currently connected. You
          * can use the sendToAll option on the endpoint instead of using this
-         * header.
+         * header. Note that this option only applies when producing messages to
+         * endpoints hosted by the vertx-websocket consumer and not to an
+         * externally hosted WebSocket.
          * 
          * The option is a: {@code boolean} type.
          * 

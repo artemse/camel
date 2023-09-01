@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-//CHECKSTYLE:OFF
 package org.apache.camel.builder.endpoint;
 
 import javax.annotation.processing.Generated;
@@ -25,6 +24,63 @@ import javax.annotation.processing.Generated;
 @Generated("org.apache.camel.maven.packaging.EndpointDslMojo")
 public class StaticEndpointBuilders {
 
+    /**
+     * ActiveMQ (camel-activemq)
+     * Send messages to (or consume from) Apache ActiveMQ. This component
+     * extends the Camel JMS component.
+     * 
+     * Category: messaging
+     * Since: 1.0
+     * Maven coordinates: org.apache.camel:camel-activemq
+     * 
+     * Syntax: <code>activemq:destinationType:destinationName</code>
+     * 
+     * Path parameter: destinationType
+     * The kind of destination to use
+     * Default value: queue
+     * There are 4 enums and the value can be one of: queue, topic, temp-queue,
+     * temp-topic
+     * 
+     * Path parameter: destinationName (required)
+     * Name of the queue or topic to use as destination
+     * 
+     * @param path destinationType:destinationName
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.ActiveMQEndpointBuilderFactory.ActiveMQEndpointBuilder activemq(
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.ActiveMQEndpointBuilderFactory.endpointBuilder("activemq", path);
+    }
+    /**
+     * ActiveMQ (camel-activemq)
+     * Send messages to (or consume from) Apache ActiveMQ. This component
+     * extends the Camel JMS component.
+     * 
+     * Category: messaging
+     * Since: 1.0
+     * Maven coordinates: org.apache.camel:camel-activemq
+     * 
+     * Syntax: <code>activemq:destinationType:destinationName</code>
+     * 
+     * Path parameter: destinationType
+     * The kind of destination to use
+     * Default value: queue
+     * There are 4 enums and the value can be one of: queue, topic, temp-queue,
+     * temp-topic
+     * 
+     * Path parameter: destinationName (required)
+     * Name of the queue or topic to use as destination
+     * 
+     * @param componentName to use a custom component name for the endpoint
+     * instead of the default name
+     * @param path destinationType:destinationName
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.ActiveMQEndpointBuilderFactory.ActiveMQEndpointBuilder activemq(
+            String componentName,
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.ActiveMQEndpointBuilderFactory.endpointBuilder(componentName, path);
+    }
     /**
      * AMQP (camel-amqp)
      * Messaging with AMQP protocol using Apache QPid Client.
@@ -85,7 +141,7 @@ public class StaticEndpointBuilders {
      * Perform operations on ArangoDb when used as a Document Database, or as a
      * Graph Database
      * 
-     * Category: database,nosql
+     * Category: database
      * Since: 3.5
      * Maven coordinates: org.apache.camel:camel-arangodb
      * 
@@ -106,7 +162,7 @@ public class StaticEndpointBuilders {
      * Perform operations on ArangoDb when used as a Document Database, or as a
      * Graph Database
      * 
-     * Category: database,nosql
+     * Category: database
      * Since: 3.5
      * Maven coordinates: org.apache.camel:camel-arangodb
      * 
@@ -178,9 +234,9 @@ public class StaticEndpointBuilders {
     }
     /**
      * Asterisk (camel-asterisk)
-     * Interact with Asterisk PBX Server.
+     * Interact with Asterisk PBX Server (VoIP).
      * 
-     * Category: voip
+     * Category: mobile
      * Since: 2.18
      * Maven coordinates: org.apache.camel:camel-asterisk
      * 
@@ -198,9 +254,9 @@ public class StaticEndpointBuilders {
     }
     /**
      * Asterisk (camel-asterisk)
-     * Interact with Asterisk PBX Server.
+     * Interact with Asterisk PBX Server (VoIP).
      * 
-     * Category: voip
+     * Category: mobile
      * Since: 2.18
      * Maven coordinates: org.apache.camel:camel-asterisk
      * 
@@ -220,61 +276,10 @@ public class StaticEndpointBuilders {
         return org.apache.camel.builder.endpoint.dsl.AsteriskEndpointBuilderFactory.endpointBuilder(componentName, path);
     }
     /**
-     * AtlasMap (camel-atlasmap)
-     * Transforms the message using an AtlasMap transformation.
-     * 
-     * Category: transformation
-     * Since: 3.7
-     * Maven coordinates: org.apache.camel:camel-atlasmap
-     * 
-     * Syntax: <code>atlasmap:resourceUri</code>
-     * 
-     * Path parameter: resourceUri (required)
-     * Path to the resource. You can prefix with: classpath, file, http, ref, or
-     * bean. classpath, file and http loads the resource using these protocols
-     * (classpath is default). ref will lookup the resource in the registry.
-     * bean will call a method on a bean to be used as the resource. For bean
-     * you can specify the method name after dot, eg bean:myBean.myMethod.
-     * 
-     * @param path resourceUri
-     * @return the dsl builder
-     */
-    public static org.apache.camel.builder.endpoint.dsl.AtlasMapEndpointBuilderFactory.AtlasMapEndpointBuilder atlasmap(
-            String path) {
-        return org.apache.camel.builder.endpoint.dsl.AtlasMapEndpointBuilderFactory.endpointBuilder("atlasmap", path);
-    }
-    /**
-     * AtlasMap (camel-atlasmap)
-     * Transforms the message using an AtlasMap transformation.
-     * 
-     * Category: transformation
-     * Since: 3.7
-     * Maven coordinates: org.apache.camel:camel-atlasmap
-     * 
-     * Syntax: <code>atlasmap:resourceUri</code>
-     * 
-     * Path parameter: resourceUri (required)
-     * Path to the resource. You can prefix with: classpath, file, http, ref, or
-     * bean. classpath, file and http loads the resource using these protocols
-     * (classpath is default). ref will lookup the resource in the registry.
-     * bean will call a method on a bean to be used as the resource. For bean
-     * you can specify the method name after dot, eg bean:myBean.myMethod.
-     * 
-     * @param componentName to use a custom component name for the endpoint
-     * instead of the default name
-     * @param path resourceUri
-     * @return the dsl builder
-     */
-    public static org.apache.camel.builder.endpoint.dsl.AtlasMapEndpointBuilderFactory.AtlasMapEndpointBuilder atlasmap(
-            String componentName,
-            String path) {
-        return org.apache.camel.builder.endpoint.dsl.AtlasMapEndpointBuilderFactory.endpointBuilder(componentName, path);
-    }
-    /**
      * Atmosphere Websocket (camel-atmosphere-websocket)
      * Expose WebSocket endpoints using the Atmosphere framework.
      * 
-     * Category: websocket
+     * Category: http,networking
      * Since: 2.14
      * Maven coordinates: org.apache.camel:camel-atmosphere-websocket
      * 
@@ -294,7 +299,7 @@ public class StaticEndpointBuilders {
      * Atmosphere Websocket (camel-atmosphere-websocket)
      * Expose WebSocket endpoints using the Atmosphere framework.
      * 
-     * Category: websocket
+     * Category: http,networking
      * Since: 2.14
      * Maven coordinates: org.apache.camel:camel-atmosphere-websocket
      * 
@@ -317,7 +322,7 @@ public class StaticEndpointBuilders {
      * Atom (camel-atom)
      * Poll Atom RSS feeds.
      * 
-     * Category: rss
+     * Category: document
      * Since: 1.2
      * Maven coordinates: org.apache.camel:camel-atom
      * 
@@ -337,7 +342,7 @@ public class StaticEndpointBuilders {
      * Atom (camel-atom)
      * Poll Atom RSS feeds.
      * 
-     * Category: rss
+     * Category: document
      * Since: 1.2
      * Maven coordinates: org.apache.camel:camel-atom
      * 
@@ -421,7 +426,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS Athena (camel-aws2-athena)
-     * Access AWS Athena service using AWS SDK version 2.x.
+     * Access AWS Athena.
      * 
      * Category: cloud,database
      * Since: 3.4
@@ -441,7 +446,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS Athena (camel-aws2-athena)
-     * Access AWS Athena service using AWS SDK version 2.x.
+     * Access AWS Athena.
      * 
      * Category: cloud,database
      * Since: 3.4
@@ -464,7 +469,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS CloudWatch (camel-aws2-cw)
-     * Sending metrics to AWS CloudWatch using AWS SDK version 2.x.
+     * Sending metrics to AWS CloudWatch.
      * 
      * Category: cloud,monitoring
      * Since: 3.1
@@ -484,7 +489,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS CloudWatch (camel-aws2-cw)
-     * Sending metrics to AWS CloudWatch using AWS SDK version 2.x.
+     * Sending metrics to AWS CloudWatch.
      * 
      * Category: cloud,monitoring
      * Since: 3.1
@@ -507,10 +512,9 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS DynamoDB (camel-aws2-ddb)
-     * Store and retrieve data from AWS DynamoDB service using AWS SDK version
-     * 2.x.
+     * Store and retrieve data from AWS DynamoDB.
      * 
-     * Category: cloud,database,nosql
+     * Category: cloud,database
      * Since: 3.1
      * Maven coordinates: org.apache.camel:camel-aws2-ddb
      * 
@@ -528,10 +532,9 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS DynamoDB (camel-aws2-ddb)
-     * Store and retrieve data from AWS DynamoDB service using AWS SDK version
-     * 2.x.
+     * Store and retrieve data from AWS DynamoDB.
      * 
-     * Category: cloud,database,nosql
+     * Category: cloud,database
      * Since: 3.1
      * Maven coordinates: org.apache.camel:camel-aws2-ddb
      * 
@@ -552,10 +555,9 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS DynamoDB Streams (camel-aws2-ddb)
-     * Receive messages from AWS DynamoDB Stream service using AWS SDK version
-     * 2.x.
+     * Receive messages from AWS DynamoDB Stream.
      * 
-     * Category: cloud,messaging,streams
+     * Category: cloud,messaging
      * Since: 3.1
      * Maven coordinates: org.apache.camel:camel-aws2-ddb
      * 
@@ -573,10 +575,9 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS DynamoDB Streams (camel-aws2-ddb)
-     * Receive messages from AWS DynamoDB Stream service using AWS SDK version
-     * 2.x.
+     * Receive messages from AWS DynamoDB Stream.
      * 
-     * Category: cloud,messaging,streams
+     * Category: cloud,messaging
      * Since: 3.1
      * Maven coordinates: org.apache.camel:camel-aws2-ddb
      * 
@@ -597,7 +598,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS Elastic Compute Cloud (EC2) (camel-aws2-ec2)
-     * Manage AWS EC2 instances using AWS SDK version 2.x.
+     * Manage AWS EC2 instances.
      * 
      * Category: cloud,management
      * Since: 3.1
@@ -617,7 +618,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS Elastic Compute Cloud (EC2) (camel-aws2-ec2)
-     * Manage AWS EC2 instances using AWS SDK version 2.x.
+     * Manage AWS EC2 instances.
      * 
      * Category: cloud,management
      * Since: 3.1
@@ -640,7 +641,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS Elastic Container Service (ECS) (camel-aws2-ecs)
-     * Manage AWS ECS cluster instances using AWS SDK version 2.x.
+     * Manage AWS ECS cluster instances.
      * 
      * Category: cloud,management
      * Since: 3.1
@@ -660,7 +661,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS Elastic Container Service (ECS) (camel-aws2-ecs)
-     * Manage AWS ECS cluster instances using AWS SDK version 2.x.
+     * Manage AWS ECS cluster instances.
      * 
      * Category: cloud,management
      * Since: 3.1
@@ -683,7 +684,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS Elastic Kubernetes Service (EKS) (camel-aws2-eks)
-     * Manage AWS EKS cluster instances using AWS SDK version 2.x.
+     * Manage AWS EKS cluster instances.
      * 
      * Category: cloud,management
      * Since: 3.1
@@ -703,7 +704,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS Elastic Kubernetes Service (EKS) (camel-aws2-eks)
-     * Manage AWS EKS cluster instances using AWS SDK version 2.x.
+     * Manage AWS EKS cluster instances.
      * 
      * Category: cloud,management
      * Since: 3.1
@@ -726,7 +727,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS Eventbridge (camel-aws2-eventbridge)
-     * Manage AWS Eventbridge cluster instances using AWS SDK version 2.x.
+     * Send events to AWS Eventbridge cluster instances.
      * 
      * Category: cloud,management
      * Since: 3.6
@@ -746,7 +747,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS Eventbridge (camel-aws2-eventbridge)
-     * Manage AWS Eventbridge cluster instances using AWS SDK version 2.x.
+     * Send events to AWS Eventbridge cluster instances.
      * 
      * Category: cloud,management
      * Since: 3.6
@@ -769,7 +770,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS Identity and Access Management (IAM) (camel-aws2-iam)
-     * Manage AWS IAM instances using AWS SDK version 2.x.
+     * Manage AWS IAM instances.
      * 
      * Category: cloud,management
      * Since: 3.1
@@ -789,7 +790,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS Identity and Access Management (IAM) (camel-aws2-iam)
-     * Manage AWS IAM instances using AWS SDK version 2.x.
+     * Manage AWS IAM instances.
      * 
      * Category: cloud,management
      * Since: 3.1
@@ -812,8 +813,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS Kinesis (camel-aws2-kinesis)
-     * Consume and produce records from and to AWS Kinesis Streams using AWS SDK
-     * version 2.x.
+     * Consume and produce records from and to AWS Kinesis Streams.
      * 
      * Category: cloud,messaging
      * Since: 3.2
@@ -833,8 +833,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS Kinesis (camel-aws2-kinesis)
-     * Consume and produce records from and to AWS Kinesis Streams using AWS SDK
-     * version 2.x.
+     * Consume and produce records from and to AWS Kinesis Streams.
      * 
      * Category: cloud,messaging
      * Since: 3.2
@@ -857,7 +856,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS Kinesis Firehose (camel-aws2-kinesis)
-     * Produce data to AWS Kinesis Firehose streams using AWS SDK version 2.x.
+     * Produce data to AWS Kinesis Firehose streams.
      * 
      * Category: cloud,messaging
      * Since: 3.2
@@ -877,7 +876,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS Kinesis Firehose (camel-aws2-kinesis)
-     * Produce data to AWS Kinesis Firehose streams using AWS SDK version 2.x.
+     * Produce data to AWS Kinesis Firehose streams.
      * 
      * Category: cloud,messaging
      * Since: 3.2
@@ -900,7 +899,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS Key Management Service (KMS) (camel-aws2-kms)
-     * Manage keys stored in AWS KMS instances using AWS SDK version 2.x.
+     * Manage keys stored in AWS KMS instances.
      * 
      * Category: cloud,management
      * Since: 3.1
@@ -920,7 +919,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS Key Management Service (KMS) (camel-aws2-kms)
-     * Manage keys stored in AWS KMS instances using AWS SDK version 2.x.
+     * Manage keys stored in AWS KMS instances.
      * 
      * Category: cloud,management
      * Since: 3.1
@@ -943,9 +942,9 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS Lambda (camel-aws2-lambda)
-     * Manage and invoke AWS Lambda functions using AWS SDK version 2.x.
+     * Manage and invoke AWS Lambda functions.
      * 
-     * Category: cloud,computing,serverless
+     * Category: cloud,serverless
      * Since: 3.2
      * Maven coordinates: org.apache.camel:camel-aws2-lambda
      * 
@@ -963,9 +962,9 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS Lambda (camel-aws2-lambda)
-     * Manage and invoke AWS Lambda functions using AWS SDK version 2.x.
+     * Manage and invoke AWS Lambda functions.
      * 
-     * Category: cloud,computing,serverless
+     * Category: cloud,serverless
      * Since: 3.2
      * Maven coordinates: org.apache.camel:camel-aws2-lambda
      * 
@@ -986,7 +985,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS MQ (camel-aws2-mq)
-     * Manage AWS MQ instances using AWS SDK version 2.x.
+     * Send messages to AWS MQ.
      * 
      * Category: cloud,messaging
      * Since: 3.1
@@ -1006,7 +1005,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS MQ (camel-aws2-mq)
-     * Manage AWS MQ instances using AWS SDK version 2.x.
+     * Send messages to AWS MQ.
      * 
      * Category: cloud,messaging
      * Since: 3.1
@@ -1029,7 +1028,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS Managed Streaming for Apache Kafka (MSK) (camel-aws2-msk)
-     * Manage AWS MSK instances using AWS SDK version 2.x.
+     * Manage AWS MSK instances.
      * 
      * Category: cloud,management
      * Since: 3.1
@@ -1049,7 +1048,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS Managed Streaming for Apache Kafka (MSK) (camel-aws2-msk)
-     * Manage AWS MSK instances using AWS SDK version 2.x.
+     * Manage AWS MSK instances.
      * 
      * Category: cloud,management
      * Since: 3.1
@@ -1072,8 +1071,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS S3 Storage Service (camel-aws2-s3)
-     * Store and retrieve objects from AWS S3 Storage Service using AWS SDK
-     * version 2.x.
+     * Store and retrieve objects from AWS S3 Storage Service.
      * 
      * Category: cloud,file
      * Since: 3.2
@@ -1093,8 +1091,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS S3 Storage Service (camel-aws2-s3)
-     * Store and retrieve objects from AWS S3 Storage Service using AWS SDK
-     * version 2.x.
+     * Store and retrieve objects from AWS S3 Storage Service.
      * 
      * Category: cloud,file
      * Since: 3.2
@@ -1117,7 +1114,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS Simple Email Service (SES) (camel-aws2-ses)
-     * Send e-mails through AWS SES service using AWS SDK version 2.x.
+     * Send e-mails through AWS SES service.
      * 
      * Category: cloud,mail
      * Since: 3.1
@@ -1137,7 +1134,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS Simple Email Service (SES) (camel-aws2-ses)
-     * Send e-mails through AWS SES service using AWS SDK version 2.x.
+     * Send e-mails through AWS SES service.
      * 
      * Category: cloud,mail
      * Since: 3.1
@@ -1160,8 +1157,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS Simple Notification System (SNS) (camel-aws2-sns)
-     * Send messages to an AWS Simple Notification Topic using AWS SDK version
-     * 2.x.
+     * Send messages to AWS Simple Notification Topic.
      * 
      * Category: cloud,messaging,mobile
      * Since: 3.1
@@ -1181,8 +1177,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS Simple Notification System (SNS) (camel-aws2-sns)
-     * Send messages to an AWS Simple Notification Topic using AWS SDK version
-     * 2.x.
+     * Send messages to AWS Simple Notification Topic.
      * 
      * Category: cloud,messaging,mobile
      * Since: 3.1
@@ -1205,8 +1200,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS Simple Queue Service (SQS) (camel-aws2-sqs)
-     * Send and receive messages to/from AWS SQS service using AWS SDK version
-     * 2.x.
+     * Send and receive messages to/from AWS SQS.
      * 
      * Category: cloud,messaging
      * Since: 3.1
@@ -1226,8 +1220,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS Simple Queue Service (SQS) (camel-aws2-sqs)
-     * Send and receive messages to/from AWS SQS service using AWS SDK version
-     * 2.x.
+     * Send and receive messages to/from AWS SQS.
      * 
      * Category: cloud,messaging
      * Since: 3.1
@@ -1249,8 +1242,51 @@ public class StaticEndpointBuilders {
         return org.apache.camel.builder.endpoint.dsl.Sqs2EndpointBuilderFactory.endpointBuilder(componentName, path);
     }
     /**
+     * AWS StepFunctions (camel-aws2-step-functions)
+     * Manage and invoke AWS Step functions.
+     * 
+     * Category: cloud,serverless
+     * Since: 4.0
+     * Maven coordinates: org.apache.camel:camel-aws2-step-functions
+     * 
+     * Syntax: <code>aws2-step-functions:label</code>
+     * 
+     * Path parameter: label (required)
+     * Logical name
+     * 
+     * @param path label
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.StepFunctions2EndpointBuilderFactory.StepFunctions2EndpointBuilder aws2StepFunctions(
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.StepFunctions2EndpointBuilderFactory.endpointBuilder("aws2-step-functions", path);
+    }
+    /**
+     * AWS StepFunctions (camel-aws2-step-functions)
+     * Manage and invoke AWS Step functions.
+     * 
+     * Category: cloud,serverless
+     * Since: 4.0
+     * Maven coordinates: org.apache.camel:camel-aws2-step-functions
+     * 
+     * Syntax: <code>aws2-step-functions:label</code>
+     * 
+     * Path parameter: label (required)
+     * Logical name
+     * 
+     * @param componentName to use a custom component name for the endpoint
+     * instead of the default name
+     * @param path label
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.StepFunctions2EndpointBuilderFactory.StepFunctions2EndpointBuilder aws2StepFunctions(
+            String componentName,
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.StepFunctions2EndpointBuilderFactory.endpointBuilder(componentName, path);
+    }
+    /**
      * AWS Security Token Service (STS) (camel-aws2-sts)
-     * Manage AWS STS cluster instances using AWS SDK version 2.x.
+     * Manage AWS STS cluster instances.
      * 
      * Category: cloud,management
      * Since: 3.5
@@ -1270,7 +1306,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS Security Token Service (STS) (camel-aws2-sts)
-     * Manage AWS STS cluster instances using AWS SDK version 2.x.
+     * Manage AWS STS cluster instances.
      * 
      * Category: cloud,management
      * Since: 3.5
@@ -1290,6 +1326,57 @@ public class StaticEndpointBuilders {
             String componentName,
             String path) {
         return org.apache.camel.builder.endpoint.dsl.STS2EndpointBuilderFactory.endpointBuilder(componentName, path);
+    }
+    /**
+     * AWS Timestream (camel-aws2-timestream)
+     * A Camel Amazon Web Services TimeStream component
+     * 
+     * Category: cloud,database
+     * Since: 4.1
+     * Maven coordinates: org.apache.camel:camel-aws2-timestream
+     * 
+     * Syntax: <code>aws2-timestream:clientType:label</code>
+     * 
+     * Path parameter: clientType (required)
+     * Type of client - write/query
+     * There are 2 enums and the value can be one of: write, query
+     * 
+     * Path parameter: label (required)
+     * Logical name
+     * 
+     * @param path clientType:label
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.Timestream2EndpointBuilderFactory.Timestream2EndpointBuilder aws2Timestream(
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.Timestream2EndpointBuilderFactory.endpointBuilder("aws2-timestream", path);
+    }
+    /**
+     * AWS Timestream (camel-aws2-timestream)
+     * A Camel Amazon Web Services TimeStream component
+     * 
+     * Category: cloud,database
+     * Since: 4.1
+     * Maven coordinates: org.apache.camel:camel-aws2-timestream
+     * 
+     * Syntax: <code>aws2-timestream:clientType:label</code>
+     * 
+     * Path parameter: clientType (required)
+     * Type of client - write/query
+     * There are 2 enums and the value can be one of: write, query
+     * 
+     * Path parameter: label (required)
+     * Logical name
+     * 
+     * @param componentName to use a custom component name for the endpoint
+     * instead of the default name
+     * @param path clientType:label
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.Timestream2EndpointBuilderFactory.Timestream2EndpointBuilder aws2Timestream(
+            String componentName,
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.Timestream2EndpointBuilderFactory.endpointBuilder(componentName, path);
     }
     /**
      * AWS Translate (camel-aws2-translate)
@@ -1338,7 +1425,7 @@ public class StaticEndpointBuilders {
      * AWS Cloudtrail (camel-aws-cloudtrail)
      * Consume events from Amazon Cloudtrail using AWS SDK version 2.x.
      * 
-     * Category: cloud,eventbus
+     * Category: cloud,management,monitoring
      * Since: 3.19
      * Maven coordinates: org.apache.camel:camel-aws-cloudtrail
      * 
@@ -1358,7 +1445,7 @@ public class StaticEndpointBuilders {
      * AWS Cloudtrail (camel-aws-cloudtrail)
      * Consume events from Amazon Cloudtrail using AWS SDK version 2.x.
      * 
-     * Category: cloud,eventbus
+     * Category: cloud,management,monitoring
      * Since: 3.19
      * Maven coordinates: org.apache.camel:camel-aws-cloudtrail
      * 
@@ -1379,7 +1466,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS Secrets Manager (camel-aws-secrets-manager)
-     * Manage AWS Secrets Manager services using AWS SDK version 2.x.
+     * Manage secrets using AWS Secrets Manager.
      * 
      * Category: cloud,management
      * Since: 3.9
@@ -1399,7 +1486,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS Secrets Manager (camel-aws-secrets-manager)
-     * Manage AWS Secrets Manager services using AWS SDK version 2.x.
+     * Manage secrets using AWS Secrets Manager.
      * 
      * Category: cloud,management
      * Since: 3.9
@@ -1527,6 +1614,67 @@ public class StaticEndpointBuilders {
             String componentName,
             String path) {
         return org.apache.camel.builder.endpoint.dsl.EventHubsEndpointBuilderFactory.endpointBuilder(componentName, path);
+    }
+    /**
+     * Azure Files (camel-azure-files)
+     * Send and receive files to Azure storage file share
+     * 
+     * Category: cloud,file
+     * Since: 3.22
+     * Maven coordinates: org.apache.camel:camel-azure-files
+     * 
+     * Syntax: <code>azure-files:account/share</code>
+     * 
+     * Path parameter: account (required)
+     * The account to use
+     * 
+     * Path parameter: share (required)
+     * The share to use
+     * 
+     * Path parameter: port
+     * Port of the FTP server
+     * 
+     * Path parameter: directoryName
+     * The starting directory
+     * 
+     * @param path account/share
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.FilesEndpointBuilderFactory.FilesEndpointBuilder azureFiles(
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.FilesEndpointBuilderFactory.endpointBuilder("azure-files", path);
+    }
+    /**
+     * Azure Files (camel-azure-files)
+     * Send and receive files to Azure storage file share
+     * 
+     * Category: cloud,file
+     * Since: 3.22
+     * Maven coordinates: org.apache.camel:camel-azure-files
+     * 
+     * Syntax: <code>azure-files:account/share</code>
+     * 
+     * Path parameter: account (required)
+     * The account to use
+     * 
+     * Path parameter: share (required)
+     * The share to use
+     * 
+     * Path parameter: port
+     * Port of the FTP server
+     * 
+     * Path parameter: directoryName
+     * The starting directory
+     * 
+     * @param componentName to use a custom component name for the endpoint
+     * instead of the default name
+     * @param path account/share
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.FilesEndpointBuilderFactory.FilesEndpointBuilder azureFiles(
+            String componentName,
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.FilesEndpointBuilderFactory.endpointBuilder(componentName, path);
     }
     /**
      * Azure Key Vault (camel-azure-key-vault)
@@ -1773,7 +1921,7 @@ public class StaticEndpointBuilders {
      * Bean (camel-bean)
      * Invoke methods of Java beans stored in Camel registry.
      * 
-     * Category: core,java
+     * Category: core,script
      * Since: 1.0
      * Maven coordinates: org.apache.camel:camel-bean
      * 
@@ -1793,7 +1941,7 @@ public class StaticEndpointBuilders {
      * Bean (camel-bean)
      * Invoke methods of Java beans stored in Camel registry.
      * 
-     * Category: core,java
+     * Category: core,script
      * Since: 1.0
      * Maven coordinates: org.apache.camel:camel-bean
      * 
@@ -1859,7 +2007,7 @@ public class StaticEndpointBuilders {
      * Bonita (camel-bonita)
      * Communicate with a remote Bonita BPM process engine.
      * 
-     * Category: process
+     * Category: workflow
      * Since: 2.19
      * Maven coordinates: org.apache.camel:camel-bonita
      * 
@@ -1880,7 +2028,7 @@ public class StaticEndpointBuilders {
      * Bonita (camel-bonita)
      * Communicate with a remote Bonita BPM process engine.
      * 
-     * Category: process
+     * Category: workflow
      * Since: 2.19
      * Maven coordinates: org.apache.camel:camel-bonita
      * 
@@ -1959,7 +2107,7 @@ public class StaticEndpointBuilders {
      * Braintree (camel-braintree)
      * Process payments using Braintree Payments.
      * 
-     * Category: cloud,payment
+     * Category: saas
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-braintree
      * 
@@ -1967,11 +2115,11 @@ public class StaticEndpointBuilders {
      * 
      * Path parameter: apiName (required)
      * What kind of operation to perform
-     * There are 17 enums and the value can be one of: ADD_ON, ADDRESS,
+     * There are 19 enums and the value can be one of: ADD_ON, ADDRESS,
      * CLIENT_TOKEN, CREDIT_CARD_VERIFICATION, CUSTOMER, DISCOUNT, DISPUTE,
      * DOCUMENT_UPLOAD, MERCHANT_ACCOUNT, PAYMENT_METHOD, PAYMENT_METHOD_NONCE,
-     * PLAN, REPORT, SETTLEMENT_BATCH_SUMMARY, SUBSCRIPTION, TRANSACTION,
-     * WEBHOOK_NOTIFICATION
+     * OAUTH, PLAN, REPORT, SETTLEMENT_BATCH_SUMMARY, SUBSCRIPTION, TRANSACTION,
+     * US_BANK_ACCOUNT, WEBHOOK_NOTIFICATION
      * 
      * Path parameter: methodName (required)
      * What sub operation to use for the selected operation
@@ -1994,7 +2142,7 @@ public class StaticEndpointBuilders {
      * Braintree (camel-braintree)
      * Process payments using Braintree Payments.
      * 
-     * Category: cloud,payment
+     * Category: saas
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-braintree
      * 
@@ -2002,11 +2150,11 @@ public class StaticEndpointBuilders {
      * 
      * Path parameter: apiName (required)
      * What kind of operation to perform
-     * There are 17 enums and the value can be one of: ADD_ON, ADDRESS,
+     * There are 19 enums and the value can be one of: ADD_ON, ADDRESS,
      * CLIENT_TOKEN, CREDIT_CARD_VERIFICATION, CUSTOMER, DISCOUNT, DISPUTE,
      * DOCUMENT_UPLOAD, MERCHANT_ACCOUNT, PAYMENT_METHOD, PAYMENT_METHOD_NONCE,
-     * PLAN, REPORT, SETTLEMENT_BATCH_SUMMARY, SUBSCRIPTION, TRANSACTION,
-     * WEBHOOK_NOTIFICATION
+     * OAUTH, PLAN, REPORT, SETTLEMENT_BATCH_SUMMARY, SUBSCRIPTION, TRANSACTION,
+     * US_BANK_ACCOUNT, WEBHOOK_NOTIFICATION
      * 
      * Path parameter: methodName (required)
      * What sub operation to use for the selected operation
@@ -2075,7 +2223,7 @@ public class StaticEndpointBuilders {
      * Caffeine Cache (camel-caffeine)
      * Perform caching operations using Caffeine Cache.
      * 
-     * Category: cache,datagrid,clustering
+     * Category: cache,clustering
      * Since: 2.20
      * Maven coordinates: org.apache.camel:camel-caffeine
      * 
@@ -2095,7 +2243,7 @@ public class StaticEndpointBuilders {
      * Caffeine Cache (camel-caffeine)
      * Perform caching operations using Caffeine Cache.
      * 
-     * Category: cache,datagrid,clustering
+     * Category: cache,clustering
      * Since: 2.20
      * Maven coordinates: org.apache.camel:camel-caffeine
      * 
@@ -2119,7 +2267,7 @@ public class StaticEndpointBuilders {
      * Perform caching operations using Caffeine Cache with an attached
      * CacheLoader.
      * 
-     * Category: cache,datagrid,clustering
+     * Category: cache,clustering
      * Since: 2.20
      * Maven coordinates: org.apache.camel:camel-caffeine
      * 
@@ -2140,7 +2288,7 @@ public class StaticEndpointBuilders {
      * Perform caching operations using Caffeine Cache with an attached
      * CacheLoader.
      * 
-     * Category: cache,datagrid,clustering
+     * Category: cache,clustering
      * Since: 2.20
      * Maven coordinates: org.apache.camel:camel-caffeine
      * 
@@ -2232,6 +2380,8 @@ public class StaticEndpointBuilders {
      * (classpath is default). ref will lookup the resource in the registry.
      * bean will call a method on a bean to be used as the resource. For bean
      * you can specify the method name after dot, eg bean:myBean.myMethod.
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param path resourceUri
      * @return the dsl builder
@@ -2256,6 +2406,8 @@ public class StaticEndpointBuilders {
      * (classpath is default). ref will lookup the resource in the registry.
      * bean will call a method on a bean to be used as the resource. For bean
      * you can specify the method name after dot, eg bean:myBean.myMethod.
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -2271,7 +2423,7 @@ public class StaticEndpointBuilders {
      * Class (camel-bean)
      * Invoke methods of Java beans specified by class name.
      * 
-     * Category: core,java
+     * Category: core,script
      * Since: 2.4
      * Maven coordinates: org.apache.camel:camel-bean
      * 
@@ -2291,7 +2443,7 @@ public class StaticEndpointBuilders {
      * Class (camel-bean)
      * Invoke methods of Java beans specified by class name.
      * 
-     * Category: core,java
+     * Category: core,script
      * Since: 2.4
      * Maven coordinates: org.apache.camel:camel-bean
      * 
@@ -2401,7 +2553,7 @@ public class StaticEndpointBuilders {
      * Offers publish/subscribe, peer-to-peer (via a server), and RPC style
      * messaging using the CometD/Bayeux protocol.
      * 
-     * Category: websocket
+     * Category: networking,messaging
      * Since: 2.0
      * Maven coordinates: org.apache.camel:camel-cometd
      * 
@@ -2429,7 +2581,7 @@ public class StaticEndpointBuilders {
      * Offers publish/subscribe, peer-to-peer (via a server), and RPC style
      * messaging using the CometD/Bayeux protocol.
      * 
-     * Category: websocket
+     * Category: networking,messaging
      * Since: 2.0
      * Maven coordinates: org.apache.camel:camel-cometd
      * 
@@ -2562,56 +2714,11 @@ public class StaticEndpointBuilders {
         return org.apache.camel.builder.endpoint.dsl.ControlBusEndpointBuilderFactory.endpointBuilder(componentName, path);
     }
     /**
-     * Corda (camel-corda)
-     * Perform operations against Corda blockchain platform using corda-rpc
-     * library.
-     * 
-     * Category: blockchain,rpc
-     * Since: 2.23
-     * Maven coordinates: org.apache.camel:camel-corda
-     * 
-     * Syntax: <code>corda:node</code>
-     * 
-     * Path parameter: node (required)
-     * The url for the corda node
-     * 
-     * @param path node
-     * @return the dsl builder
-     */
-    public static org.apache.camel.builder.endpoint.dsl.CordaEndpointBuilderFactory.CordaEndpointBuilder corda(
-            String path) {
-        return org.apache.camel.builder.endpoint.dsl.CordaEndpointBuilderFactory.endpointBuilder("corda", path);
-    }
-    /**
-     * Corda (camel-corda)
-     * Perform operations against Corda blockchain platform using corda-rpc
-     * library.
-     * 
-     * Category: blockchain,rpc
-     * Since: 2.23
-     * Maven coordinates: org.apache.camel:camel-corda
-     * 
-     * Syntax: <code>corda:node</code>
-     * 
-     * Path parameter: node (required)
-     * The url for the corda node
-     * 
-     * @param componentName to use a custom component name for the endpoint
-     * instead of the default name
-     * @param path node
-     * @return the dsl builder
-     */
-    public static org.apache.camel.builder.endpoint.dsl.CordaEndpointBuilderFactory.CordaEndpointBuilder corda(
-            String componentName,
-            String path) {
-        return org.apache.camel.builder.endpoint.dsl.CordaEndpointBuilderFactory.endpointBuilder(componentName, path);
-    }
-    /**
      * Couchbase (camel-couchbase)
      * Query Couchbase Views with a poll strategy and/or perform various
      * operations against Couchbase databases.
      * 
-     * Category: database,nosql
+     * Category: database
      * Since: 2.19
      * Maven coordinates: org.apache.camel:camel-couchbase
      * 
@@ -2639,7 +2746,7 @@ public class StaticEndpointBuilders {
      * Query Couchbase Views with a poll strategy and/or perform various
      * operations against Couchbase databases.
      * 
-     * Category: database,nosql
+     * Category: database
      * Since: 2.19
      * Maven coordinates: org.apache.camel:camel-couchbase
      * 
@@ -2671,7 +2778,7 @@ public class StaticEndpointBuilders {
      * database, as well as get, save, update and delete documents from a
      * CouchDB database.
      * 
-     * Category: database,nosql
+     * Category: database
      * Since: 2.11
      * Maven coordinates: org.apache.camel:camel-couchdb
      * 
@@ -2704,7 +2811,7 @@ public class StaticEndpointBuilders {
      * database, as well as get, save, update and delete documents from a
      * CouchDB database.
      * 
-     * Category: database,nosql
+     * Category: database
      * Since: 2.11
      * Maven coordinates: org.apache.camel:camel-couchdb
      * 
@@ -2739,7 +2846,7 @@ public class StaticEndpointBuilders {
      * Integrate with Cassandra 2.0 using the CQL3 API (not the Thrift API).
      * Based on Cassandra Java Driver provided by DataStax.
      * 
-     * Category: database,nosql
+     * Category: database,bigdata
      * Since: 2.15
      * Maven coordinates: org.apache.camel:camel-cassandraql
      * 
@@ -2770,7 +2877,7 @@ public class StaticEndpointBuilders {
      * Integrate with Cassandra 2.0 using the CQL3 API (not the Thrift API).
      * Based on Cassandra Java Driver provided by DataStax.
      * 
-     * Category: database,nosql
+     * Category: database,bigdata
      * Since: 2.15
      * Maven coordinates: org.apache.camel:camel-cassandraql
      * 
@@ -2904,7 +3011,7 @@ public class StaticEndpointBuilders {
      * Expose SOAP WebServices using Apache CXF or connect to external
      * WebServices using CXF WS client.
      * 
-     * Category: soap,webservice
+     * Category: http,webservice
      * Since: 1.0
      * Maven coordinates: org.apache.camel:camel-cxf-soap
      * 
@@ -2928,7 +3035,7 @@ public class StaticEndpointBuilders {
      * Expose SOAP WebServices using Apache CXF or connect to external
      * WebServices using CXF WS client.
      * 
-     * Category: soap,webservice
+     * Category: http,webservice
      * Since: 1.0
      * Maven coordinates: org.apache.camel:camel-cxf-soap
      * 
@@ -3148,7 +3255,7 @@ public class StaticEndpointBuilders {
      * Debezium DB2 Connector (camel-debezium-db2)
      * Capture changes from a DB2 database.
      * 
-     * Category: database,sql
+     * Category: database
      * Since: 3.17
      * Maven coordinates: org.apache.camel:camel-debezium-db2
      * 
@@ -3169,7 +3276,7 @@ public class StaticEndpointBuilders {
      * Debezium DB2 Connector (camel-debezium-db2)
      * Capture changes from a DB2 database.
      * 
-     * Category: database,sql
+     * Category: database
      * Since: 3.17
      * Maven coordinates: org.apache.camel:camel-debezium-db2
      * 
@@ -3193,7 +3300,7 @@ public class StaticEndpointBuilders {
      * Debezium MongoDB Connector (camel-debezium-mongodb)
      * Capture changes from a MongoDB database.
      * 
-     * Category: database,nosql
+     * Category: database
      * Since: 3.0
      * Maven coordinates: org.apache.camel:camel-debezium-mongodb
      * 
@@ -3214,7 +3321,7 @@ public class StaticEndpointBuilders {
      * Debezium MongoDB Connector (camel-debezium-mongodb)
      * Capture changes from a MongoDB database.
      * 
-     * Category: database,nosql
+     * Category: database
      * Since: 3.0
      * Maven coordinates: org.apache.camel:camel-debezium-mongodb
      * 
@@ -3238,7 +3345,7 @@ public class StaticEndpointBuilders {
      * Debezium MySQL Connector (camel-debezium-mysql)
      * Capture changes from a MySQL database.
      * 
-     * Category: database,sql
+     * Category: database
      * Since: 3.0
      * Maven coordinates: org.apache.camel:camel-debezium-mysql
      * 
@@ -3259,7 +3366,7 @@ public class StaticEndpointBuilders {
      * Debezium MySQL Connector (camel-debezium-mysql)
      * Capture changes from a MySQL database.
      * 
-     * Category: database,sql
+     * Category: database
      * Since: 3.0
      * Maven coordinates: org.apache.camel:camel-debezium-mysql
      * 
@@ -3283,7 +3390,7 @@ public class StaticEndpointBuilders {
      * Debezium Oracle Connector (camel-debezium-oracle)
      * Capture changes from a Oracle database.
      * 
-     * Category: database,sql
+     * Category: database
      * Since: 3.17
      * Maven coordinates: org.apache.camel:camel-debezium-oracle
      * 
@@ -3304,7 +3411,7 @@ public class StaticEndpointBuilders {
      * Debezium Oracle Connector (camel-debezium-oracle)
      * Capture changes from a Oracle database.
      * 
-     * Category: database,sql
+     * Category: database
      * Since: 3.17
      * Maven coordinates: org.apache.camel:camel-debezium-oracle
      * 
@@ -3328,7 +3435,7 @@ public class StaticEndpointBuilders {
      * Debezium PostgresSQL Connector (camel-debezium-postgres)
      * Capture changes from a PostgresSQL database.
      * 
-     * Category: database,sql
+     * Category: database
      * Since: 3.0
      * Maven coordinates: org.apache.camel:camel-debezium-postgres
      * 
@@ -3349,7 +3456,7 @@ public class StaticEndpointBuilders {
      * Debezium PostgresSQL Connector (camel-debezium-postgres)
      * Capture changes from a PostgresSQL database.
      * 
-     * Category: database,sql
+     * Category: database
      * Since: 3.0
      * Maven coordinates: org.apache.camel:camel-debezium-postgres
      * 
@@ -3373,7 +3480,7 @@ public class StaticEndpointBuilders {
      * Debezium SQL Server Connector (camel-debezium-sqlserver)
      * Capture changes from an SQL Server database.
      * 
-     * Category: database,sql
+     * Category: database
      * Since: 3.0
      * Maven coordinates: org.apache.camel:camel-debezium-sqlserver
      * 
@@ -3394,7 +3501,7 @@ public class StaticEndpointBuilders {
      * Debezium SQL Server Connector (camel-debezium-sqlserver)
      * Capture changes from an SQL Server database.
      * 
-     * Category: database,sql
+     * Category: database
      * Since: 3.0
      * Maven coordinates: org.apache.camel:camel-debezium-sqlserver
      * 
@@ -3413,6 +3520,61 @@ public class StaticEndpointBuilders {
             String componentName,
             String path) {
         return org.apache.camel.builder.endpoint.dsl.DebeziumSqlserverEndpointBuilderFactory.endpointBuilder(componentName, path);
+    }
+    /**
+     * DHIS2 (camel-dhis2)
+     * Leverages the DHIS2 Java SDK to integrate Apache Camel with the DHIS2 Web
+     * API.
+     * 
+     * Category: api
+     * Since: 4.0
+     * Maven coordinates: org.apache.camel:camel-dhis2
+     * 
+     * Syntax: <code>dhis2:apiName/methodName</code>
+     * 
+     * Path parameter: apiName (required)
+     * API operation (e.g., get)
+     * There are 5 enums and the value can be one of: POST, RESOURCE_TABLES,
+     * GET, DELETE, PUT
+     * 
+     * Path parameter: methodName (required)
+     * Subject of the API operation (e.g., resource)
+     * 
+     * @param path apiName/methodName
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.Dhis2EndpointBuilderFactory.Dhis2EndpointBuilder dhis2(
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.Dhis2EndpointBuilderFactory.endpointBuilder("dhis2", path);
+    }
+    /**
+     * DHIS2 (camel-dhis2)
+     * Leverages the DHIS2 Java SDK to integrate Apache Camel with the DHIS2 Web
+     * API.
+     * 
+     * Category: api
+     * Since: 4.0
+     * Maven coordinates: org.apache.camel:camel-dhis2
+     * 
+     * Syntax: <code>dhis2:apiName/methodName</code>
+     * 
+     * Path parameter: apiName (required)
+     * API operation (e.g., get)
+     * There are 5 enums and the value can be one of: POST, RESOURCE_TABLES,
+     * GET, DELETE, PUT
+     * 
+     * Path parameter: methodName (required)
+     * Subject of the API operation (e.g., resource)
+     * 
+     * @param componentName to use a custom component name for the endpoint
+     * instead of the default name
+     * @param path apiName/methodName
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.Dhis2EndpointBuilderFactory.Dhis2EndpointBuilder dhis2(
+            String componentName,
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.Dhis2EndpointBuilderFactory.endpointBuilder(componentName, path);
     }
     /**
      * DigitalOcean (camel-digitalocean)
@@ -3475,7 +3637,7 @@ public class StaticEndpointBuilders {
      * Direct (camel-direct)
      * Call another endpoint from the same Camel Context synchronously.
      * 
-     * Category: core,endpoint
+     * Category: core,messaging
      * Since: 1.0
      * Maven coordinates: org.apache.camel:camel-direct
      * 
@@ -3495,7 +3657,7 @@ public class StaticEndpointBuilders {
      * Direct (camel-direct)
      * Call another endpoint from the same Camel Context synchronously.
      * 
-     * Category: core,endpoint
+     * Category: core,messaging
      * Since: 1.0
      * Maven coordinates: org.apache.camel:camel-direct
      * 
@@ -3515,55 +3677,10 @@ public class StaticEndpointBuilders {
         return org.apache.camel.builder.endpoint.dsl.DirectEndpointBuilderFactory.endpointBuilder(componentName, path);
     }
     /**
-     * Direct VM (camel-directvm)
-     * Call another endpoint from any Camel Context in the same JVM
-     * synchronously.
-     * 
-     * Category: core,endpoint
-     * Since: 2.10
-     * Maven coordinates: org.apache.camel:camel-directvm
-     * 
-     * Syntax: <code>direct-vm:name</code>
-     * 
-     * Path parameter: name (required)
-     * Name of direct-vm endpoint
-     * 
-     * @param path name
-     * @return the dsl builder
-     */
-    public static org.apache.camel.builder.endpoint.dsl.DirectVmEndpointBuilderFactory.DirectVmEndpointBuilder directVm(
-            String path) {
-        return org.apache.camel.builder.endpoint.dsl.DirectVmEndpointBuilderFactory.endpointBuilder("direct-vm", path);
-    }
-    /**
-     * Direct VM (camel-directvm)
-     * Call another endpoint from any Camel Context in the same JVM
-     * synchronously.
-     * 
-     * Category: core,endpoint
-     * Since: 2.10
-     * Maven coordinates: org.apache.camel:camel-directvm
-     * 
-     * Syntax: <code>direct-vm:name</code>
-     * 
-     * Path parameter: name (required)
-     * Name of direct-vm endpoint
-     * 
-     * @param componentName to use a custom component name for the endpoint
-     * instead of the default name
-     * @param path name
-     * @return the dsl builder
-     */
-    public static org.apache.camel.builder.endpoint.dsl.DirectVmEndpointBuilderFactory.DirectVmEndpointBuilder directVm(
-            String componentName,
-            String path) {
-        return org.apache.camel.builder.endpoint.dsl.DirectVmEndpointBuilderFactory.endpointBuilder(componentName, path);
-    }
-    /**
      * Disruptor (camel-disruptor)
      * Provides asynchronous SEDA behavior using LMAX Disruptor.
      * 
-     * Category: endpoint
+     * Category: messaging
      * Since: 2.12
      * Maven coordinates: org.apache.camel:camel-disruptor
      * 
@@ -3583,7 +3700,7 @@ public class StaticEndpointBuilders {
      * Disruptor (camel-disruptor)
      * Provides asynchronous SEDA behavior using LMAX Disruptor.
      * 
-     * Category: endpoint
+     * Category: messaging
      * Since: 2.12
      * Maven coordinates: org.apache.camel:camel-disruptor
      * 
@@ -3606,7 +3723,7 @@ public class StaticEndpointBuilders {
      * Disruptor VM (camel-disruptor)
      * Provides asynchronous SEDA behavior using LMAX Disruptor.
      * 
-     * Category: endpoint
+     * Category: messaging
      * Since: 2.12
      * Maven coordinates: org.apache.camel:camel-disruptor
      * 
@@ -3626,7 +3743,7 @@ public class StaticEndpointBuilders {
      * Disruptor VM (camel-disruptor)
      * Provides asynchronous SEDA behavior using LMAX Disruptor.
      * 
-     * Category: endpoint
+     * Category: messaging
      * Since: 2.12
      * Maven coordinates: org.apache.camel:camel-disruptor
      * 
@@ -3650,7 +3767,7 @@ public class StaticEndpointBuilders {
      * Infer Deep Learning models from message exchanges data using Deep Java
      * Library (DJL).
      * 
-     * Category: ai,deeplearning
+     * Category: ai
      * Since: 3.3
      * Maven coordinates: org.apache.camel:camel-djl
      * 
@@ -3671,7 +3788,7 @@ public class StaticEndpointBuilders {
      * Infer Deep Learning models from message exchanges data using Deep Java
      * Library (DJL).
      * 
-     * Category: ai,deeplearning
+     * Category: ai
      * Since: 3.3
      * Maven coordinates: org.apache.camel:camel-djl
      * 
@@ -3739,7 +3856,7 @@ public class StaticEndpointBuilders {
      * Docker (camel-docker)
      * Manage Docker containers.
      * 
-     * Category: cloud,container,paas
+     * Category: cloud,container
      * Since: 2.15
      * Maven coordinates: org.apache.camel:camel-docker
      * 
@@ -3768,7 +3885,7 @@ public class StaticEndpointBuilders {
      * Docker (camel-docker)
      * Manage Docker containers.
      * 
-     * Category: cloud,container,paas
+     * Category: cloud,container
      * Since: 2.15
      * Maven coordinates: org.apache.camel:camel-docker
      * 
@@ -3800,7 +3917,7 @@ public class StaticEndpointBuilders {
      * Drill (camel-drill)
      * Perform queries against an Apache Drill cluster.
      * 
-     * Category: database,sql
+     * Category: database,bigdata
      * Since: 2.19
      * Maven coordinates: org.apache.camel:camel-drill
      * 
@@ -3820,7 +3937,7 @@ public class StaticEndpointBuilders {
      * Drill (camel-drill)
      * Perform queries against an Apache Drill cluster.
      * 
-     * Category: database,sql
+     * Category: database,bigdata
      * Since: 2.19
      * Maven coordinates: org.apache.camel:camel-drill
      * 
@@ -3895,7 +4012,7 @@ public class StaticEndpointBuilders {
      * The Dynamic Router component routes exchanges to recipients, and the
      * recipients (and their rules) may change at runtime.
      * 
-     * Category: endpoint,java
+     * Category: messaging,core
      * Since: 3.15
      * Maven coordinates: org.apache.camel:camel-dynamic-router
      * 
@@ -3923,7 +4040,7 @@ public class StaticEndpointBuilders {
      * The Dynamic Router component routes exchanges to recipients, and the
      * recipients (and their rules) may change at runtime.
      * 
-     * Category: endpoint,java
+     * Category: messaging,core
      * Since: 3.15
      * Maven coordinates: org.apache.camel:camel-dynamic-router
      * 
@@ -3953,7 +4070,7 @@ public class StaticEndpointBuilders {
      * Ehcache (camel-ehcache)
      * Perform caching operations using Ehcache.
      * 
-     * Category: cache,datagrid,clustering
+     * Category: cache,clustering
      * Since: 2.18
      * Maven coordinates: org.apache.camel:camel-ehcache
      * 
@@ -3973,7 +4090,7 @@ public class StaticEndpointBuilders {
      * Ehcache (camel-ehcache)
      * Perform caching operations using Ehcache.
      * 
-     * Category: cache,datagrid,clustering
+     * Category: cache,clustering
      * Since: 2.18
      * Maven coordinates: org.apache.camel:camel-ehcache
      * 
@@ -4082,7 +4199,7 @@ public class StaticEndpointBuilders {
      * Exec (camel-exec)
      * Execute commands on the underlying operating system.
      * 
-     * Category: system
+     * Category: core
      * Since: 2.3
      * Maven coordinates: org.apache.camel:camel-exec
      * 
@@ -4103,7 +4220,7 @@ public class StaticEndpointBuilders {
      * Exec (camel-exec)
      * Execute commands on the underlying operating system.
      * 
-     * Category: system
+     * Category: core
      * Since: 2.3
      * Maven coordinates: org.apache.camel:camel-exec
      * 
@@ -4328,6 +4445,8 @@ public class StaticEndpointBuilders {
      * 
      * Path parameter: resourceUri (required)
      * URL for loading the flatpack mapping file from classpath or file system
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param path type:resourceUri
      * @return the dsl builder
@@ -4353,6 +4472,8 @@ public class StaticEndpointBuilders {
      * 
      * Path parameter: resourceUri (required)
      * URL for loading the flatpack mapping file from classpath or file system
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -4368,7 +4489,7 @@ public class StaticEndpointBuilders {
      * Flink (camel-flink)
      * Send DataSet jobs to an Apache Flink cluster.
      * 
-     * Category: transformation,bigdata,streams
+     * Category: transformation,bigdata
      * Since: 2.18
      * Maven coordinates: org.apache.camel:camel-flink
      * 
@@ -4389,7 +4510,7 @@ public class StaticEndpointBuilders {
      * Flink (camel-flink)
      * Send DataSet jobs to an Apache Flink cluster.
      * 
-     * Category: transformation,bigdata,streams
+     * Category: transformation,bigdata
      * Since: 2.18
      * Maven coordinates: org.apache.camel:camel-flink
      * 
@@ -4476,6 +4597,8 @@ public class StaticEndpointBuilders {
      * (classpath is default). ref will lookup the resource in the registry.
      * bean will call a method on a bean to be used as the resource. For bean
      * you can specify the method name after dot, eg bean:myBean.myMethod.
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param path resourceUri
      * @return the dsl builder
@@ -4500,6 +4623,8 @@ public class StaticEndpointBuilders {
      * (classpath is default). ref will lookup the resource in the registry.
      * bean will call a method on a bean to be used as the resource. For bean
      * you can specify the method name after dot, eg bean:myBean.myMethod.
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -4628,7 +4753,7 @@ public class StaticEndpointBuilders {
      * Find geocodes (latitude and longitude) for a given address or the other
      * way round.
      * 
-     * Category: api,location
+     * Category: api,search
      * Since: 2.12
      * Maven coordinates: org.apache.camel:camel-geocoder
      * 
@@ -4652,7 +4777,7 @@ public class StaticEndpointBuilders {
      * Find geocodes (latitude and longitude) for a given address or the other
      * way round.
      * 
-     * Category: api,location
+     * Category: api,search
      * Since: 2.12
      * Maven coordinates: org.apache.camel:camel-geocoder
      * 
@@ -4842,6 +4967,8 @@ public class StaticEndpointBuilders {
      * 
      * Path parameter: queryString (required)
      * BigQuery standard SQL query
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param path projectId:queryString
      * @return the dsl builder
@@ -4865,6 +4992,8 @@ public class StaticEndpointBuilders {
      * 
      * Path parameter: queryString (required)
      * BigQuery standard SQL query
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -4990,10 +5119,9 @@ public class StaticEndpointBuilders {
      * 
      * Path parameter: apiName (required)
      * What kind of operation to perform
-     * There are 14 enums and the value can be one of: DRIVE_ABOUT, DRIVE_APPS,
-     * DRIVE_CHANGES, DRIVE_CHANNELS, DRIVE_CHILDREN, DRIVE_COMMENTS,
-     * DRIVE_FILES, DRIVE_PARENTS, DRIVE_PERMISSIONS, DRIVE_PROPERTIES,
-     * DRIVE_DRIVES, DRIVE_TEAMDRIVES, DRIVE_REPLIES, DRIVE_REVISIONS
+     * There are 10 enums and the value can be one of: DRIVE_ABOUT,
+     * DRIVE_CHANGES, DRIVE_CHANNELS, DRIVE_COMMENTS, DRIVE_DRIVES, DRIVE_FILES,
+     * DRIVE_PERMISSIONS, DRIVE_REPLIES, DRIVE_REVISIONS, DRIVE_TEAMDRIVES
      * 
      * Path parameter: methodName (required)
      * What sub operation to use for the selected operation
@@ -5020,10 +5148,9 @@ public class StaticEndpointBuilders {
      * 
      * Path parameter: apiName (required)
      * What kind of operation to perform
-     * There are 14 enums and the value can be one of: DRIVE_ABOUT, DRIVE_APPS,
-     * DRIVE_CHANGES, DRIVE_CHANNELS, DRIVE_CHILDREN, DRIVE_COMMENTS,
-     * DRIVE_FILES, DRIVE_PARENTS, DRIVE_PERMISSIONS, DRIVE_PROPERTIES,
-     * DRIVE_DRIVES, DRIVE_TEAMDRIVES, DRIVE_REPLIES, DRIVE_REVISIONS
+     * There are 10 enums and the value can be one of: DRIVE_ABOUT,
+     * DRIVE_CHANGES, DRIVE_CHANNELS, DRIVE_COMMENTS, DRIVE_DRIVES, DRIVE_FILES,
+     * DRIVE_PERMISSIONS, DRIVE_REPLIES, DRIVE_REVISIONS, DRIVE_TEAMDRIVES
      * 
      * Path parameter: methodName (required)
      * What sub operation to use for the selected operation
@@ -5284,7 +5411,7 @@ public class StaticEndpointBuilders {
      * Google Sheets (camel-google-sheets)
      * Manage spreadsheets in Google Sheets.
      * 
-     * Category: api,cloud,sheets
+     * Category: cloud,document
      * Since: 2.23
      * Maven coordinates: org.apache.camel:camel-google-sheets
      * 
@@ -5310,7 +5437,7 @@ public class StaticEndpointBuilders {
      * Google Sheets (camel-google-sheets)
      * Manage spreadsheets in Google Sheets.
      * 
-     * Category: api,cloud,sheets
+     * Category: cloud,document
      * Since: 2.23
      * Maven coordinates: org.apache.camel:camel-google-sheets
      * 
@@ -5339,7 +5466,7 @@ public class StaticEndpointBuilders {
      * Google Sheets Stream (camel-google-sheets)
      * Poll for changes in Google Sheets.
      * 
-     * Category: cloud,sheets
+     * Category: cloud,document
      * Since: 2.23
      * Maven coordinates: org.apache.camel:camel-google-sheets
      * 
@@ -5360,7 +5487,7 @@ public class StaticEndpointBuilders {
      * Google Sheets Stream (camel-google-sheets)
      * Poll for changes in Google Sheets.
      * 
-     * Category: cloud,sheets
+     * Category: cloud,document
      * Since: 2.23
      * Maven coordinates: org.apache.camel:camel-google-sheets
      * 
@@ -5430,7 +5557,7 @@ public class StaticEndpointBuilders {
      * Fetch, load and manage additional jars dynamically after Camel Context
      * was started.
      * 
-     * Category: management,deployment
+     * Category: management
      * Since: 2.16
      * Maven coordinates: org.apache.camel:camel-grape
      * 
@@ -5451,7 +5578,7 @@ public class StaticEndpointBuilders {
      * Fetch, load and manage additional jars dynamically after Camel Context
      * was started.
      * 
-     * Category: management,deployment
+     * Category: management
      * Since: 2.16
      * Maven coordinates: org.apache.camel:camel-grape
      * 
@@ -5576,7 +5703,7 @@ public class StaticEndpointBuilders {
      * Guava EventBus (camel-guava-eventbus)
      * Send and receive messages to/from Guava EventBus.
      * 
-     * Category: eventbus
+     * Category: messaging
      * Since: 2.10
      * Maven coordinates: org.apache.camel:camel-guava-eventbus
      * 
@@ -5596,7 +5723,7 @@ public class StaticEndpointBuilders {
      * Guava EventBus (camel-guava-eventbus)
      * Send and receive messages to/from Guava EventBus.
      * 
-     * Category: eventbus
+     * Category: messaging
      * Since: 2.10
      * Maven coordinates: org.apache.camel:camel-guava-eventbus
      * 
@@ -5663,7 +5790,7 @@ public class StaticEndpointBuilders {
      * Increment, decrement, set, etc. Hazelcast atomic number (a grid wide
      * number).
      * 
-     * Category: cache,datagrid
+     * Category: cache,clustering
      * Since: 2.7
      * Maven coordinates: org.apache.camel:camel-hazelcast
      * 
@@ -5684,7 +5811,7 @@ public class StaticEndpointBuilders {
      * Increment, decrement, set, etc. Hazelcast atomic number (a grid wide
      * number).
      * 
-     * Category: cache,datagrid
+     * Category: cache,clustering
      * Since: 2.7
      * Maven coordinates: org.apache.camel:camel-hazelcast
      * 
@@ -5707,7 +5834,7 @@ public class StaticEndpointBuilders {
      * Hazelcast Instance (camel-hazelcast)
      * Consume join/leave events of a cache instance in a Hazelcast cluster.
      * 
-     * Category: cache,datagrid
+     * Category: cache,clustering
      * Since: 2.7
      * Maven coordinates: org.apache.camel:camel-hazelcast
      * 
@@ -5727,7 +5854,7 @@ public class StaticEndpointBuilders {
      * Hazelcast Instance (camel-hazelcast)
      * Consume join/leave events of a cache instance in a Hazelcast cluster.
      * 
-     * Category: cache,datagrid
+     * Category: cache,clustering
      * Since: 2.7
      * Maven coordinates: org.apache.camel:camel-hazelcast
      * 
@@ -5750,7 +5877,7 @@ public class StaticEndpointBuilders {
      * Hazelcast List (camel-hazelcast)
      * Perform operations on Hazelcast distributed list.
      * 
-     * Category: cache,datagrid
+     * Category: cache,clustering
      * Since: 2.7
      * Maven coordinates: org.apache.camel:camel-hazelcast
      * 
@@ -5770,7 +5897,7 @@ public class StaticEndpointBuilders {
      * Hazelcast List (camel-hazelcast)
      * Perform operations on Hazelcast distributed list.
      * 
-     * Category: cache,datagrid
+     * Category: cache,clustering
      * Since: 2.7
      * Maven coordinates: org.apache.camel:camel-hazelcast
      * 
@@ -5793,7 +5920,7 @@ public class StaticEndpointBuilders {
      * Hazelcast Map (camel-hazelcast)
      * Perform operations on Hazelcast distributed map.
      * 
-     * Category: cache,datagrid
+     * Category: cache,clustering
      * Since: 2.7
      * Maven coordinates: org.apache.camel:camel-hazelcast
      * 
@@ -5813,7 +5940,7 @@ public class StaticEndpointBuilders {
      * Hazelcast Map (camel-hazelcast)
      * Perform operations on Hazelcast distributed map.
      * 
-     * Category: cache,datagrid
+     * Category: cache,clustering
      * Since: 2.7
      * Maven coordinates: org.apache.camel:camel-hazelcast
      * 
@@ -5836,7 +5963,7 @@ public class StaticEndpointBuilders {
      * Hazelcast Multimap (camel-hazelcast)
      * Perform operations on Hazelcast distributed multimap.
      * 
-     * Category: cache,datagrid
+     * Category: cache,clustering
      * Since: 2.7
      * Maven coordinates: org.apache.camel:camel-hazelcast
      * 
@@ -5856,7 +5983,7 @@ public class StaticEndpointBuilders {
      * Hazelcast Multimap (camel-hazelcast)
      * Perform operations on Hazelcast distributed multimap.
      * 
-     * Category: cache,datagrid
+     * Category: cache,clustering
      * Since: 2.7
      * Maven coordinates: org.apache.camel:camel-hazelcast
      * 
@@ -5879,7 +6006,7 @@ public class StaticEndpointBuilders {
      * Hazelcast Queue (camel-hazelcast)
      * Perform operations on Hazelcast distributed queue.
      * 
-     * Category: cache,datagrid,messaging
+     * Category: cache,clustering,messaging
      * Since: 2.7
      * Maven coordinates: org.apache.camel:camel-hazelcast
      * 
@@ -5899,7 +6026,7 @@ public class StaticEndpointBuilders {
      * Hazelcast Queue (camel-hazelcast)
      * Perform operations on Hazelcast distributed queue.
      * 
-     * Category: cache,datagrid,messaging
+     * Category: cache,clustering,messaging
      * Since: 2.7
      * Maven coordinates: org.apache.camel:camel-hazelcast
      * 
@@ -5922,7 +6049,7 @@ public class StaticEndpointBuilders {
      * Hazelcast Replicated Map (camel-hazelcast)
      * Perform operations on Hazelcast replicated map.
      * 
-     * Category: cache,datagrid
+     * Category: cache,clustering
      * Since: 2.16
      * Maven coordinates: org.apache.camel:camel-hazelcast
      * 
@@ -5942,7 +6069,7 @@ public class StaticEndpointBuilders {
      * Hazelcast Replicated Map (camel-hazelcast)
      * Perform operations on Hazelcast replicated map.
      * 
-     * Category: cache,datagrid
+     * Category: cache,clustering
      * Since: 2.16
      * Maven coordinates: org.apache.camel:camel-hazelcast
      * 
@@ -5965,7 +6092,7 @@ public class StaticEndpointBuilders {
      * Hazelcast Ringbuffer (camel-hazelcast)
      * Perform operations on Hazelcast distributed ringbuffer.
      * 
-     * Category: cache,datagrid
+     * Category: cache,clustering
      * Since: 2.16
      * Maven coordinates: org.apache.camel:camel-hazelcast
      * 
@@ -5985,7 +6112,7 @@ public class StaticEndpointBuilders {
      * Hazelcast Ringbuffer (camel-hazelcast)
      * Perform operations on Hazelcast distributed ringbuffer.
      * 
-     * Category: cache,datagrid
+     * Category: cache,clustering
      * Since: 2.16
      * Maven coordinates: org.apache.camel:camel-hazelcast
      * 
@@ -6009,7 +6136,7 @@ public class StaticEndpointBuilders {
      * Asynchronously send/receive Exchanges between Camel routes running on
      * potentially distinct JVMs/hosts backed by Hazelcast BlockingQueue.
      * 
-     * Category: cache,datagrid
+     * Category: cache,clustering
      * Since: 2.7
      * Maven coordinates: org.apache.camel:camel-hazelcast
      * 
@@ -6030,7 +6157,7 @@ public class StaticEndpointBuilders {
      * Asynchronously send/receive Exchanges between Camel routes running on
      * potentially distinct JVMs/hosts backed by Hazelcast BlockingQueue.
      * 
-     * Category: cache,datagrid
+     * Category: cache,clustering
      * Since: 2.7
      * Maven coordinates: org.apache.camel:camel-hazelcast
      * 
@@ -6053,7 +6180,7 @@ public class StaticEndpointBuilders {
      * Hazelcast Set (camel-hazelcast)
      * Perform operations on Hazelcast distributed set.
      * 
-     * Category: cache,datagrid
+     * Category: cache,clustering
      * Since: 2.7
      * Maven coordinates: org.apache.camel:camel-hazelcast
      * 
@@ -6073,7 +6200,7 @@ public class StaticEndpointBuilders {
      * Hazelcast Set (camel-hazelcast)
      * Perform operations on Hazelcast distributed set.
      * 
-     * Category: cache,datagrid
+     * Category: cache,clustering
      * Since: 2.7
      * Maven coordinates: org.apache.camel:camel-hazelcast
      * 
@@ -6096,7 +6223,7 @@ public class StaticEndpointBuilders {
      * Hazelcast Topic (camel-hazelcast)
      * Send and receive messages to/from Hazelcast distributed topic.
      * 
-     * Category: cache,datagrid
+     * Category: cache,clustering
      * Since: 2.15
      * Maven coordinates: org.apache.camel:camel-hazelcast
      * 
@@ -6116,7 +6243,7 @@ public class StaticEndpointBuilders {
      * Hazelcast Topic (camel-hazelcast)
      * Send and receive messages to/from Hazelcast distributed topic.
      * 
-     * Category: cache,datagrid
+     * Category: cache,clustering
      * Since: 2.15
      * Maven coordinates: org.apache.camel:camel-hazelcast
      * 
@@ -6139,7 +6266,7 @@ public class StaticEndpointBuilders {
      * HDFS (camel-hdfs)
      * Read and write from/to an HDFS filesystem using Hadoop 2.x.
      * 
-     * Category: bigdata,hadoop,file
+     * Category: bigdata,file
      * Since: 2.14
      * Maven coordinates: org.apache.camel:camel-hdfs
      * 
@@ -6166,7 +6293,7 @@ public class StaticEndpointBuilders {
      * HDFS (camel-hdfs)
      * Read and write from/to an HDFS filesystem using Hadoop 2.x.
      * 
-     * Category: bigdata,hadoop,file
+     * Category: bigdata,file
      * Since: 2.14
      * Maven coordinates: org.apache.camel:camel-hdfs
      * 
@@ -6194,7 +6321,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * HTTP (camel-http)
-     * Send requests to external HTTP servers using Apache HTTP Client 4.x.
+     * Send requests to external HTTP servers using Apache HTTP Client 5.x.
      * 
      * Category: http
      * Since: 2.3
@@ -6214,7 +6341,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * HTTP (camel-http)
-     * Send requests to external HTTP servers using Apache HTTP Client 4.x.
+     * Send requests to external HTTP servers using Apache HTTP Client 5.x.
      * 
      * Category: http
      * Since: 2.3
@@ -6551,49 +6678,6 @@ public class StaticEndpointBuilders {
         return org.apache.camel.builder.endpoint.dsl.SimpleNotificationEndpointBuilderFactory.endpointBuilder(componentName, path);
     }
     /**
-     * Hyperledger Aries (camel-hyperledger-aries)
-     * Camel support for Hyperledger Aries
-     * 
-     * Category: blockchain,identity
-     * Since: 3.19
-     * Maven coordinates: org.apache.camel:camel-hyperledger-aries
-     * 
-     * Syntax: <code>hyperledger-aries:walletName</code>
-     * 
-     * Path parameter: walletName (required)
-     * The wallet to connect to
-     * 
-     * @param path walletName
-     * @return the dsl builder
-     */
-    public static org.apache.camel.builder.endpoint.dsl.HyperledgerAriesEndpointBuilderFactory.HyperledgerAriesEndpointBuilder hyperledgerAries(
-            String path) {
-        return org.apache.camel.builder.endpoint.dsl.HyperledgerAriesEndpointBuilderFactory.endpointBuilder("hyperledger-aries", path);
-    }
-    /**
-     * Hyperledger Aries (camel-hyperledger-aries)
-     * Camel support for Hyperledger Aries
-     * 
-     * Category: blockchain,identity
-     * Since: 3.19
-     * Maven coordinates: org.apache.camel:camel-hyperledger-aries
-     * 
-     * Syntax: <code>hyperledger-aries:walletName</code>
-     * 
-     * Path parameter: walletName (required)
-     * The wallet to connect to
-     * 
-     * @param componentName to use a custom component name for the endpoint
-     * instead of the default name
-     * @param path walletName
-     * @return the dsl builder
-     */
-    public static org.apache.camel.builder.endpoint.dsl.HyperledgerAriesEndpointBuilderFactory.HyperledgerAriesEndpointBuilder hyperledgerAries(
-            String componentName,
-            String path) {
-        return org.apache.camel.builder.endpoint.dsl.HyperledgerAriesEndpointBuilderFactory.endpointBuilder(componentName, path);
-    }
-    /**
      * IEC 60870 Client (camel-iec60870)
      * IEC 60870 supervisory control and data acquisition (SCADA) client using
      * NeoSCADA implementation.
@@ -6688,7 +6772,7 @@ public class StaticEndpointBuilders {
      * Perform cache operations on an Ignite cache or consume changes from a
      * continuous query.
      * 
-     * Category: cache,datagrid
+     * Category: cache,clustering
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-ignite
      * 
@@ -6709,7 +6793,7 @@ public class StaticEndpointBuilders {
      * Perform cache operations on an Ignite cache or consume changes from a
      * continuous query.
      * 
-     * Category: cache,datagrid
+     * Category: cache,clustering
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-ignite
      * 
@@ -6732,7 +6816,7 @@ public class StaticEndpointBuilders {
      * Ignite Compute (camel-ignite)
      * Run compute operations on an Ignite cluster.
      * 
-     * Category: compute
+     * Category: cache,clustering
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-ignite
      * 
@@ -6752,7 +6836,7 @@ public class StaticEndpointBuilders {
      * Ignite Compute (camel-ignite)
      * Run compute operations on an Ignite cluster.
      * 
-     * Category: compute
+     * Category: cache,clustering
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-ignite
      * 
@@ -6775,7 +6859,7 @@ public class StaticEndpointBuilders {
      * Ignite Events (camel-ignite)
      * Receive events from an Ignite cluster by creating a local event listener.
      * 
-     * Category: messaging,eventbus
+     * Category: messaging,cache,clustering
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-ignite
      * 
@@ -6795,7 +6879,7 @@ public class StaticEndpointBuilders {
      * Ignite Events (camel-ignite)
      * Receive events from an Ignite cluster by creating a local event listener.
      * 
-     * Category: messaging,eventbus
+     * Category: messaging,cache,clustering
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-ignite
      * 
@@ -6818,7 +6902,7 @@ public class StaticEndpointBuilders {
      * Ignite ID Generator (camel-ignite)
      * Interact with Ignite Atomic Sequences and ID Generators .
      * 
-     * Category: compute
+     * Category: cache,clustering
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-ignite
      * 
@@ -6838,7 +6922,7 @@ public class StaticEndpointBuilders {
      * Ignite ID Generator (camel-ignite)
      * Interact with Ignite Atomic Sequences and ID Generators .
      * 
-     * Category: compute
+     * Category: cache,clustering
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-ignite
      * 
@@ -6904,7 +6988,7 @@ public class StaticEndpointBuilders {
      * Ignite Queues (camel-ignite)
      * Interact with Ignite Queue data structures.
      * 
-     * Category: messaging,queue
+     * Category: cache,clustering,messaging
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-ignite
      * 
@@ -6924,7 +7008,7 @@ public class StaticEndpointBuilders {
      * Ignite Queues (camel-ignite)
      * Interact with Ignite Queue data structures.
      * 
-     * Category: messaging,queue
+     * Category: cache,clustering,messaging
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-ignite
      * 
@@ -6947,7 +7031,7 @@ public class StaticEndpointBuilders {
      * Ignite Sets (camel-ignite)
      * Interact with Ignite Set data structures.
      * 
-     * Category: cache,compute
+     * Category: cache,clustering
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-ignite
      * 
@@ -6967,7 +7051,7 @@ public class StaticEndpointBuilders {
      * Ignite Sets (camel-ignite)
      * Interact with Ignite Set data structures.
      * 
-     * Category: cache,compute
+     * Category: cache,clustering
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-ignite
      * 
@@ -7040,7 +7124,7 @@ public class StaticEndpointBuilders {
      * Read and write from/to Infinispan distributed key/value store and data
      * grid.
      * 
-     * Category: cache,datagrid,clustering
+     * Category: cache,clustering
      * Since: 2.13
      * Maven coordinates: org.apache.camel:camel-infinispan
      * 
@@ -7063,7 +7147,7 @@ public class StaticEndpointBuilders {
      * Read and write from/to Infinispan distributed key/value store and data
      * grid.
      * 
-     * Category: cache,datagrid,clustering
+     * Category: cache,clustering
      * Since: 2.13
      * Maven coordinates: org.apache.camel:camel-infinispan
      * 
@@ -7089,7 +7173,7 @@ public class StaticEndpointBuilders {
      * Read and write from/to Infinispan distributed key/value store and data
      * grid.
      * 
-     * Category: cache,datagrid,clustering
+     * Category: cache,clustering
      * Since: 2.13
      * Maven coordinates: org.apache.camel:camel-infinispan-embedded
      * 
@@ -7112,7 +7196,7 @@ public class StaticEndpointBuilders {
      * Read and write from/to Infinispan distributed key/value store and data
      * grid.
      * 
-     * Category: cache,datagrid,clustering
+     * Category: cache,clustering
      * Since: 2.13
      * Maven coordinates: org.apache.camel:camel-infinispan-embedded
      * 
@@ -7321,7 +7405,7 @@ public class StaticEndpointBuilders {
      * JCache (camel-jcache)
      * Perform caching operations against JSR107/JCache.
      * 
-     * Category: cache,datagrid,clustering
+     * Category: cache,clustering
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-jcache
      * 
@@ -7341,7 +7425,7 @@ public class StaticEndpointBuilders {
      * JCache (camel-jcache)
      * Perform caching operations against JSR107/JCache.
      * 
-     * Category: cache,datagrid,clustering
+     * Category: cache,clustering
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-jcache
      * 
@@ -7415,7 +7499,7 @@ public class StaticEndpointBuilders {
      * JDBC (camel-jdbc)
      * Access databases through SQL and JDBC.
      * 
-     * Category: database,sql
+     * Category: database
      * Since: 1.2
      * Maven coordinates: org.apache.camel:camel-jdbc
      * 
@@ -7438,7 +7522,7 @@ public class StaticEndpointBuilders {
      * JDBC (camel-jdbc)
      * Access databases through SQL and JDBC.
      * 
-     * Category: database,sql
+     * Category: database
      * Since: 1.2
      * Maven coordinates: org.apache.camel:camel-jdbc
      * 
@@ -7593,7 +7677,7 @@ public class StaticEndpointBuilders {
      * Jira (camel-jira)
      * Interact with JIRA issue tracker.
      * 
-     * Category: api,reporting
+     * Category: document
      * Since: 3.0
      * Maven coordinates: org.apache.camel:camel-jira
      * 
@@ -7619,7 +7703,7 @@ public class StaticEndpointBuilders {
      * Jira (camel-jira)
      * Interact with JIRA issue tracker.
      * 
-     * Category: api,reporting
+     * Category: document
      * Since: 3.0
      * Maven coordinates: org.apache.camel:camel-jira
      * 
@@ -7760,6 +7844,8 @@ public class StaticEndpointBuilders {
      * (classpath is default). ref will lookup the resource in the registry.
      * bean will call a method on a bean to be used as the resource. For bean
      * you can specify the method name after dot, eg bean:myBean.myMethod.
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param path resourceUri
      * @return the dsl builder
@@ -7784,6 +7870,8 @@ public class StaticEndpointBuilders {
      * (classpath is default). ref will lookup the resource in the registry.
      * bean will call a method on a bean to be used as the resource. For bean
      * you can specify the method name after dot, eg bean:myBean.myMethod.
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -7799,7 +7887,7 @@ public class StaticEndpointBuilders {
      * JOOQ (camel-jooq)
      * Store and retrieve Java objects from an SQL database using JOOQ.
      * 
-     * Category: database,sql
+     * Category: database
      * Since: 3.0
      * Maven coordinates: org.apache.camel:camel-jooq
      * 
@@ -7819,7 +7907,7 @@ public class StaticEndpointBuilders {
      * JOOQ (camel-jooq)
      * Store and retrieve Java objects from an SQL database using JOOQ.
      * 
-     * Category: database,sql
+     * Category: database
      * Since: 3.0
      * Maven coordinates: org.apache.camel:camel-jooq
      * 
@@ -7843,7 +7931,7 @@ public class StaticEndpointBuilders {
      * Store and retrieve Java objects from databases using Java Persistence API
      * (JPA).
      * 
-     * Category: database,sql
+     * Category: database
      * Since: 1.0
      * Maven coordinates: org.apache.camel:camel-jpa
      * 
@@ -7864,7 +7952,7 @@ public class StaticEndpointBuilders {
      * Store and retrieve Java objects from databases using Java Persistence API
      * (JPA).
      * 
-     * Category: database,sql
+     * Category: database
      * Since: 1.0
      * Maven coordinates: org.apache.camel:camel-jpa
      * 
@@ -7899,6 +7987,8 @@ public class StaticEndpointBuilders {
      * (classpath is default). ref will lookup the resource in the registry.
      * bean will call a method on a bean to be used as the resource. For bean
      * you can specify the method name after dot, eg bean:myBean.myMethod.
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param path resourceUri
      * @return the dsl builder
@@ -7923,6 +8013,8 @@ public class StaticEndpointBuilders {
      * (classpath is default). ref will lookup the resource in the registry.
      * bean will call a method on a bean to be used as the resource. For bean
      * you can specify the method name after dot, eg bean:myBean.myMethod.
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -7950,6 +8042,8 @@ public class StaticEndpointBuilders {
      * (classpath is default). ref will lookup the resource in the registry.
      * bean will call a method on a bean to be used as the resource. For bean
      * you can specify the method name after dot, eg bean:myBean.myMethod.
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param path resourceUri
      * @return the dsl builder
@@ -7974,6 +8068,8 @@ public class StaticEndpointBuilders {
      * (classpath is default). ref will lookup the resource in the registry.
      * bean will call a method on a bean to be used as the resource. For bean
      * you can specify the method name after dot, eg bean:myBean.myMethod.
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -8001,6 +8097,8 @@ public class StaticEndpointBuilders {
      * (classpath is default). ref will lookup the resource in the registry.
      * bean will call a method on a bean to be used as the resource. For bean
      * you can specify the method name after dot, eg bean:myBean.myMethod.
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param path resourceUri
      * @return the dsl builder
@@ -8025,6 +8123,8 @@ public class StaticEndpointBuilders {
      * (classpath is default). ref will lookup the resource in the registry.
      * bean will call a method on a bean to be used as the resource. For bean
      * you can specify the method name after dot, eg bean:myBean.myMethod.
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -8052,6 +8152,8 @@ public class StaticEndpointBuilders {
      * (classpath is default). ref will lookup the resource in the registry.
      * bean will call a method on a bean to be used as the resource. For bean
      * you can specify the method name after dot, eg bean:myBean.myMethod.
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param path resourceUri
      * @return the dsl builder
@@ -8076,6 +8178,8 @@ public class StaticEndpointBuilders {
      * (classpath is default). ref will lookup the resource in the registry.
      * bean will call a method on a bean to be used as the resource. For bean
      * you can specify the method name after dot, eg bean:myBean.myMethod.
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -8316,7 +8420,7 @@ public class StaticEndpointBuilders {
      * Perform operations on Kubernetes ConfigMaps and get notified on
      * ConfigMaps changes.
      * 
-     * Category: container,cloud,paas
+     * Category: container,cloud
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-kubernetes
      * 
@@ -8337,7 +8441,7 @@ public class StaticEndpointBuilders {
      * Perform operations on Kubernetes ConfigMaps and get notified on
      * ConfigMaps changes.
      * 
-     * Category: container,cloud,paas
+     * Category: container,cloud
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-kubernetes
      * 
@@ -8361,7 +8465,7 @@ public class StaticEndpointBuilders {
      * Perform operations on Kubernetes Custom Resources and get notified on
      * Deployment changes.
      * 
-     * Category: container,cloud,paas
+     * Category: container,cloud
      * Since: 3.7
      * Maven coordinates: org.apache.camel:camel-kubernetes
      * 
@@ -8382,7 +8486,7 @@ public class StaticEndpointBuilders {
      * Perform operations on Kubernetes Custom Resources and get notified on
      * Deployment changes.
      * 
-     * Category: container,cloud,paas
+     * Category: container,cloud
      * Since: 3.7
      * Maven coordinates: org.apache.camel:camel-kubernetes
      * 
@@ -8406,7 +8510,7 @@ public class StaticEndpointBuilders {
      * Perform operations on Kubernetes Deployments and get notified on
      * Deployment changes.
      * 
-     * Category: container,cloud,paas
+     * Category: container,cloud
      * Since: 2.20
      * Maven coordinates: org.apache.camel:camel-kubernetes
      * 
@@ -8427,7 +8531,7 @@ public class StaticEndpointBuilders {
      * Perform operations on Kubernetes Deployments and get notified on
      * Deployment changes.
      * 
-     * Category: container,cloud,paas
+     * Category: container,cloud
      * Since: 2.20
      * Maven coordinates: org.apache.camel:camel-kubernetes
      * 
@@ -8451,7 +8555,7 @@ public class StaticEndpointBuilders {
      * Perform operations on Kubernetes Events and get notified on Events
      * changes.
      * 
-     * Category: container,cloud,paas
+     * Category: container,cloud
      * Since: 3.20
      * Maven coordinates: org.apache.camel:camel-kubernetes
      * 
@@ -8472,7 +8576,7 @@ public class StaticEndpointBuilders {
      * Perform operations on Kubernetes Events and get notified on Events
      * changes.
      * 
-     * Category: container,cloud,paas
+     * Category: container,cloud
      * Since: 3.20
      * Maven coordinates: org.apache.camel:camel-kubernetes
      * 
@@ -8496,7 +8600,7 @@ public class StaticEndpointBuilders {
      * Perform operations on Kubernetes Horizontal Pod Autoscalers (HPA) and get
      * notified on HPA changes.
      * 
-     * Category: container,cloud,paas
+     * Category: container,cloud
      * Since: 2.23
      * Maven coordinates: org.apache.camel:camel-kubernetes
      * 
@@ -8517,7 +8621,7 @@ public class StaticEndpointBuilders {
      * Perform operations on Kubernetes Horizontal Pod Autoscalers (HPA) and get
      * notified on HPA changes.
      * 
-     * Category: container,cloud,paas
+     * Category: container,cloud
      * Since: 2.23
      * Maven coordinates: org.apache.camel:camel-kubernetes
      * 
@@ -8540,7 +8644,7 @@ public class StaticEndpointBuilders {
      * Kubernetes Job (camel-kubernetes)
      * Perform operations on Kubernetes Jobs.
      * 
-     * Category: container,cloud,paas
+     * Category: container,cloud
      * Since: 2.23
      * Maven coordinates: org.apache.camel:camel-kubernetes
      * 
@@ -8560,7 +8664,7 @@ public class StaticEndpointBuilders {
      * Kubernetes Job (camel-kubernetes)
      * Perform operations on Kubernetes Jobs.
      * 
-     * Category: container,cloud,paas
+     * Category: container,cloud
      * Since: 2.23
      * Maven coordinates: org.apache.camel:camel-kubernetes
      * 
@@ -8584,7 +8688,7 @@ public class StaticEndpointBuilders {
      * Perform operations on Kubernetes Namespaces and get notified on Namespace
      * changes.
      * 
-     * Category: container,cloud,paas
+     * Category: container,cloud
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-kubernetes
      * 
@@ -8605,7 +8709,7 @@ public class StaticEndpointBuilders {
      * Perform operations on Kubernetes Namespaces and get notified on Namespace
      * changes.
      * 
-     * Category: container,cloud,paas
+     * Category: container,cloud
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-kubernetes
      * 
@@ -8628,7 +8732,7 @@ public class StaticEndpointBuilders {
      * Kubernetes Nodes (camel-kubernetes)
      * Perform operations on Kubernetes Nodes and get notified on Node changes.
      * 
-     * Category: container,cloud,paas
+     * Category: container,cloud
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-kubernetes
      * 
@@ -8648,7 +8752,7 @@ public class StaticEndpointBuilders {
      * Kubernetes Nodes (camel-kubernetes)
      * Perform operations on Kubernetes Nodes and get notified on Node changes.
      * 
-     * Category: container,cloud,paas
+     * Category: container,cloud
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-kubernetes
      * 
@@ -8672,7 +8776,7 @@ public class StaticEndpointBuilders {
      * Perform operations on Kubernetes Persistent Volumes and get notified on
      * Persistent Volume changes.
      * 
-     * Category: container,cloud,paas
+     * Category: container,cloud
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-kubernetes
      * 
@@ -8693,7 +8797,7 @@ public class StaticEndpointBuilders {
      * Perform operations on Kubernetes Persistent Volumes and get notified on
      * Persistent Volume changes.
      * 
-     * Category: container,cloud,paas
+     * Category: container,cloud
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-kubernetes
      * 
@@ -8717,7 +8821,7 @@ public class StaticEndpointBuilders {
      * Perform operations on Kubernetes Persistent Volumes Claims and get
      * notified on Persistent Volumes Claim changes.
      * 
-     * Category: container,cloud,paas
+     * Category: container,cloud
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-kubernetes
      * 
@@ -8738,7 +8842,7 @@ public class StaticEndpointBuilders {
      * Perform operations on Kubernetes Persistent Volumes Claims and get
      * notified on Persistent Volumes Claim changes.
      * 
-     * Category: container,cloud,paas
+     * Category: container,cloud
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-kubernetes
      * 
@@ -8761,7 +8865,7 @@ public class StaticEndpointBuilders {
      * Kubernetes Pods (camel-kubernetes)
      * Perform operations on Kubernetes Pods and get notified on Pod changes.
      * 
-     * Category: container,cloud,paas
+     * Category: container,cloud
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-kubernetes
      * 
@@ -8781,7 +8885,7 @@ public class StaticEndpointBuilders {
      * Kubernetes Pods (camel-kubernetes)
      * Perform operations on Kubernetes Pods and get notified on Pod changes.
      * 
-     * Category: container,cloud,paas
+     * Category: container,cloud
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-kubernetes
      * 
@@ -8805,7 +8909,7 @@ public class StaticEndpointBuilders {
      * Perform operations on Kubernetes Replication Controllers and get notified
      * on Replication Controllers changes.
      * 
-     * Category: container,cloud,paas
+     * Category: container,cloud
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-kubernetes
      * 
@@ -8826,7 +8930,7 @@ public class StaticEndpointBuilders {
      * Perform operations on Kubernetes Replication Controllers and get notified
      * on Replication Controllers changes.
      * 
-     * Category: container,cloud,paas
+     * Category: container,cloud
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-kubernetes
      * 
@@ -8849,7 +8953,7 @@ public class StaticEndpointBuilders {
      * Kubernetes Resources Quota (camel-kubernetes)
      * Perform operations on Kubernetes Resources Quotas.
      * 
-     * Category: container,cloud,paas
+     * Category: container,cloud
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-kubernetes
      * 
@@ -8869,7 +8973,7 @@ public class StaticEndpointBuilders {
      * Kubernetes Resources Quota (camel-kubernetes)
      * Perform operations on Kubernetes Resources Quotas.
      * 
-     * Category: container,cloud,paas
+     * Category: container,cloud
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-kubernetes
      * 
@@ -8892,7 +8996,7 @@ public class StaticEndpointBuilders {
      * Kubernetes Secrets (camel-kubernetes)
      * Perform operations on Kubernetes Secrets.
      * 
-     * Category: container,cloud,paas
+     * Category: container,cloud
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-kubernetes
      * 
@@ -8912,7 +9016,7 @@ public class StaticEndpointBuilders {
      * Kubernetes Secrets (camel-kubernetes)
      * Perform operations on Kubernetes Secrets.
      * 
-     * Category: container,cloud,paas
+     * Category: container,cloud
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-kubernetes
      * 
@@ -8935,7 +9039,7 @@ public class StaticEndpointBuilders {
      * Kubernetes Service Account (camel-kubernetes)
      * Perform operations on Kubernetes Service Accounts.
      * 
-     * Category: container,cloud,paas
+     * Category: container,cloud
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-kubernetes
      * 
@@ -8955,7 +9059,7 @@ public class StaticEndpointBuilders {
      * Kubernetes Service Account (camel-kubernetes)
      * Perform operations on Kubernetes Service Accounts.
      * 
-     * Category: container,cloud,paas
+     * Category: container,cloud
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-kubernetes
      * 
@@ -8979,7 +9083,7 @@ public class StaticEndpointBuilders {
      * Perform operations on Kubernetes Services and get notified on Service
      * changes.
      * 
-     * Category: container,cloud,paas
+     * Category: container,cloud
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-kubernetes
      * 
@@ -9000,7 +9104,7 @@ public class StaticEndpointBuilders {
      * Perform operations on Kubernetes Services and get notified on Service
      * changes.
      * 
-     * Category: container,cloud,paas
+     * Category: container,cloud
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-kubernetes
      * 
@@ -9096,6 +9200,8 @@ public class StaticEndpointBuilders {
      * Path parameter: resourceUri
      * Path to the resource, or a reference to lookup a bean in the Registry to
      * use as the resource
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param path languageName:resourceUri
      * @return the dsl builder
@@ -9124,6 +9230,8 @@ public class StaticEndpointBuilders {
      * Path parameter: resourceUri
      * Path to the resource, or a reference to lookup a bean in the Registry to
      * use as the resource
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -9139,7 +9247,7 @@ public class StaticEndpointBuilders {
      * LDAP (camel-ldap)
      * Perform searches on LDAP servers.
      * 
-     * Category: search,ldap
+     * Category: database,security
      * Since: 1.5
      * Maven coordinates: org.apache.camel:camel-ldap
      * 
@@ -9166,7 +9274,7 @@ public class StaticEndpointBuilders {
      * LDAP (camel-ldap)
      * Perform searches on LDAP servers.
      * 
-     * Category: search,ldap
+     * Category: database,security
      * Since: 1.5
      * Maven coordinates: org.apache.camel:camel-ldap
      * 
@@ -9196,7 +9304,7 @@ public class StaticEndpointBuilders {
      * LDIF (camel-ldif)
      * Perform updates on an LDAP server from an LDIF body content.
      * 
-     * Category: ldap
+     * Category: database,security
      * Since: 2.20
      * Maven coordinates: org.apache.camel:camel-ldif
      * 
@@ -9218,7 +9326,7 @@ public class StaticEndpointBuilders {
      * LDIF (camel-ldif)
      * Perform updates on an LDAP server from an LDIF body content.
      * 
-     * Category: ldap
+     * Category: database,security
      * Since: 2.20
      * Maven coordinates: org.apache.camel:camel-ldif
      * 
@@ -9286,7 +9394,7 @@ public class StaticEndpointBuilders {
      * Printer (camel-printer)
      * Send print jobs to printers.
      * 
-     * Category: printing
+     * Category: document
      * Since: 2.1
      * Maven coordinates: org.apache.camel:camel-printer
      * 
@@ -9312,7 +9420,7 @@ public class StaticEndpointBuilders {
      * Printer (camel-printer)
      * Send print jobs to printers.
      * 
-     * Category: printing
+     * Category: document
      * Since: 2.1
      * Maven coordinates: org.apache.camel:camel-printer
      * 
@@ -9392,7 +9500,7 @@ public class StaticEndpointBuilders {
      * Lumberjack (camel-lumberjack)
      * Receive logs messages using the Lumberjack protocol.
      * 
-     * Category: log
+     * Category: monitoring
      * Since: 2.18
      * Maven coordinates: org.apache.camel:camel-lumberjack
      * 
@@ -9416,7 +9524,7 @@ public class StaticEndpointBuilders {
      * Lumberjack (camel-lumberjack)
      * Receive logs messages using the Lumberjack protocol.
      * 
-     * Category: log
+     * Category: monitoring
      * Since: 2.18
      * Maven coordinates: org.apache.camel:camel-lumberjack
      * 
@@ -9603,8 +9711,7 @@ public class StaticEndpointBuilders {
      * 
      * Path parameter: metricsType (required)
      * Type of metrics
-     * There are 3 enums and the value can be one of: counter,
-     * distribution_summary, timer
+     * There are 3 enums and the value can be one of: counter, summary, timer
      * 
      * Path parameter: metricsName (required)
      * Name of metrics
@@ -9632,8 +9739,7 @@ public class StaticEndpointBuilders {
      * 
      * Path parameter: metricsType (required)
      * Type of metrics
-     * There are 3 enums and the value can be one of: counter,
-     * distribution_summary, timer
+     * There are 3 enums and the value can be one of: counter, summary, timer
      * 
      * Path parameter: metricsName (required)
      * Name of metrics
@@ -9655,7 +9761,7 @@ public class StaticEndpointBuilders {
      * Mina (camel-mina)
      * Socket level networking using TCP or UDP with Apache Mina 2.x.
      * 
-     * Category: networking,tcp,udp
+     * Category: networking
      * Since: 2.10
      * Maven coordinates: org.apache.camel:camel-mina
      * 
@@ -9682,7 +9788,7 @@ public class StaticEndpointBuilders {
      * Mina (camel-mina)
      * Socket level networking using TCP or UDP with Apache Mina 2.x.
      * 
-     * Category: networking,tcp,udp
+     * Category: networking
      * Since: 2.10
      * Maven coordinates: org.apache.camel:camel-mina
      * 
@@ -9755,7 +9861,7 @@ public class StaticEndpointBuilders {
      * MLLP (camel-mllp)
      * Communicate with external systems using the MLLP protocol.
      * 
-     * Category: networking,rpc,mllp
+     * Category: HEALTH
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-mllp
      * 
@@ -9779,7 +9885,7 @@ public class StaticEndpointBuilders {
      * MLLP (camel-mllp)
      * Communicate with external systems using the MLLP protocol.
      * 
-     * Category: networking,rpc,mllp
+     * Category: HEALTH
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-mllp
      * 
@@ -9849,7 +9955,7 @@ public class StaticEndpointBuilders {
      * MongoDB (camel-mongodb)
      * Perform operations on MongoDB documents and collections.
      * 
-     * Category: database,nosql
+     * Category: database
      * Since: 2.19
      * Maven coordinates: org.apache.camel:camel-mongodb
      * 
@@ -9870,7 +9976,7 @@ public class StaticEndpointBuilders {
      * MongoDB (camel-mongodb)
      * Perform operations on MongoDB documents and collections.
      * 
-     * Category: database,nosql
+     * Category: database
      * Since: 2.19
      * Maven coordinates: org.apache.camel:camel-mongodb
      * 
@@ -9894,7 +10000,7 @@ public class StaticEndpointBuilders {
      * MongoDB GridFS (camel-mongodb-gridfs)
      * Interact with MongoDB GridFS.
      * 
-     * Category: database,nosql
+     * Category: database,file
      * Since: 2.18
      * Maven coordinates: org.apache.camel:camel-mongodb-gridfs
      * 
@@ -9914,7 +10020,7 @@ public class StaticEndpointBuilders {
      * MongoDB GridFS (camel-mongodb-gridfs)
      * Interact with MongoDB GridFS.
      * 
-     * Category: database,nosql
+     * Category: database,file
      * Since: 2.18
      * Maven coordinates: org.apache.camel:camel-mongodb-gridfs
      * 
@@ -9949,6 +10055,8 @@ public class StaticEndpointBuilders {
      * (classpath is default). ref will lookup the resource in the registry.
      * bean will call a method on a bean to be used as the resource. For bean
      * you can specify the method name after dot, eg bean:myBean.myMethod.
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param path resourceUri
      * @return the dsl builder
@@ -9973,6 +10081,8 @@ public class StaticEndpointBuilders {
      * (classpath is default). ref will lookup the resource in the registry.
      * bean will call a method on a bean to be used as the resource. For bean
      * you can specify the method name after dot, eg bean:myBean.myMethod.
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -10000,6 +10110,8 @@ public class StaticEndpointBuilders {
      * (classpath is default). ref will lookup the resource in the registry.
      * bean will call a method on a bean to be used as the resource. For bean
      * you can specify the method name after dot, eg bean:myBean.myMethod.
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param path resourceUri
      * @return the dsl builder
@@ -10024,6 +10136,8 @@ public class StaticEndpointBuilders {
      * (classpath is default). ref will lookup the resource in the registry.
      * bean will call a method on a bean to be used as the resource. For bean
      * you can specify the method name after dot, eg bean:myBean.myMethod.
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -10040,7 +10154,7 @@ public class StaticEndpointBuilders {
      * Performs a query, poll, insert, update or delete in a relational database
      * using MyBatis.
      * 
-     * Category: database,sql
+     * Category: database
      * Since: 2.7
      * Maven coordinates: org.apache.camel:camel-mybatis
      * 
@@ -10062,7 +10176,7 @@ public class StaticEndpointBuilders {
      * Performs a query, poll, insert, update or delete in a relational database
      * using MyBatis.
      * 
-     * Category: database,sql
+     * Category: database
      * Since: 2.7
      * Maven coordinates: org.apache.camel:camel-mybatis
      * 
@@ -10087,7 +10201,7 @@ public class StaticEndpointBuilders {
      * Perform queries, inserts, updates or deletes in a relational database
      * using MyBatis.
      * 
-     * Category: database,sql
+     * Category: database
      * Since: 2.22
      * Maven coordinates: org.apache.camel:camel-mybatis
      * 
@@ -10112,7 +10226,7 @@ public class StaticEndpointBuilders {
      * Perform queries, inserts, updates or deletes in a relational database
      * using MyBatis.
      * 
-     * Category: database,sql
+     * Category: database
      * Since: 2.22
      * Maven coordinates: org.apache.camel:camel-mybatis
      * 
@@ -10182,7 +10296,7 @@ public class StaticEndpointBuilders {
      * Netty (camel-netty)
      * Socket level networking using TCP or UDP with Netty 4.x.
      * 
-     * Category: networking,tcp,udp
+     * Category: networking
      * Since: 2.14
      * Maven coordinates: org.apache.camel:camel-netty
      * 
@@ -10210,7 +10324,7 @@ public class StaticEndpointBuilders {
      * Netty (camel-netty)
      * Socket level networking using TCP or UDP with Netty 4.x.
      * 
-     * Category: networking,tcp,udp
+     * Category: networking
      * Since: 2.14
      * Maven coordinates: org.apache.camel:camel-netty
      * 
@@ -10308,7 +10422,7 @@ public class StaticEndpointBuilders {
      * Nitrite (camel-nitrite)
      * Access Nitrite databases.
      * 
-     * Category: database,nosql
+     * Category: database
      * Since: 3.0
      * Maven coordinates: org.apache.camel:camel-nitrite
      * 
@@ -10328,7 +10442,7 @@ public class StaticEndpointBuilders {
      * Nitrite (camel-nitrite)
      * Access Nitrite databases.
      * 
-     * Category: database,nosql
+     * Category: database
      * Since: 3.0
      * Maven coordinates: org.apache.camel:camel-nitrite
      * 
@@ -10351,7 +10465,7 @@ public class StaticEndpointBuilders {
      * OAI-PMH (camel-oaipmh)
      * Harvest metadata using OAI-PMH protocol
      * 
-     * Category: endpoint,webservice,batch
+     * Category: search
      * Since: 3.5
      * Maven coordinates: org.apache.camel:camel-oaipmh
      * 
@@ -10372,7 +10486,7 @@ public class StaticEndpointBuilders {
      * OAI-PMH (camel-oaipmh)
      * Harvest metadata using OAI-PMH protocol
      * 
-     * Category: endpoint,webservice,batch
+     * Category: search
      * Since: 3.5
      * Maven coordinates: org.apache.camel:camel-oaipmh
      * 
@@ -10495,10 +10609,53 @@ public class StaticEndpointBuilders {
         return org.apache.camel.builder.endpoint.dsl.Olingo4EndpointBuilderFactory.endpointBuilder(componentName, path);
     }
     /**
+     * OpenSearch (camel-opensearch)
+     * Send requests to OpenSearch via Java Client API.
+     * 
+     * Category: search,monitoring
+     * Since: 4.0
+     * Maven coordinates: org.apache.camel:camel-opensearch
+     * 
+     * Syntax: <code>opensearch:clusterName</code>
+     * 
+     * Path parameter: clusterName (required)
+     * Name of the cluster
+     * 
+     * @param path clusterName
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.OpensearchEndpointBuilderFactory.OpensearchEndpointBuilder opensearch(
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.OpensearchEndpointBuilderFactory.endpointBuilder("opensearch", path);
+    }
+    /**
+     * OpenSearch (camel-opensearch)
+     * Send requests to OpenSearch via Java Client API.
+     * 
+     * Category: search,monitoring
+     * Since: 4.0
+     * Maven coordinates: org.apache.camel:camel-opensearch
+     * 
+     * Syntax: <code>opensearch:clusterName</code>
+     * 
+     * Path parameter: clusterName (required)
+     * Name of the cluster
+     * 
+     * @param componentName to use a custom component name for the endpoint
+     * instead of the default name
+     * @param path clusterName
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.OpensearchEndpointBuilderFactory.OpensearchEndpointBuilder opensearch(
+            String componentName,
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.OpensearchEndpointBuilderFactory.endpointBuilder(componentName, path);
+    }
+    /**
      * Openshift Build Config (camel-kubernetes)
      * Perform operations on OpenShift Build Configs.
      * 
-     * Category: container,cloud,paas
+     * Category: container,cloud
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-kubernetes
      * 
@@ -10518,7 +10675,7 @@ public class StaticEndpointBuilders {
      * Openshift Build Config (camel-kubernetes)
      * Perform operations on OpenShift Build Configs.
      * 
-     * Category: container,cloud,paas
+     * Category: container,cloud
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-kubernetes
      * 
@@ -10541,7 +10698,7 @@ public class StaticEndpointBuilders {
      * Openshift Builds (camel-kubernetes)
      * Perform operations on OpenShift Builds.
      * 
-     * Category: container,cloud,paas
+     * Category: container,cloud
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-kubernetes
      * 
@@ -10561,7 +10718,7 @@ public class StaticEndpointBuilders {
      * Openshift Builds (camel-kubernetes)
      * Perform operations on OpenShift Builds.
      * 
-     * Category: container,cloud,paas
+     * Category: container,cloud
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-kubernetes
      * 
@@ -10585,7 +10742,7 @@ public class StaticEndpointBuilders {
      * Perform operations on Openshift Deployment Configs and get notified on
      * Deployment Config changes.
      * 
-     * Category: container,cloud,paas
+     * Category: container,cloud
      * Since: 3.18
      * Maven coordinates: org.apache.camel:camel-kubernetes
      * 
@@ -10606,7 +10763,7 @@ public class StaticEndpointBuilders {
      * Perform operations on Openshift Deployment Configs and get notified on
      * Deployment Config changes.
      * 
-     * Category: container,cloud,paas
+     * Category: container,cloud
      * Since: 3.18
      * Maven coordinates: org.apache.camel:camel-kubernetes
      * 
@@ -10629,7 +10786,7 @@ public class StaticEndpointBuilders {
      * OpenStack Cinder (camel-openstack)
      * Access data in OpenStack Cinder block storage.
      * 
-     * Category: cloud,paas
+     * Category: container
      * Since: 2.19
      * Maven coordinates: org.apache.camel:camel-openstack
      * 
@@ -10649,7 +10806,7 @@ public class StaticEndpointBuilders {
      * OpenStack Cinder (camel-openstack)
      * Access data in OpenStack Cinder block storage.
      * 
-     * Category: cloud,paas
+     * Category: container
      * Since: 2.19
      * Maven coordinates: org.apache.camel:camel-openstack
      * 
@@ -10672,7 +10829,7 @@ public class StaticEndpointBuilders {
      * OpenStack Glance (camel-openstack)
      * Manage VM images and metadata definitions in OpenStack Glance.
      * 
-     * Category: cloud,paas
+     * Category: container
      * Since: 2.19
      * Maven coordinates: org.apache.camel:camel-openstack
      * 
@@ -10692,7 +10849,7 @@ public class StaticEndpointBuilders {
      * OpenStack Glance (camel-openstack)
      * Manage VM images and metadata definitions in OpenStack Glance.
      * 
-     * Category: cloud,paas
+     * Category: container
      * Since: 2.19
      * Maven coordinates: org.apache.camel:camel-openstack
      * 
@@ -10716,7 +10873,7 @@ public class StaticEndpointBuilders {
      * Access OpenStack Keystone for API client authentication, service
      * discovery and distributed multi-tenant authorization.
      * 
-     * Category: cloud,paas
+     * Category: container
      * Since: 2.19
      * Maven coordinates: org.apache.camel:camel-openstack
      * 
@@ -10737,7 +10894,7 @@ public class StaticEndpointBuilders {
      * Access OpenStack Keystone for API client authentication, service
      * discovery and distributed multi-tenant authorization.
      * 
-     * Category: cloud,paas
+     * Category: container
      * Since: 2.19
      * Maven coordinates: org.apache.camel:camel-openstack
      * 
@@ -10760,7 +10917,7 @@ public class StaticEndpointBuilders {
      * OpenStack Neutron (camel-openstack)
      * Access OpenStack Neutron for network services.
      * 
-     * Category: cloud,paas
+     * Category: container
      * Since: 2.19
      * Maven coordinates: org.apache.camel:camel-openstack
      * 
@@ -10780,7 +10937,7 @@ public class StaticEndpointBuilders {
      * OpenStack Neutron (camel-openstack)
      * Access OpenStack Neutron for network services.
      * 
-     * Category: cloud,paas
+     * Category: container
      * Since: 2.19
      * Maven coordinates: org.apache.camel:camel-openstack
      * 
@@ -10803,7 +10960,7 @@ public class StaticEndpointBuilders {
      * OpenStack Nova (camel-openstack)
      * Access OpenStack to manage compute resources.
      * 
-     * Category: cloud,paas
+     * Category: container
      * Since: 2.19
      * Maven coordinates: org.apache.camel:camel-openstack
      * 
@@ -10823,7 +10980,7 @@ public class StaticEndpointBuilders {
      * OpenStack Nova (camel-openstack)
      * Access OpenStack to manage compute resources.
      * 
-     * Category: cloud,paas
+     * Category: container
      * Since: 2.19
      * Maven coordinates: org.apache.camel:camel-openstack
      * 
@@ -10846,7 +11003,7 @@ public class StaticEndpointBuilders {
      * OpenStack Swift (camel-openstack)
      * Access OpenStack Swift object/blob store.
      * 
-     * Category: cloud,paas
+     * Category: container
      * Since: 2.19
      * Maven coordinates: org.apache.camel:camel-openstack
      * 
@@ -10866,7 +11023,7 @@ public class StaticEndpointBuilders {
      * OpenStack Swift (camel-openstack)
      * Access OpenStack Swift object/blob store.
      * 
-     * Category: cloud,paas
+     * Category: container
      * Since: 2.19
      * Maven coordinates: org.apache.camel:camel-openstack
      * 
@@ -10884,6 +11041,49 @@ public class StaticEndpointBuilders {
             String componentName,
             String path) {
         return org.apache.camel.builder.endpoint.dsl.SwiftEndpointBuilderFactory.endpointBuilder(componentName, path);
+    }
+    /**
+     * OptaPlanner (camel-optaplanner)
+     * Solve planning problems with OptaPlanner.
+     * 
+     * Category: workflow
+     * Since: 2.13
+     * Maven coordinates: org.apache.camel:camel-optaplanner
+     * 
+     * Syntax: <code>optaplanner:problemName</code>
+     * 
+     * Path parameter: problemName (required)
+     * Problem name
+     * 
+     * @param path problemName
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.OptaPlannerEndpointBuilderFactory.OptaPlannerEndpointBuilder optaplanner(
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.OptaPlannerEndpointBuilderFactory.endpointBuilder("optaplanner", path);
+    }
+    /**
+     * OptaPlanner (camel-optaplanner)
+     * Solve planning problems with OptaPlanner.
+     * 
+     * Category: workflow
+     * Since: 2.13
+     * Maven coordinates: org.apache.camel:camel-optaplanner
+     * 
+     * Syntax: <code>optaplanner:problemName</code>
+     * 
+     * Path parameter: problemName (required)
+     * Problem name
+     * 
+     * @param componentName to use a custom component name for the endpoint
+     * instead of the default name
+     * @param path problemName
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.OptaPlannerEndpointBuilderFactory.OptaPlannerEndpointBuilder optaplanner(
+            String componentName,
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.OptaPlannerEndpointBuilderFactory.endpointBuilder(componentName, path);
     }
     /**
      * Paho (camel-paho)
@@ -10975,7 +11175,7 @@ public class StaticEndpointBuilders {
      * PDF (camel-pdf)
      * Create, modify or extract content from PDF documents.
      * 
-     * Category: document,transformation,printing
+     * Category: document,transformation
      * Since: 2.16
      * Maven coordinates: org.apache.camel:camel-pdf
      * 
@@ -10997,7 +11197,7 @@ public class StaticEndpointBuilders {
      * PDF (camel-pdf)
      * Create, modify or extract content from PDF documents.
      * 
-     * Category: document,transformation,printing
+     * Category: document,transformation
      * Since: 2.16
      * Maven coordinates: org.apache.camel:camel-pdf
      * 
@@ -11022,7 +11222,7 @@ public class StaticEndpointBuilders {
      * PostgresSQL Event (camel-pgevent)
      * Send and receive PostgreSQL events via LISTEN and NOTIFY commands.
      * 
-     * Category: database,sql
+     * Category: database
      * Since: 2.15
      * Maven coordinates: org.apache.camel:camel-pgevent
      * 
@@ -11055,7 +11255,7 @@ public class StaticEndpointBuilders {
      * PostgresSQL Event (camel-pgevent)
      * Send and receive PostgreSQL events via LISTEN and NOTIFY commands.
      * 
-     * Category: database,sql
+     * Category: database
      * Since: 2.15
      * Maven coordinates: org.apache.camel:camel-pgevent
      * 
@@ -11092,7 +11292,7 @@ public class StaticEndpointBuilders {
      * Poll for PostgreSQL Write-Ahead Log (WAL) records using Streaming
      * Replication Slots.
      * 
-     * Category: database,sql
+     * Category: database
      * Since: 3.0
      * Maven coordinates: org.apache.camel:camel-pg-replication-slot
      * 
@@ -11128,7 +11328,7 @@ public class StaticEndpointBuilders {
      * Poll for PostgreSQL Write-Ahead Log (WAL) records using Streaming
      * Replication Slots.
      * 
-     * Category: database,sql
+     * Category: database
      * Since: 3.0
      * Maven coordinates: org.apache.camel:camel-pg-replication-slot
      * 
@@ -11433,6 +11633,8 @@ public class StaticEndpointBuilders {
      * lookup the configuration file in the registry. bean will call a method on
      * a bean to be used as the configuration. For bean you can specify the
      * method name after dot, eg bean:myBean.myMethod
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param path configurationName
      * @return the dsl builder
@@ -11459,6 +11661,8 @@ public class StaticEndpointBuilders {
      * lookup the configuration file in the registry. bean will call a method on
      * a bean to be used as the configuration. For bean you can specify the
      * method name after dot, eg bean:myBean.myMethod
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -11475,7 +11679,7 @@ public class StaticEndpointBuilders {
      * Exchange messages with reactive stream processing libraries compatible
      * with the reactive streams standard.
      * 
-     * Category: reactive,streams
+     * Category: messaging
      * Since: 2.19
      * Maven coordinates: org.apache.camel:camel-reactive-streams
      * 
@@ -11496,7 +11700,7 @@ public class StaticEndpointBuilders {
      * Exchange messages with reactive stream processing libraries compatible
      * with the reactive streams standard.
      * 
-     * Category: reactive,streams
+     * Category: messaging
      * Since: 2.19
      * Maven coordinates: org.apache.camel:camel-reactive-streams
      * 
@@ -11520,7 +11724,7 @@ public class StaticEndpointBuilders {
      * Route messages to an endpoint looked up dynamically by name in the Camel
      * Registry.
      * 
-     * Category: core,endpoint
+     * Category: core
      * Since: 1.2
      * Maven coordinates: org.apache.camel:camel-ref
      * 
@@ -11541,7 +11745,7 @@ public class StaticEndpointBuilders {
      * Route messages to an endpoint looked up dynamically by name in the Camel
      * Registry.
      * 
-     * Category: core,endpoint
+     * Category: core
      * Since: 1.2
      * Maven coordinates: org.apache.camel:camel-ref
      * 
@@ -11669,7 +11873,7 @@ public class StaticEndpointBuilders {
      * Configure REST producers based on an OpenAPI specification document
      * delegating to a component implementing the RestProducerFactory interface.
      * 
-     * Category: openapi,rest,api
+     * Category: rest,api
      * Since: 3.1
      * Maven coordinates: org.apache.camel:camel-rest-openapi
      * 
@@ -11707,7 +11911,7 @@ public class StaticEndpointBuilders {
      * Configure REST producers based on an OpenAPI specification document
      * delegating to a component implementing the RestProducerFactory interface.
      * 
-     * Category: openapi,rest,api
+     * Category: rest,api
      * Since: 3.1
      * Maven coordinates: org.apache.camel:camel-rest-openapi
      * 
@@ -11759,6 +11963,8 @@ public class StaticEndpointBuilders {
      * (classpath is default). ref will lookup the resource in the registry.
      * bean will call a method on a bean to be used as the resource. For bean
      * you can specify the method name after dot, eg bean:myBean.myMethod.
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param path resourceUri
      * @return the dsl builder
@@ -11783,6 +11989,8 @@ public class StaticEndpointBuilders {
      * (classpath is default). ref will lookup the resource in the registry.
      * bean will call a method on a bean to be used as the resource. For bean
      * you can specify the method name after dot, eg bean:myBean.myMethod.
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -11841,7 +12049,7 @@ public class StaticEndpointBuilders {
      * RSS (camel-rss)
      * Poll RSS feeds.
      * 
-     * Category: rss
+     * Category: document
      * Since: 2.0
      * Maven coordinates: org.apache.camel:camel-rss
      * 
@@ -11861,7 +12069,7 @@ public class StaticEndpointBuilders {
      * RSS (camel-rss)
      * Poll RSS feeds.
      * 
-     * Category: rss
+     * Category: document
      * Since: 2.0
      * Maven coordinates: org.apache.camel:camel-rss
      * 
@@ -11884,7 +12092,7 @@ public class StaticEndpointBuilders {
      * Saga (camel-saga)
      * Execute custom actions within a route using the Saga EIP.
      * 
-     * Category: core,endpoint
+     * Category: clustering
      * Since: 2.21
      * Maven coordinates: org.apache.camel:camel-saga
      * 
@@ -11905,7 +12113,7 @@ public class StaticEndpointBuilders {
      * Saga (camel-saga)
      * Execute custom actions within a route using the Saga EIP.
      * 
-     * Category: core,endpoint
+     * Category: clustering
      * Since: 2.21
      * Maven coordinates: org.apache.camel:camel-saga
      * 
@@ -11929,7 +12137,7 @@ public class StaticEndpointBuilders {
      * Salesforce (camel-salesforce)
      * Communicate with Salesforce using Java DTOs.
      * 
-     * Category: cloud,api,crm
+     * Category: cloud,saas
      * Since: 2.12
      * Maven coordinates: org.apache.camel:camel-salesforce
      * 
@@ -11937,7 +12145,7 @@ public class StaticEndpointBuilders {
      * 
      * Path parameter: operationName (required)
      * The operation to use
-     * There are 66 enums and the value can be one of: getVersions,
+     * There are 68 enums and the value can be one of: getVersions,
      * getResources, getGlobalObjects, getBasicInfo, getDescription, getSObject,
      * createSObject, updateSObject, deleteSObject, getSObjectWithId,
      * upsertSObject, deleteSObjectWithId, getBlobField, query, queryMore,
@@ -11954,7 +12162,7 @@ public class StaticEndpointBuilders {
      * bulk2DeleteJob, bulk2GetSuccessfulResults, bulk2GetFailedResults,
      * bulk2GetUnprocessedRecords, bulk2CreateQueryJob, bulk2GetQueryJob,
      * bulk2GetAllQueryJobs, bulk2GetQueryJobResults, bulk2AbortQueryJob,
-     * bulk2DeleteQueryJob, raw, subscribe
+     * bulk2DeleteQueryJob, raw, subscribe, pubSubSubscribe, pubSubPublish
      * 
      * Path parameter: topicName
      * The name of the topic/channel to use
@@ -11970,7 +12178,7 @@ public class StaticEndpointBuilders {
      * Salesforce (camel-salesforce)
      * Communicate with Salesforce using Java DTOs.
      * 
-     * Category: cloud,api,crm
+     * Category: cloud,saas
      * Since: 2.12
      * Maven coordinates: org.apache.camel:camel-salesforce
      * 
@@ -11978,7 +12186,7 @@ public class StaticEndpointBuilders {
      * 
      * Path parameter: operationName (required)
      * The operation to use
-     * There are 66 enums and the value can be one of: getVersions,
+     * There are 68 enums and the value can be one of: getVersions,
      * getResources, getGlobalObjects, getBasicInfo, getDescription, getSObject,
      * createSObject, updateSObject, deleteSObject, getSObjectWithId,
      * upsertSObject, deleteSObjectWithId, getBlobField, query, queryMore,
@@ -11995,7 +12203,7 @@ public class StaticEndpointBuilders {
      * bulk2DeleteJob, bulk2GetSuccessfulResults, bulk2GetFailedResults,
      * bulk2GetUnprocessedRecords, bulk2CreateQueryJob, bulk2GetQueryJob,
      * bulk2GetAllQueryJobs, bulk2GetQueryJobResults, bulk2AbortQueryJob,
-     * bulk2DeleteQueryJob, raw, subscribe
+     * bulk2DeleteQueryJob, raw, subscribe, pubSubSubscribe, pubSubPublish
      * 
      * Path parameter: topicName
      * The name of the topic/channel to use
@@ -12014,7 +12222,7 @@ public class StaticEndpointBuilders {
      * SAP NetWeaver (camel-sap-netweaver)
      * Send requests to SAP NetWeaver Gateway using HTTP.
      * 
-     * Category: sap,cloud,api
+     * Category: saas
      * Since: 2.12
      * Maven coordinates: org.apache.camel:camel-sap-netweaver
      * 
@@ -12034,7 +12242,7 @@ public class StaticEndpointBuilders {
      * SAP NetWeaver (camel-sap-netweaver)
      * Send requests to SAP NetWeaver Gateway using HTTP.
      * 
-     * Category: sap,cloud,api
+     * Category: saas
      * Since: 2.12
      * Maven coordinates: org.apache.camel:camel-sap-netweaver
      * 
@@ -12111,6 +12319,8 @@ public class StaticEndpointBuilders {
      * Path parameter: path (required)
      * The path to the schematron rules file. Can either be in class path or
      * location in the file system.
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param path path
      * @return the dsl builder
@@ -12132,6 +12342,8 @@ public class StaticEndpointBuilders {
      * Path parameter: path (required)
      * The path to the schematron rules file. Can either be in class path or
      * location in the file system.
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -12203,7 +12415,7 @@ public class StaticEndpointBuilders {
      * Asynchronously call another endpoint from any Camel Context in the same
      * JVM.
      * 
-     * Category: core,endpoint
+     * Category: core,messaging
      * Since: 1.1
      * Maven coordinates: org.apache.camel:camel-seda
      * 
@@ -12224,7 +12436,7 @@ public class StaticEndpointBuilders {
      * Asynchronously call another endpoint from any Camel Context in the same
      * JVM.
      * 
-     * Category: core,endpoint
+     * Category: core,messaging
      * Since: 1.1
      * Maven coordinates: org.apache.camel:camel-seda
      * 
@@ -12695,53 +12907,6 @@ public class StaticEndpointBuilders {
         return org.apache.camel.builder.endpoint.dsl.SnmpEndpointBuilderFactory.endpointBuilder(componentName, path);
     }
     /**
-     * Solr (camel-solr)
-     * Perform operations against Apache Lucene Solr.
-     * 
-     * Category: monitoring,search
-     * Since: 2.9
-     * Maven coordinates: org.apache.camel:camel-solr
-     * 
-     * Syntax: <code>solr:url</code>
-     * 
-     * Path parameter: url (required)
-     * Hostname and port for the Solr server(s). Multiple hosts can be
-     * specified, separated with a comma. See the solrClient parameter for more
-     * information on the SolrClient used to connect to Solr.
-     * 
-     * @param path url
-     * @return the dsl builder
-     */
-    public static org.apache.camel.builder.endpoint.dsl.SolrEndpointBuilderFactory.SolrEndpointBuilder solr(
-            String path) {
-        return org.apache.camel.builder.endpoint.dsl.SolrEndpointBuilderFactory.endpointBuilder("solr", path);
-    }
-    /**
-     * Solr (camel-solr)
-     * Perform operations against Apache Lucene Solr.
-     * 
-     * Category: monitoring,search
-     * Since: 2.9
-     * Maven coordinates: org.apache.camel:camel-solr
-     * 
-     * Syntax: <code>solr:url</code>
-     * 
-     * Path parameter: url (required)
-     * Hostname and port for the Solr server(s). Multiple hosts can be
-     * specified, separated with a comma. See the solrClient parameter for more
-     * information on the SolrClient used to connect to Solr.
-     * 
-     * @param componentName to use a custom component name for the endpoint
-     * instead of the default name
-     * @param path url
-     * @return the dsl builder
-     */
-    public static org.apache.camel.builder.endpoint.dsl.SolrEndpointBuilderFactory.SolrEndpointBuilder solr(
-            String componentName,
-            String path) {
-        return org.apache.camel.builder.endpoint.dsl.SolrEndpointBuilderFactory.endpointBuilder(componentName, path);
-    }
-    /**
      * Splunk (camel-splunk)
      * Publish or search for events in Splunk.
      * 
@@ -12789,7 +12954,7 @@ public class StaticEndpointBuilders {
      * The splunk component allows to publish events in Splunk using the HTTP
      * Event Collector.
      * 
-     * Category: log,monitoring
+     * Category: monitoring
      * Since: 3.3
      * Maven coordinates: org.apache.camel:camel-splunk-hec
      * 
@@ -12814,7 +12979,7 @@ public class StaticEndpointBuilders {
      * The splunk component allows to publish events in Splunk using the HTTP
      * Event Collector.
      * 
-     * Category: log,monitoring
+     * Category: monitoring
      * Since: 3.3
      * Maven coordinates: org.apache.camel:camel-splunk-hec
      * 
@@ -12841,7 +13006,7 @@ public class StaticEndpointBuilders {
      * Spring Batch (camel-spring-batch)
      * Send messages to Spring Batch for further processing.
      * 
-     * Category: spring,batch,scheduling
+     * Category: workflow
      * Since: 2.10
      * Maven coordinates: org.apache.camel:camel-spring-batch
      * 
@@ -12861,7 +13026,7 @@ public class StaticEndpointBuilders {
      * Spring Batch (camel-spring-batch)
      * Send messages to Spring Batch for further processing.
      * 
-     * Category: spring,batch,scheduling
+     * Category: workflow
      * Since: 2.10
      * Maven coordinates: org.apache.camel:camel-spring-batch
      * 
@@ -12884,7 +13049,7 @@ public class StaticEndpointBuilders {
      * Spring Event (camel-spring)
      * Listen for Spring Application Events.
      * 
-     * Category: spring,eventbus
+     * Category: messaging
      * Since: 1.4
      * Maven coordinates: org.apache.camel:camel-spring
      * 
@@ -12904,7 +13069,7 @@ public class StaticEndpointBuilders {
      * Spring Event (camel-spring)
      * Listen for Spring Application Events.
      * 
-     * Category: spring,eventbus
+     * Category: messaging
      * Since: 1.4
      * Maven coordinates: org.apache.camel:camel-spring
      * 
@@ -12927,7 +13092,7 @@ public class StaticEndpointBuilders {
      * Spring JDBC (camel-spring-jdbc)
      * Access databases through SQL and JDBC with Spring Transaction support.
      * 
-     * Category: database,sql
+     * Category: database
      * Since: 3.10
      * Maven coordinates: org.apache.camel:camel-spring-jdbc
      * 
@@ -12950,7 +13115,7 @@ public class StaticEndpointBuilders {
      * Spring JDBC (camel-spring-jdbc)
      * Access databases through SQL and JDBC with Spring Transaction support.
      * 
-     * Category: database,sql
+     * Category: database
      * Since: 3.10
      * Maven coordinates: org.apache.camel:camel-spring-jdbc
      * 
@@ -12976,7 +13141,7 @@ public class StaticEndpointBuilders {
      * Spring LDAP (camel-spring-ldap)
      * Perform searches in LDAP servers using filters as the message payload.
      * 
-     * Category: spring,ldap
+     * Category: security
      * Since: 2.11
      * Maven coordinates: org.apache.camel:camel-spring-ldap
      * 
@@ -12996,7 +13161,7 @@ public class StaticEndpointBuilders {
      * Spring LDAP (camel-spring-ldap)
      * Perform searches in LDAP servers using filters as the message payload.
      * 
-     * Category: spring,ldap
+     * Category: security
      * Since: 2.11
      * Maven coordinates: org.apache.camel:camel-spring-ldap
      * 
@@ -13068,7 +13233,7 @@ public class StaticEndpointBuilders {
      * Spring Redis (camel-spring-redis)
      * Send and receive messages from Redis.
      * 
-     * Category: spring,nosql
+     * Category: cache
      * Since: 2.11
      * Maven coordinates: org.apache.camel:camel-spring-redis
      * 
@@ -13091,7 +13256,7 @@ public class StaticEndpointBuilders {
      * Spring Redis (camel-spring-redis)
      * Send and receive messages from Redis.
      * 
-     * Category: spring,nosql
+     * Category: cache
      * Since: 2.11
      * Maven coordinates: org.apache.camel:camel-spring-redis
      * 
@@ -13117,7 +13282,7 @@ public class StaticEndpointBuilders {
      * Spring WebService (camel-spring-ws)
      * Access external web services as a client or expose your own web services.
      * 
-     * Category: spring,soap,webservice
+     * Category: webservice
      * Since: 2.6
      * Maven coordinates: org.apache.camel:camel-spring-ws
      * 
@@ -13144,10 +13309,6 @@ public class StaticEndpointBuilders {
      * 
      * Path parameter: webServiceEndpointUri
      * The default Web Service endpoint uri to use for the producer.
-     * 
-     * Path parameter: expression
-     * The XPath expression to use when option type=xpathresult. Then this
-     * option is required to be configured.
      * 
      * @param path type:lookupKey:webServiceEndpointUri
      * @return the dsl builder
@@ -13160,7 +13321,7 @@ public class StaticEndpointBuilders {
      * Spring WebService (camel-spring-ws)
      * Access external web services as a client or expose your own web services.
      * 
-     * Category: spring,soap,webservice
+     * Category: webservice
      * Since: 2.6
      * Maven coordinates: org.apache.camel:camel-spring-ws
      * 
@@ -13187,10 +13348,6 @@ public class StaticEndpointBuilders {
      * 
      * Path parameter: webServiceEndpointUri
      * The default Web Service endpoint uri to use for the producer.
-     * 
-     * Path parameter: expression
-     * The XPath expression to use when option type=xpathresult. Then this
-     * option is required to be configured.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -13206,7 +13363,7 @@ public class StaticEndpointBuilders {
      * SQL (camel-sql)
      * Perform SQL queries using Spring JDBC.
      * 
-     * Category: database,sql
+     * Category: database
      * Since: 1.4
      * Maven coordinates: org.apache.camel:camel-sql
      * 
@@ -13215,6 +13372,8 @@ public class StaticEndpointBuilders {
      * Path parameter: query (required)
      * Sets the SQL query to perform. You can externalize the query by using
      * file: or classpath: as prefix and specify the location of the file.
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param path query
      * @return the dsl builder
@@ -13227,7 +13386,7 @@ public class StaticEndpointBuilders {
      * SQL (camel-sql)
      * Perform SQL queries using Spring JDBC.
      * 
-     * Category: database,sql
+     * Category: database
      * Since: 1.4
      * Maven coordinates: org.apache.camel:camel-sql
      * 
@@ -13236,6 +13395,8 @@ public class StaticEndpointBuilders {
      * Path parameter: query (required)
      * Sets the SQL query to perform. You can externalize the query by using
      * file: or classpath: as prefix and specify the location of the file.
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -13251,14 +13412,18 @@ public class StaticEndpointBuilders {
      * SQL Stored Procedure (camel-sql)
      * Perform SQL queries as a JDBC Stored Procedures using Spring JDBC.
      * 
-     * Category: database,sql
+     * Category: database
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-sql
      * 
      * Syntax: <code>sql-stored:template</code>
      * 
      * Path parameter: template (required)
-     * Sets the StoredProcedure template to perform
+     * Sets the stored procedure template to perform. You can externalize the
+     * template by using file: or classpath: as prefix and specify the location
+     * of the file.
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param path template
      * @return the dsl builder
@@ -13271,14 +13436,18 @@ public class StaticEndpointBuilders {
      * SQL Stored Procedure (camel-sql)
      * Perform SQL queries as a JDBC Stored Procedures using Spring JDBC.
      * 
-     * Category: database,sql
+     * Category: database
      * Since: 2.17
      * Maven coordinates: org.apache.camel:camel-sql
      * 
      * Syntax: <code>sql-stored:template</code>
      * 
      * Path parameter: template (required)
-     * Sets the StoredProcedure template to perform
+     * Sets the stored procedure template to perform. You can externalize the
+     * template by using file: or classpath: as prefix and specify the location
+     * of the file.
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -13389,7 +13558,7 @@ public class StaticEndpointBuilders {
      * Stitch is a cloud ETL service that integrates various data sources into a
      * central data warehouse through various integrations.
      * 
-     * Category: cloud,api,compute,bigdata
+     * Category: cloud,api,saas,bigdata
      * Since: 3.8
      * Maven coordinates: org.apache.camel:camel-stitch
      * 
@@ -13413,7 +13582,7 @@ public class StaticEndpointBuilders {
      * Stitch is a cloud ETL service that integrates various data sources into a
      * central data warehouse through various integrations.
      * 
-     * Category: cloud,api,compute,bigdata
+     * Category: cloud,api,saas,bigdata
      * Since: 3.8
      * Maven coordinates: org.apache.camel:camel-stitch
      * 
@@ -13484,7 +13653,7 @@ public class StaticEndpointBuilders {
      * Stream (camel-stream)
      * Read from system-in and write to system-out and system-err streams.
      * 
-     * Category: file,system
+     * Category: file,core
      * Since: 1.3
      * Maven coordinates: org.apache.camel:camel-stream
      * 
@@ -13507,7 +13676,7 @@ public class StaticEndpointBuilders {
      * Stream (camel-stream)
      * Read from system-in and write to system-out and system-err streams.
      * 
-     * Category: file,system
+     * Category: file,core
      * Since: 1.3
      * Maven coordinates: org.apache.camel:camel-stream
      * 
@@ -13545,6 +13714,8 @@ public class StaticEndpointBuilders {
      * (classpath is default). ref will lookup the resource in the registry.
      * bean will call a method on a bean to be used as the resource. For bean
      * you can specify the method name after dot, eg bean:myBean.myMethod.
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param path resourceUri
      * @return the dsl builder
@@ -13569,6 +13740,8 @@ public class StaticEndpointBuilders {
      * (classpath is default). ref will lookup the resource in the registry.
      * bean will call a method on a bean to be used as the resource. For bean
      * you can specify the method name after dot, eg bean:myBean.myMethod.
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -13916,7 +14089,7 @@ public class StaticEndpointBuilders {
      * Twitter Direct Message (camel-twitter)
      * Send and receive Twitter direct messages.
      * 
-     * Category: cloud,api,social,chat
+     * Category: saas,social
      * Since: 2.10
      * Maven coordinates: org.apache.camel:camel-twitter
      * 
@@ -13937,7 +14110,7 @@ public class StaticEndpointBuilders {
      * Twitter Direct Message (camel-twitter)
      * Send and receive Twitter direct messages.
      * 
-     * Category: cloud,api,social,chat
+     * Category: saas,social
      * Since: 2.10
      * Maven coordinates: org.apache.camel:camel-twitter
      * 
@@ -13961,7 +14134,7 @@ public class StaticEndpointBuilders {
      * Twitter Search (camel-twitter)
      * Access Twitter Search.
      * 
-     * Category: cloud,api,search,social
+     * Category: saas,social
      * Since: 2.10
      * Maven coordinates: org.apache.camel:camel-twitter
      * 
@@ -13982,7 +14155,7 @@ public class StaticEndpointBuilders {
      * Twitter Search (camel-twitter)
      * Access Twitter Search.
      * 
-     * Category: cloud,api,search,social
+     * Category: saas,social
      * Since: 2.10
      * Maven coordinates: org.apache.camel:camel-twitter
      * 
@@ -14006,7 +14179,7 @@ public class StaticEndpointBuilders {
      * Twitter Timeline (camel-twitter)
      * Send tweets and receive tweets from user's timeline.
      * 
-     * Category: api,cloud,social
+     * Category: saas,social
      * Since: 2.10
      * Maven coordinates: org.apache.camel:camel-twitter
      * 
@@ -14014,8 +14187,8 @@ public class StaticEndpointBuilders {
      * 
      * Path parameter: timelineType (required)
      * The timeline type to produce/consume.
-     * There are 7 enums and the value can be one of: PUBLIC, HOME, USER,
-     * MENTIONS, RETWEETSOFME, LIST, UNKNOWN
+     * There are 6 enums and the value can be one of: PUBLIC, HOME, USER,
+     * MENTIONS, LIST, UNKNOWN
      * 
      * @param path timelineType
      * @return the dsl builder
@@ -14028,7 +14201,7 @@ public class StaticEndpointBuilders {
      * Twitter Timeline (camel-twitter)
      * Send tweets and receive tweets from user's timeline.
      * 
-     * Category: api,cloud,social
+     * Category: saas,social
      * Since: 2.10
      * Maven coordinates: org.apache.camel:camel-twitter
      * 
@@ -14036,8 +14209,8 @@ public class StaticEndpointBuilders {
      * 
      * Path parameter: timelineType (required)
      * The timeline type to produce/consume.
-     * There are 7 enums and the value can be one of: PUBLIC, HOME, USER,
-     * MENTIONS, RETWEETSOFME, LIST, UNKNOWN
+     * There are 6 enums and the value can be one of: PUBLIC, HOME, USER,
+     * MENTIONS, LIST, UNKNOWN
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -14054,7 +14227,7 @@ public class StaticEndpointBuilders {
      * Expose HTTP and WebSocket endpoints and access external HTTP/WebSocket
      * servers.
      * 
-     * Category: http,websocket
+     * Category: http,networking
      * Since: 2.16
      * Maven coordinates: org.apache.camel:camel-undertow
      * 
@@ -14075,7 +14248,7 @@ public class StaticEndpointBuilders {
      * Expose HTTP and WebSocket endpoints and access external HTTP/WebSocket
      * servers.
      * 
-     * Category: http,websocket
+     * Category: http,networking
      * Since: 2.16
      * Maven coordinates: org.apache.camel:camel-undertow
      * 
@@ -14108,6 +14281,8 @@ public class StaticEndpointBuilders {
      * URL to a local resource on the classpath, or a reference to lookup a bean
      * in the Registry, or a full URL to a remote resource or resource on the
      * file system which contains the XSD to validate against.
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param path resourceUri
      * @return the dsl builder
@@ -14130,6 +14305,8 @@ public class StaticEndpointBuilders {
      * URL to a local resource on the classpath, or a reference to lookup a bean
      * in the Registry, or a full URL to a remote resource or resource on the
      * file system which contains the XSD to validate against.
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -14157,6 +14334,8 @@ public class StaticEndpointBuilders {
      * (classpath is default). ref will lookup the resource in the registry.
      * bean will call a method on a bean to be used as the resource. For bean
      * you can specify the method name after dot, eg bean:myBean.myMethod.
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param path resourceUri
      * @return the dsl builder
@@ -14181,6 +14360,8 @@ public class StaticEndpointBuilders {
      * (classpath is default). ref will lookup the resource in the registry.
      * bean will call a method on a bean to be used as the resource. For bean
      * you can specify the method name after dot, eg bean:myBean.myMethod.
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -14196,7 +14377,7 @@ public class StaticEndpointBuilders {
      * Vert.x (camel-vertx)
      * Send and receive messages to/from Vert.x Event Bus.
      * 
-     * Category: eventbus,reactive
+     * Category: messaging
      * Since: 2.12
      * Maven coordinates: org.apache.camel:camel-vertx
      * 
@@ -14216,7 +14397,7 @@ public class StaticEndpointBuilders {
      * Vert.x (camel-vertx)
      * Send and receive messages to/from Vert.x Event Bus.
      * 
-     * Category: eventbus,reactive
+     * Category: messaging
      * Since: 2.12
      * Maven coordinates: org.apache.camel:camel-vertx
      * 
@@ -14283,7 +14464,7 @@ public class StaticEndpointBuilders {
      * Expose WebSocket endpoints and connect to remote WebSocket servers using
      * Vert.x
      * 
-     * Category: websocket
+     * Category: http,networking
      * Since: 3.5
      * Maven coordinates: org.apache.camel:camel-vertx-websocket
      * 
@@ -14311,7 +14492,7 @@ public class StaticEndpointBuilders {
      * Expose WebSocket endpoints and connect to remote WebSocket servers using
      * Vert.x
      * 
-     * Category: websocket
+     * Category: http,networking
      * Since: 3.5
      * Maven coordinates: org.apache.camel:camel-vertx-websocket
      * 
@@ -14336,49 +14517,6 @@ public class StaticEndpointBuilders {
             String componentName,
             String path) {
         return org.apache.camel.builder.endpoint.dsl.VertxWebsocketEndpointBuilderFactory.endpointBuilder(componentName, path);
-    }
-    /**
-     * VM (camel-vm)
-     * Call another endpoint in the same CamelContext asynchronously.
-     * 
-     * Category: core,endpoint
-     * Since: 1.1
-     * Maven coordinates: org.apache.camel:camel-vm
-     * 
-     * Syntax: <code>vm:name</code>
-     * 
-     * Path parameter: name (required)
-     * Name of queue
-     * 
-     * @param path name
-     * @return the dsl builder
-     */
-    public static org.apache.camel.builder.endpoint.dsl.VmEndpointBuilderFactory.VmEndpointBuilder vm(
-            String path) {
-        return org.apache.camel.builder.endpoint.dsl.VmEndpointBuilderFactory.endpointBuilder("vm", path);
-    }
-    /**
-     * VM (camel-vm)
-     * Call another endpoint in the same CamelContext asynchronously.
-     * 
-     * Category: core,endpoint
-     * Since: 1.1
-     * Maven coordinates: org.apache.camel:camel-vm
-     * 
-     * Syntax: <code>vm:name</code>
-     * 
-     * Path parameter: name (required)
-     * Name of queue
-     * 
-     * @param componentName to use a custom component name for the endpoint
-     * instead of the default name
-     * @param path name
-     * @return the dsl builder
-     */
-    public static org.apache.camel.builder.endpoint.dsl.VmEndpointBuilderFactory.VmEndpointBuilder vm(
-            String componentName,
-            String path) {
-        return org.apache.camel.builder.endpoint.dsl.VmEndpointBuilderFactory.endpointBuilder(componentName, path);
     }
     /**
      * Weather (camel-weather)
@@ -14427,7 +14565,7 @@ public class StaticEndpointBuilders {
      * Web3j Ethereum Blockchain (camel-web3j)
      * Interact with Ethereum nodes using web3j client API.
      * 
-     * Category: bitcoin,blockchain,api
+     * Category: blockchain
      * Since: 2.22
      * Maven coordinates: org.apache.camel:camel-web3j
      * 
@@ -14447,7 +14585,7 @@ public class StaticEndpointBuilders {
      * Web3j Ethereum Blockchain (camel-web3j)
      * Interact with Ethereum nodes using web3j client API.
      * 
-     * Category: bitcoin,blockchain,api
+     * Category: blockchain
      * Since: 2.22
      * Maven coordinates: org.apache.camel:camel-web3j
      * 
@@ -14510,53 +14648,6 @@ public class StaticEndpointBuilders {
             String componentName,
             String path) {
         return org.apache.camel.builder.endpoint.dsl.WebhookEndpointBuilderFactory.endpointBuilder(componentName, path);
-    }
-    /**
-     * Weka (camel-weka)
-     * Perform machine learning tasks using Weka.
-     * 
-     * Category: datamining
-     * Since: 3.1
-     * Maven coordinates: org.apache.camel:camel-weka
-     * 
-     * Syntax: <code>weka:command</code>
-     * 
-     * Path parameter: command (required)
-     * The command to use.
-     * There are 7 enums and the value can be one of: filter, model, read,
-     * write, push, pop, version
-     * 
-     * @param path command
-     * @return the dsl builder
-     */
-    public static org.apache.camel.builder.endpoint.dsl.WekaEndpointBuilderFactory.WekaEndpointBuilder weka(
-            String path) {
-        return org.apache.camel.builder.endpoint.dsl.WekaEndpointBuilderFactory.endpointBuilder("weka", path);
-    }
-    /**
-     * Weka (camel-weka)
-     * Perform machine learning tasks using Weka.
-     * 
-     * Category: datamining
-     * Since: 3.1
-     * Maven coordinates: org.apache.camel:camel-weka
-     * 
-     * Syntax: <code>weka:command</code>
-     * 
-     * Path parameter: command (required)
-     * The command to use.
-     * There are 7 enums and the value can be one of: filter, model, read,
-     * write, push, pop, version
-     * 
-     * @param componentName to use a custom component name for the endpoint
-     * instead of the default name
-     * @param path command
-     * @return the dsl builder
-     */
-    public static org.apache.camel.builder.endpoint.dsl.WekaEndpointBuilderFactory.WekaEndpointBuilder weka(
-            String componentName,
-            String path) {
-        return org.apache.camel.builder.endpoint.dsl.WekaEndpointBuilderFactory.endpointBuilder(componentName, path);
     }
     /**
      * WhatsApp (camel-whatsapp)
@@ -14660,7 +14751,7 @@ public class StaticEndpointBuilders {
      * Workday (camel-workday)
      * Detect and parse documents using Workday.
      * 
-     * Category: cloud,api,hcm
+     * Category: cloud,api,saas
      * Since: 3.1
      * Maven coordinates: org.apache.camel:camel-workday
      * 
@@ -14684,7 +14775,7 @@ public class StaticEndpointBuilders {
      * Workday (camel-workday)
      * Detect and parse documents using Workday.
      * 
-     * Category: cloud,api,hcm
+     * Category: cloud,api,saas
      * Since: 3.1
      * Maven coordinates: org.apache.camel:camel-workday
      * 
@@ -14711,7 +14802,7 @@ public class StaticEndpointBuilders {
      * XChange (camel-xchange)
      * Access market data and trade on Bitcoin and Altcoin exchanges.
      * 
-     * Category: bitcoin,blockchain
+     * Category: blockchain
      * Since: 2.21
      * Maven coordinates: org.apache.camel:camel-xchange
      * 
@@ -14731,7 +14822,7 @@ public class StaticEndpointBuilders {
      * XChange (camel-xchange)
      * Access market data and trade on Bitcoin and Altcoin exchanges.
      * 
-     * Category: bitcoin,blockchain
+     * Category: blockchain
      * Since: 2.21
      * Maven coordinates: org.apache.camel:camel-xchange
      * 
@@ -15104,7 +15195,7 @@ public class StaticEndpointBuilders {
      * Zeebe component which does integrage with Camunda Zeebe to interact with
      * the API.
      * 
-     * Category: process
+     * Category: workflow,saas
      * Since: 3.21
      * Maven coordinates: org.apache.camel:camel-zeebe
      * 
@@ -15128,7 +15219,7 @@ public class StaticEndpointBuilders {
      * Zeebe component which does integrage with Camunda Zeebe to interact with
      * the API.
      * 
-     * Category: process
+     * Category: workflow,saas
      * Since: 3.21
      * Maven coordinates: org.apache.camel:camel-zeebe
      * 
@@ -15154,7 +15245,7 @@ public class StaticEndpointBuilders {
      * Zendesk (camel-zendesk)
      * Manage Zendesk tickets, users, organizations, etc.
      * 
-     * Category: cloud,api,support
+     * Category: cloud,api,saas
      * Since: 2.19
      * Maven coordinates: org.apache.camel:camel-zendesk
      * 
@@ -15162,14 +15253,15 @@ public class StaticEndpointBuilders {
      * 
      * Path parameter: methodName (required)
      * What operation to use
-     * There are 355 enums and the value can be one of:
+     * There are 371 enums and the value can be one of:
      * ADD_TAG_TO_ORGANISATIONS, ADD_TAG_TO_TICKET, ADD_TAG_TO_TOPICS,
      * ASSOCIATE_ATTACHMENTS_TO_ARTICLE, CHANGE_USER_PASSWORD, CREATE_ARTICLE,
      * CREATE_ARTICLE_1, CREATE_ARTICLE_TRANSLATION, CREATE_AUTOMATION,
      * CREATE_CATEGORY, CREATE_CATEGORY_TRANSLATION, CREATE_COMMENT,
-     * CREATE_DYNAMIC_CONTENT_ITEM, CREATE_DYNAMIC_CONTENT_ITEM_VARIANT,
-     * CREATE_FORUM, CREATE_GROUP, CREATE_GROUP_MEMBERSHIP,
-     * CREATE_GROUP_MEMBERSHIP_1, CREATE_MACRO, CREATE_OR_UPDATE_USER,
+     * CREATE_CONTENT_TAG, CREATE_DYNAMIC_CONTENT_ITEM,
+     * CREATE_DYNAMIC_CONTENT_ITEM_VARIANT, CREATE_FORUM, CREATE_GROUP,
+     * CREATE_GROUP_MEMBERSHIP, CREATE_GROUP_MEMBERSHIP_1, CREATE_MACRO,
+     * CREATE_OR_UPDATE_ORGANIZATION, CREATE_OR_UPDATE_USER,
      * CREATE_OR_UPDATE_USERS, CREATE_OR_UPDATE_USERS_1,
      * CREATE_OR_UPDATE_USERS_ASYNC, CREATE_ORGANIZATION,
      * CREATE_ORGANIZATION_MEMBERSHIP, CREATE_ORGANIZATION_MEMBERSHIP_1,
@@ -15187,22 +15279,22 @@ public class StaticEndpointBuilders {
      * CREATE_USERS_1, CREATE_USERS_ASYNC, DELETE_ARTICLE,
      * DELETE_ARTICLE_ATTACHMENT, DELETE_ARTICLE_ATTACHMENT_1,
      * DELETE_ATTACHMENT, DELETE_ATTACHMENT_1, DELETE_AUTOMATION,
-     * DELETE_CATEGORY, DELETE_DYNAMIC_CONTENT_ITEM,
+     * DELETE_CATEGORY, DELETE_CONTENT_TAG, DELETE_DYNAMIC_CONTENT_ITEM,
      * DELETE_DYNAMIC_CONTENT_ITEM_VARIANT, DELETE_FORUM, DELETE_GROUP,
      * DELETE_GROUP_1, DELETE_GROUP_MEMBERSHIP, DELETE_GROUP_MEMBERSHIP_1,
      * DELETE_GROUP_MEMBERSHIP_2, DELETE_GROUP_MEMBERSHIP_3,
      * DELETE_ORGANIZATION, DELETE_ORGANIZATION_1,
      * DELETE_ORGANIZATION_MEMBERSHIP, DELETE_ORGANIZATION_MEMBERSHIP_1,
      * DELETE_ORGANIZATION_MEMBERSHIP_2, DELETE_ORGANIZATION_MEMBERSHIPS,
-     * DELETE_PERMISSION_GROUP, DELETE_PERMISSION_GROUP_1, DELETE_SECTION,
-     * DELETE_SUSPENDED_TICKET, DELETE_SUSPENDED_TICKET_1, DELETE_TARGET,
-     * DELETE_TICKET, DELETE_TICKET_1, DELETE_TICKET_FIELD,
+     * DELETE_ORGANIZATIONS, DELETE_PERMISSION_GROUP, DELETE_PERMISSION_GROUP_1,
+     * DELETE_SECTION, DELETE_SUSPENDED_TICKET, DELETE_SUSPENDED_TICKET_1,
+     * DELETE_TARGET, DELETE_TICKET, DELETE_TICKET_1, DELETE_TICKET_FIELD,
      * DELETE_TICKET_FIELD_1, DELETE_TICKET_FORM, DELETE_TICKET_FORM_1,
      * DELETE_TICKETS, DELETE_TOPIC, DELETE_TRANSLATION, DELETE_TRANSLATION_1,
      * DELETE_TRIGGER, DELETE_UPLOAD, DELETE_UPLOAD_1, DELETE_USER,
      * DELETE_USER_1, DELETE_USER_IDENTITY, DELETE_USER_IDENTITY_1,
      * DELETE_USER_IDENTITY_2, DELETE_USER_SEGMENT, DELETE_USER_SEGMENT_1,
-     * GET_ACTIVE_TRIGGERS, GET_ARTICLE, GET_ARTICLE_FROM_SEARCH,
+     * DELETE_USERS, GET_ACTIVE_TRIGGERS, GET_ARTICLE, GET_ARTICLE_FROM_SEARCH,
      * GET_ARTICLE_FROM_SEARCH_1, GET_ARTICLE_SUBSCRIPTIONS,
      * GET_ARTICLE_SUBSCRIPTIONS_1, GET_ARTICLE_TRANSLATIONS, GET_ARTICLES,
      * GET_ARTICLES_1, GET_ARTICLES_2, GET_ARTICLES_3,
@@ -15214,7 +15306,8 @@ public class StaticEndpointBuilders {
      * GET_AUTHENTICATED_USER, GET_AUTO_COMPLETE_ORGANIZATIONS, GET_AUTOMATION,
      * GET_AUTOMATIONS, GET_BRANDS, GET_CC_REQUESTS, GET_CATEGORIES,
      * GET_CATEGORY, GET_CATEGORY_TRANSLATIONS, GET_CCD_TICKETS_COUNT_FOR_USER,
-     * GET_COMPLIANCE_DELETION_STATUSES, GET_CURRENT_USER,
+     * GET_COMPLIANCE_DELETION_STATUSES, GET_CONTENT_TAG, GET_CONTENT_TAGS,
+     * GET_CONTENT_TAGS_1, GET_CONTENT_TAGS_2, GET_CURRENT_USER,
      * GET_CUSTOM_AGENT_ROLES, GET_DELETED_TICKETS, GET_DELETED_TICKETS_1,
      * GET_DYNAMIC_CONTENT_ITEM, GET_DYNAMIC_CONTENT_ITEM_VARIANT,
      * GET_DYNAMIC_CONTENT_ITEM_VARIANTS, GET_DYNAMIC_CONTENT_ITEMS, GET_FORUM,
@@ -15249,17 +15342,18 @@ public class StaticEndpointBuilders {
      * GET_TICKETS_BY_EXTERNAL_ID, GET_TICKETS_BY_EXTERNAL_ID_1,
      * GET_TICKETS_COUNT, GET_TICKETS_COUNT_FOR_ORGANIZATION,
      * GET_TICKETS_FROM_SEARCH, GET_TICKETS_INCREMENTALLY,
-     * GET_TICKETS_INCREMENTALLY_1, GET_TOPIC, GET_TOPICS, GET_TOPICS_1,
-     * GET_TOPICS_2, GET_TOPICS_3, GET_TOPICS_BY_USER, GET_TRIGGER,
-     * GET_TRIGGERS, GET_TRIGGERS_1, GET_TWITTER_MONITORS, GET_USER,
-     * GET_USER_CCD_TICKETS, GET_USER_FIELDS, GET_USER_IDENTITIES,
+     * GET_TICKETS_INCREMENTALLY_1, GET_TIME_ZONES, GET_TOPIC, GET_TOPICS,
+     * GET_TOPICS_1, GET_TOPICS_2, GET_TOPICS_3, GET_TOPICS_BY_USER,
+     * GET_TRIGGER, GET_TRIGGERS, GET_TRIGGERS_1, GET_TWITTER_MONITORS,
+     * GET_USER, GET_USER_CCD_TICKETS, GET_USER_FIELDS, GET_USER_IDENTITIES,
      * GET_USER_IDENTITIES_1, GET_USER_IDENTITY, GET_USER_IDENTITY_1,
      * GET_USER_IDENTITY_2, GET_USER_RELATED_INFO, GET_USER_REQUESTED_TICKETS,
      * GET_USER_REQUESTS, GET_USER_REQUESTS_1, GET_USER_SEGMENT,
      * GET_USER_SEGMENTS, GET_USER_SEGMENTS_1, GET_USER_SEGMENTS_APPLICABLE,
      * GET_USER_SUBSCRIPTIONS, GET_USER_SUBSCRIPTIONS_1, GET_USERS, GET_USERS_1,
-     * GET_USERS_BY_EXTERNAL_IDS, GET_USERS_BY_ROLE, GET_USERS_INCREMENTALLY,
-     * GET_VIEW, GET_VIEWS, IMPORT_TICKET, IMPORT_TOPIC,
+     * GET_USERS_BY_EXTERNAL_IDS, GET_USERS_BY_EXTERNAL_IDS_1,
+     * GET_USERS_BY_ROLE, GET_USERS_INCREMENTALLY, GET_VIEW, GET_VIEWS,
+     * IMPORT_TICKET, IMPORT_TOPIC, LIST_HELP_CENTER_LOCALES,
      * LOOKUP_ORGANIZATIONS_BY_EXTERNAL_ID, LOOKUP_USER_BY_EMAIL,
      * LOOKUP_USER_BY_EXTERNAL_ID, MACROS_SHOW_CHANGES_TO_TICKET,
      * MACROS_SHOW_TICKET_AFTER_CHANGES, MAKE_PRIVATE_TICKET_AUDIT,
@@ -15275,10 +15369,12 @@ public class StaticEndpointBuilders {
      * SEARCH_TRIGGERS_1, SET_GROUP_MEMBERSHIP_AS_DEFAULT,
      * SET_ORGANIZATION_MEMBERSHIP_AS_DEFAULT, SET_TAG_ON_ORGANISATIONS,
      * SET_TAG_ON_TICKET, SET_TAG_ON_TOPICS, SET_USER_PRIMARY_IDENTITY,
-     * SET_USER_PRIMARY_IDENTITY_1, SET_USER_PRIMARY_IDENTITY_2, SUSPEND_USER,
-     * TRUST_TICKET_AUDIT, TRUST_TICKET_AUDIT_1, TRUST_TICKET_AUDIT_2,
-     * UNSUSPEND_USER, UPDATE_ARTICLE, UPDATE_ARTICLE_TRANSLATION,
-     * UPDATE_AUTOMATION, UPDATE_CATEGORY, UPDATE_CATEGORY_TRANSLATION,
+     * SET_USER_PRIMARY_IDENTITY_1, SET_USER_PRIMARY_IDENTITY_2,
+     * SHOW_ARTICLE_TRANSLATION, SHOW_CATEGORY_TRANSLATION,
+     * SHOW_SECTION_TRANSLATION, SUSPEND_USER, TRUST_TICKET_AUDIT,
+     * TRUST_TICKET_AUDIT_1, TRUST_TICKET_AUDIT_2, UNSUSPEND_USER,
+     * UPDATE_ARTICLE, UPDATE_ARTICLE_TRANSLATION, UPDATE_AUTOMATION,
+     * UPDATE_CATEGORY, UPDATE_CATEGORY_TRANSLATION, UPDATE_CONTENT_TAG,
      * UPDATE_DYNAMIC_CONTENT_ITEM, UPDATE_DYNAMIC_CONTENT_ITEM_VARIANT,
      * UPDATE_FORUM, UPDATE_GROUP, UPDATE_INSTALLATION, UPDATE_MACRO,
      * UPDATE_ORGANIZATION, UPDATE_ORGANIZATIONS, UPDATE_ORGANIZATIONS_1,
@@ -15301,7 +15397,7 @@ public class StaticEndpointBuilders {
      * Zendesk (camel-zendesk)
      * Manage Zendesk tickets, users, organizations, etc.
      * 
-     * Category: cloud,api,support
+     * Category: cloud,api,saas
      * Since: 2.19
      * Maven coordinates: org.apache.camel:camel-zendesk
      * 
@@ -15309,14 +15405,15 @@ public class StaticEndpointBuilders {
      * 
      * Path parameter: methodName (required)
      * What operation to use
-     * There are 355 enums and the value can be one of:
+     * There are 371 enums and the value can be one of:
      * ADD_TAG_TO_ORGANISATIONS, ADD_TAG_TO_TICKET, ADD_TAG_TO_TOPICS,
      * ASSOCIATE_ATTACHMENTS_TO_ARTICLE, CHANGE_USER_PASSWORD, CREATE_ARTICLE,
      * CREATE_ARTICLE_1, CREATE_ARTICLE_TRANSLATION, CREATE_AUTOMATION,
      * CREATE_CATEGORY, CREATE_CATEGORY_TRANSLATION, CREATE_COMMENT,
-     * CREATE_DYNAMIC_CONTENT_ITEM, CREATE_DYNAMIC_CONTENT_ITEM_VARIANT,
-     * CREATE_FORUM, CREATE_GROUP, CREATE_GROUP_MEMBERSHIP,
-     * CREATE_GROUP_MEMBERSHIP_1, CREATE_MACRO, CREATE_OR_UPDATE_USER,
+     * CREATE_CONTENT_TAG, CREATE_DYNAMIC_CONTENT_ITEM,
+     * CREATE_DYNAMIC_CONTENT_ITEM_VARIANT, CREATE_FORUM, CREATE_GROUP,
+     * CREATE_GROUP_MEMBERSHIP, CREATE_GROUP_MEMBERSHIP_1, CREATE_MACRO,
+     * CREATE_OR_UPDATE_ORGANIZATION, CREATE_OR_UPDATE_USER,
      * CREATE_OR_UPDATE_USERS, CREATE_OR_UPDATE_USERS_1,
      * CREATE_OR_UPDATE_USERS_ASYNC, CREATE_ORGANIZATION,
      * CREATE_ORGANIZATION_MEMBERSHIP, CREATE_ORGANIZATION_MEMBERSHIP_1,
@@ -15334,22 +15431,22 @@ public class StaticEndpointBuilders {
      * CREATE_USERS_1, CREATE_USERS_ASYNC, DELETE_ARTICLE,
      * DELETE_ARTICLE_ATTACHMENT, DELETE_ARTICLE_ATTACHMENT_1,
      * DELETE_ATTACHMENT, DELETE_ATTACHMENT_1, DELETE_AUTOMATION,
-     * DELETE_CATEGORY, DELETE_DYNAMIC_CONTENT_ITEM,
+     * DELETE_CATEGORY, DELETE_CONTENT_TAG, DELETE_DYNAMIC_CONTENT_ITEM,
      * DELETE_DYNAMIC_CONTENT_ITEM_VARIANT, DELETE_FORUM, DELETE_GROUP,
      * DELETE_GROUP_1, DELETE_GROUP_MEMBERSHIP, DELETE_GROUP_MEMBERSHIP_1,
      * DELETE_GROUP_MEMBERSHIP_2, DELETE_GROUP_MEMBERSHIP_3,
      * DELETE_ORGANIZATION, DELETE_ORGANIZATION_1,
      * DELETE_ORGANIZATION_MEMBERSHIP, DELETE_ORGANIZATION_MEMBERSHIP_1,
      * DELETE_ORGANIZATION_MEMBERSHIP_2, DELETE_ORGANIZATION_MEMBERSHIPS,
-     * DELETE_PERMISSION_GROUP, DELETE_PERMISSION_GROUP_1, DELETE_SECTION,
-     * DELETE_SUSPENDED_TICKET, DELETE_SUSPENDED_TICKET_1, DELETE_TARGET,
-     * DELETE_TICKET, DELETE_TICKET_1, DELETE_TICKET_FIELD,
+     * DELETE_ORGANIZATIONS, DELETE_PERMISSION_GROUP, DELETE_PERMISSION_GROUP_1,
+     * DELETE_SECTION, DELETE_SUSPENDED_TICKET, DELETE_SUSPENDED_TICKET_1,
+     * DELETE_TARGET, DELETE_TICKET, DELETE_TICKET_1, DELETE_TICKET_FIELD,
      * DELETE_TICKET_FIELD_1, DELETE_TICKET_FORM, DELETE_TICKET_FORM_1,
      * DELETE_TICKETS, DELETE_TOPIC, DELETE_TRANSLATION, DELETE_TRANSLATION_1,
      * DELETE_TRIGGER, DELETE_UPLOAD, DELETE_UPLOAD_1, DELETE_USER,
      * DELETE_USER_1, DELETE_USER_IDENTITY, DELETE_USER_IDENTITY_1,
      * DELETE_USER_IDENTITY_2, DELETE_USER_SEGMENT, DELETE_USER_SEGMENT_1,
-     * GET_ACTIVE_TRIGGERS, GET_ARTICLE, GET_ARTICLE_FROM_SEARCH,
+     * DELETE_USERS, GET_ACTIVE_TRIGGERS, GET_ARTICLE, GET_ARTICLE_FROM_SEARCH,
      * GET_ARTICLE_FROM_SEARCH_1, GET_ARTICLE_SUBSCRIPTIONS,
      * GET_ARTICLE_SUBSCRIPTIONS_1, GET_ARTICLE_TRANSLATIONS, GET_ARTICLES,
      * GET_ARTICLES_1, GET_ARTICLES_2, GET_ARTICLES_3,
@@ -15361,7 +15458,8 @@ public class StaticEndpointBuilders {
      * GET_AUTHENTICATED_USER, GET_AUTO_COMPLETE_ORGANIZATIONS, GET_AUTOMATION,
      * GET_AUTOMATIONS, GET_BRANDS, GET_CC_REQUESTS, GET_CATEGORIES,
      * GET_CATEGORY, GET_CATEGORY_TRANSLATIONS, GET_CCD_TICKETS_COUNT_FOR_USER,
-     * GET_COMPLIANCE_DELETION_STATUSES, GET_CURRENT_USER,
+     * GET_COMPLIANCE_DELETION_STATUSES, GET_CONTENT_TAG, GET_CONTENT_TAGS,
+     * GET_CONTENT_TAGS_1, GET_CONTENT_TAGS_2, GET_CURRENT_USER,
      * GET_CUSTOM_AGENT_ROLES, GET_DELETED_TICKETS, GET_DELETED_TICKETS_1,
      * GET_DYNAMIC_CONTENT_ITEM, GET_DYNAMIC_CONTENT_ITEM_VARIANT,
      * GET_DYNAMIC_CONTENT_ITEM_VARIANTS, GET_DYNAMIC_CONTENT_ITEMS, GET_FORUM,
@@ -15396,17 +15494,18 @@ public class StaticEndpointBuilders {
      * GET_TICKETS_BY_EXTERNAL_ID, GET_TICKETS_BY_EXTERNAL_ID_1,
      * GET_TICKETS_COUNT, GET_TICKETS_COUNT_FOR_ORGANIZATION,
      * GET_TICKETS_FROM_SEARCH, GET_TICKETS_INCREMENTALLY,
-     * GET_TICKETS_INCREMENTALLY_1, GET_TOPIC, GET_TOPICS, GET_TOPICS_1,
-     * GET_TOPICS_2, GET_TOPICS_3, GET_TOPICS_BY_USER, GET_TRIGGER,
-     * GET_TRIGGERS, GET_TRIGGERS_1, GET_TWITTER_MONITORS, GET_USER,
-     * GET_USER_CCD_TICKETS, GET_USER_FIELDS, GET_USER_IDENTITIES,
+     * GET_TICKETS_INCREMENTALLY_1, GET_TIME_ZONES, GET_TOPIC, GET_TOPICS,
+     * GET_TOPICS_1, GET_TOPICS_2, GET_TOPICS_3, GET_TOPICS_BY_USER,
+     * GET_TRIGGER, GET_TRIGGERS, GET_TRIGGERS_1, GET_TWITTER_MONITORS,
+     * GET_USER, GET_USER_CCD_TICKETS, GET_USER_FIELDS, GET_USER_IDENTITIES,
      * GET_USER_IDENTITIES_1, GET_USER_IDENTITY, GET_USER_IDENTITY_1,
      * GET_USER_IDENTITY_2, GET_USER_RELATED_INFO, GET_USER_REQUESTED_TICKETS,
      * GET_USER_REQUESTS, GET_USER_REQUESTS_1, GET_USER_SEGMENT,
      * GET_USER_SEGMENTS, GET_USER_SEGMENTS_1, GET_USER_SEGMENTS_APPLICABLE,
      * GET_USER_SUBSCRIPTIONS, GET_USER_SUBSCRIPTIONS_1, GET_USERS, GET_USERS_1,
-     * GET_USERS_BY_EXTERNAL_IDS, GET_USERS_BY_ROLE, GET_USERS_INCREMENTALLY,
-     * GET_VIEW, GET_VIEWS, IMPORT_TICKET, IMPORT_TOPIC,
+     * GET_USERS_BY_EXTERNAL_IDS, GET_USERS_BY_EXTERNAL_IDS_1,
+     * GET_USERS_BY_ROLE, GET_USERS_INCREMENTALLY, GET_VIEW, GET_VIEWS,
+     * IMPORT_TICKET, IMPORT_TOPIC, LIST_HELP_CENTER_LOCALES,
      * LOOKUP_ORGANIZATIONS_BY_EXTERNAL_ID, LOOKUP_USER_BY_EMAIL,
      * LOOKUP_USER_BY_EXTERNAL_ID, MACROS_SHOW_CHANGES_TO_TICKET,
      * MACROS_SHOW_TICKET_AFTER_CHANGES, MAKE_PRIVATE_TICKET_AUDIT,
@@ -15422,10 +15521,12 @@ public class StaticEndpointBuilders {
      * SEARCH_TRIGGERS_1, SET_GROUP_MEMBERSHIP_AS_DEFAULT,
      * SET_ORGANIZATION_MEMBERSHIP_AS_DEFAULT, SET_TAG_ON_ORGANISATIONS,
      * SET_TAG_ON_TICKET, SET_TAG_ON_TOPICS, SET_USER_PRIMARY_IDENTITY,
-     * SET_USER_PRIMARY_IDENTITY_1, SET_USER_PRIMARY_IDENTITY_2, SUSPEND_USER,
-     * TRUST_TICKET_AUDIT, TRUST_TICKET_AUDIT_1, TRUST_TICKET_AUDIT_2,
-     * UNSUSPEND_USER, UPDATE_ARTICLE, UPDATE_ARTICLE_TRANSLATION,
-     * UPDATE_AUTOMATION, UPDATE_CATEGORY, UPDATE_CATEGORY_TRANSLATION,
+     * SET_USER_PRIMARY_IDENTITY_1, SET_USER_PRIMARY_IDENTITY_2,
+     * SHOW_ARTICLE_TRANSLATION, SHOW_CATEGORY_TRANSLATION,
+     * SHOW_SECTION_TRANSLATION, SUSPEND_USER, TRUST_TICKET_AUDIT,
+     * TRUST_TICKET_AUDIT_1, TRUST_TICKET_AUDIT_2, UNSUSPEND_USER,
+     * UPDATE_ARTICLE, UPDATE_ARTICLE_TRANSLATION, UPDATE_AUTOMATION,
+     * UPDATE_CATEGORY, UPDATE_CATEGORY_TRANSLATION, UPDATE_CONTENT_TAG,
      * UPDATE_DYNAMIC_CONTENT_ITEM, UPDATE_DYNAMIC_CONTENT_ITEM_VARIANT,
      * UPDATE_FORUM, UPDATE_GROUP, UPDATE_INSTALLATION, UPDATE_MACRO,
      * UPDATE_ORGANIZATION, UPDATE_ORGANIZATIONS, UPDATE_ORGANIZATIONS_1,
@@ -15548,4 +15649,3 @@ public class StaticEndpointBuilders {
         return org.apache.camel.builder.endpoint.dsl.ZooKeeperMasterEndpointBuilderFactory.endpointBuilder(componentName, path);
     }
 }
-//CHECKSTYLE:ON

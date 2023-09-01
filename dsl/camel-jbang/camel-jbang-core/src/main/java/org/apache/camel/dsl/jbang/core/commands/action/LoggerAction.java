@@ -27,6 +27,8 @@ import com.github.freva.asciitable.Column;
 import com.github.freva.asciitable.HorizontalAlign;
 import com.github.freva.asciitable.OverflowBehaviour;
 import org.apache.camel.dsl.jbang.core.commands.CamelJBangMain;
+import org.apache.camel.dsl.jbang.core.common.LoggingLevelCompletionCandidates;
+import org.apache.camel.dsl.jbang.core.common.PidNameAgeCompletionCandidates;
 import org.apache.camel.dsl.jbang.core.common.ProcessHelper;
 import org.apache.camel.util.IOHelper;
 import org.apache.camel.util.TimeUtils;
@@ -34,10 +36,10 @@ import org.apache.camel.util.json.JsonObject;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "logger",
-                     description = "List or change logging levels")
+                     description = "List or change logging levels", sortOptions = false)
 public class LoggerAction extends ActionBaseCommand {
 
-    @CommandLine.Option(names = { "--sort" },
+    @CommandLine.Option(names = { "--sort" }, completionCandidates = PidNameAgeCompletionCandidates.class,
                         description = "Sort by pid, name or age", defaultValue = "pid")
     String sort;
 
@@ -48,7 +50,7 @@ public class LoggerAction extends ActionBaseCommand {
                         description = "To select all running Camel integrations")
     boolean all;
 
-    @CommandLine.Option(names = { "--level", "--logging-level" },
+    @CommandLine.Option(names = { "--logging-level" }, completionCandidates = LoggingLevelCompletionCandidates.class,
                         description = "To change logging level")
     String loggingLevel;
 
@@ -61,7 +63,7 @@ public class LoggerAction extends ActionBaseCommand {
     }
 
     @Override
-    public Integer call() throws Exception {
+    public Integer doCall() throws Exception {
         if (loggingLevel == null) {
             return callList();
         }
@@ -74,15 +76,12 @@ public class LoggerAction extends ActionBaseCommand {
     }
 
     protected Integer callChangeLoggingLevel() throws Exception {
-        // configure logging first
-        configureLoggingOff();
-
         List<Long> pids = findPids(name);
 
         for (long pid : pids) {
             JsonObject root = new JsonObject();
             root.put("action", "logger");
-            File f = getActionFile("" + pid);
+            File f = getActionFile(Long.toString(pid));
             root.put("command", "set-logging-level");
             root.put("logger-name", logger);
             root.put("logging-level", loggingLevel);
@@ -102,7 +101,7 @@ public class LoggerAction extends ActionBaseCommand {
                     JsonObject root = loadStatus(ph.pid());
                     if (root != null) {
                         Row row = new Row();
-                        row.pid = "" + ph.pid();
+                        row.pid = Long.toString(ph.pid());
                         row.uptime = extractSince(ph);
                         row.ago = TimeUtils.printSince(row.uptime);
                         JsonObject context = (JsonObject) root.get("context");

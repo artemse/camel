@@ -75,6 +75,23 @@ public interface SchedulerComponentBuilderFactory {
             return this;
         }
         /**
+         * Whether to include metadata in the exchange such as fired time, timer
+         * name, timer count etc.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: false
+         * Group: consumer
+         * 
+         * @param includeMetadata the value to set
+         * @return the dsl builder
+         */
+        default SchedulerComponentBuilder includeMetadata(
+                boolean includeMetadata) {
+            doSetProperty("includeMetadata", includeMetadata);
+            return this;
+        }
+        /**
          * Whether autowiring is enabled. This is used for automatic autowiring
          * options (the option must be marked as autowired) by looking up in the
          * registry to find if there is a single instance of matching type,
@@ -93,6 +110,42 @@ public interface SchedulerComponentBuilderFactory {
         default SchedulerComponentBuilder autowiredEnabled(
                 boolean autowiredEnabled) {
             doSetProperty("autowiredEnabled", autowiredEnabled);
+            return this;
+        }
+        /**
+         * Used for enabling or disabling all consumer based health checks from
+         * this component.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: true
+         * Group: health
+         * 
+         * @param healthCheckConsumerEnabled the value to set
+         * @return the dsl builder
+         */
+        default SchedulerComponentBuilder healthCheckConsumerEnabled(
+                boolean healthCheckConsumerEnabled) {
+            doSetProperty("healthCheckConsumerEnabled", healthCheckConsumerEnabled);
+            return this;
+        }
+        /**
+         * Used for enabling or disabling all producer based health checks from
+         * this component. Notice: Camel has by default disabled all producer
+         * based health-checks. You can turn on producer checks globally by
+         * setting camel.health.producersEnabled=true.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: true
+         * Group: health
+         * 
+         * @param healthCheckProducerEnabled the value to set
+         * @return the dsl builder
+         */
+        default SchedulerComponentBuilder healthCheckProducerEnabled(
+                boolean healthCheckProducerEnabled) {
+            doSetProperty("healthCheckProducerEnabled", healthCheckProducerEnabled);
             return this;
         }
         /**
@@ -129,7 +182,10 @@ public interface SchedulerComponentBuilderFactory {
                 Object value) {
             switch (name) {
             case "bridgeErrorHandler": ((SchedulerComponent) component).setBridgeErrorHandler((boolean) value); return true;
+            case "includeMetadata": ((SchedulerComponent) component).setIncludeMetadata((boolean) value); return true;
             case "autowiredEnabled": ((SchedulerComponent) component).setAutowiredEnabled((boolean) value); return true;
+            case "healthCheckConsumerEnabled": ((SchedulerComponent) component).setHealthCheckConsumerEnabled((boolean) value); return true;
+            case "healthCheckProducerEnabled": ((SchedulerComponent) component).setHealthCheckProducerEnabled((boolean) value); return true;
             case "poolSize": ((SchedulerComponent) component).setPoolSize((int) value); return true;
             default: return false;
             }

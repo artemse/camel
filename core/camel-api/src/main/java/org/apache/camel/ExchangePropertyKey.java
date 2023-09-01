@@ -84,7 +84,6 @@ public enum ExchangePropertyKey {
         return name;
     }
 
-    // CHECKSTYLE:OFF
     public static ExchangePropertyKey asExchangePropertyKey(String name) {
         switch (name) {
             case Exchange.AGGREGATED_COMPLETED_BY:
@@ -137,8 +136,6 @@ public enum ExchangePropertyKey {
                 return EXCEPTION_HANDLED;
             case Exchange.FAILURE_ENDPOINT:
                 return FAILURE_ENDPOINT;
-            case Exchange.FAILURE_HANDLED:
-                return FAILURE_HANDLED;
             case Exchange.FAILURE_ROUTE_ID:
                 return FAILURE_ROUTE_ID;
             case Exchange.FATAL_FALLBACK_ERROR_HANDLER:
@@ -191,5 +188,4 @@ public enum ExchangePropertyKey {
                 return null;
         }
     }
-    // CHECKSTYLE:ON
 }

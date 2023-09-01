@@ -20,7 +20,6 @@ package org.apache.camel.support.resume;
 import java.util.Optional;
 
 import org.apache.camel.CamelContext;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.RuntimeCamelException;
 import org.apache.camel.resume.Cacheable;
 import org.apache.camel.resume.ResumeAdapter;
@@ -40,28 +39,27 @@ public final class AdapterHelper {
     private AdapterHelper() {
     }
 
-    public static ResumeAdapter eval(CamelContext context, ResumeAware resumeAware, ResumeStrategy resumeStrategy) {
+    public static ResumeAdapter eval(CamelContext context, ResumeAware<?> resumeAware, ResumeStrategy resumeStrategy) {
         assert context != null;
         assert resumeAware != null;
         assert resumeStrategy != null;
 
         LOG.debug("Using the factory finder to search for the resume adapter");
         final FactoryFinder factoryFinder
-                = context.adapt(ExtendedCamelContext.class).getFactoryFinder(FactoryFinder.DEFAULT_PATH);
+                = context.getCamelContextExtension().getFactoryFinder(FactoryFinder.DEFAULT_PATH);
 
         LOG.debug("Creating a new resume adapter");
         Optional<ResumeAdapter> adapterOptional
                 = factoryFinder.newInstance(resumeAware.adapterFactoryService(), ResumeAdapter.class);
 
-        if (!adapterOptional.isPresent()) {
+        if (adapterOptional.isEmpty()) {
             throw new RuntimeCamelException("Cannot find a resume adapter class in the consumer classpath or in the registry");
         }
 
         final ResumeAdapter resumeAdapter = adapterOptional.get();
         LOG.debug("Using the acquired resume adapter: {}", resumeAdapter.getClass().getName());
 
-        if (resumeAdapter instanceof Cacheable) {
-            final Cacheable cacheableAdapter = (Cacheable) resumeAdapter;
+        if (resumeAdapter instanceof Cacheable cacheableAdapter) {
             final ResumeStrategyConfiguration resumeStrategyConfiguration = resumeStrategy.getResumeStrategyConfiguration();
 
             final ResumeCache<?> resumeCache = resumeStrategyConfiguration.getResumeCache();

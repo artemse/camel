@@ -63,16 +63,16 @@ public class KafkaProducerTest {
 
     private static final String SOME_INDIVIDUAL_HEADER = "someIndividualHeader";
 
-    private KafkaProducer producer;
-    private KafkaEndpoint endpoint;
-    private KafkaEndpoint fromEndpoint;
+    private final KafkaProducer producer;
+    private final KafkaEndpoint endpoint;
+    private final KafkaEndpoint fromEndpoint;
 
-    private TypeConverter converter = Mockito.mock(TypeConverter.class);
-    private CamelContext context = Mockito.mock(CamelContext.class);
-    private Exchange exchange = Mockito.mock(Exchange.class);
-    private ExtendedCamelContext camelContext = Mockito.mock(ExtendedCamelContext.class);
-    private Message in = new DefaultMessage(camelContext);
-    private AsyncCallback callback = Mockito.mock(AsyncCallback.class);
+    private final TypeConverter converter = Mockito.mock(TypeConverter.class);
+    private final CamelContext context = Mockito.mock(DefaultCamelContext.class);
+    private final Exchange exchange = Mockito.mock(Exchange.class);
+    private final ExtendedCamelContext ecc = Mockito.mock(ExtendedCamelContext.class);
+    private final Message in = new DefaultMessage(context);
+    private final AsyncCallback callback = Mockito.mock(AsyncCallback.class);
 
     @SuppressWarnings({ "unchecked" })
     public KafkaProducerTest() throws Exception {
@@ -100,10 +100,10 @@ public class KafkaProducerTest {
         Mockito.when(exchange.getContext()).thenReturn(context);
         Mockito.when(context.getTypeConverter()).thenReturn(converter);
         Mockito.when(converter.tryConvertTo(String.class, exchange, null)).thenReturn(null);
-        Mockito.when(camelContext.adapt(ExtendedCamelContext.class)).thenReturn(camelContext);
-        Mockito.when(camelContext.adapt(ExtendedCamelContext.class).getHeadersMapFactory())
+        Mockito.when(context.getCamelContextExtension()).thenReturn(ecc);
+        Mockito.when(ecc.getHeadersMapFactory())
                 .thenReturn(new DefaultHeadersMapFactory());
-        Mockito.when(camelContext.getTypeConverter()).thenReturn(converter);
+        Mockito.when(context.getTypeConverter()).thenReturn(converter);
 
         producer.setKafkaProducer(kp);
         producer.setWorkerPool(Executors.newFixedThreadPool(1));
@@ -133,7 +133,7 @@ public class KafkaProducerTest {
     @SuppressWarnings({ "unchecked" })
     public void processSendsMessageWithException() {
         endpoint.getConfiguration().setTopic("sometopic");
-        // setup the exception here
+        // set up the exception here
         org.apache.kafka.clients.producer.Producer kp = producer.getKafkaProducer();
         Mockito.when(kp.send(any(ProducerRecord.class))).thenThrow(new ApiException());
         Mockito.when(exchange.getIn()).thenReturn(in);
@@ -167,7 +167,7 @@ public class KafkaProducerTest {
         Mockito.when(exchange.getIn()).thenReturn(in);
         Mockito.when(exchange.getMessage()).thenReturn(in);
 
-        // setup the exception here
+        // set up the exception here
         org.apache.kafka.clients.producer.Producer kp = producer.getKafkaProducer();
         Mockito.when(kp.send(any(ProducerRecord.class), any(Callback.class))).thenThrow(new ApiException());
 
@@ -227,7 +227,7 @@ public class KafkaProducerTest {
         in.setHeader(KafkaConstants.KEY, "someKey");
 
         // test using a string value instead of long
-        String time = "" + LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        String time = String.valueOf(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
         in.setHeader(KafkaConstants.OVERRIDE_TIMESTAMP, time);
 
         producer.process(exchange);
@@ -576,7 +576,7 @@ public class KafkaProducerTest {
     }
 
     private Exchange aggregateExchanges(final List<Exchange> exchangesToAggregate, final AggregationStrategy strategy) {
-        Exchange exchangeHolder = new DefaultExchange(camelContext);
+        Exchange exchangeHolder = new DefaultExchange(context);
 
         for (final Exchange innerExchange : exchangesToAggregate) {
             exchangeHolder = strategy.aggregate(exchangeHolder, innerExchange);
@@ -592,7 +592,7 @@ public class KafkaProducerTest {
 
         int index = 1;
         for (String topic : topics) {
-            final Exchange innerExchange = new DefaultExchange(camelContext);
+            final Exchange innerExchange = new DefaultExchange(context);
             innerExchange.setExchangeId("exchange-" + index);
             final Message msg = innerExchange.getIn();
             msg.setMessageId("message-" + index);

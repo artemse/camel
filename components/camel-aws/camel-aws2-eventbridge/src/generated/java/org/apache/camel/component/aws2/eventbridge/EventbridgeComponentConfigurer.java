@@ -37,6 +37,10 @@ public class EventbridgeComponentConfigurer extends PropertyConfigurerSupport im
         case "eventPatternFile": getOrCreateConfiguration(target).setEventPatternFile(property(camelContext, java.lang.String.class, value)); return true;
         case "eventbridgeclient":
         case "eventbridgeClient": getOrCreateConfiguration(target).setEventbridgeClient(property(camelContext, software.amazon.awssdk.services.eventbridge.EventBridgeClient.class, value)); return true;
+        case "healthcheckconsumerenabled":
+        case "healthCheckConsumerEnabled": target.setHealthCheckConsumerEnabled(property(camelContext, boolean.class, value)); return true;
+        case "healthcheckproducerenabled":
+        case "healthCheckProducerEnabled": target.setHealthCheckProducerEnabled(property(camelContext, boolean.class, value)); return true;
         case "lazystartproducer":
         case "lazyStartProducer": target.setLazyStartProducer(property(camelContext, boolean.class, value)); return true;
         case "operation": getOrCreateConfiguration(target).setOperation(property(camelContext, org.apache.camel.component.aws2.eventbridge.EventbridgeOperations.class, value)); return true;
@@ -44,6 +48,8 @@ public class EventbridgeComponentConfigurer extends PropertyConfigurerSupport im
         case "overrideEndpoint": getOrCreateConfiguration(target).setOverrideEndpoint(property(camelContext, boolean.class, value)); return true;
         case "pojorequest":
         case "pojoRequest": getOrCreateConfiguration(target).setPojoRequest(property(camelContext, boolean.class, value)); return true;
+        case "profilecredentialsname":
+        case "profileCredentialsName": getOrCreateConfiguration(target).setProfileCredentialsName(property(camelContext, java.lang.String.class, value)); return true;
         case "proxyhost":
         case "proxyHost": getOrCreateConfiguration(target).setProxyHost(property(camelContext, java.lang.String.class, value)); return true;
         case "proxyport":
@@ -59,6 +65,8 @@ public class EventbridgeComponentConfigurer extends PropertyConfigurerSupport im
         case "uriEndpointOverride": getOrCreateConfiguration(target).setUriEndpointOverride(property(camelContext, java.lang.String.class, value)); return true;
         case "usedefaultcredentialsprovider":
         case "useDefaultCredentialsProvider": getOrCreateConfiguration(target).setUseDefaultCredentialsProvider(property(camelContext, boolean.class, value)); return true;
+        case "useprofilecredentialsprovider":
+        case "useProfileCredentialsProvider": getOrCreateConfiguration(target).setUseProfileCredentialsProvider(property(camelContext, boolean.class, value)); return true;
         default: return false;
         }
     }
@@ -80,6 +88,10 @@ public class EventbridgeComponentConfigurer extends PropertyConfigurerSupport im
         case "eventPatternFile": return java.lang.String.class;
         case "eventbridgeclient":
         case "eventbridgeClient": return software.amazon.awssdk.services.eventbridge.EventBridgeClient.class;
+        case "healthcheckconsumerenabled":
+        case "healthCheckConsumerEnabled": return boolean.class;
+        case "healthcheckproducerenabled":
+        case "healthCheckProducerEnabled": return boolean.class;
         case "lazystartproducer":
         case "lazyStartProducer": return boolean.class;
         case "operation": return org.apache.camel.component.aws2.eventbridge.EventbridgeOperations.class;
@@ -87,6 +99,8 @@ public class EventbridgeComponentConfigurer extends PropertyConfigurerSupport im
         case "overrideEndpoint": return boolean.class;
         case "pojorequest":
         case "pojoRequest": return boolean.class;
+        case "profilecredentialsname":
+        case "profileCredentialsName": return java.lang.String.class;
         case "proxyhost":
         case "proxyHost": return java.lang.String.class;
         case "proxyport":
@@ -102,6 +116,8 @@ public class EventbridgeComponentConfigurer extends PropertyConfigurerSupport im
         case "uriEndpointOverride": return java.lang.String.class;
         case "usedefaultcredentialsprovider":
         case "useDefaultCredentialsProvider": return boolean.class;
+        case "useprofilecredentialsprovider":
+        case "useProfileCredentialsProvider": return boolean.class;
         default: return null;
         }
     }
@@ -119,6 +135,10 @@ public class EventbridgeComponentConfigurer extends PropertyConfigurerSupport im
         case "eventPatternFile": return getOrCreateConfiguration(target).getEventPatternFile();
         case "eventbridgeclient":
         case "eventbridgeClient": return getOrCreateConfiguration(target).getEventbridgeClient();
+        case "healthcheckconsumerenabled":
+        case "healthCheckConsumerEnabled": return target.isHealthCheckConsumerEnabled();
+        case "healthcheckproducerenabled":
+        case "healthCheckProducerEnabled": return target.isHealthCheckProducerEnabled();
         case "lazystartproducer":
         case "lazyStartProducer": return target.isLazyStartProducer();
         case "operation": return getOrCreateConfiguration(target).getOperation();
@@ -126,6 +146,8 @@ public class EventbridgeComponentConfigurer extends PropertyConfigurerSupport im
         case "overrideEndpoint": return getOrCreateConfiguration(target).isOverrideEndpoint();
         case "pojorequest":
         case "pojoRequest": return getOrCreateConfiguration(target).isPojoRequest();
+        case "profilecredentialsname":
+        case "profileCredentialsName": return getOrCreateConfiguration(target).getProfileCredentialsName();
         case "proxyhost":
         case "proxyHost": return getOrCreateConfiguration(target).getProxyHost();
         case "proxyport":
@@ -141,6 +163,8 @@ public class EventbridgeComponentConfigurer extends PropertyConfigurerSupport im
         case "uriEndpointOverride": return getOrCreateConfiguration(target).getUriEndpointOverride();
         case "usedefaultcredentialsprovider":
         case "useDefaultCredentialsProvider": return getOrCreateConfiguration(target).isUseDefaultCredentialsProvider();
+        case "useprofilecredentialsprovider":
+        case "useProfileCredentialsProvider": return getOrCreateConfiguration(target).isUseProfileCredentialsProvider();
         default: return null;
         }
     }

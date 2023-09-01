@@ -53,6 +53,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -244,6 +245,13 @@ public class SimpleTest extends LanguageTestSupport {
     }
 
     @Test
+    public void testSimpleThreadId() throws Exception {
+        long id = Thread.currentThread().getId();
+        assertExpression("${threadId}", id);
+        assertExpression("The id is ${threadId}", "The id is " + id);
+    }
+
+    @Test
     public void testSimpleThreadName() throws Exception {
         String name = Thread.currentThread().getName();
         assertExpression("${threadName}", name);
@@ -336,7 +344,7 @@ public class SimpleTest extends LanguageTestSupport {
     @Test
     public void testOGNLBodyEmptyList() throws Exception {
         Map<String, List<String>> map = new HashMap<>();
-        map.put("list", new ArrayList<String>());
+        map.put("list", new ArrayList<>());
 
         exchange.getIn().setBody(map);
 
@@ -439,12 +447,7 @@ public class SimpleTest extends LanguageTestSupport {
             fail("Should have thrown an exception");
         } catch (Exception e) {
             IndexOutOfBoundsException cause = assertIsInstanceOf(IndexOutOfBoundsException.class, e.getCause());
-            if (getJavaMajorVersion() <= 8) {
-                assertEquals(JAVA8_INDEX_OUT_OF_BOUNDS_ERROR_MSG, cause.getMessage());
-            } else {
-                assertEquals(INDEX_OUT_OF_BOUNDS_ERROR_MSG, cause.getMessage());
-            }
-
+            assertEquals(INDEX_OUT_OF_BOUNDS_ERROR_MSG, cause.getMessage());
         }
         assertExpression("${exchangeProperty.unknown[cool]}", null);
     }
@@ -463,11 +466,7 @@ public class SimpleTest extends LanguageTestSupport {
             fail("Should have thrown an exception");
         } catch (Exception e) {
             IndexOutOfBoundsException cause = assertIsInstanceOf(IndexOutOfBoundsException.class, e.getCause());
-            if (getJavaMajorVersion() <= 8) {
-                assertEquals(JAVA8_INDEX_OUT_OF_BOUNDS_ERROR_MSG, cause.getMessage());
-            } else {
-                assertEquals(INDEX_OUT_OF_BOUNDS_ERROR_MSG, cause.getMessage());
-            }
+            assertEquals(INDEX_OUT_OF_BOUNDS_ERROR_MSG, cause.getMessage());
         }
         assertExpression("${exchangeProperty.unknown[cool]}", null);
     }
@@ -648,14 +647,15 @@ public class SimpleTest extends LanguageTestSupport {
 
     @Test
     public void testDateExchangeCreated() throws Exception {
-        Object out = evaluateExpression("${date:exchangeCreated:hh:mm:ss a}", "" + exchange.getCreated());
+        Object out = evaluateExpression("${date:exchangeCreated:hh:mm:ss a}", ("" + exchange.getCreated()).getClass());
         assertNotNull(out);
     }
 
     @Test
     public void testDatePredicates() throws Exception {
         assertPredicate("${date:now} < ${date:now+60s}");
-        assertPredicate("${date:now-2s+2s} == ${date:now}");
+        assertPredicate("${date:now-5s} < ${date:now}");
+        assertPredicate("${date:now+5s} > ${date:now}");
     }
 
     @Test
@@ -960,11 +960,7 @@ public class SimpleTest extends LanguageTestSupport {
             fail("Should have thrown an exception");
         } catch (Exception e) {
             IndexOutOfBoundsException cause = assertIsInstanceOf(IndexOutOfBoundsException.class, e.getCause());
-            if (getJavaMajorVersion() <= 8) {
-                assertEquals(JAVA8_INDEX_OUT_OF_BOUNDS_ERROR_MSG, cause.getMessage());
-            } else {
-                assertEquals(INDEX_OUT_OF_BOUNDS_ERROR_MSG, cause.getMessage());
-            }
+            assertEquals(INDEX_OUT_OF_BOUNDS_ERROR_MSG, cause.getMessage());
         }
         assertExpression("${header.unknown[cool]}", null);
     }
@@ -983,11 +979,7 @@ public class SimpleTest extends LanguageTestSupport {
             fail("Should have thrown an exception");
         } catch (Exception e) {
             IndexOutOfBoundsException cause = assertIsInstanceOf(IndexOutOfBoundsException.class, e.getCause());
-            if (getJavaMajorVersion() <= 8) {
-                assertEquals(JAVA8_INDEX_OUT_OF_BOUNDS_ERROR_MSG, cause.getMessage());
-            } else {
-                assertEquals(INDEX_OUT_OF_BOUNDS_ERROR_MSG, cause.getMessage());
-            }
+            assertEquals(INDEX_OUT_OF_BOUNDS_ERROR_MSG, cause.getMessage());
         }
         assertExpression("${header.unknown[cool]}", null);
     }
@@ -1712,8 +1704,18 @@ public class SimpleTest extends LanguageTestSupport {
         assertExpression("${type:org.apache.camel.ExchangePattern.InOut}", ExchangePattern.InOut);
 
         // non existing fields
-        assertExpression("${type:org.apache.camel.ExchangePattern.}", null);
-        assertExpression("${type:org.apache.camel.ExchangePattern.UNKNOWN}", null);
+        try {
+            assertExpression("${type:org.apache.camel.ExchangePattern.}", null);
+            fail("Should throw exception");
+        } catch (Exception e) {
+            assertIsInstanceOf(ClassNotFoundException.class, e.getCause());
+        }
+        try {
+            assertExpression("${type:org.apache.camel.ExchangePattern.UNKNOWN}", null);
+            fail("Should throw exception");
+        } catch (Exception e) {
+            assertIsInstanceOf(ClassNotFoundException.class, e.getCause());
+        }
     }
 
     @Test
@@ -1970,6 +1972,80 @@ public class SimpleTest extends LanguageTestSupport {
     }
 
     @Test
+    public void testJsonPrettyPrint() throws Exception {
+
+        StringBuilder expectedJson = new StringBuilder();
+        expectedJson.append("{");
+        expectedJson.append(System.lineSeparator());
+        expectedJson.append("\t\"firstName\": \"foo\",");
+        expectedJson.append(System.lineSeparator());
+        expectedJson.append("\t\"lastName\": \"bar\"");
+        expectedJson.append(System.lineSeparator());
+        expectedJson.append("}");
+        expectedJson.append(System.lineSeparator());
+
+        exchange.getIn().setBody("{\"firstName\": \"foo\", \"lastName\": \"bar\"}");
+        assertExpression("${prettyBody}", expectedJson.toString());
+        assertExpression("Hi ${prettyBody}", "Hi " + expectedJson.toString());
+        assertExpression("Hi ${prettyBody} Again", "Hi " + expectedJson.toString() + " Again");
+
+        expectedJson = new StringBuilder();
+        expectedJson.append("[");
+        expectedJson.append(System.lineSeparator());
+        expectedJson.append("\t{");
+        expectedJson.append(System.lineSeparator());
+        expectedJson.append("\t\t\"firstName\": \"foo\",");
+        expectedJson.append(System.lineSeparator());
+        expectedJson.append("\t\t\"lastName\": \"bar\"");
+        expectedJson.append(System.lineSeparator());
+        expectedJson.append("\t},");
+        expectedJson.append(System.lineSeparator());
+        expectedJson.append("\t{");
+        expectedJson.append(System.lineSeparator());
+        expectedJson.append("\t\t\"firstName\": \"foo\",");
+        expectedJson.append(System.lineSeparator());
+        expectedJson.append("\t\t\"lastName\": \"bar\"");
+        expectedJson.append(System.lineSeparator());
+        expectedJson.append("\t}");
+        expectedJson.append(System.lineSeparator());
+        expectedJson.append("]");
+        expectedJson.append(System.lineSeparator());
+
+        exchange.getIn()
+                .setBody("[{\"firstName\": \"foo\", \"lastName\": \"bar\"},{\"firstName\": \"foo\", \"lastName\": \"bar\"}]");
+        assertExpression("${prettyBody}", expectedJson.toString());
+        assertExpression("Hi ${prettyBody}", "Hi " + expectedJson.toString());
+        assertExpression("Hi ${prettyBody} Again", "Hi " + expectedJson.toString() + " Again");
+
+    }
+
+    @Test
+    public void testXMLPrettyPrint() throws Exception {
+        StringBuilder expectedXml = new StringBuilder();
+        expectedXml.append("<person>");
+        expectedXml.append(System.lineSeparator());
+        expectedXml.append("  <firstName>");
+        expectedXml.append(System.lineSeparator());
+        expectedXml.append("    foo");
+        expectedXml.append(System.lineSeparator());
+        expectedXml.append("  </firstName>");
+        expectedXml.append(System.lineSeparator());
+        expectedXml.append("  <lastName>");
+        expectedXml.append(System.lineSeparator());
+        expectedXml.append("    bar");
+        expectedXml.append(System.lineSeparator());
+        expectedXml.append("  </lastName>");
+        expectedXml.append(System.lineSeparator());
+        expectedXml.append("</person>");
+
+        exchange.getIn().setBody("<person><firstName>foo</firstName><lastName>bar</lastName></person>");
+
+        assertExpression("${prettyBody}", expectedXml.toString());
+        assertExpression("Hi ${prettyBody}", "Hi " + expectedXml.toString());
+        assertExpression("Hi ${prettyBody} Again", "Hi " + expectedXml.toString() + " Again");
+    }
+
+    @Test
     public void testNestedTypeFunction() throws Exception {
         // when using type: function we need special logic to not lazy evaluate
         // it so its evaluated only once
@@ -2060,6 +2136,33 @@ public class SimpleTest extends LanguageTestSupport {
         // custom generator
         context.getRegistry().bind("mygen", (UuidGenerator) () -> "1234");
         assertExpression("${uuid(mygen)}", "1234");
+    }
+
+    @Test
+    public void testNewEmpty() {
+        assertExpressionCreateNewEmpty("list", List.class, v -> ((List) v).isEmpty());
+        assertExpressionCreateNewEmpty("LIST", List.class, v -> ((List) v).isEmpty());
+        assertExpressionCreateNewEmpty("List", List.class, v -> ((List) v).isEmpty());
+        assertExpressionCreateNewEmpty("map", Map.class, v -> ((Map) v).isEmpty());
+        assertExpressionCreateNewEmpty("MAP", Map.class, v -> ((Map) v).isEmpty());
+        assertExpressionCreateNewEmpty("Map", Map.class, v -> ((Map) v).isEmpty());
+        assertExpressionCreateNewEmpty("string", String.class, v -> ((String) v).isEmpty());
+        assertExpressionCreateNewEmpty("STRING", String.class, v -> ((String) v).isEmpty());
+        assertExpressionCreateNewEmpty("String", String.class, v -> ((String) v).isEmpty());
+
+        assertThrows(SimpleIllegalSyntaxException.class, () -> evaluateExpression("${empty(falseSyntax}", null));
+        assertThrows(SimpleIllegalSyntaxException.class, () -> evaluateExpression("${empty()}", null));
+        assertThrows(SimpleIllegalSyntaxException.class, () -> evaluateExpression("${empty(}", null));
+        assertThrows(SimpleIllegalSyntaxException.class, () -> evaluateExpression("${empty}", null));
+        assertThrows(IllegalArgumentException.class, () -> evaluateExpression("${empty(unknownType)}", null));
+    }
+
+    private void assertExpressionCreateNewEmpty(
+            String type, Class<?> expectedClass, java.util.function.Predicate<Object> isEmptyAssertion) {
+        Object value = evaluateExpression("${empty(%s)}".formatted(type), null);
+        assertNotNull(value);
+        assertIsInstanceOf(expectedClass, value);
+        assertTrue(isEmptyAssertion.test(value));
     }
 
     @Override

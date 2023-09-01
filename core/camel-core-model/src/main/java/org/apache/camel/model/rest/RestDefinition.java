@@ -31,14 +31,17 @@ import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementRef;
 import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlTransient;
 
 import org.apache.camel.CamelContext;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.RuntimeCamelException;
 import org.apache.camel.model.OptionalIdentifiedDefinition;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.model.ToDefinition;
 import org.apache.camel.spi.Metadata;
+import org.apache.camel.spi.NodeIdFactory;
+import org.apache.camel.spi.Resource;
+import org.apache.camel.spi.ResourceAware;
 import org.apache.camel.spi.RestConfiguration;
 import org.apache.camel.support.CamelContextHelper;
 import org.apache.camel.util.FileUtil;
@@ -52,7 +55,7 @@ import org.apache.camel.util.URISupport;
 @Metadata(label = "rest")
 @XmlRootElement(name = "rest")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class RestDefinition extends OptionalIdentifiedDefinition<RestDefinition> {
+public class RestDefinition extends OptionalIdentifiedDefinition<RestDefinition> implements ResourceAware {
 
     @XmlAttribute
     private String path;
@@ -89,6 +92,8 @@ public class RestDefinition extends OptionalIdentifiedDefinition<RestDefinition>
     private List<SecurityDefinition> securityRequirements = new ArrayList<>();
     @XmlElementRef
     private List<VerbDefinition> verbs = new ArrayList<>();
+    @XmlTransient
+    private Resource resource;
 
     @Override
     public String getShortName() {
@@ -261,6 +266,14 @@ public class RestDefinition extends OptionalIdentifiedDefinition<RestDefinition>
         this.apiDocs = apiDocs;
     }
 
+    public Resource getResource() {
+        return resource;
+    }
+
+    public void setResource(Resource resource) {
+        this.resource = resource;
+    }
+
     // Fluent API
     // -------------------------------------------------------------------------
 
@@ -403,26 +416,13 @@ public class RestDefinition extends OptionalIdentifiedDefinition<RestDefinition>
     }
 
     @Override
-    public RestDefinition description(String text) {
+    public RestDefinition description(String description) {
         if (getVerbs().isEmpty()) {
-            super.description(text);
+            super.description(description);
         } else {
             // add on last verb as that is how the Java DSL works
             VerbDefinition verb = getVerbs().get(getVerbs().size() - 1);
-            verb.description(text);
-        }
-
-        return this;
-    }
-
-    @Override
-    public RestDefinition description(String id, String text, String lang) {
-        if (getVerbs().isEmpty()) {
-            super.description(id, text, lang);
-        } else {
-            // add on last verb as that is how the Java DSL works
-            VerbDefinition verb = getVerbs().get(getVerbs().size() - 1);
-            verb.description(id, text, lang);
+            verb.description(description);
         }
 
         return this;
@@ -829,7 +829,7 @@ public class RestDefinition extends OptionalIdentifiedDefinition<RestDefinition>
         String from = "rest-api:" + configuration.getApiContextPath();
         String routeId = configuration.getApiContextRouteId();
         if (routeId == null) {
-            routeId = answer.idOrCreate(camelContext.adapt(ExtendedCamelContext.class).getNodeIdFactory());
+            routeId = answer.idOrCreate(camelContext.getCamelContextExtension().getContextPlugin(NodeIdFactory.class));
         }
 
         // append options

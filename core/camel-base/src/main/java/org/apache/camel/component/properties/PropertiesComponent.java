@@ -19,16 +19,14 @@ package org.apache.camel.component.properties;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.CamelContextAware;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.PropertiesLookupListener;
 import org.apache.camel.StaticService;
 import org.apache.camel.api.management.ManagedAttribute;
@@ -39,6 +37,7 @@ import org.apache.camel.spi.FactoryFinder;
 import org.apache.camel.spi.LoadablePropertiesSource;
 import org.apache.camel.spi.PropertiesFunction;
 import org.apache.camel.spi.PropertiesSource;
+import org.apache.camel.spi.PropertiesSourceFactory;
 import org.apache.camel.spi.annotations.JdkService;
 import org.apache.camel.support.OrderedComparator;
 import org.apache.camel.support.PatternHelper;
@@ -110,6 +109,7 @@ public class PropertiesComponent extends ServiceSupport
     private PropertiesParser propertiesParser = new DefaultPropertiesParser(this);
     private final PropertiesLookup propertiesLookup = new DefaultPropertiesLookup(this);
     private final List<PropertiesLookupListener> propertiesLookupListeners = new ArrayList<>();
+    private final PropertiesSourceFactory propertiesSourceFactory = new DefaultPropertiesSourceFactory(this);
     private final List<PropertiesSource> sources = new ArrayList<>();
     private List<PropertiesLocation> locations = new ArrayList<>();
     private String location;
@@ -333,7 +333,7 @@ public class PropertiesComponent extends ServiceSupport
         if (locations.isEmpty()) {
             return Collections.emptyList();
         } else {
-            return locations.stream().map(PropertiesLocation::toString).collect(Collectors.toList());
+            return locations.stream().map(PropertiesLocation::toString).toList();
         }
     }
 
@@ -366,6 +366,11 @@ public class PropertiesComponent extends ServiceSupport
         }
 
         setLocations(propertiesLocations);
+    }
+
+    @Override
+    public PropertiesSourceFactory getPropertiesSourceFactory() {
+        return propertiesSourceFactory;
     }
 
     public void addLocation(PropertiesLocation location) {
@@ -541,14 +546,6 @@ public class PropertiesComponent extends ServiceSupport
         return localPropertiesEnabled ? localProperties.get() : null;
     }
 
-    /**
-     * Gets the functions registered in this properties component.
-     */
-    @Deprecated
-    public Map<String, PropertiesFunction> getFunctions() {
-        return propertiesFunctionResolver.getFunctions();
-    }
-
     @Override
     public PropertiesFunction getPropertiesFunction(String name) {
         if (name == null) {
@@ -565,16 +562,6 @@ public class PropertiesComponent extends ServiceSupport
     @Override
     public boolean hasPropertiesFunction(String name) {
         return propertiesFunctionResolver.hasFunction(name);
-    }
-
-    /**
-     * Is there a {@link PropertiesFunction} with the given name?
-     *
-     * @deprecated use hasPropertiesFunction
-     */
-    @Deprecated
-    public boolean hasFunction(String name) {
-        return hasPropertiesFunction(name);
     }
 
     @ManagedAttribute(description = "System properties mode")
@@ -705,6 +692,18 @@ public class PropertiesComponent extends ServiceSupport
     }
 
     @Override
+    public void keepOnlyChangeProperties(Properties properties) {
+        Properties loaded = loadProperties();
+        for (String key : loaded.stringPropertyNames()) {
+            Object v1 = loaded.getProperty(key);
+            Object v2 = properties.getProperty(key);
+            if (Objects.equals(v1, v2)) {
+                properties.remove(key);
+            }
+        }
+    }
+
+    @Override
     protected void doInit() throws Exception {
         super.doInit();
 
@@ -735,7 +734,7 @@ public class PropertiesComponent extends ServiceSupport
                     LOG.debug("PropertiesComponent added custom PropertiesSource (registry): {}", source);
                 }
 
-                FactoryFinder factoryFinder = getCamelContext().adapt(ExtendedCamelContext.class)
+                FactoryFinder factoryFinder = getCamelContext().getCamelContextExtension()
                         .getBootstrapFactoryFinder();
                 Class<?> type = factoryFinder.findClass("properties-source-factory").orElse(null);
                 if (type != null) {

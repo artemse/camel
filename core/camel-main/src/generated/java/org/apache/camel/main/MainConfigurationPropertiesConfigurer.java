@@ -41,6 +41,8 @@ public class MainConfigurationPropertiesConfigurer extends org.apache.camel.supp
         case "BacklogTracing": target.setBacklogTracing(property(camelContext, boolean.class, value)); return true;
         case "backlogtracingstandby":
         case "BacklogTracingStandby": target.setBacklogTracingStandby(property(camelContext, boolean.class, value)); return true;
+        case "backlogtracingtemplates":
+        case "BacklogTracingTemplates": target.setBacklogTracingTemplates(property(camelContext, boolean.class, value)); return true;
         case "basepackagescan":
         case "BasePackageScan": target.setBasePackageScan(property(camelContext, java.lang.String.class, value)); return true;
         case "basepackagescanenabled":
@@ -70,7 +72,19 @@ public class MainConfigurationPropertiesConfigurer extends org.apache.camel.supp
         case "devconsoleenabled":
         case "DevConsoleEnabled": target.setDevConsoleEnabled(property(camelContext, boolean.class, value)); return true;
         case "dumproutes":
-        case "DumpRoutes": target.setDumpRoutes(property(camelContext, boolean.class, value)); return true;
+        case "DumpRoutes": target.setDumpRoutes(property(camelContext, java.lang.String.class, value)); return true;
+        case "dumproutesgeneratedids":
+        case "DumpRoutesGeneratedIds": target.setDumpRoutesGeneratedIds(property(camelContext, boolean.class, value)); return true;
+        case "dumproutesinclude":
+        case "DumpRoutesInclude": target.setDumpRoutesInclude(property(camelContext, java.lang.String.class, value)); return true;
+        case "dumprouteslog":
+        case "DumpRoutesLog": target.setDumpRoutesLog(property(camelContext, boolean.class, value)); return true;
+        case "dumproutesoutput":
+        case "DumpRoutesOutput": target.setDumpRoutesOutput(property(camelContext, java.lang.String.class, value)); return true;
+        case "dumproutesresolveplaceholders":
+        case "DumpRoutesResolvePlaceholders": target.setDumpRoutesResolvePlaceholders(property(camelContext, boolean.class, value)); return true;
+        case "dumproutesuriasparameters":
+        case "DumpRoutesUriAsParameters": target.setDumpRoutesUriAsParameters(property(camelContext, boolean.class, value)); return true;
         case "durationhitexitcode":
         case "DurationHitExitCode": target.setDurationHitExitCode(property(camelContext, int.class, value)); return true;
         case "durationmaxaction":
@@ -153,8 +167,6 @@ public class MainConfigurationPropertiesConfigurer extends org.apache.camel.supp
         case "RouteControllerIncludeRoutes": target.setRouteControllerIncludeRoutes(property(camelContext, java.lang.String.class, value)); return true;
         case "routecontrollerinitialdelay":
         case "RouteControllerInitialDelay": target.setRouteControllerInitialDelay(property(camelContext, long.class, value)); return true;
-        case "routecontrollerlogginglevel":
-        case "RouteControllerLoggingLevel": target.setRouteControllerLoggingLevel(property(camelContext, org.apache.camel.LoggingLevel.class, value)); return true;
         case "routecontrollersuperviseenabled":
         case "RouteControllerSuperviseEnabled": target.setRouteControllerSuperviseEnabled(property(camelContext, boolean.class, value)); return true;
         case "routecontrollerthreadpoolsize":
@@ -213,10 +225,14 @@ public class MainConfigurationPropertiesConfigurer extends org.apache.camel.supp
         case "StartupRecorderRecording": target.setStartupRecorderRecording(property(camelContext, boolean.class, value)); return true;
         case "startupsummarylevel":
         case "StartupSummaryLevel": target.setStartupSummaryLevel(property(camelContext, org.apache.camel.StartupSummaryLevel.class, value)); return true;
+        case "streamcachingallowclasses":
+        case "StreamCachingAllowClasses": target.setStreamCachingAllowClasses(property(camelContext, java.lang.String.class, value)); return true;
         case "streamcachinganyspoolrules":
         case "StreamCachingAnySpoolRules": target.setStreamCachingAnySpoolRules(property(camelContext, boolean.class, value)); return true;
         case "streamcachingbuffersize":
         case "StreamCachingBufferSize": target.setStreamCachingBufferSize(property(camelContext, int.class, value)); return true;
+        case "streamcachingdenyclasses":
+        case "StreamCachingDenyClasses": target.setStreamCachingDenyClasses(property(camelContext, java.lang.String.class, value)); return true;
         case "streamcachingenabled":
         case "StreamCachingEnabled": target.setStreamCachingEnabled(property(camelContext, boolean.class, value)); return true;
         case "streamcachingremovespooldirectorywhenstopping":
@@ -245,6 +261,8 @@ public class MainConfigurationPropertiesConfigurer extends org.apache.camel.supp
         case "TracingPattern": target.setTracingPattern(property(camelContext, java.lang.String.class, value)); return true;
         case "tracingstandby":
         case "TracingStandby": target.setTracingStandby(property(camelContext, boolean.class, value)); return true;
+        case "tracingtemplates":
+        case "TracingTemplates": target.setTracingTemplates(property(camelContext, boolean.class, value)); return true;
         case "typeconverterstatisticsenabled":
         case "TypeConverterStatisticsEnabled": target.setTypeConverterStatisticsEnabled(property(camelContext, boolean.class, value)); return true;
         case "usebreadcrumb":
@@ -282,6 +300,8 @@ public class MainConfigurationPropertiesConfigurer extends org.apache.camel.supp
         case "BacklogTracing": return boolean.class;
         case "backlogtracingstandby":
         case "BacklogTracingStandby": return boolean.class;
+        case "backlogtracingtemplates":
+        case "BacklogTracingTemplates": return boolean.class;
         case "basepackagescan":
         case "BasePackageScan": return java.lang.String.class;
         case "basepackagescanenabled":
@@ -311,7 +331,19 @@ public class MainConfigurationPropertiesConfigurer extends org.apache.camel.supp
         case "devconsoleenabled":
         case "DevConsoleEnabled": return boolean.class;
         case "dumproutes":
-        case "DumpRoutes": return boolean.class;
+        case "DumpRoutes": return java.lang.String.class;
+        case "dumproutesgeneratedids":
+        case "DumpRoutesGeneratedIds": return boolean.class;
+        case "dumproutesinclude":
+        case "DumpRoutesInclude": return java.lang.String.class;
+        case "dumprouteslog":
+        case "DumpRoutesLog": return boolean.class;
+        case "dumproutesoutput":
+        case "DumpRoutesOutput": return java.lang.String.class;
+        case "dumproutesresolveplaceholders":
+        case "DumpRoutesResolvePlaceholders": return boolean.class;
+        case "dumproutesuriasparameters":
+        case "DumpRoutesUriAsParameters": return boolean.class;
         case "durationhitexitcode":
         case "DurationHitExitCode": return int.class;
         case "durationmaxaction":
@@ -394,8 +426,6 @@ public class MainConfigurationPropertiesConfigurer extends org.apache.camel.supp
         case "RouteControllerIncludeRoutes": return java.lang.String.class;
         case "routecontrollerinitialdelay":
         case "RouteControllerInitialDelay": return long.class;
-        case "routecontrollerlogginglevel":
-        case "RouteControllerLoggingLevel": return org.apache.camel.LoggingLevel.class;
         case "routecontrollersuperviseenabled":
         case "RouteControllerSuperviseEnabled": return boolean.class;
         case "routecontrollerthreadpoolsize":
@@ -454,10 +484,14 @@ public class MainConfigurationPropertiesConfigurer extends org.apache.camel.supp
         case "StartupRecorderRecording": return boolean.class;
         case "startupsummarylevel":
         case "StartupSummaryLevel": return org.apache.camel.StartupSummaryLevel.class;
+        case "streamcachingallowclasses":
+        case "StreamCachingAllowClasses": return java.lang.String.class;
         case "streamcachinganyspoolrules":
         case "StreamCachingAnySpoolRules": return boolean.class;
         case "streamcachingbuffersize":
         case "StreamCachingBufferSize": return int.class;
+        case "streamcachingdenyclasses":
+        case "StreamCachingDenyClasses": return java.lang.String.class;
         case "streamcachingenabled":
         case "StreamCachingEnabled": return boolean.class;
         case "streamcachingremovespooldirectorywhenstopping":
@@ -486,6 +520,8 @@ public class MainConfigurationPropertiesConfigurer extends org.apache.camel.supp
         case "TracingPattern": return java.lang.String.class;
         case "tracingstandby":
         case "TracingStandby": return boolean.class;
+        case "tracingtemplates":
+        case "TracingTemplates": return boolean.class;
         case "typeconverterstatisticsenabled":
         case "TypeConverterStatisticsEnabled": return boolean.class;
         case "usebreadcrumb":
@@ -524,6 +560,8 @@ public class MainConfigurationPropertiesConfigurer extends org.apache.camel.supp
         case "BacklogTracing": return target.isBacklogTracing();
         case "backlogtracingstandby":
         case "BacklogTracingStandby": return target.isBacklogTracingStandby();
+        case "backlogtracingtemplates":
+        case "BacklogTracingTemplates": return target.isBacklogTracingTemplates();
         case "basepackagescan":
         case "BasePackageScan": return target.getBasePackageScan();
         case "basepackagescanenabled":
@@ -553,7 +591,19 @@ public class MainConfigurationPropertiesConfigurer extends org.apache.camel.supp
         case "devconsoleenabled":
         case "DevConsoleEnabled": return target.isDevConsoleEnabled();
         case "dumproutes":
-        case "DumpRoutes": return target.isDumpRoutes();
+        case "DumpRoutes": return target.getDumpRoutes();
+        case "dumproutesgeneratedids":
+        case "DumpRoutesGeneratedIds": return target.isDumpRoutesGeneratedIds();
+        case "dumproutesinclude":
+        case "DumpRoutesInclude": return target.getDumpRoutesInclude();
+        case "dumprouteslog":
+        case "DumpRoutesLog": return target.isDumpRoutesLog();
+        case "dumproutesoutput":
+        case "DumpRoutesOutput": return target.getDumpRoutesOutput();
+        case "dumproutesresolveplaceholders":
+        case "DumpRoutesResolvePlaceholders": return target.isDumpRoutesResolvePlaceholders();
+        case "dumproutesuriasparameters":
+        case "DumpRoutesUriAsParameters": return target.isDumpRoutesUriAsParameters();
         case "durationhitexitcode":
         case "DurationHitExitCode": return target.getDurationHitExitCode();
         case "durationmaxaction":
@@ -636,8 +686,6 @@ public class MainConfigurationPropertiesConfigurer extends org.apache.camel.supp
         case "RouteControllerIncludeRoutes": return target.getRouteControllerIncludeRoutes();
         case "routecontrollerinitialdelay":
         case "RouteControllerInitialDelay": return target.getRouteControllerInitialDelay();
-        case "routecontrollerlogginglevel":
-        case "RouteControllerLoggingLevel": return target.getRouteControllerLoggingLevel();
         case "routecontrollersuperviseenabled":
         case "RouteControllerSuperviseEnabled": return target.isRouteControllerSuperviseEnabled();
         case "routecontrollerthreadpoolsize":
@@ -696,10 +744,14 @@ public class MainConfigurationPropertiesConfigurer extends org.apache.camel.supp
         case "StartupRecorderRecording": return target.isStartupRecorderRecording();
         case "startupsummarylevel":
         case "StartupSummaryLevel": return target.getStartupSummaryLevel();
+        case "streamcachingallowclasses":
+        case "StreamCachingAllowClasses": return target.getStreamCachingAllowClasses();
         case "streamcachinganyspoolrules":
         case "StreamCachingAnySpoolRules": return target.isStreamCachingAnySpoolRules();
         case "streamcachingbuffersize":
         case "StreamCachingBufferSize": return target.getStreamCachingBufferSize();
+        case "streamcachingdenyclasses":
+        case "StreamCachingDenyClasses": return target.getStreamCachingDenyClasses();
         case "streamcachingenabled":
         case "StreamCachingEnabled": return target.isStreamCachingEnabled();
         case "streamcachingremovespooldirectorywhenstopping":
@@ -728,6 +780,8 @@ public class MainConfigurationPropertiesConfigurer extends org.apache.camel.supp
         case "TracingPattern": return target.getTracingPattern();
         case "tracingstandby":
         case "TracingStandby": return target.isTracingStandby();
+        case "tracingtemplates":
+        case "TracingTemplates": return target.isTracingTemplates();
         case "typeconverterstatisticsenabled":
         case "TypeConverterStatisticsEnabled": return target.isTypeConverterStatisticsEnabled();
         case "usebreadcrumb":

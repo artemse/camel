@@ -241,6 +241,42 @@ public interface SshComponentBuilderFactory {
             return this;
         }
         /**
+         * Used for enabling or disabling all consumer based health checks from
+         * this component.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: true
+         * Group: health
+         * 
+         * @param healthCheckConsumerEnabled the value to set
+         * @return the dsl builder
+         */
+        default SshComponentBuilder healthCheckConsumerEnabled(
+                boolean healthCheckConsumerEnabled) {
+            doSetProperty("healthCheckConsumerEnabled", healthCheckConsumerEnabled);
+            return this;
+        }
+        /**
+         * Used for enabling or disabling all producer based health checks from
+         * this component. Notice: Camel has by default disabled all producer
+         * based health-checks. You can turn on producer checks globally by
+         * setting camel.health.producersEnabled=true.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: true
+         * Group: health
+         * 
+         * @param healthCheckProducerEnabled the value to set
+         * @return the dsl builder
+         */
+        default SshComponentBuilder healthCheckProducerEnabled(
+                boolean healthCheckProducerEnabled) {
+            doSetProperty("healthCheckProducerEnabled", healthCheckProducerEnabled);
+            return this;
+        }
+        /**
          * Sets the resource path of the certificate to use for Authentication.
          * Will use ResourceHelperKeyPairProvider to resolve file based
          * certificate, and depends on keyType setting.
@@ -371,6 +407,8 @@ public interface SshComponentBuilderFactory {
             case "configuration": ((SshComponent) component).setConfiguration((org.apache.camel.component.ssh.SshConfiguration) value); return true;
             case "shellPrompt": getOrCreateConfiguration((SshComponent) component).setShellPrompt((java.lang.String) value); return true;
             case "sleepForShellPrompt": getOrCreateConfiguration((SshComponent) component).setSleepForShellPrompt((long) value); return true;
+            case "healthCheckConsumerEnabled": ((SshComponent) component).setHealthCheckConsumerEnabled((boolean) value); return true;
+            case "healthCheckProducerEnabled": ((SshComponent) component).setHealthCheckProducerEnabled((boolean) value); return true;
             case "certResource": getOrCreateConfiguration((SshComponent) component).setCertResource((java.lang.String) value); return true;
             case "certResourcePassword": getOrCreateConfiguration((SshComponent) component).setCertResourcePassword((java.lang.String) value); return true;
             case "keyPairProvider": getOrCreateConfiguration((SshComponent) component).setKeyPairProvider((org.apache.sshd.common.keyprovider.KeyPairProvider) value); return true;

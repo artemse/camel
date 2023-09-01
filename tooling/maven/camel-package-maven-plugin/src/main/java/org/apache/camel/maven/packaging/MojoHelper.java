@@ -37,6 +37,8 @@ public final class MojoHelper {
                         dir.resolve("camel-cxf-rest"));
             case "camel-salesforce":
                 return Collections.singletonList(dir.resolve("camel-salesforce-component"));
+            case "camel-dhis2":
+                return Collections.singletonList(dir.resolve("camel-dhis2-component"));
             case "camel-olingo2":
                 return Collections.singletonList(dir.resolve("camel-olingo2-component"));
             case "camel-olingo4":
@@ -53,7 +55,7 @@ public final class MojoHelper {
                 return Arrays.asList(dir.resolve("camel-azure-eventhubs"), dir.resolve("camel-azure-storage-blob"),
                         dir.resolve("camel-azure-storage-datalake"), dir.resolve("camel-azure-cosmosdb"),
                         dir.resolve("camel-azure-storage-queue"), dir.resolve("camel-azure-servicebus"),
-                        dir.resolve("camel-azure-key-vault"));
+                        dir.resolve("camel-azure-key-vault"), dir.resolve("camel-azure-files"));
             case "camel-google":
                 return Arrays.asList(dir.resolve("camel-google-bigquery"), dir.resolve("camel-google-calendar"),
                         dir.resolve("camel-google-drive"), dir.resolve("camel-google-mail"), dir.resolve("camel-google-pubsub"),
@@ -81,7 +83,9 @@ public final class MojoHelper {
                         dir.resolve("camel-aws2-mq"),
                         dir.resolve("camel-aws2-msk"), dir.resolve("camel-aws2-s3"), dir.resolve("camel-aws2-ses"),
                         dir.resolve("camel-aws2-sns"),
-                        dir.resolve("camel-aws2-sqs"), dir.resolve("camel-aws2-sts"), dir.resolve("camel-aws2-translate"),
+                        dir.resolve("camel-aws2-sqs"), dir.resolve("camel-aws2-step-functions"),
+                        dir.resolve("camel-aws2-sts"),
+                        dir.resolve("camel-aws2-timestream"), dir.resolve("camel-aws2-translate"),
                         dir.resolve("camel-aws-xray"), dir.resolve("camel-aws-secrets-manager"),
                         dir.resolve("camel-aws-cloudtrail"));
             case "camel-vertx":

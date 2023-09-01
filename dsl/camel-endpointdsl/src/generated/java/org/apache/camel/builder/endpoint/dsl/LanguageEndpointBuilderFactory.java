@@ -182,6 +182,20 @@ public interface LanguageEndpointBuilderFactory {
             return this;
         }
         /**
+         * Sets the class of the result type (type from output).
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: producer
+         * 
+         * @param resultType the value to set
+         * @return the dsl builder
+         */
+        default LanguageEndpointBuilder resultType(String resultType) {
+            doSetProperty("resultType", resultType);
+            return this;
+        }
+        /**
          * Sets the script to execute.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -324,6 +338,8 @@ public interface LanguageEndpointBuilderFactory {
          * Path parameter: resourceUri
          * Path to the resource, or a reference to lookup a bean in the Registry
          * to use as the resource
+         * This option can also be loaded from an existing file, by prefixing
+         * with file: or classpath: followed by the location of the file.
          * 
          * @param path languageName:resourceUri
          * @return the dsl builder
@@ -351,6 +367,8 @@ public interface LanguageEndpointBuilderFactory {
          * Path parameter: resourceUri
          * Path to the resource, or a reference to lookup a bean in the Registry
          * to use as the resource
+         * This option can also be loaded from an existing file, by prefixing
+         * with file: or classpath: followed by the location of the file.
          * 
          * @param componentName to use a custom component name for the endpoint
          * instead of the default name

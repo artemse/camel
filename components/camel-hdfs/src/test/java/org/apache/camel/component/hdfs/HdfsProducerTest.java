@@ -23,6 +23,7 @@ import java.net.URL;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.language.SimpleExpression;
 import org.apache.camel.util.IOHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
@@ -39,6 +40,7 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.MapFile;
 import org.apache.hadoop.io.SequenceFile;
+import org.apache.hadoop.io.ShortWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.util.ReflectionUtils;
@@ -46,7 +48,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.apache.camel.language.simple.SimpleLanguage.simple;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
@@ -82,7 +83,7 @@ public class HdfsProducerTest extends HdfsTestSupport {
     public void testProducerClose() throws Exception {
         for (int i = 0; i < 10; ++i) {
             // send 10 messages, and mark to close in last message
-            template.sendBodyAndHeader("direct:start1", "PAPPO" + i, HdfsConstants.HDFS_CLOSE, i == 9 ? true : false);
+            template.sendBodyAndHeader("direct:start1", "PAPPO" + i, HdfsConstants.HDFS_CLOSE, i == 9);
         }
 
         Configuration conf = new Configuration();
@@ -131,6 +132,23 @@ public class HdfsProducerTest extends HdfsTestSupport {
         reader.next(key, value);
         byte rByte = ((ByteWritable) value).get();
         assertEquals(rByte, aByte);
+
+        IOHelper.close(reader);
+    }
+
+    @Test
+    public void testWriteShort() throws Exception {
+        short aShort = 32767;
+        template.sendBody("direct:write_short", aShort);
+
+        Configuration conf = new Configuration();
+        Path file1 = new Path("file:///" + TEMP_DIR.toUri() + "/test-camel-short");
+        SequenceFile.Reader reader = new SequenceFile.Reader(conf, SequenceFile.Reader.file(file1));
+        Writable key = (Writable) ReflectionUtils.newInstance(reader.getKeyClass(), conf);
+        Writable value = (Writable) ReflectionUtils.newInstance(reader.getValueClass(), conf);
+        reader.next(key, value);
+        short rShort = ((ShortWritable) value).get();
+        assertEquals(rShort, aShort);
 
         IOHelper.close(reader);
     }
@@ -311,7 +329,8 @@ public class HdfsProducerTest extends HdfsTestSupport {
     @Test
     public void testWriteTextWithDynamicFilenameExpression() throws Exception {
         for (int i = 0; i < 5; i++) {
-            template.sendBodyAndHeader("direct:write_dynamic_filename", "CIAO" + i, Exchange.FILE_NAME, simple("file-${body}"));
+            template.sendBodyAndHeader("direct:write_dynamic_filename", "CIAO" + i, Exchange.FILE_NAME,
+                    new SimpleExpression("file-${body}"));
         }
 
         for (int i = 0; i < 5; i++) {
@@ -442,6 +461,9 @@ public class HdfsProducerTest extends HdfsTestSupport {
 
                 from("direct:write_byte").to("hdfs:localhost/" + TEMP_DIR.toUri()
                                              + "/test-camel-byte?fileSystemType=LOCAL&valueType=BYTE&fileType=SEQUENCE_FILE");
+
+                from("direct:write_short").to("hdfs:localhost/" + TEMP_DIR.toUri()
+                                              + "/test-camel-short?fileSystemType=LOCAL&valueType=SHORT&fileType=SEQUENCE_FILE");
 
                 from("direct:write_int").to("hdfs:localhost/" + TEMP_DIR.toUri()
                                             + "/test-camel-int?fileSystemType=LOCAL&valueType=INT&fileType=SEQUENCE_FILE");

@@ -24,7 +24,6 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -60,8 +59,9 @@ import org.apache.camel.util.StringHelper;
  */
 public final class ExchangeHelper {
 
-    private static String defaultCharsetName = ObjectHelper.getSystemProperty(Exchange.DEFAULT_CHARSET_PROPERTY, "UTF-8");
-    private static Charset defaultCharset = Charset.forName(defaultCharsetName);
+    private static final String DEFAULT_CHARSET_NAME
+            = ObjectHelper.getSystemProperty(Exchange.DEFAULT_CHARSET_PROPERTY, "UTF-8");
+    private static final Charset DEFAULT_CHARSET = Charset.forName(DEFAULT_CHARSET_NAME);
 
     /**
      * Utility classes should not have a public constructor.
@@ -345,9 +345,7 @@ public final class ExchangeHelper {
         if (result == source) {
             // we just need to ensure MEP is as expected (eg copy result to OUT if out capable)
             // and the result is not failed
-            if (result.getPattern() == ExchangePattern.InOptionalOut) {
-                // keep as is
-            } else if (result.getPattern().isOutCapable() && !result.hasOut() && !result.isFailed()) {
+            if (result.getPattern().isOutCapable() && !result.hasOut() && !result.isFailed()) {
                 // copy IN to OUT as we expect a OUT response
                 result.getOut().copyFrom(source.getIn());
             }
@@ -362,10 +360,6 @@ public final class ExchangeHelper {
             } else {
                 result.getOut().copyFrom(source.getOut());
             }
-        } else if (result.getPattern() == ExchangePattern.InOptionalOut) {
-            // special case where the result is InOptionalOut and with no OUT response
-            // so we should return null to indicate this fact
-            result.setOut(null);
         } else {
             // no results so lets copy the last input
             // as the final processor on a pipeline might not
@@ -388,6 +382,7 @@ public final class ExchangeHelper {
             result.getProperties().putAll(source.getProperties());
         }
         source.getExchangeExtension().copyInternalProperties(result);
+        source.getExchangeExtension().copySafeCopyPropertiesTo(result.getExchangeExtension());
 
         // copy over state
         result.setRouteStop(source.isRouteStop());
@@ -396,6 +391,7 @@ public final class ExchangeHelper {
         result.getExchangeExtension().setNotifyEvent(source.getExchangeExtension().isNotifyEvent());
         result.getExchangeExtension().setRedeliveryExhausted(source.getExchangeExtension().isRedeliveryExhausted());
         result.getExchangeExtension().setErrorHandlerHandled(source.getExchangeExtension().getErrorHandlerHandled());
+
         result.setException(source.getException());
     }
 
@@ -580,7 +576,7 @@ public final class ExchangeHelper {
      * @return          <tt>true</tt> if failure handled, <tt>false</tt> otherwise
      */
     public static boolean isFailureHandled(Exchange exchange) {
-        return exchange.getProperty(ExchangePropertyKey.FAILURE_HANDLED, false, Boolean.class);
+        return exchange.getExchangeExtension().isFailureHandled();
     }
 
     /**
@@ -609,9 +605,9 @@ public final class ExchangeHelper {
      * @param exchange the exchange
      */
     public static void setFailureHandled(Exchange exchange) {
-        exchange.setProperty(ExchangePropertyKey.FAILURE_HANDLED, Boolean.TRUE);
         // clear exception since its failure handled
         exchange.setException(null);
+        exchange.getExchangeExtension().setFailureHandled(true);
     }
 
     /**
@@ -665,10 +661,6 @@ public final class ExchangeHelper {
             if (hasOut && !notOut) {
                 // we have a response in out and the pattern is out capable
                 answer = exchange.getOut().getBody();
-            } else if (!hasOut && exchange.getPattern() == ExchangePattern.InOptionalOut) {
-                // special case where the result is InOptionalOut and with no OUT response
-                // so we should return null to indicate this fact
-                answer = null;
             } else {
                 // use IN as the response
                 answer = exchange.getIn().getBody();
@@ -790,43 +782,28 @@ public final class ExchangeHelper {
         return "(MessageId: " + msgId + " on ExchangeId: " + exchange.getExchangeId() + ")";
     }
 
-    /**
-     * Copies the exchange but the copy will be tied to the given context
-     *
-     * @param  exchange the source exchange
-     * @param  context  the camel context
-     * @return          a copy with the given camel context
+    /*
+     * Safe copy message history using a defensive copy
      */
-    public static Exchange copyExchangeAndSetCamelContext(Exchange exchange, CamelContext context) {
-        return copyExchangeAndSetCamelContext(exchange, context, true);
+    private static void setMessageHistory(Exchange target, Exchange source) {
+        final Object history = source.getProperty(ExchangePropertyKey.MESSAGE_HISTORY);
+        if (history != null) {
+            // use thread-safe list as message history may be accessed concurrently
+            target.setProperty(ExchangePropertyKey.MESSAGE_HISTORY, new CopyOnWriteArrayList<>((List<MessageHistory>) history));
+        }
     }
 
     /**
      * Copies the exchange but the copy will be tied to the given context
      *
      * @param  exchange the source exchange
-     * @param  context  the camel context
-     * @param  handover whether to handover on completions from the source to the copy
      * @return          a copy with the given camel context
      */
-    public static Exchange copyExchangeAndSetCamelContext(Exchange exchange, CamelContext context, boolean handover) {
-        DefaultExchange answer = new DefaultExchange(context, exchange.getPattern());
-        if (exchange.hasProperties()) {
-            answer.getExchangeExtension().setProperties(safeCopyProperties(exchange.getProperties()));
-        }
-        exchange.getExchangeExtension().copyInternalProperties(answer);
-        // safe copy message history using a defensive copy
-        List<MessageHistory> history
-                = (List<MessageHistory>) exchange.getProperty(ExchangePropertyKey.MESSAGE_HISTORY);
-        if (history != null) {
-            // use thread-safe list as message history may be accessed concurrently
-            answer.setProperty(ExchangePropertyKey.MESSAGE_HISTORY, new CopyOnWriteArrayList<>(history));
-        }
+    public static Exchange copyExchangeWithProperties(Exchange exchange, CamelContext context) {
+        Exchange answer = exchange.getExchangeExtension().createCopyWithProperties(context);
 
-        if (handover) {
-            // Need to hand over the completion for async invocation
-            exchange.getExchangeExtension().handoverCompletions(answer);
-        }
+        setMessageHistory(answer, exchange);
+
         answer.setIn(exchange.getIn().copy());
         if (exchange.hasOut()) {
             answer.setOut(exchange.getOut().copy());
@@ -891,14 +868,6 @@ public final class ExchangeHelper {
      */
     public static String resolveScheme(String uri) {
         return StringHelper.before(uri, ":");
-    }
-
-    @SuppressWarnings("unchecked")
-    private static Map<String, Object> safeCopyProperties(Map<String, Object> properties) {
-        if (properties == null) {
-            return null;
-        }
-        return new ConcurrentHashMap<>(properties);
     }
 
     /**
@@ -969,11 +938,11 @@ public final class ExchangeHelper {
     }
 
     private static String getDefaultCharsetName() {
-        return defaultCharsetName;
+        return DEFAULT_CHARSET_NAME;
     }
 
     private static Charset getDefaultCharset() {
-        return defaultCharset;
+        return DEFAULT_CHARSET;
     }
 
     /**

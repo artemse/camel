@@ -37,6 +37,10 @@ public class Sns2ComponentConfigurer extends PropertyConfigurerSupport implement
         case "autowiredenabled":
         case "autowiredEnabled": target.setAutowiredEnabled(property(camelContext, boolean.class, value)); return true;
         case "configuration": target.setConfiguration(property(camelContext, org.apache.camel.component.aws2.sns.Sns2Configuration.class, value)); return true;
+        case "healthcheckconsumerenabled":
+        case "healthCheckConsumerEnabled": target.setHealthCheckConsumerEnabled(property(camelContext, boolean.class, value)); return true;
+        case "healthcheckproducerenabled":
+        case "healthCheckProducerEnabled": target.setHealthCheckProducerEnabled(property(camelContext, boolean.class, value)); return true;
         case "kmsmasterkeyid":
         case "kmsMasterKeyId": getOrCreateConfiguration(target).setKmsMasterKeyId(property(camelContext, java.lang.String.class, value)); return true;
         case "lazystartproducer":
@@ -50,14 +54,16 @@ public class Sns2ComponentConfigurer extends PropertyConfigurerSupport implement
         case "overrideendpoint":
         case "overrideEndpoint": getOrCreateConfiguration(target).setOverrideEndpoint(property(camelContext, boolean.class, value)); return true;
         case "policy": getOrCreateConfiguration(target).setPolicy(property(camelContext, java.lang.String.class, value)); return true;
+        case "profilecredentialsname":
+        case "profileCredentialsName": getOrCreateConfiguration(target).setProfileCredentialsName(property(camelContext, java.lang.String.class, value)); return true;
         case "proxyhost":
         case "proxyHost": getOrCreateConfiguration(target).setProxyHost(property(camelContext, java.lang.String.class, value)); return true;
         case "proxyport":
         case "proxyPort": getOrCreateConfiguration(target).setProxyPort(property(camelContext, java.lang.Integer.class, value)); return true;
         case "proxyprotocol":
         case "proxyProtocol": getOrCreateConfiguration(target).setProxyProtocol(property(camelContext, software.amazon.awssdk.core.Protocol.class, value)); return true;
-        case "queueurl":
-        case "queueUrl": getOrCreateConfiguration(target).setQueueUrl(property(camelContext, java.lang.String.class, value)); return true;
+        case "queuearn":
+        case "queueArn": getOrCreateConfiguration(target).setQueueArn(property(camelContext, java.lang.String.class, value)); return true;
         case "region": getOrCreateConfiguration(target).setRegion(property(camelContext, java.lang.String.class, value)); return true;
         case "secretkey":
         case "secretKey": getOrCreateConfiguration(target).setSecretKey(property(camelContext, java.lang.String.class, value)); return true;
@@ -72,6 +78,8 @@ public class Sns2ComponentConfigurer extends PropertyConfigurerSupport implement
         case "uriEndpointOverride": getOrCreateConfiguration(target).setUriEndpointOverride(property(camelContext, java.lang.String.class, value)); return true;
         case "usedefaultcredentialsprovider":
         case "useDefaultCredentialsProvider": getOrCreateConfiguration(target).setUseDefaultCredentialsProvider(property(camelContext, boolean.class, value)); return true;
+        case "useprofilecredentialsprovider":
+        case "useProfileCredentialsProvider": getOrCreateConfiguration(target).setUseProfileCredentialsProvider(property(camelContext, boolean.class, value)); return true;
         default: return false;
         }
     }
@@ -93,6 +101,10 @@ public class Sns2ComponentConfigurer extends PropertyConfigurerSupport implement
         case "autowiredenabled":
         case "autowiredEnabled": return boolean.class;
         case "configuration": return org.apache.camel.component.aws2.sns.Sns2Configuration.class;
+        case "healthcheckconsumerenabled":
+        case "healthCheckConsumerEnabled": return boolean.class;
+        case "healthcheckproducerenabled":
+        case "healthCheckProducerEnabled": return boolean.class;
         case "kmsmasterkeyid":
         case "kmsMasterKeyId": return java.lang.String.class;
         case "lazystartproducer":
@@ -106,14 +118,16 @@ public class Sns2ComponentConfigurer extends PropertyConfigurerSupport implement
         case "overrideendpoint":
         case "overrideEndpoint": return boolean.class;
         case "policy": return java.lang.String.class;
+        case "profilecredentialsname":
+        case "profileCredentialsName": return java.lang.String.class;
         case "proxyhost":
         case "proxyHost": return java.lang.String.class;
         case "proxyport":
         case "proxyPort": return java.lang.Integer.class;
         case "proxyprotocol":
         case "proxyProtocol": return software.amazon.awssdk.core.Protocol.class;
-        case "queueurl":
-        case "queueUrl": return java.lang.String.class;
+        case "queuearn":
+        case "queueArn": return java.lang.String.class;
         case "region": return java.lang.String.class;
         case "secretkey":
         case "secretKey": return java.lang.String.class;
@@ -128,6 +142,8 @@ public class Sns2ComponentConfigurer extends PropertyConfigurerSupport implement
         case "uriEndpointOverride": return java.lang.String.class;
         case "usedefaultcredentialsprovider":
         case "useDefaultCredentialsProvider": return boolean.class;
+        case "useprofilecredentialsprovider":
+        case "useProfileCredentialsProvider": return boolean.class;
         default: return null;
         }
     }
@@ -145,6 +161,10 @@ public class Sns2ComponentConfigurer extends PropertyConfigurerSupport implement
         case "autowiredenabled":
         case "autowiredEnabled": return target.isAutowiredEnabled();
         case "configuration": return target.getConfiguration();
+        case "healthcheckconsumerenabled":
+        case "healthCheckConsumerEnabled": return target.isHealthCheckConsumerEnabled();
+        case "healthcheckproducerenabled":
+        case "healthCheckProducerEnabled": return target.isHealthCheckProducerEnabled();
         case "kmsmasterkeyid":
         case "kmsMasterKeyId": return getOrCreateConfiguration(target).getKmsMasterKeyId();
         case "lazystartproducer":
@@ -158,14 +178,16 @@ public class Sns2ComponentConfigurer extends PropertyConfigurerSupport implement
         case "overrideendpoint":
         case "overrideEndpoint": return getOrCreateConfiguration(target).isOverrideEndpoint();
         case "policy": return getOrCreateConfiguration(target).getPolicy();
+        case "profilecredentialsname":
+        case "profileCredentialsName": return getOrCreateConfiguration(target).getProfileCredentialsName();
         case "proxyhost":
         case "proxyHost": return getOrCreateConfiguration(target).getProxyHost();
         case "proxyport":
         case "proxyPort": return getOrCreateConfiguration(target).getProxyPort();
         case "proxyprotocol":
         case "proxyProtocol": return getOrCreateConfiguration(target).getProxyProtocol();
-        case "queueurl":
-        case "queueUrl": return getOrCreateConfiguration(target).getQueueUrl();
+        case "queuearn":
+        case "queueArn": return getOrCreateConfiguration(target).getQueueArn();
         case "region": return getOrCreateConfiguration(target).getRegion();
         case "secretkey":
         case "secretKey": return getOrCreateConfiguration(target).getSecretKey();
@@ -180,6 +202,8 @@ public class Sns2ComponentConfigurer extends PropertyConfigurerSupport implement
         case "uriEndpointOverride": return getOrCreateConfiguration(target).getUriEndpointOverride();
         case "usedefaultcredentialsprovider":
         case "useDefaultCredentialsProvider": return getOrCreateConfiguration(target).isUseDefaultCredentialsProvider();
+        case "useprofilecredentialsprovider":
+        case "useProfileCredentialsProvider": return getOrCreateConfiguration(target).isUseProfileCredentialsProvider();
         default: return null;
         }
     }

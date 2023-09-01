@@ -24,9 +24,9 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import org.apache.camel.CamelContext;
 import org.apache.camel.Category;
 import org.apache.camel.Consumer;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.Processor;
 import org.apache.camel.Producer;
 import org.apache.camel.component.cloudevents.CloudEvent;
@@ -40,6 +40,7 @@ import org.apache.camel.spi.UriEndpoint;
 import org.apache.camel.spi.UriParam;
 import org.apache.camel.spi.UriPath;
 import org.apache.camel.support.DefaultEndpoint;
+import org.apache.camel.support.PluginHelper;
 import org.apache.camel.support.PropertyBindingSupport;
 import org.apache.camel.util.ObjectHelper;
 import org.slf4j.Logger;
@@ -115,14 +116,16 @@ public class KnativeEndpoint extends DefaultEndpoint {
         if (replyProcessor != null) {
             list.add(replyProcessor);
         }
-        ExtendedCamelContext ecc = getCamelContext().adapt(ExtendedCamelContext.class);
-        Processor pipeline = ecc.getProcessorFactory().createProcessor(ecc, "Pipeline", new Object[] { list });
+        CamelContext camelContext = getCamelContext();
+        Processor pipeline
+                = PluginHelper.getProcessorFactory(camelContext).createProcessor(camelContext, "Pipeline",
+                        new Object[] { list });
 
         Consumer consumer = getComponent().getConsumerFactory().createConsumer(this,
                 createTransportConfiguration(service), service, pipeline);
 
         PropertyBindingSupport.build()
-                .withCamelContext(getCamelContext())
+                .withCamelContext(camelContext)
                 .withProperties(configuration.getTransportOptions())
                 .withRemoveParameters(false)
                 .withMandatory(false)

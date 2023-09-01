@@ -60,11 +60,11 @@ public final class AS2HeaderUtils {
             StringBuilder sb = new StringBuilder();
             sb.append(attribute);
             if (importance != null) {
-                sb.append("=" + importance.toString());
+                sb.append('=').append(importance);
             }
             if (values != null) {
                 for (String value : values) {
-                    sb.append("," + value);
+                    sb.append(',').append(value);
                 }
             }
             return sb.toString();
@@ -99,11 +99,10 @@ public final class AS2HeaderUtils {
             }
             sb.append(element[0]);
             if (element.length > 1) {
-                sb.append(NAME_VALUE_DELIMITER + element[1]);
+                sb.append(NAME_VALUE_DELIMITER).append(element[1]);
             }
         }
-        BasicHeader header = new BasicHeader(headerName, sb.toString());
-        return header;
+        return new BasicHeader(headerName, sb.toString());
     }
 
     public static Parameter parseParameter(final CharArrayBuffer buffer, final ParserCursor cursor) {
@@ -142,7 +141,7 @@ public final class AS2HeaderUtils {
             }
         }
 
-        return new Parameter(name, importance, values.toArray(new String[values.size()]));
+        return new Parameter(name, importance, values.toArray(new String[0]));
     }
 
     public static String getParameterValue(Header[] headers, String headerName, String parameterName) {

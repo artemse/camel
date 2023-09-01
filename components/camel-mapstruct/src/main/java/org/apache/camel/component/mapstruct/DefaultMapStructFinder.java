@@ -16,12 +16,14 @@
  */
 package org.apache.camel.component.mapstruct;
 
+import java.lang.reflect.Modifier;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.CamelContextAware;
 import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.support.ObjectHelper;
+import org.apache.camel.support.PluginHelper;
 import org.apache.camel.support.SimpleTypeConverter;
 import org.apache.camel.support.service.ServiceSupport;
 import org.apache.camel.util.ReflectionHelper;
@@ -57,7 +59,11 @@ public class DefaultMapStructFinder extends ServiceSupport implements MapStructM
             // is there a generated mapper
             final Object mapper = Mappers.getMapper(clazz);
             if (mapper != null) {
-                ReflectionHelper.doWithMethods(clazz, mc -> {
+                ReflectionHelper.doWithMethods(mapper.getClass(), mc -> {
+                    // must be public
+                    if (!Modifier.isPublic(mc.getModifiers())) {
+                        return;
+                    }
                     // must not be a default method
                     if (mc.isDefault()) {
                         return;
@@ -68,9 +74,9 @@ public class DefaultMapStructFinder extends ServiceSupport implements MapStructM
                         return;
                     }
                     Class<?> from = mc.getParameterTypes()[0];
-                    // must return a value
+                    // must return a non-primitive value
                     Class<?> to = mc.getReturnType();
-                    if (to.equals(Void.class)) {
+                    if (to.isPrimitive()) {
                         return;
                     }
                     // okay register this method as a Camel type converter
@@ -81,7 +87,7 @@ public class DefaultMapStructFinder extends ServiceSupport implements MapStructM
                     answer.incrementAndGet();
                 });
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
             LOG.debug("Mapper class: {} is not a MapStruct Mapper. Skipping this class.", clazz);
         }
 
@@ -96,8 +102,8 @@ public class DefaultMapStructFinder extends ServiceSupport implements MapStructM
     protected void doInit() throws Exception {
         if (mapperPackageName != null) {
             String[] names = mapperPackageName.split(",");
-            ExtendedCamelContext ecc = camelContext.adapt(ExtendedCamelContext.class);
-            var set = ecc.getPackageScanClassResolver()
+            ExtendedCamelContext ecc = camelContext.getCamelContextExtension();
+            var set = PluginHelper.getPackageScanClassResolver(ecc)
                     .findByFilter(f -> f.getName().endsWith("Mapper"), names);
             if (!set.isEmpty()) {
                 int converters = 0;

@@ -194,6 +194,22 @@ public interface SpringWebserviceEndpointBuilderFactory {
             return this;
         }
         /**
+         * The XPath expression to use when option type=xpathresult. Then this
+         * option is required to be configured.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: consumer
+         * 
+         * @param expression the value to set
+         * @return the dsl builder
+         */
+        default SpringWebserviceEndpointConsumerBuilder expression(
+                String expression) {
+            doSetProperty("expression", expression);
+            return this;
+        }
+        /**
          * To configure security using SSLContextParameters.
          * 
          * The option is a:
@@ -1091,7 +1107,7 @@ public interface SpringWebserviceEndpointBuilderFactory {
          * Access external web services as a client or expose your own web
          * services.
          * 
-         * Category: spring,soap,webservice
+         * Category: webservice
          * Since: 2.6
          * Maven coordinates: org.apache.camel:camel-spring-ws
          * 
@@ -1105,7 +1121,7 @@ public interface SpringWebserviceEndpointBuilderFactory {
          * Access external web services as a client or expose your own web
          * services.
          * 
-         * Category: spring,soap,webservice
+         * Category: webservice
          * Since: 2.6
          * Maven coordinates: org.apache.camel:camel-spring-ws
          * 
@@ -1132,10 +1148,6 @@ public interface SpringWebserviceEndpointBuilderFactory {
          * 
          * Path parameter: webServiceEndpointUri
          * The default Web Service endpoint uri to use for the producer.
-         * 
-         * Path parameter: expression
-         * The XPath expression to use when option type=xpathresult. Then this
-         * option is required to be configured.
          * 
          * @param path type:lookupKey:webServiceEndpointUri
          * @return the dsl builder
@@ -1148,7 +1160,7 @@ public interface SpringWebserviceEndpointBuilderFactory {
          * Access external web services as a client or expose your own web
          * services.
          * 
-         * Category: spring,soap,webservice
+         * Category: webservice
          * Since: 2.6
          * Maven coordinates: org.apache.camel:camel-spring-ws
          * 
@@ -1175,10 +1187,6 @@ public interface SpringWebserviceEndpointBuilderFactory {
          * 
          * Path parameter: webServiceEndpointUri
          * The default Web Service endpoint uri to use for the producer.
-         * 
-         * Path parameter: expression
-         * The XPath expression to use when option type=xpathresult. Then this
-         * option is required to be configured.
          * 
          * @param componentName to use a custom component name for the endpoint
          * instead of the default name

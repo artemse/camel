@@ -29,7 +29,7 @@ public abstract class AbstractSynchronizedExchange implements SynchronizedExchan
     protected final List<Synchronization> synchronizations;
     private final Exchange exchange;
 
-    public AbstractSynchronizedExchange(Exchange exchange) {
+    protected AbstractSynchronizedExchange(Exchange exchange) {
         this.exchange = exchange;
         synchronizations = exchange.getExchangeExtension().handoverCompletions();
     }
@@ -53,6 +53,6 @@ public abstract class AbstractSynchronizedExchange implements SynchronizedExchan
     protected void performSynchronization() {
         //call synchronizations with the result
         UnitOfWorkHelper.doneSynchronizations(getExchange(),
-                synchronizations, AbstractSynchronizedExchange.LOG);
+                synchronizations);
     }
 }

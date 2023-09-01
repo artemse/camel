@@ -32,10 +32,10 @@ import java.util.function.Function;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Component;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.PropertyBindingException;
 import org.apache.camel.spi.ExtendedPropertyConfigurerGetter;
 import org.apache.camel.spi.PropertyConfigurer;
+import org.apache.camel.support.PluginHelper;
 import org.apache.camel.support.PropertyBindingSupport;
 import org.apache.camel.support.service.ServiceHelper;
 import org.apache.camel.util.IOHelper;
@@ -120,9 +120,17 @@ public final class MainHelper {
             final String pk2 = pk.replace('-', '_');
             System.getenv().forEach((k, v) -> {
                 k = k.toUpperCase(Locale.US);
-                if (k.startsWith(pk) || k.startsWith(pk2)) {
-                    String key = k.toLowerCase(Locale.US).replace('_', '.');
-                    answer.put(key, v);
+                // kubernetes ENV injected services should be skipped
+                // (https://learn.microsoft.com/en-us/visualstudio/bridge/kubernetes-environment-variables#environment-variables-table)
+                boolean k8s = k.endsWith("_SERVICE_HOST") || k.endsWith("_SERVICE_PORT") || k.endsWith("_PORT")
+                        || k.contains("_PORT_");
+                if (k8s) {
+                    LOG.trace("Skipping Kubernetes Service OS environment variable: {}", k);
+                } else {
+                    if (k.startsWith(pk) || k.startsWith(pk2)) {
+                        String key = k.toLowerCase(Locale.US).replace('_', '.');
+                        answer.put(key, v);
+                    }
                 }
             });
         }
@@ -250,8 +258,7 @@ public final class MainHelper {
         if (targetConfigurer == null) {
             String name = target.getClass().getName();
             // see if there is a configurer for it
-            targetConfigurer = context.adapt(ExtendedCamelContext.class)
-                    .getConfigurerResolver().resolvePropertyConfigurer(name, context);
+            targetConfigurer = PluginHelper.getConfigurerResolver(context).resolvePropertyConfigurer(name, context);
         }
 
         PropertyConfigurer sourceConfigurer = null;
@@ -263,8 +270,7 @@ public final class MainHelper {
         if (sourceConfigurer == null) {
             String name = source.getClass().getName();
             // see if there is a configurer for it
-            sourceConfigurer = context.adapt(ExtendedCamelContext.class)
-                    .getConfigurerResolver().resolvePropertyConfigurer(name, context);
+            sourceConfigurer = PluginHelper.getConfigurerResolver(context).resolvePropertyConfigurer(name, context);
         }
 
         if (targetConfigurer != null && sourceConfigurer instanceof ExtendedPropertyConfigurerGetter) {
@@ -299,8 +305,7 @@ public final class MainHelper {
         if (configurer == null) {
             String name = target.getClass().getName();
             // see if there is a configurer for it (use bootstrap)
-            configurer = context.adapt(ExtendedCamelContext.class)
-                    .getBootstrapConfigurerResolver().resolvePropertyConfigurer(name, context);
+            configurer = PluginHelper.getBootstrapConfigurerResolver(context).resolvePropertyConfigurer(name, context);
         }
 
         try {
@@ -346,9 +351,9 @@ public final class MainHelper {
                 throw new PropertyBindingException(
                         e.getTarget(), e.getPropertyName(), e.getValue(), optionPrefix, key, e.getCause());
             } else {
-                LOG.debug("Error configuring property (" + key + ") with name: " + e.getPropertyName() + ") on bean: " + target
-                          + " with value: " + e.getValue() + ". This exception is ignored as failIfNotSet=false.",
-                        e);
+                LOG.debug(
+                        "Error configuring property ({}) with name: {}) on bean: {} with value: {}. This exception is ignored as failIfNotSet=false.",
+                        key, e.getPropertyName(), target, e.getValue(), e);
             }
         }
 
@@ -443,11 +448,13 @@ public final class MainHelper {
      * Warning, don't use for crazy big streams :)
      */
     private static void loadLines(InputStream in, Set<String> lines, Function<String, String> func) throws IOException {
-        try (final InputStreamReader isr = new InputStreamReader(in);
-             final BufferedReader reader = new LineNumberReader(isr)) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                lines.add(func.apply(line));
+        if (in != null) {
+            try (final InputStreamReader isr = new InputStreamReader(in);
+                 final BufferedReader reader = new LineNumberReader(isr)) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    lines.add(func.apply(line));
+                }
             }
         }
     }

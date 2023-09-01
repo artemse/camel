@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
 import java.security.KeyManagementException;
 import java.security.SecureRandom;
@@ -57,16 +56,16 @@ import org.slf4j.LoggerFactory;
 public abstract class BaseSSLContextParameters extends JsseParameters {
 
     protected static final List<String> DEFAULT_CIPHER_SUITES_FILTER_INCLUDE
-            = Collections.unmodifiableList(Arrays.asList(".*"));
+            = List.of(".*");
 
-    protected static final List<String> DEFAULT_CIPHER_SUITES_FILTER_EXCLUDE = Collections
-            .unmodifiableList(Arrays.asList(".*_NULL_.*", ".*_anon_.*", ".*_EXPORT_.*", ".*_DES_.*", ".*MD5", ".*RC4.*"));
+    protected static final List<String> DEFAULT_CIPHER_SUITES_FILTER_EXCLUDE
+            = List.of(".*_NULL_.*", ".*_anon_.*", ".*_EXPORT_.*", ".*_DES_.*", ".*MD5", ".*RC4.*");
 
     protected static final List<String> DEFAULT_SECURE_SOCKET_PROTOCOLS_FILTER_INCLUDE
-            = Collections.unmodifiableList(Arrays.asList(".*"));
+            = List.of(".*");
 
     protected static final List<String> DEFAULT_SECURE_SOCKET_PROTOCOLS_FILTER_EXCLUDE
-            = Collections.unmodifiableList(Arrays.asList("SSL.*"));
+            = List.of("SSL.*");
 
     private static final Logger LOG = LoggerFactory.getLogger(BaseSSLContextParameters.class);
 
@@ -345,7 +344,7 @@ public abstract class BaseSSLContextParameters extends JsseParameters {
                             filteredCipherSuites);
                 }
 
-                engine.setEnabledCipherSuites(filteredCipherSuites.toArray(new String[filteredCipherSuites.size()]));
+                engine.setEnabledCipherSuites(filteredCipherSuites.toArray(new String[0]));
 
                 Collection<String> filteredSecureSocketProtocols = BaseSSLContextParameters.this
                         .filter(enabledSecureSocketProtocols, Arrays.asList(engine.getSSLParameters().getProtocols()),
@@ -365,7 +364,7 @@ public abstract class BaseSSLContextParameters extends JsseParameters {
                 }
 
                 engine.setEnabledProtocols(
-                        filteredSecureSocketProtocols.toArray(new String[filteredSecureSocketProtocols.size()]));
+                        filteredSecureSocketProtocols.toArray(new String[0]));
 
                 return engine;
             }
@@ -517,7 +516,7 @@ public abstract class BaseSSLContextParameters extends JsseParameters {
                             filteredCipherSuites);
                 }
 
-                socket.setEnabledCipherSuites(filteredCipherSuites.toArray(new String[filteredCipherSuites.size()]));
+                socket.setEnabledCipherSuites(filteredCipherSuites.toArray(new String[0]));
 
                 Collection<String> filteredSecureSocketProtocols = BaseSSLContextParameters.this
                         .filter(enabledSecureSocketProtocols, Arrays.asList(socket.getSSLParameters().getProtocols()),
@@ -537,7 +536,7 @@ public abstract class BaseSSLContextParameters extends JsseParameters {
                 }
 
                 socket.setEnabledProtocols(
-                        filteredSecureSocketProtocols.toArray(new String[filteredSecureSocketProtocols.size()]));
+                        filteredSecureSocketProtocols.toArray(new String[0]));
                 return socket;
             }
         };
@@ -613,7 +612,7 @@ public abstract class BaseSSLContextParameters extends JsseParameters {
                             filteredCipherSuites);
                 }
 
-                socket.setEnabledCipherSuites(filteredCipherSuites.toArray(new String[filteredCipherSuites.size()]));
+                socket.setEnabledCipherSuites(filteredCipherSuites.toArray(new String[0]));
 
                 Collection<String> filteredSecureSocketProtocols = BaseSSLContextParameters.this
                         .filter(enabledSecureSocketProtocols, Arrays.asList(socket.getSupportedProtocols()),
@@ -633,7 +632,7 @@ public abstract class BaseSSLContextParameters extends JsseParameters {
                 }
 
                 socket.setEnabledProtocols(
-                        filteredSecureSocketProtocols.toArray(new String[filteredSecureSocketProtocols.size()]));
+                        filteredSecureSocketProtocols.toArray(new String[0]));
                 return socket;
             }
         };
@@ -1043,12 +1042,12 @@ public abstract class BaseSSLContextParameters extends JsseParameters {
         public Socket createSocket(
                 Socket s, String host,
                 int port, boolean autoClose)
-                throws IOException, UnknownHostException {
+                throws IOException {
             return configureSocket(sslSocketFactory.createSocket(s, host, port, autoClose));
         }
 
         @Override
-        public Socket createSocket(String host, int port) throws IOException, UnknownHostException {
+        public Socket createSocket(String host, int port) throws IOException {
             return configureSocket(sslSocketFactory.createSocket(host, port));
         }
 
@@ -1056,7 +1055,7 @@ public abstract class BaseSSLContextParameters extends JsseParameters {
         public Socket createSocket(
                 String host, int port,
                 InetAddress localHost, int localPort)
-                throws IOException, UnknownHostException {
+                throws IOException {
             return configureSocket(sslSocketFactory.createSocket(host, port, localHost, localPort));
         }
 

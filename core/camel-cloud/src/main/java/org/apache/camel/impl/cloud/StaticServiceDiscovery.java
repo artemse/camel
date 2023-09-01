@@ -18,11 +18,9 @@ package org.apache.camel.impl.cloud;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import org.apache.camel.cloud.ServiceDefinition;
 import org.apache.camel.util.ObjectHelper;
@@ -105,10 +103,9 @@ public class StaticServiceDiscovery extends DefaultServiceDiscovery {
 
     @Override
     public List<ServiceDefinition> getServices(String name) {
-        return Collections.unmodifiableList(
-                services.stream()
-                        .filter(s -> Objects.isNull(s.getName()) || Objects.equals(name, s.getName()))
-                        .collect(Collectors.toList()));
+        return services.stream()
+                .filter(s -> Objects.isNull(s.getName()) || Objects.equals(name, s.getName()))
+                .toList();
     }
 
     // *************************************************************************

@@ -77,37 +77,18 @@ import org.apache.camel.vault.VaultConfiguration;
  * End users are advised to use suspend/resume. Using stop is for shutting down Camel and it's not guaranteed that when
  * it's being started again using the start method that Camel will operate consistently.
  * <p/>
- * For more advanced APIs with {@link CamelContext} see {@link ExtendedCamelContext}, which you can obtain via the adapt
- * method.
+ * You can use the {@link CamelContext#getCamelContextExtension()} to obtain the extension point for the
+ * {@link CamelContext}. This extension point exposes internal APIs via {@link ExtendedCamelContext}.
  */
 public interface CamelContext extends CamelContextLifecycle, RuntimeConfiguration {
 
     /**
-     * Adapts this {@link org.apache.camel.CamelContext} to the specialized type.
-     * <p/>
-     * For example to adapt to <tt>ExtendedCamelContext</tt>, <tt>ModelCamelContext</tt>, or
-     * <tt>SpringCamelContext</tt>, or <tt>CdiCamelContext</tt>, etc.
+     * Gets the {@link ExtendedCamelContext} that contains the extension points for internal context APIs. These APIs
+     * are intended for internal usage within Camel and end-users should avoid using them.
      *
-     * @param  type the type to adapt to
-     * @return      this {@link org.apache.camel.CamelContext} adapted to the given type
+     * @return this {@link ExtendedCamelContext} extension point for this context.
      */
-    <T extends CamelContext> T adapt(Class<T> type);
-
-    /**
-     * Gets the extension of the given type.
-     *
-     * @param  type the type of the extension
-     * @return      the extension, or <tt>null</tt> if no extension has been installed.
-     */
-    <T> T getExtension(Class<T> type);
-
-    /**
-     * Allows to install custom extensions to the Camel context.
-     *
-     * @param type   the type of the extension
-     * @param module the instance of the extension
-     */
-    <T> void setExtension(Class<T> type, T module);
+    ExtendedCamelContext getCamelContextExtension();
 
     /**
      * If CamelContext during the start procedure was vetoed, and therefore causing Camel to not start.
@@ -453,15 +434,6 @@ public interface CamelContext extends CamelContextLifecycle, RuntimeConfiguratio
     Collection<Endpoint> getEndpoints();
 
     /**
-     * Returns a new {@link Map} containing all of the endpoints from the {@link org.apache.camel.spi.EndpointRegistry}
-     *
-     * @return     map of endpoints
-     * @deprecated use {@link #getEndpointRegistry()}
-     */
-    @Deprecated
-    Map<String, Endpoint> getEndpointMap();
-
-    /**
      * Is the given endpoint already registered in the {@link org.apache.camel.spi.EndpointRegistry}
      *
      * @param  uri the URI of the endpoint
@@ -627,14 +599,12 @@ public interface CamelContext extends CamelContextLifecycle, RuntimeConfiguratio
      * Camel end users should favour using {@link org.apache.camel.builder.TemplatedRouteBuilder} which is a fluent
      * builder with more functionality than this API.
      *
-     * @param      routeId         the id of the new route to add (optional)
-     * @param      routeTemplateId the id of the route template (mandatory)
-     * @param      parameters      parameters to use for the route template when creating the new route
-     * @return                     the id of the route added (for example when an id was auto assigned)
-     * @throws     Exception       is thrown if error creating and adding the new route
-     * @deprecated                 use {@link #addRouteFromTemplate(String, String, String, Map)}
+     * @param  routeId         the id of the new route to add (optional)
+     * @param  routeTemplateId the id of the route template (mandatory)
+     * @param  parameters      parameters to use for the route template when creating the new route
+     * @return                 the id of the route added (for example when an id was auto assigned)
+     * @throws Exception       is thrown if error creating and adding the new route
      */
-    @Deprecated
     String addRouteFromTemplate(String routeId, String routeTemplateId, Map<String, Object> parameters) throws Exception;
 
     /**
@@ -653,23 +623,6 @@ public interface CamelContext extends CamelContextLifecycle, RuntimeConfiguratio
     String addRouteFromTemplate(
             String routeId, String routeTemplateId, String prefixId,
             Map<String, Object> parameters)
-            throws Exception;
-
-    /**
-     * Adds a new route from a given route template.
-     *
-     * Camel end users should favour using {@link org.apache.camel.builder.TemplatedRouteBuilder} which is a fluent
-     * builder with more functionality than this API.
-     *
-     * @param      routeId              the id of the new route to add (optional)
-     * @param      routeTemplateId      the id of the route template (mandatory)
-     * @param      routeTemplateContext the route template context (mandatory)
-     * @return                          the id of the route added (for example when an id was auto assigned)
-     * @throws     Exception            is thrown if error creating and adding the new route
-     * @deprecated                      use {@link #addRouteFromTemplate(String, String, String, RouteTemplateContext)}
-     */
-    @Deprecated
-    String addRouteFromTemplate(String routeId, String routeTemplateId, RouteTemplateContext routeTemplateContext)
             throws Exception;
 
     /**
@@ -995,10 +948,10 @@ public interface CamelContext extends CamelContextLifecycle, RuntimeConfiguratio
     /**
      * Resolve a transformer given a scheme
      *
-     * @param  model data model name.
-     * @return       the resolved transformer, or <tt>null</tt> if not found
+     * @param  name the transformer name, usually a combination of some scheme and name.
+     * @return      the resolved transformer, or <tt>null</tt> if not found
      */
-    Transformer resolveTransformer(String model);
+    Transformer resolveTransformer(String name);
 
     /**
      * Resolve a transformer given from/to data type.
@@ -1228,6 +1181,19 @@ public interface CamelContext extends CamelContextLifecycle, RuntimeConfiguratio
     boolean isBacklogTracingStandby();
 
     /**
+     * Whether backlog tracing should trace inner details from route templates (or kamelets). Turning this off can
+     * reduce the verbosity of tracing when using many route templates, and allow to focus on tracing your own Camel
+     * routes only.
+     */
+    void setBacklogTracingTemplates(boolean backlogTracingTemplates);
+
+    /**
+     * Whether backlog tracing should trace inner details from route templates (or kamelets). Turning this on increases
+     * the verbosity of tracing by including events from internal routes in the templates or kamelets.
+     */
+    boolean isBacklogTracingTemplates();
+
+    /**
      * Gets the current {@link UuidGenerator}
      *
      * @return the uuidGenerator
@@ -1402,17 +1368,16 @@ public interface CamelContext extends CamelContextLifecycle, RuntimeConfiguratio
     void setTracingLoggingFormat(String format);
 
     /**
-     * If dumping is enabled then Camel will during startup dump all loaded routes (incl rests and route templates)
-     * represented as XML DSL into the log. This is intended for trouble shooting or to assist during development.
-     *
-     * Sensitive information that may be configured in the route endpoints could potentially be included in the dump
-     * output and is therefore not recommended to be used for production usage.
-     *
-     * This requires to have camel-xml-jaxb on the classpath to be able to dump the routes as XML.
-     *
-     * @return <tt>true</tt> if dumping is enabled
+     * Whether tracing should trace inner details from route templates (or kamelets). Turning this on increases the
+     * verbosity of tracing by including events from internal routes in the templates or kamelets.
      */
-    Boolean isDumpRoutes();
+    void setTracingTemplates(boolean tracingTemplates);
+
+    /**
+     * Whether tracing should trace inner details from route templates (or kamelets). Turning this off can reduce the
+     * verbosity of tracing when using many route templates, and allow to focus on tracing your own Camel routes only.
+     */
+    boolean isTracingTemplates();
 
     /**
      * If dumping is enabled then Camel will during startup dump all loaded routes (incl rests and route templates)
@@ -1423,15 +1388,29 @@ public interface CamelContext extends CamelContextLifecycle, RuntimeConfiguratio
      *
      * This requires to have camel-xml-jaxb on the classpath to be able to dump the routes as XML.
      *
-     * @param dumpRoutes <tt>true</tt> to enable dumping routes.
+     * @return <tt>xml</tt>, or <tt>yaml</tt> if dumping is enabled
      */
-    void setDumpRoutes(Boolean dumpRoutes);
+    String getDumpRoutes();
+
+    /**
+     * If dumping is enabled then Camel will during startup dump all loaded routes (incl rests and route templates)
+     * represented as XML/YAML DSL into the log. This is intended for trouble shooting or to assist during development.
+     *
+     * Sensitive information that may be configured in the route endpoints could potentially be included in the dump
+     * output and is therefore not recommended being used for production usage.
+     *
+     * This requires to have camel-xml-io/camel-yaml-io on the classpath to be able to dump the routes as XML/YAML.
+     *
+     * @param format xml or yaml (additional configuration can be specified using query parameters, eg
+     *               ?include=all&uriAsParameters=true)
+     */
+    void setDumpRoutes(String format);
 
     /**
      * Whether to enable using data type on Camel messages.
      * <p/>
-     * Data type are automatic turned on if one ore more routes has been explicit configured with input and output
-     * types. Otherwise data type is default off.
+     * Data type are automatic turned on if one or more routes has been explicit configured with input and output types.
+     * Otherwise, data type is default off.
      *
      * @return <tt>true</tt> if data type is enabled
      */
@@ -1440,8 +1419,8 @@ public interface CamelContext extends CamelContextLifecycle, RuntimeConfiguratio
     /**
      * Whether to enable using data type on Camel messages.
      * <p/>
-     * Data type are automatic turned on if one ore more routes has been explicit configured with input and output
-     * types. Otherwise data type is default off.
+     * Data type are automatic turned on if one or more routes has been explicit configured with input and output types.
+     * Otherwise, data type is default off.
      *
      * @param useDataType <tt>true</tt> to enable data type on Camel messages.
      */

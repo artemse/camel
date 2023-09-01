@@ -34,7 +34,7 @@ public interface GoogleSheetsStreamComponentBuilderFactory {
      * Google Sheets Stream (camel-google-sheets)
      * Poll for changes in Google Sheets.
      * 
-     * Category: cloud,sheets
+     * Category: cloud,document
      * Since: 2.23
      * Maven coordinates: org.apache.camel:camel-google-sheets
      * 
@@ -289,6 +289,42 @@ public interface GoogleSheetsStreamComponentBuilderFactory {
             return this;
         }
         /**
+         * Used for enabling or disabling all consumer based health checks from
+         * this component.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: true
+         * Group: health
+         * 
+         * @param healthCheckConsumerEnabled the value to set
+         * @return the dsl builder
+         */
+        default GoogleSheetsStreamComponentBuilder healthCheckConsumerEnabled(
+                boolean healthCheckConsumerEnabled) {
+            doSetProperty("healthCheckConsumerEnabled", healthCheckConsumerEnabled);
+            return this;
+        }
+        /**
+         * Used for enabling or disabling all producer based health checks from
+         * this component. Notice: Camel has by default disabled all producer
+         * based health-checks. You can turn on producer checks globally by
+         * setting camel.health.producersEnabled=true.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: true
+         * Group: health
+         * 
+         * @param healthCheckProducerEnabled the value to set
+         * @return the dsl builder
+         */
+        default GoogleSheetsStreamComponentBuilder healthCheckProducerEnabled(
+                boolean healthCheckProducerEnabled) {
+            doSetProperty("healthCheckProducerEnabled", healthCheckProducerEnabled);
+            return this;
+        }
+        /**
          * OAuth 2 access token. This typically expires after an hour so
          * refreshToken is recommended for long term usage.
          * 
@@ -389,6 +425,8 @@ public interface GoogleSheetsStreamComponentBuilderFactory {
             case "valueRenderOption": getOrCreateConfiguration((GoogleSheetsStreamComponent) component).setValueRenderOption((java.lang.String) value); return true;
             case "autowiredEnabled": ((GoogleSheetsStreamComponent) component).setAutowiredEnabled((boolean) value); return true;
             case "clientFactory": ((GoogleSheetsStreamComponent) component).setClientFactory((org.apache.camel.component.google.sheets.GoogleSheetsClientFactory) value); return true;
+            case "healthCheckConsumerEnabled": ((GoogleSheetsStreamComponent) component).setHealthCheckConsumerEnabled((boolean) value); return true;
+            case "healthCheckProducerEnabled": ((GoogleSheetsStreamComponent) component).setHealthCheckProducerEnabled((boolean) value); return true;
             case "accessToken": getOrCreateConfiguration((GoogleSheetsStreamComponent) component).setAccessToken((java.lang.String) value); return true;
             case "clientSecret": getOrCreateConfiguration((GoogleSheetsStreamComponent) component).setClientSecret((java.lang.String) value); return true;
             case "refreshToken": getOrCreateConfiguration((GoogleSheetsStreamComponent) component).setRefreshToken((java.lang.String) value); return true;

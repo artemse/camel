@@ -44,23 +44,24 @@ public class BatchConsumerPooledExchangeTest extends ContextTestSupport {
 
     @Override
     protected CamelContext createCamelContext() throws Exception {
-        ExtendedCamelContext ecc = (ExtendedCamelContext) super.createCamelContext();
+        CamelContext camelContext = super.createCamelContext();
+        ExtendedCamelContext ecc = camelContext.getCamelContextExtension();
 
         ecc.setExchangeFactory(new PooledExchangeFactory());
         ecc.setProcessorExchangeFactory(new PooledProcessorExchangeFactory());
         ecc.getExchangeFactory().setStatisticsEnabled(true);
         ecc.getProcessorExchangeFactory().setStatisticsEnabled(true);
 
-        return ecc;
+        return camelContext;
     }
 
     @Override
     @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
-        template.sendBodyAndHeader(fileUri(), "aaa", Exchange.FILE_NAME, "aaa.txt");
-        template.sendBodyAndHeader(fileUri(), "bbb", Exchange.FILE_NAME, "bbb.txt");
-        template.sendBodyAndHeader(fileUri(), "ccc", Exchange.FILE_NAME, "ccc.txt");
+        template.sendBodyAndHeader(fileUri(), "aaa", Exchange.FILE_NAME, "aaa.BatchConsumerPooledExchangeTest.txt");
+        template.sendBodyAndHeader(fileUri(), "bbb", Exchange.FILE_NAME, "bbb.BatchConsumerPooledExchangeTest.txt");
+        template.sendBodyAndHeader(fileUri(), "ccc", Exchange.FILE_NAME, "ccc.BatchConsumerPooledExchangeTest.txt");
     }
 
     @Test
@@ -79,7 +80,7 @@ public class BatchConsumerPooledExchangeTest extends ContextTestSupport {
 
         Awaitility.waitAtMost(2, TimeUnit.SECONDS).untilAsserted(() -> {
             PooledObjectFactory.Statistics stat
-                    = context.adapt(ExtendedCamelContext.class).getExchangeFactoryManager().getStatistics();
+                    = context.getCamelContextExtension().getExchangeFactoryManager().getStatistics();
             assertEquals(1, stat.getCreatedCounter());
             assertEquals(2, stat.getAcquiredCounter());
             assertEquals(3, stat.getReleasedCounter());

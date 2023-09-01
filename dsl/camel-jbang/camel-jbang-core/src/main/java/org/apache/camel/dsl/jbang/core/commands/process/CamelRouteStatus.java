@@ -26,6 +26,7 @@ import com.github.freva.asciitable.Column;
 import com.github.freva.asciitable.HorizontalAlign;
 import com.github.freva.asciitable.OverflowBehaviour;
 import org.apache.camel.dsl.jbang.core.commands.CamelJBangMain;
+import org.apache.camel.dsl.jbang.core.common.PidNameAgeCompletionCandidates;
 import org.apache.camel.dsl.jbang.core.common.ProcessHelper;
 import org.apache.camel.util.TimeUtils;
 import org.apache.camel.util.json.JsonArray;
@@ -33,13 +34,14 @@ import org.apache.camel.util.json.JsonObject;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
-@Command(name = "route", description = "Get status of Camel routes")
+@Command(name = "route", description = "Get status of Camel routes",
+         sortOptions = false)
 public class CamelRouteStatus extends ProcessWatchCommand {
 
     @CommandLine.Parameters(description = "Name or pid of running Camel integration", arity = "0..1")
     String name = "*";
 
-    @CommandLine.Option(names = { "--sort" },
+    @CommandLine.Option(names = { "--sort" }, completionCandidates = PidNameAgeCompletionCandidates.class,
                         description = "Sort by pid, name or age", defaultValue = "pid")
     String sort;
 
@@ -50,6 +52,10 @@ public class CamelRouteStatus extends ProcessWatchCommand {
     @CommandLine.Option(names = { "--short-uri" },
                         description = "List endpoint URI without query parameters (short)")
     boolean shortUri;
+
+    @CommandLine.Option(names = { "--wide-uri" },
+                        description = "List endpoint URI in full details")
+    boolean wideUri;
 
     @CommandLine.Option(names = { "--limit" },
                         description = "Filter routes by limiting to the given number of rows")
@@ -64,7 +70,7 @@ public class CamelRouteStatus extends ProcessWatchCommand {
     }
 
     @Override
-    public Integer doCall() throws Exception {
+    public Integer doProcessWatchCall() throws Exception {
         List<Row> rows = new ArrayList<>();
 
         List<Long> pids = findPids(name);
@@ -85,7 +91,7 @@ public class CamelRouteStatus extends ProcessWatchCommand {
                             if ("CamelJBang".equals(row.name)) {
                                 row.name = ProcessHelper.extractName(root, ph);
                             }
-                            row.pid = "" + ph.pid();
+                            row.pid = Long.toString(ph.pid());
                             row.routeId = o.getString("routeId");
                             row.from = o.getString("from");
                             row.source = o.getString("source");
@@ -174,9 +180,13 @@ public class CamelRouteStatus extends ProcessWatchCommand {
                 new Column().header("PID").headerAlign(HorizontalAlign.CENTER).with(r -> r.pid),
                 new Column().header("NAME").dataAlign(HorizontalAlign.LEFT).maxWidth(30, OverflowBehaviour.ELLIPSIS_RIGHT)
                         .with(r -> r.name),
-                new Column().header("ID").dataAlign(HorizontalAlign.LEFT).maxWidth(25, OverflowBehaviour.ELLIPSIS_RIGHT)
+                new Column().header("ID").dataAlign(HorizontalAlign.LEFT).maxWidth(20, OverflowBehaviour.ELLIPSIS_RIGHT)
                         .with(this::getId),
-                new Column().header("FROM").dataAlign(HorizontalAlign.LEFT).maxWidth(40, OverflowBehaviour.ELLIPSIS_RIGHT)
+                new Column().header("FROM").visible(!wideUri).dataAlign(HorizontalAlign.LEFT)
+                        .maxWidth(45, OverflowBehaviour.ELLIPSIS_RIGHT)
+                        .with(this::getFrom),
+                new Column().header("FROM").visible(wideUri).dataAlign(HorizontalAlign.LEFT)
+                        .maxWidth(45, OverflowBehaviour.NEWLINE)
                         .with(this::getFrom),
                 new Column().header("STATUS").headerAlign(HorizontalAlign.CENTER)
                         .with(r -> r.state),

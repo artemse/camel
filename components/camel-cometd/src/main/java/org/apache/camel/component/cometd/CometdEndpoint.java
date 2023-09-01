@@ -37,7 +37,7 @@ import org.apache.camel.util.ObjectHelper;
  * the browser using an AJAX based mechanism.
  */
 @UriEndpoint(firstVersion = "2.0.0", scheme = "cometd,cometds", title = "CometD", syntax = "cometd:host:port/channelName",
-             category = { Category.WEBSOCKET }, headersClass = CometdBinding.class)
+             category = { Category.NETWORKING, Category.MESSAGING }, headersClass = CometdBinding.class)
 public class CometdEndpoint extends DefaultEndpoint {
 
     private CometdComponent component;
@@ -93,8 +93,7 @@ public class CometdEndpoint extends DefaultEndpoint {
     @Override
     public Producer createProducer() throws Exception {
         ObjectHelper.notNull(component, "component");
-        CometdProducer producer = new CometdProducer(this);
-        return producer;
+        return new CometdProducer(this);
     }
 
     @Override

@@ -43,7 +43,6 @@ import org.apache.camel.CamelExchangeException;
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePropertyKey;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.Navigate;
 import org.apache.camel.Processor;
 import org.apache.camel.Producer;
@@ -54,6 +53,7 @@ import org.apache.camel.Traceable;
 import org.apache.camel.processor.aggregate.ShareUnitOfWorkAggregationStrategy;
 import org.apache.camel.processor.aggregate.UseOriginalAggregationStrategy;
 import org.apache.camel.processor.errorhandler.ErrorHandlerSupport;
+import org.apache.camel.spi.AsyncProcessorAwaitManager;
 import org.apache.camel.spi.ErrorHandlerAware;
 import org.apache.camel.spi.IdAware;
 import org.apache.camel.spi.InternalProcessorFactory;
@@ -67,6 +67,7 @@ import org.apache.camel.support.DefaultExchange;
 import org.apache.camel.support.EventHelper;
 import org.apache.camel.support.ExchangeHelper;
 import org.apache.camel.support.PatternHelper;
+import org.apache.camel.support.PluginHelper;
 import org.apache.camel.support.service.ServiceHelper;
 import org.apache.camel.util.CastUtils;
 import org.apache.camel.util.IOHelper;
@@ -148,6 +149,7 @@ public class MulticastProcessor extends AsyncProcessorSupport
 
     protected final Processor onPrepare;
     protected final ProcessorExchangeFactory processorExchangeFactory;
+    private final AsyncProcessorAwaitManager awaitManager;
     private final CamelContext camelContext;
     private final InternalProcessorFactory internalProcessorFactory;
     private final Route route;
@@ -155,9 +157,10 @@ public class MulticastProcessor extends AsyncProcessorSupport
     private Processor errorHandler;
     private String id;
     private String routeId;
-    private Collection<Processor> processors;
+    private final Collection<Processor> processors;
     private final AggregationStrategy aggregationStrategy;
     private final boolean parallelProcessing;
+    private boolean synchronous;
     private final boolean streaming;
     private final boolean parallelAggregate;
     private final boolean stopOnException;
@@ -187,9 +190,10 @@ public class MulticastProcessor extends AsyncProcessorSupport
                               boolean parallelAggregate) {
         notNull(camelContext, "camelContext");
         this.camelContext = camelContext;
-        this.internalProcessorFactory = camelContext.adapt(ExtendedCamelContext.class).getInternalProcessorFactory();
+        this.internalProcessorFactory = PluginHelper.getInternalProcessorFactory(camelContext);
+        this.awaitManager = PluginHelper.getAsyncProcessorAwaitManager(camelContext);
         this.route = route;
-        this.reactiveExecutor = camelContext.adapt(ExtendedCamelContext.class).getReactiveExecutor();
+        this.reactiveExecutor = camelContext.getCamelContextExtension().getReactiveExecutor();
         this.processors = processors;
         this.aggregationStrategy = aggregationStrategy;
         this.executorService = executorService;
@@ -202,7 +206,7 @@ public class MulticastProcessor extends AsyncProcessorSupport
         this.onPrepare = onPrepare;
         this.shareUnitOfWork = shareUnitOfWork;
         this.parallelAggregate = parallelAggregate;
-        this.processorExchangeFactory = camelContext.adapt(ExtendedCamelContext.class)
+        this.processorExchangeFactory = camelContext.getCamelContextExtension()
                 .getProcessorExchangeFactory().newProcessorExchangeFactory(this);
     }
 
@@ -250,6 +254,14 @@ public class MulticastProcessor extends AsyncProcessorSupport
         return camelContext;
     }
 
+    public boolean isSynchronous() {
+        return synchronous;
+    }
+
+    public void setSynchronous(boolean synchronous) {
+        this.synchronous = synchronous;
+    }
+
     @Override
     protected void doBuild() throws Exception {
         if (processorExchangeFactory != null) {
@@ -288,6 +300,28 @@ public class MulticastProcessor extends AsyncProcessorSupport
 
     @Override
     public boolean process(Exchange exchange, AsyncCallback callback) {
+        if (synchronous) {
+            try {
+                // force synchronous processing using await manager
+                awaitManager.process(new AsyncProcessorSupport() {
+                    @Override
+                    public boolean process(Exchange exchange, AsyncCallback callback) {
+                        // must invoke doProcess directly here to avoid calling recursive
+                        return doProcess(exchange, callback);
+                    }
+                }, exchange);
+            } catch (Exception e) {
+                exchange.setException(e);
+            } finally {
+                callback.done(true);
+            }
+            return true;
+        } else {
+            return doProcess(exchange, callback);
+        }
+    }
+
+    protected boolean doProcess(Exchange exchange, AsyncCallback callback) {
         Iterable<ProcessorExchangePair> pairs;
         int size = 0;
         try {
@@ -295,7 +329,7 @@ public class MulticastProcessor extends AsyncProcessorSupport
             if (pairs instanceof Collection) {
                 size = ((Collection<ProcessorExchangePair>) pairs).size();
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
             exchange.setException(e);
             // unexpected exception was thrown, maybe from iterator etc. so do not regard as exhausted
             // and do the done work
@@ -440,7 +474,7 @@ public class MulticastProcessor extends AsyncProcessorSupport
                             doDone(result.get(), true);
                         }
                     }
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     original.setException(e);
                     // and do the done work
                     doDone(null, false);
@@ -468,7 +502,7 @@ public class MulticastProcessor extends AsyncProcessorSupport
                         }
                     }
                     doDone(result.get(), true);
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     original.setException(e);
                     // and do the done work
                     doDone(null, false);
@@ -801,10 +835,10 @@ public class MulticastProcessor extends AsyncProcessorSupport
             } else {
                 // copy the current result to original (preserve original correlation id),
                 // so it will contain this result of this eip
-                Object correlationId = subExchange.removeProperty(ExchangePropertyKey.CORRELATION_ID);
+                Object correlationId = original.removeProperty(ExchangePropertyKey.CORRELATION_ID);
                 ExchangeHelper.copyResults(original, subExchange);
                 if (correlationId != null) {
-                    subExchange.setProperty(ExchangePropertyKey.CORRELATION_ID, correlationId);
+                    original.setProperty(ExchangePropertyKey.CORRELATION_ID, correlationId);
                 }
             }
         }
@@ -815,8 +849,8 @@ public class MulticastProcessor extends AsyncProcessorSupport
                 for (ProcessorExchangePair pair : pairs) {
                     processorExchangeFactory.release(pair.getExchange());
                 }
-            } catch (Throwable e) {
-                LOG.warn("Error releasing exchange due to " + e.getMessage() + ". This exception is ignored.", e);
+            } catch (Exception e) {
+                LOG.warn("Error releasing exchange due to {}. This exception is ignored.", e.getMessage(), e);
             }
         }
         // we are done so close the pairs iterator
@@ -1063,7 +1097,7 @@ public class MulticastProcessor extends AsyncProcessorSupport
             return ((ErrorHandlerSupport) errorHandler).clone(processor);
         }
         // fallback and use reifier to create the error handler
-        return camelContext.adapt(ExtendedCamelContext.class).createErrorHandler(route, processor);
+        return camelContext.getCamelContextExtension().createErrorHandler(route, processor);
     }
 
     /**

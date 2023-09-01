@@ -33,8 +33,9 @@ import org.apache.camel.catalog.DefaultCamelCatalog;
 import org.apache.camel.dsl.jbang.core.commands.CamelCommand;
 import org.apache.camel.dsl.jbang.core.commands.CamelJBangMain;
 import org.apache.camel.dsl.jbang.core.common.CatalogLoader;
-import org.apache.camel.main.download.MavenGav;
+import org.apache.camel.dsl.jbang.core.common.RuntimeCompletionCandidates;
 import org.apache.camel.main.util.SuggestSimilarHelper;
+import org.apache.camel.tooling.maven.MavenGav;
 import org.apache.camel.tooling.model.BaseOptionModel;
 import org.apache.camel.tooling.model.ComponentModel;
 import org.apache.camel.tooling.model.DataFormatModel;
@@ -47,7 +48,7 @@ import picocli.CommandLine;
 import static org.apache.camel.dsl.jbang.core.commands.catalog.CatalogBaseCommand.findComponentNames;
 
 @CommandLine.Command(name = "doc",
-                     description = "Shows documentation for kamelet, component, and other Camel resources")
+                     description = "Shows documentation for kamelet, component, and other Camel resources", sortOptions = false)
 public class CatalogDoc extends CamelCommand {
 
     @CommandLine.Parameters(description = "Name of kamelet, component, dataformat, or other Camel resource",
@@ -55,10 +56,11 @@ public class CatalogDoc extends CamelCommand {
     String name;
 
     @CommandLine.Option(names = { "--camel-version" },
-                        description = "To run using a different Camel version than the default version.")
+                        description = "To use a different Camel version than the default version")
     String camelVersion;
 
-    @CommandLine.Option(names = { "--runtime" }, description = "Runtime (spring-boot, quarkus, or camel-main)")
+    @CommandLine.Option(names = { "--runtime" }, completionCandidates = RuntimeCompletionCandidates.class,
+                        description = "Runtime (spring-boot, quarkus, or camel-main)")
     String runtime;
 
     @CommandLine.Option(names = { "--repos" },
@@ -84,7 +86,7 @@ public class CatalogDoc extends CamelCommand {
     boolean headers;
 
     @CommandLine.Option(names = {
-            "--kamelets-version" }, description = "Apache Camel Kamelets version", defaultValue = "3.20.1.1")
+            "--kamelets-version" }, description = "Apache Camel Kamelets version", defaultValue = "4.0.0-RC1")
     String kameletsVersion;
 
     CamelCatalog catalog;
@@ -94,9 +96,6 @@ public class CatalogDoc extends CamelCommand {
     }
 
     CamelCatalog loadCatalog() throws Exception {
-        // configure logging first
-        configureLoggingOff();
-
         if ("spring-boot".equals(runtime)) {
             return CatalogLoader.loadSpringBootCatalog(repos, camelVersion);
         } else if ("quarkus".equals(runtime)) {
@@ -110,7 +109,7 @@ public class CatalogDoc extends CamelCommand {
     }
 
     @Override
-    public Integer call() throws Exception {
+    public Integer doCall() throws Exception {
         this.catalog = loadCatalog();
 
         String prefix = StringHelper.before(name, ":");

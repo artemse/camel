@@ -23,10 +23,10 @@ import java.io.LineNumberReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,16 +35,14 @@ import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.regex.Pattern;
 
-import com.github.freva.asciitable.AsciiTable;
-import com.github.freva.asciitable.Column;
-import com.github.freva.asciitable.HorizontalAlign;
-import com.github.freva.asciitable.OverflowBehaviour;
 import org.apache.camel.catalog.impl.TimePatternConverter;
 import org.apache.camel.dsl.jbang.core.commands.CamelJBangMain;
 import org.apache.camel.dsl.jbang.core.common.ProcessHelper;
+import org.apache.camel.util.IOHelper;
 import org.apache.camel.util.StopWatch;
 import org.apache.camel.util.StringHelper;
 import org.apache.camel.util.TimeUtils;
+import org.apache.camel.util.URISupport;
 import org.apache.camel.util.json.JsonArray;
 import org.apache.camel.util.json.JsonObject;
 import org.apache.camel.util.json.Jsoner;
@@ -53,11 +51,22 @@ import org.fusesource.jansi.AnsiConsole;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "trace",
-                     description = "Tail message traces from running Camel integrations")
+                     description = "Tail message traces from running Camel integrations", sortOptions = false)
 public class CamelTraceAction extends ActionBaseCommand {
 
     private static final int NAME_MAX_WIDTH = 25;
     private static final int NAME_MIN_WIDTH = 10;
+
+    public static class PrefixCompletionCandidates implements Iterable<String> {
+
+        public PrefixCompletionCandidates() {
+        }
+
+        @Override
+        public Iterator<String> iterator() {
+            return List.of("auto", "true", "false").iterator();
+        }
+    }
 
     @CommandLine.Parameters(description = "Name or pid of running Camel integration. (default selects all)", arity = "0..1")
     String name = "*";
@@ -74,7 +83,7 @@ public class CamelTraceAction extends ActionBaseCommand {
                         description = "Keep following and outputting new traces (use ctrl + c to exit).")
     boolean follow = true;
 
-    @CommandLine.Option(names = { "--prefix" }, defaultValue = "auto",
+    @CommandLine.Option(names = { "--prefix" }, defaultValue = "auto", completionCandidates = PrefixCompletionCandidates.class,
                         description = "Print prefix with running Camel integration name. auto=only prefix when running multiple integrations. true=always prefix. false=prefix off.")
     String prefix = "auto";
 
@@ -129,23 +138,49 @@ public class CamelTraceAction extends ActionBaseCommand {
                         description = "Only output traces from the latest (follow if necessary until complete and exit)")
     boolean latest;
 
+    @CommandLine.Option(names = { "--mask" },
+                        description = "Whether to mask endpoint URIs to avoid printing sensitive information such as password or access keys")
+    boolean mask;
+
+    @CommandLine.Option(names = { "--pretty" },
+                        description = "Pretty print message body when using JSon or XML format")
+    boolean pretty;
+
     String findAnsi;
 
     private int nameMaxWidth;
     private boolean prefixShown;
 
+    private MessageTableHelper tableHelper;
+
     private final Map<String, Ansi.Color> nameColors = new HashMap<>();
     private final Map<String, Ansi.Color> exchangeIdColors = new HashMap<>();
-    private int exchangeIdColorsIndex;
+    private int exchangeIdColorsIndex = 1;
 
     public CamelTraceAction(CamelJBangMain main) {
         super(main);
     }
 
     @Override
-    public Integer call() throws Exception {
-        // configure logging first
-        configureLoggingOff();
+    public Integer doCall() throws Exception {
+        // setup table helper
+        tableHelper = new MessageTableHelper();
+        tableHelper.setPretty(pretty);
+        tableHelper.setLoggingColor(loggingColor);
+        tableHelper.setShowExchangeProperties(showExchangeProperties);
+        tableHelper.setExchangeIdColorChooser(value -> {
+            Ansi.Color color = exchangeIdColors.get(value);
+            if (color == null) {
+                // grab a new color
+                exchangeIdColorsIndex++;
+                if (exchangeIdColorsIndex > 6) {
+                    exchangeIdColorsIndex = 2;
+                }
+                color = Ansi.Color.values()[exchangeIdColorsIndex];
+                exchangeIdColors.put(value, color);
+            }
+            return color;
+        });
 
         Map<Long, Pid> pids = new LinkedHashMap<>();
 
@@ -233,25 +268,31 @@ public class CamelTraceAction extends ActionBaseCommand {
     private void positionTraceLatest(Map<Long, Pid> pids) throws Exception {
         for (Pid pid : pids.values()) {
             File file = getTraceFile(pid.pid);
-            boolean marked = false;
+            long position = -1;
             if (file.exists()) {
                 pid.reader = new LineNumberReader(new FileReader(file));
                 String line;
+                long counter = 0;
                 do {
                     line = pid.reader.readLine();
                     if (line != null) {
+                        counter++;
                         List<Row> rows = parseTraceLine(pid, line);
                         for (Row r : rows) {
                             if (r.first) {
-                                pid.reader.mark(8192);
-                                marked = true;
+                                position = counter;
                             }
                         }
                     }
                 } while (line != null);
             }
-            if (marked) {
-                pid.reader.reset();
+            if (position != -1) {
+                IOHelper.close(pid.reader);
+                // re-create reader and forward to position
+                pid.reader = new LineNumberReader(new FileReader(file));
+                while (--position > 0) {
+                    pid.reader.readLine();
+                }
             }
         }
     }
@@ -287,7 +328,7 @@ public class CamelTraceAction extends ActionBaseCommand {
                     JsonObject root = loadStatus(ph.pid());
                     if (root != null) {
                         Pid row = new Pid();
-                        row.pid = "" + ph.pid();
+                        row.pid = Long.toString(ph.pid());
                         JsonObject context = (JsonObject) root.get("context");
                         if (context == null) {
                             return;
@@ -385,6 +426,14 @@ public class CamelTraceAction extends ActionBaseCommand {
                     row.location = jo.getString("location");
                     row.routeId = jo.getString("routeId");
                     row.nodeId = jo.getString("nodeId");
+                    String uri = jo.getString("endpointUri");
+                    if (uri != null) {
+                        row.endpoint = new JsonObject();
+                        if (mask) {
+                            uri = URISupport.sanitizeUri(uri);
+                        }
+                        row.endpoint.put("endpoint", uri);
+                    }
                     Long ts = jo.getLong("timestamp");
                     if (ts != null) {
                         row.timestamp = ts;
@@ -569,24 +618,6 @@ public class CamelTraceAction extends ActionBaseCommand {
             System.out.print(p);
             System.out.print(" --- ");
         }
-        // exchange id
-        String eid = row.exchangeId;
-        if (loggingColor) {
-            Ansi.Color color = exchangeIdColors.get(eid);
-            if (color == null) {
-                // grab a new color
-                exchangeIdColorsIndex++;
-                if (exchangeIdColorsIndex > 6) {
-                    exchangeIdColorsIndex = 1;
-                }
-                color = Ansi.Color.values()[exchangeIdColorsIndex];
-                exchangeIdColors.put(eid, color);
-            }
-            AnsiConsole.out().print(Ansi.ansi().fg(color).a(eid).reset());
-        } else {
-            System.out.print(eid);
-        }
-        System.out.print(" ");
         // thread name
         String tn = row.threadName;
         if (tn.length() > 25) {
@@ -606,10 +637,10 @@ public class CamelTraceAction extends ActionBaseCommand {
         } else {
             ids = row.routeId + "/" + getId(row);
         }
-        if (ids.length() > 25) {
-            ids = ids.substring(ids.length() - 25);
+        if (ids.length() > 40) {
+            ids = ids.substring(ids.length() - 40);
         }
-        ids = String.format("%-25.25s", ids);
+        ids = String.format("%40.40s", ids);
         if (loggingColor) {
             AnsiConsole.out().print(Ansi.ansi().fgCyan().a(ids).reset());
         } else {
@@ -622,14 +653,6 @@ public class CamelTraceAction extends ActionBaseCommand {
             AnsiConsole.out().print(Ansi.ansi().fgMagenta().a(u).reset());
         } else {
             System.out.print(u);
-        }
-        System.out.print(" ");
-        // MEP
-        String mep = String.format("%6.6s", row.exchangePattern);
-        if (loggingColor) {
-            AnsiConsole.out().print(Ansi.ansi().fgBrightMagenta().a(Ansi.Attribute.INTENSITY_FAINT).a(mep).reset());
-        } else {
-            System.out.print(mep);
         }
         System.out.print(" - ");
         // status
@@ -665,12 +688,17 @@ public class CamelTraceAction extends ActionBaseCommand {
                 System.out.println(line);
             }
             if (!compact) {
-                System.out.println(nameWithPrefix);
+                if (nameWithPrefix != null) {
+                    System.out.println(nameWithPrefix);
+                } else {
+                    // empty line
+                    System.out.println();
+                }
             }
         }
 
         if (row.parent.depth <= 0 && row.last) {
-            exchangeIdColors.remove(eid);
+            exchangeIdColors.remove(row.exchangeId);
         }
     }
 
@@ -686,78 +714,7 @@ public class CamelTraceAction extends ActionBaseCommand {
     }
 
     private String getDataAsTable(Row r) {
-        List<TableRow> rows = new ArrayList<>();
-
-        JsonArray arr = r.message.getCollection("exchangeProperties");
-        if (arr != null) {
-            for (Object o : arr) {
-                JsonObject jo = (JsonObject) o;
-                rows.add(new TableRow("Property", jo.getString("type"), jo.getString("key"), jo.get("value")));
-            }
-        }
-        arr = r.message.getCollection("headers");
-        if (arr != null) {
-            for (Object o : arr) {
-                JsonObject jo = (JsonObject) o;
-                rows.add(new TableRow("Header", jo.getString("type"), jo.getString("key"), jo.get("value")));
-            }
-        }
-        // properties and headers
-        String tab1 = AsciiTable.getTable(AsciiTable.NO_BORDERS, rows, Arrays.asList(
-                new Column().dataAlign(HorizontalAlign.LEFT)
-                        .minWidth(showExchangeProperties ? 10 : 8).with(TableRow::kindAsString),
-                new Column().dataAlign(HorizontalAlign.LEFT)
-                        .maxWidth(40, OverflowBehaviour.ELLIPSIS_LEFT).with(TableRow::typeAsString),
-                new Column().dataAlign(HorizontalAlign.RIGHT)
-                        .maxWidth(40, OverflowBehaviour.NEWLINE).with(TableRow::keyAsString),
-                new Column().dataAlign(HorizontalAlign.LEFT)
-                        .maxWidth(80, OverflowBehaviour.NEWLINE).with(TableRow::valueAsString)));
-
-        // body and type
-        JsonObject jo = r.message.getMap("body");
-        TableRow bodyRow = new TableRow("Body", jo.getString("type"), null, jo.get("value"));
-        String tab2 = AsciiTable.getTable(AsciiTable.NO_BORDERS, List.of(bodyRow), Arrays.asList(
-                new Column().dataAlign(HorizontalAlign.LEFT)
-                        .minWidth(showExchangeProperties ? 10 : 8).with(t -> "Body"),
-                new Column().dataAlign(HorizontalAlign.LEFT).with(TableRow::typeAndLengthAsString)));
-        // body value only (span)
-        String tab3 = null;
-        if (bodyRow.value != null) {
-            tab3 = AsciiTable.getTable(AsciiTable.NO_BORDERS, List.of(bodyRow), Arrays.asList(
-                    new Column().dataAlign(HorizontalAlign.LEFT).maxWidth(160, OverflowBehaviour.NEWLINE)
-                            .with(TableRow::valueAsString)));
-        }
-        String tab4 = null;
-        jo = r.exception;
-        if (jo != null) {
-            TableRow eRow = new TableRow("Exception", jo.getString("type"), null, jo.get("message"));
-            tab4 = AsciiTable.getTable(AsciiTable.NO_BORDERS, List.of(eRow), Arrays.asList(
-                    new Column().dataAlign(HorizontalAlign.LEFT)
-                            .minWidth(showExchangeProperties ? 10 : 8).with(TableRow::kindAsStringRed),
-                    new Column().dataAlign(HorizontalAlign.LEFT)
-                            .maxWidth(40, OverflowBehaviour.ELLIPSIS_LEFT).with(TableRow::typeAsString),
-                    new Column().dataAlign(HorizontalAlign.LEFT)
-                            .maxWidth(80, OverflowBehaviour.NEWLINE).with(TableRow::valueAsStringRed)));
-        }
-        // stacktrace only (span)
-        String tab5 = null;
-        if (jo != null) {
-            TableRow eRow = new TableRow("Stacktrace", null, null, jo.get("stackTrace"));
-            tab5 = AsciiTable.getTable(AsciiTable.NO_BORDERS, List.of(eRow), Arrays.asList(
-                    new Column().dataAlign(HorizontalAlign.LEFT).maxWidth(160, OverflowBehaviour.NEWLINE)
-                            .with(TableRow::valueAsStringRed)));
-        }
-        String answer = tab1 + System.lineSeparator() + tab2;
-        if (tab3 != null) {
-            answer = answer + System.lineSeparator() + tab3;
-        }
-        if (tab4 != null) {
-            answer = answer + System.lineSeparator() + tab4;
-        }
-        if (tab5 != null) {
-            answer = answer + System.lineSeparator() + tab5;
-        }
-        return answer;
+        return tableHelper.getDataAsTable(r.exchangeId, r.exchangePattern, r.endpoint, r.message, r.exception);
     }
 
     private String getElapsed(Row r) {
@@ -812,7 +769,7 @@ public class CamelTraceAction extends ActionBaseCommand {
         } else if (r.last) {
             return "*<--";
         } else {
-            return "" + r.nodeId;
+            return r.nodeId;
         }
     }
 
@@ -841,104 +798,12 @@ public class CamelTraceAction extends ActionBaseCommand {
         long elapsed;
         boolean done;
         boolean failed;
+        JsonObject endpoint;
         JsonObject message;
         JsonObject exception;
 
         Row(Pid parent) {
             this.parent = parent;
-        }
-
-    }
-
-    private class TableRow {
-        String kind;
-        String type;
-        String key;
-        Object value;
-
-        TableRow(String kind, String type, String key, Object value) {
-            this.kind = kind;
-            this.type = type;
-            this.key = key;
-            this.value = value;
-        }
-
-        String valueAsString() {
-            return value != null ? value.toString() : "null";
-        }
-
-        String valueAsStringRed() {
-            if (value != null) {
-                if (loggingColor) {
-                    return Ansi.ansi().fgRed().a(value).reset().toString();
-                } else {
-                    return value.toString();
-                }
-            }
-            return "";
-        }
-
-        String keyAsString() {
-            if (key == null) {
-                return "";
-            }
-            return key;
-        }
-
-        String kindAsString() {
-            return kind;
-        }
-
-        String kindAsStringRed() {
-            if (loggingColor) {
-                return Ansi.ansi().fgRed().a(kind).reset().toString();
-            } else {
-                return kind;
-            }
-        }
-
-        String typeAsString() {
-            String s;
-            if (type == null) {
-                s = "null";
-            } else if (type.startsWith("java.lang.") || type.startsWith("java.util.")) {
-                s = type.substring(10);
-            } else {
-                s = type;
-            }
-            s = "(" + s + ")";
-            if (loggingColor) {
-                s = Ansi.ansi().fgBrightDefault().a(Ansi.Attribute.INTENSITY_FAINT).a(s).reset().toString();
-            }
-            return s;
-        }
-
-        String typeAndLengthAsString() {
-            String s;
-            if (type == null) {
-                s = "null";
-            } else if (type.startsWith("java.lang.") || type.startsWith("java.util.")) {
-                s = type.substring(10);
-            } else {
-                s = type;
-            }
-            s = "(" + s + ")";
-            int l = valueLength();
-            if (l != -1) {
-                s = s + " (length: " + l + ")";
-            }
-            if (loggingColor) {
-                s = Ansi.ansi().fgBrightDefault().a(Ansi.Attribute.INTENSITY_FAINT).a(s).reset().toString();
-            }
-            return s;
-        }
-
-        int valueLength() {
-            if (value == null) {
-                return -1;
-            } else {
-                return valueAsString().length();
-            }
         }
 
     }

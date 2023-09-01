@@ -59,6 +59,8 @@ public abstract class DefaultConfigurationProperties<T> {
     private boolean modeline;
     private int logDebugMaxChars;
     private boolean streamCachingEnabled = true;
+    private String streamCachingAllowClasses;
+    private String streamCachingDenyClasses;
     private boolean streamCachingSpoolEnabled;
     private String streamCachingSpoolDirectory;
     private String streamCachingSpoolCipher;
@@ -72,9 +74,11 @@ public abstract class DefaultConfigurationProperties<T> {
     private boolean debugging;
     private boolean backlogTracing;
     private boolean backlogTracingStandby;
+    private boolean backlogTracingTemplates;
     private boolean typeConverterStatisticsEnabled;
     private boolean tracing;
     private boolean tracingStandby;
+    private boolean tracingTemplates;
     private String tracingPattern;
     @Metadata(defaultValue = "%-4.4s [%-12.12s] [%-33.33s]")
     private String tracingLoggingFormat;
@@ -125,12 +129,16 @@ public abstract class DefaultConfigurationProperties<T> {
     private String exchangeFactory = "default";
     private int exchangeFactoryCapacity = 100;
     private boolean exchangeFactoryStatisticsEnabled;
-    private boolean dumpRoutes;
+    @Metadata(enums = "xml,yaml")
+    private String dumpRoutes;
+    private String dumpRoutesInclude = "routes";
+    private boolean dumpRoutesLog = true;
+    private boolean dumpRoutesResolvePlaceholders = true;
+    private boolean dumpRoutesUriAsParameters;
+    private boolean dumpRoutesGeneratedIds;
+    private String dumpRoutesOutput;
     private Map<String, String> globalOptions;
     // route controller
-    @Metadata(defaultValue = "DEBUG")
-    @Deprecated
-    private LoggingLevel routeControllerLoggingLevel;
     private boolean routeControllerSuperviseEnabled;
     private String routeControllerIncludeRoutes;
     private String routeControllerExcludeRoutes;
@@ -461,6 +469,30 @@ public abstract class DefaultConfigurationProperties<T> {
         this.streamCachingEnabled = streamCachingEnabled;
     }
 
+    public String getStreamCachingAllowClasses() {
+        return streamCachingAllowClasses;
+    }
+
+    /**
+     * To filter stream caching of a given set of allowed/denied classes. By default, all classes that are
+     * {@link java.io.InputStream} is allowed. Multiple class names can be separated by comma.
+     */
+    public void setStreamCachingAllowClasses(String streamCachingAllowClasses) {
+        this.streamCachingAllowClasses = streamCachingAllowClasses;
+    }
+
+    public String getStreamCachingDenyClasses() {
+        return streamCachingDenyClasses;
+    }
+
+    /**
+     * To filter stream caching of a given set of allowed/denied classes. By default, all classes that are
+     * {@link java.io.InputStream} is allowed. Multiple class names can be separated by comma.
+     */
+    public void setStreamCachingDenyClasses(String streamCachingDenyClasses) {
+        this.streamCachingDenyClasses = streamCachingDenyClasses;
+    }
+
     public boolean isStreamCachingSpoolEnabled() {
         return streamCachingSpoolEnabled;
     }
@@ -625,6 +657,20 @@ public abstract class DefaultConfigurationProperties<T> {
         this.tracingStandby = tracingStandby;
     }
 
+    public boolean isTracingTemplates() {
+        return tracingTemplates;
+    }
+
+    /**
+     * Whether tracing should trace inner details from route templates (or kamelets). Turning this on increases the
+     * verbosity of tracing by including events from internal routes in the templates or kamelets.
+     *
+     * Default is false.
+     */
+    public void setTracingTemplates(boolean tracingTemplates) {
+        this.tracingTemplates = tracingTemplates;
+    }
+
     public String getTracingPattern() {
         return tracingPattern;
     }
@@ -688,6 +734,20 @@ public abstract class DefaultConfigurationProperties<T> {
      */
     public void setBacklogTracingStandby(boolean backlogTracingStandby) {
         this.backlogTracingStandby = backlogTracingStandby;
+    }
+
+    public boolean isBacklogTracingTemplates() {
+        return backlogTracingTemplates;
+    }
+
+    /**
+     * Whether backlog tracing should trace inner details from route templates (or kamelets). Turning this on increases
+     * the verbosity of tracing by including events from internal routes in the templates or kamelets.
+     *
+     * Default is false.
+     */
+    public void setBacklogTracingTemplates(boolean backlogTracingTemplates) {
+        this.backlogTracingTemplates = backlogTracingTemplates;
     }
 
     public boolean isMessageHistory() {
@@ -1315,21 +1375,95 @@ public abstract class DefaultConfigurationProperties<T> {
         this.exchangeFactoryStatisticsEnabled = exchangeFactoryStatisticsEnabled;
     }
 
-    public boolean isDumpRoutes() {
+    public String getDumpRoutes() {
         return dumpRoutes;
     }
 
     /**
      * If dumping is enabled then Camel will during startup dump all loaded routes (incl rests and route templates)
-     * represented as XML DSL into the log. This is intended for trouble shooting or to assist during development.
+     * represented as XML/YAML DSL into the log. This is intended for trouble shooting or to assist during development.
      *
      * Sensitive information that may be configured in the route endpoints could potentially be included in the dump
      * output and is therefore not recommended being used for production usage.
      *
-     * This requires to have camel-xml-jaxb on the classpath to be able to dump the routes as XML.
+     * This requires to have camel-xml-io/camel-yaml-io on the classpath to be able to dump the routes as XML/YAML.
      */
-    public void setDumpRoutes(boolean dumpRoutes) {
+    public void setDumpRoutes(String dumpRoutes) {
         this.dumpRoutes = dumpRoutes;
+    }
+
+    public String getDumpRoutesInclude() {
+        return dumpRoutesInclude;
+    }
+
+    /**
+     * Controls what to include in output for route dumping.
+     *
+     * Possible values: all, routes, rests, routeConfigurations, routeTemplates, beans. Multiple values can be separated
+     * by comma. Default is routes.
+     */
+    public void setDumpRoutesInclude(String dumpRoutesInclude) {
+        this.dumpRoutesInclude = dumpRoutesInclude;
+    }
+
+    public boolean isDumpRoutesLog() {
+        return dumpRoutesLog;
+    }
+
+    /**
+     * Whether to log route dumps to Logger
+     */
+    public void setDumpRoutesLog(boolean dumpRoutesLog) {
+        this.dumpRoutesLog = dumpRoutesLog;
+    }
+
+    public boolean isDumpRoutesResolvePlaceholders() {
+        return dumpRoutesResolvePlaceholders;
+    }
+
+    /**
+     * Whether to resolve property placeholders in the dumped output. Default is true.
+     */
+    public void setDumpRoutesResolvePlaceholders(boolean dumpRoutesResolvePlaceholders) {
+        this.dumpRoutesResolvePlaceholders = dumpRoutesResolvePlaceholders;
+    }
+
+    public boolean isDumpRoutesUriAsParameters() {
+        return dumpRoutesUriAsParameters;
+    }
+
+    /**
+     * When dumping routes to YAML format, then this option controls whether endpoint URIs should be expanded into a
+     * key/value parameters.
+     */
+    public void setDumpRoutesUriAsParameters(boolean dumpRoutesUriAsParameters) {
+        this.dumpRoutesUriAsParameters = dumpRoutesUriAsParameters;
+    }
+
+    public boolean isDumpRoutesGeneratedIds() {
+        return dumpRoutesGeneratedIds;
+    }
+
+    /**
+     * Whether to include auto generated IDs in the dumped output. Default is false.
+     */
+    public void setDumpRoutesGeneratedIds(boolean dumpRoutesGeneratedIds) {
+        this.dumpRoutesGeneratedIds = dumpRoutesGeneratedIds;
+    }
+
+    public String getDumpRoutesOutput() {
+        return dumpRoutesOutput;
+    }
+
+    /**
+     * Whether to save route dumps to an output file.
+     *
+     * If the output is a filename, then all content is saved to this file. If the output is a directory name, then one
+     * or more files are saved to the directory, where the names are based on the original source file names, or auto
+     * generated names.
+     */
+    public void setDumpRoutesOutput(String dumpRoutesOutput) {
+        this.dumpRoutesOutput = dumpRoutesOutput;
     }
 
     public Map<String, String> getGlobalOptions() {
@@ -1357,20 +1491,6 @@ public abstract class DefaultConfigurationProperties<T> {
             this.globalOptions = new HashMap<>();
         }
         this.globalOptions.put(key, value.toString());
-    }
-
-    @Deprecated
-    public LoggingLevel getRouteControllerLoggingLevel() {
-        return routeControllerLoggingLevel;
-    }
-
-    /**
-     * Sets the logging level used for logging route activity (such as starting and stopping routes). The default
-     * logging level is DEBUG.
-     */
-    @Deprecated
-    public void setRouteControllerLoggingLevel(LoggingLevel routeControllerLoggingLevel) {
-        this.routeControllerLoggingLevel = routeControllerLoggingLevel;
     }
 
     public boolean isRouteControllerSuperviseEnabled() {
@@ -1825,6 +1945,24 @@ public abstract class DefaultConfigurationProperties<T> {
     }
 
     /**
+     * To filter stream caching of a given set of allowed/denied classes. By default, all classes that are
+     * {@link java.io.InputStream} is allowed. Multiple class names can be separated by comma.
+     */
+    public T withStreamCachingAllowClasses(String streamCachingAllowClasses) {
+        this.streamCachingAllowClasses = streamCachingAllowClasses;
+        return (T) this;
+    }
+
+    /**
+     * To filter stream caching of a given set of allowed/denied classes. By default, all classes that are
+     * {@link java.io.InputStream} is allowed. Multiple class names can be separated by comma.
+     */
+    public T withStreamCachingDenyClasses(String streamCachingDenyClasses) {
+        this.streamCachingDenyClasses = streamCachingDenyClasses;
+        return (T) this;
+    }
+
+    /**
      * To enable stream caching spooling to disk. This means, for large stream messages (over 128 KB by default) will be
      * cached in a temporary file instead, and Camel will handle deleting the temporary file once the cached stream is
      * no longer necessary.
@@ -1952,6 +2090,17 @@ public abstract class DefaultConfigurationProperties<T> {
     }
 
     /**
+     * Whether tracing should trace inner details from route templates (or kamelets). Turning this on increases the
+     * verbosity of tracing by including events from internal routes in the templates or kamelets.
+     *
+     * Default is false.
+     */
+    public T withTracingTemplates(boolean tracingTemplates) {
+        this.tracingTemplates = tracingTemplates;
+        return (T) this;
+    }
+
+    /**
      * Sets whether backlog tracing is enabled or not.
      *
      * Default is false.
@@ -1969,6 +2118,17 @@ public abstract class DefaultConfigurationProperties<T> {
      */
     public T withBacklogTracingStandby(boolean backlogTracingStandby) {
         this.backlogTracingStandby = backlogTracingStandby;
+        return (T) this;
+    }
+
+    /**
+     * Whether backlog tracing should trace inner details from route templates (or kamelets). Turning this on increases
+     * the verbosity of tracing by including events from internal routes in the templates or kamelets.
+     *
+     * Default is false.
+     */
+    public T withBacklogTracingTemplates(boolean backlogTracingTemplates) {
+        this.backlogTracingTemplates = backlogTracingTemplates;
         return (T) this;
     }
 
@@ -2485,16 +2645,72 @@ public abstract class DefaultConfigurationProperties<T> {
     }
 
     /**
-     * If enable then Camel will during startup dump all loaded routes (incl rests and route templates) represented as
-     * XML DSL into the log. This is intended for trouble shooting or to assist during development.
+     * If dumping is enabled then Camel will during startup dump all loaded routes (incl rests and route templates)
+     * represented as XML/YAML DSL into the log. This is intended for trouble shooting or to assist during development.
      *
      * Sensitive information that may be configured in the route endpoints could potentially be included in the dump
-     * output and is therefore not recommended to be used for production usage.
+     * output and is therefore not recommended being used for production usage.
      *
-     * This requires to have camel-xml-jaxb on the classpath to be able to dump the routes as XML.
+     * This requires to have camel-xml-io/camel-yaml-io on the classpath to be able to dump the routes as XML/YAML.
      */
-    public T withDumpRoutes(boolean dumpRoutes) {
+    public T withDumpRoutes(String dumpRoutes) {
         this.dumpRoutes = dumpRoutes;
+        return (T) this;
+    }
+
+    /**
+     * Controls what to include in output for route dumping.
+     *
+     * Possible values: all, routes, rests, routeConfigurations, routeTemplates, beans. Multiple values can be separated
+     * by comma. Default is routes.
+     */
+    public T withDumpRoutesInclude(String dumpRoutesInclude) {
+        this.dumpRoutesInclude = dumpRoutesInclude;
+        return (T) this;
+    }
+
+    /**
+     * Whether to log route dumps to Logger
+     */
+    public T withDumpRoutesLog(boolean dumpRoutesLog) {
+        this.dumpRoutesLog = dumpRoutesLog;
+        return (T) this;
+    }
+
+    /**
+     * Whether to resolve property placeholders in the dumped output. Default is true.
+     */
+    public T withDumpRoutesResolvePlaceholders(boolean dumpRoutesResolvePlaceholders) {
+        this.dumpRoutesResolvePlaceholders = dumpRoutesResolvePlaceholders;
+        return (T) this;
+    }
+
+    /**
+     * When dumping routes to YAML format, then this option controls whether endpoint URIs should be expanded into a
+     * key/value parameters.
+     */
+    public T withDumpRoutesUriAsParameters(boolean dumpRoutesUriAsParameters) {
+        this.dumpRoutesUriAsParameters = dumpRoutesUriAsParameters;
+        return (T) this;
+    }
+
+    /**
+     * Whether to include auto generated IDs in the dumped output. Default is false.
+     */
+    public T withDumpRoutesGeneratedIds(boolean dumpRoutesGeneratedIds) {
+        this.dumpRoutesGeneratedIds = dumpRoutesGeneratedIds;
+        return (T) this;
+    }
+
+    /**
+     * Whether to save route dumps to an output file.
+     *
+     * If the output is a filename, then all content is saved to this file. If the output is a directory name, then one
+     * or more files are saved to the directory, where the names are based on the original source file names, or auto
+     * generated names.
+     */
+    public T withDumpRoutesOutput(String dumpRoutesOutput) {
+        this.dumpRoutesOutput = dumpRoutesOutput;
         return (T) this;
     }
 
@@ -2523,15 +2739,6 @@ public abstract class DefaultConfigurationProperties<T> {
             this.globalOptions = new HashMap<>();
         }
         this.globalOptions.put(key, value);
-        return (T) this;
-    }
-
-    /**
-     * Sets the logging level used for logging route activity (such as starting and stopping routes). The default
-     * logging level is DEBUG.
-     */
-    public T withRouteControllerLoggingLevel(LoggingLevel routeControllerLoggingLevel) {
-        this.routeControllerLoggingLevel = routeControllerLoggingLevel;
         return (T) this;
     }
 

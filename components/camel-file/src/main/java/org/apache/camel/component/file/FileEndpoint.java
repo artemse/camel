@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.Set;
 
 import org.apache.camel.Category;
@@ -65,6 +65,8 @@ public class FileEndpoint extends GenericFileEndpoint<File> {
     private boolean copyAndDeleteOnRenameFail = true;
     @UriParam(label = "advanced")
     private boolean renameUsingCopy;
+    @UriParam(label = "consumer,advanced")
+    private boolean includeHiddenFiles;
     @UriParam(label = "consumer,advanced")
     private boolean startingDirectoryMustExist;
     @UriParam(label = "consumer,advanced")
@@ -260,6 +262,11 @@ public class FileEndpoint extends GenericFileEndpoint<File> {
         return FileUtil.isAbsolute(new File(name));
     }
 
+    @Override
+    public boolean isHiddenFilesEnabled() {
+        return includeHiddenFiles;
+    }
+
     public boolean isCopyAndDeleteOnRenameFail() {
         return copyAndDeleteOnRenameFail;
     }
@@ -284,6 +291,18 @@ public class FileEndpoint extends GenericFileEndpoint<File> {
      */
     public void setRenameUsingCopy(boolean renameUsingCopy) {
         this.renameUsingCopy = renameUsingCopy;
+    }
+
+    public boolean isIncludeHiddenFiles() {
+        return includeHiddenFiles;
+    }
+
+    /**
+     * Whether to accept hidden files. Files which names starts with dot is regarded as a hidden file, and by default
+     * not included. Set this option to true to include hidden files in the file consumer.
+     */
+    public void setIncludeHiddenFiles(boolean includeHiddenFiles) {
+        this.includeHiddenFiles = includeHiddenFiles;
     }
 
     public boolean isStartingDirectoryMustExist() {
@@ -379,7 +398,7 @@ public class FileEndpoint extends GenericFileEndpoint<File> {
     }
 
     public Set<PosixFilePermission> getPermissions() {
-        Set<PosixFilePermission> permissions = new HashSet<>();
+        Set<PosixFilePermission> permissions = EnumSet.noneOf(PosixFilePermission.class);
         if (ObjectHelper.isEmpty(chmod)) {
             return permissions;
         }
@@ -442,7 +461,7 @@ public class FileEndpoint extends GenericFileEndpoint<File> {
     }
 
     public Set<PosixFilePermission> getDirectoryPermissions() {
-        Set<PosixFilePermission> permissions = new HashSet<>();
+        Set<PosixFilePermission> permissions = EnumSet.noneOf(PosixFilePermission.class);
         if (ObjectHelper.isEmpty(chmodDirectory)) {
             return permissions;
         }

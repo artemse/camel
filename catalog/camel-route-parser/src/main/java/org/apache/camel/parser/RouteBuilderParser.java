@@ -111,15 +111,15 @@ public final class RouteBuilderParser {
             // is the field annotated with a Camel endpoint
             String uri = null;
             Expression exp = null;
-            for (Annotation ann : field.getAnnotations()) {
+            for (Annotation<JavaClassSource> ann : field.getAnnotations()) {
                 boolean valid = "org.apache.camel.EndpointInject".equals(ann.getQualifiedName())
                         || "org.apache.camel.cdi.Uri".equals(ann.getQualifiedName());
                 if (valid) {
                     exp = (Expression) ann.getInternal();
-                    if (exp instanceof SingleMemberAnnotation) {
-                        exp = ((SingleMemberAnnotation) exp).getValue();
-                    } else if (exp instanceof NormalAnnotation) {
-                        List values = ((NormalAnnotation) exp).values();
+                    if (exp instanceof SingleMemberAnnotation singleMemberAnnotation) {
+                        exp = singleMemberAnnotation.getValue();
+                    } else if (exp instanceof NormalAnnotation normalAnnotation) {
+                        List<?> values = normalAnnotation.values();
                         for (Object value : values) {
                             MemberValuePair pair = (MemberValuePair) value;
                             if ("uri".equals(pair.getName().toString())) {
@@ -150,16 +150,16 @@ public final class RouteBuilderParser {
                 Object internal = exp != null ? exp : field.getInternal();
 
                 // find position of field/expression
-                if (internal instanceof ASTNode) {
-                    int pos = ((ASTNode) internal).getStartPosition();
-                    int len = ((ASTNode) internal).getLength();
+                if (internal instanceof ASTNode astNode) {
+                    int pos = astNode.getStartPosition();
+                    int len = astNode.getLength();
                     int line = findLineNumber(clazz.toUnformattedString(), pos);
                     if (line > -1) {
-                        detail.setLineNumber("" + line);
+                        detail.setLineNumber(Integer.toString(line));
                     }
                     int endLine = findLineNumber(clazz.toUnformattedString(), pos + len);
                     if (endLine > -1) {
-                        detail.setLineNumberEnd("" + endLine);
+                        detail.setLineNumberEnd(Integer.toString(endLine));
                     }
                     detail.setAbsolutePosition(pos);
                     int linePos = findLinePosition(clazz.toUnformattedString(), pos);
@@ -242,11 +242,11 @@ public final class RouteBuilderParser {
         detail.setEndpointUri(result.getElement());
         int line = findLineNumber(clazz.toUnformattedString(), result.getPosition());
         if (line > -1) {
-            detail.setLineNumber("" + line);
+            detail.setLineNumber(Integer.toString(line));
         }
         int lineEnd = findLineNumber(clazz.toUnformattedString(), result.getPosition() + result.getLength());
         if (lineEnd > -1) {
-            detail.setLineNumberEnd("" + lineEnd);
+            detail.setLineNumberEnd(Integer.toString(lineEnd));
         }
         detail.setAbsolutePosition(result.getPosition());
         int linePos = findLinePosition(clazz.toUnformattedString(), result.getPosition());
@@ -289,11 +289,11 @@ public final class RouteBuilderParser {
                     detail.setMethodName("configure");
                     int line = findLineNumber(clazz.toUnformattedString(), result.getPosition());
                     if (line > -1) {
-                        detail.setLineNumber("" + line);
+                        detail.setLineNumber(Integer.toString(line));
                     }
                     int endLine = findLineNumber(clazz.toUnformattedString(), result.getPosition() + result.getLength());
                     if (endLine > -1) {
-                        detail.setLineNumberEnd("" + endLine);
+                        detail.setLineNumberEnd(Integer.toString(endLine));
                     }
                     detail.setAbsolutePosition(result.getPosition());
                     int linePos = findLinePosition(clazz.toUnformattedString(), result.getPosition());
@@ -337,11 +337,11 @@ public final class RouteBuilderParser {
                     detail.setMethodName("configure");
                     int line = findLineNumber(clazz.toUnformattedString(), result.getPosition());
                     if (line > -1) {
-                        detail.setLineNumber("" + line);
+                        detail.setLineNumber(Integer.toString(line));
                     }
                     int endLine = findLineNumber(clazz.toUnformattedString(), result.getPosition() + result.getLength());
                     if (endLine > -1) {
-                        detail.setLineNumberEnd("" + endLine);
+                        detail.setLineNumberEnd(Integer.toString(endLine));
                     }
                     detail.setAbsolutePosition(result.getPosition());
                     int linePos = findLinePosition(clazz.toUnformattedString(), result.getPosition());
@@ -387,11 +387,11 @@ public final class RouteBuilderParser {
                     detail.setMethodName("configure");
                     int line = findLineNumber(clazz.toUnformattedString(), result.getPosition());
                     if (line > -1) {
-                        detail.setLineNumber("" + line);
+                        detail.setLineNumber(Integer.toString(line));
                     }
                     int endLine = findLineNumber(clazz.toUnformattedString(), result.getPosition() + result.getLength());
                     if (endLine > -1) {
-                        detail.setLineNumberEnd("" + endLine);
+                        detail.setLineNumberEnd(Integer.toString(endLine));
                     }
                     detail.setRouteId(result.getElement());
 

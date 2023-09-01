@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.function.Function;
 
 import org.apache.camel.Exchange;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.Route;
 import org.apache.camel.api.management.ManagedCamelContext;
 import org.apache.camel.api.management.mbean.ManagedPerformanceCounterMBean;
@@ -34,6 +33,7 @@ import org.apache.camel.spi.Resource;
 import org.apache.camel.spi.annotations.DevConsole;
 import org.apache.camel.support.LoggerHelper;
 import org.apache.camel.support.PatternHelper;
+import org.apache.camel.support.PluginHelper;
 import org.apache.camel.support.console.AbstractDevConsole;
 import org.apache.camel.util.IOHelper;
 import org.apache.camel.util.StringHelper;
@@ -67,7 +67,7 @@ public class TopDevConsole extends AbstractDevConsole {
         final int max = limit == null ? Integer.MAX_VALUE : Integer.parseInt(limit);
 
         final StringBuilder sb = new StringBuilder();
-        ManagedCamelContext mcc = getCamelContext().getExtension(ManagedCamelContext.class);
+        ManagedCamelContext mcc = getCamelContext().getCamelContextExtension().getContextPlugin(ManagedCamelContext.class);
         if (mcc != null) {
             if (subPath == null || subPath.isBlank()) {
                 Function<ManagedRouteMBean, Object> task = mrb -> {
@@ -108,8 +108,7 @@ public class TopDevConsole extends AbstractDevConsole {
                         int line = mpb.getSourceLineNumber();
                         try {
                             loc = LoggerHelper.stripSourceLocationLineNumber(loc);
-                            Resource resource = getCamelContext().adapt(ExtendedCamelContext.class).getResourceLoader()
-                                    .resolveResource(loc);
+                            Resource resource = PluginHelper.getResourceLoader(getCamelContext()).resolveResource(loc);
                             if (resource != null) {
                                 LineNumberReader reader = new LineNumberReader(resource.getReader());
                                 for (int i = 1; i < line + 3; i++) {
@@ -169,7 +168,7 @@ public class TopDevConsole extends AbstractDevConsole {
         final JsonObject root = new JsonObject();
         final List<JsonObject> list = new ArrayList<>();
 
-        ManagedCamelContext mcc = getCamelContext().getExtension(ManagedCamelContext.class);
+        ManagedCamelContext mcc = getCamelContext().getCamelContextExtension().getContextPlugin(ManagedCamelContext.class);
         if (mcc != null) {
             if (subPath == null || subPath.isBlank()) {
                 Function<ManagedRouteMBean, Object> task = mrb -> {
@@ -211,8 +210,7 @@ public class TopDevConsole extends AbstractDevConsole {
                         int line = mpb.getSourceLineNumber();
                         try {
                             loc = LoggerHelper.stripSourceLocationLineNumber(loc);
-                            Resource resource = getCamelContext().adapt(ExtendedCamelContext.class).getResourceLoader()
-                                    .resolveResource(loc);
+                            Resource resource = PluginHelper.getResourceLoader(getCamelContext()).resolveResource(loc);
                             if (resource != null) {
                                 LineNumberReader reader = new LineNumberReader(resource.getReader());
                                 for (int i = 1; i < line + 3; i++) {

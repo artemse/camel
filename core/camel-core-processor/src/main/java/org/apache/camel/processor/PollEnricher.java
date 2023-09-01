@@ -24,6 +24,7 @@ import org.apache.camel.CamelExchangeException;
 import org.apache.camel.Consumer;
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
+import org.apache.camel.ExchangePropertyKey;
 import org.apache.camel.Expression;
 import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.NoTypeConversionAvailableException;
@@ -225,7 +226,7 @@ public class PollEnricher extends AsyncProcessorSupport implements IdAware, Rout
             }
             // acquire the consumer from the cache
             consumer = consumerCache.acquirePollingConsumer(endpoint);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             if (isIgnoreInvalidEndpoint()) {
                 LOG.debug("Endpoint uri is invalid: {}. This exception will be ignored.", recipient, e);
             } else {
@@ -335,9 +336,10 @@ public class PollEnricher extends AsyncProcessorSupport implements IdAware, Rout
                 }
             }
 
-            // set header with the uri of the endpoint enriched so we can use that for tracing etc
-            exchange.getMessage().setHeader(Exchange.TO_ENDPOINT, consumer.getEndpoint().getEndpointUri());
-        } catch (Throwable e) {
+            // set property with the uri of the endpoint enriched so we can use that for tracing etc
+            exchange.setProperty(ExchangePropertyKey.TO_ENDPOINT, consumer.getEndpoint().getEndpointUri());
+
+        } catch (Exception e) {
             exchange.setException(new CamelExchangeException("Error occurred during aggregation", exchange, e));
             callback.done(true);
             return true;
@@ -355,7 +357,7 @@ public class PollEnricher extends AsyncProcessorSupport implements IdAware, Rout
             recipient = ((String) recipient).trim();
         }
         if (recipient != null) {
-            ExtendedCamelContext ecc = (ExtendedCamelContext) exchange.getContext();
+            CamelContext ecc = exchange.getContext();
             String uri;
             if (recipient instanceof String) {
                 uri = (String) recipient;
@@ -364,7 +366,7 @@ public class PollEnricher extends AsyncProcessorSupport implements IdAware, Rout
                 uri = ecc.getTypeConverter().mandatoryConvertTo(String.class, exchange, recipient);
             }
             // optimize and normalize endpoint
-            return ecc.normalizeUri(uri);
+            return ecc.getCamelContextExtension().normalizeUri(uri);
         }
         return null;
     }
@@ -376,7 +378,7 @@ public class PollEnricher extends AsyncProcessorSupport implements IdAware, Rout
         if (recipient != null) {
             if (recipient instanceof NormalizedEndpointUri) {
                 NormalizedEndpointUri nu = (NormalizedEndpointUri) recipient;
-                ExtendedCamelContext ecc = context.adapt(ExtendedCamelContext.class);
+                ExtendedCamelContext ecc = context.getCamelContextExtension();
                 return ecc.hasEndpoint(nu);
             } else {
                 String uri = recipient.toString();

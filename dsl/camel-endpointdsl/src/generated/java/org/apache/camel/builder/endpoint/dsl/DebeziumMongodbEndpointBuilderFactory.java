@@ -381,118 +381,6 @@ public interface DebeziumMongodbEndpointBuilderFactory {
             return this;
         }
         /**
-         * The initial delay when trying to reconnect to a primary after a
-         * connection cannot be made or when no primary is available, given in
-         * milliseconds. Defaults to 1 second (1,000 ms).
-         * 
-         * The option is a: &lt;code&gt;long&lt;/code&gt; type.
-         * 
-         * Default: 1s
-         * Group: mongodb
-         * 
-         * @param connectBackoffInitialDelayMs the value to set
-         * @return the dsl builder
-         */
-        default DebeziumMongodbEndpointBuilder connectBackoffInitialDelayMs(
-                long connectBackoffInitialDelayMs) {
-            doSetProperty("connectBackoffInitialDelayMs", connectBackoffInitialDelayMs);
-            return this;
-        }
-        /**
-         * The initial delay when trying to reconnect to a primary after a
-         * connection cannot be made or when no primary is available, given in
-         * milliseconds. Defaults to 1 second (1,000 ms).
-         * 
-         * The option will be converted to a &lt;code&gt;long&lt;/code&gt; type.
-         * 
-         * Default: 1s
-         * Group: mongodb
-         * 
-         * @param connectBackoffInitialDelayMs the value to set
-         * @return the dsl builder
-         */
-        default DebeziumMongodbEndpointBuilder connectBackoffInitialDelayMs(
-                String connectBackoffInitialDelayMs) {
-            doSetProperty("connectBackoffInitialDelayMs", connectBackoffInitialDelayMs);
-            return this;
-        }
-        /**
-         * The maximum delay when trying to reconnect to a primary after a
-         * connection cannot be made or when no primary is available, given in
-         * milliseconds. Defaults to 120 second (120,000 ms).
-         * 
-         * The option is a: &lt;code&gt;long&lt;/code&gt; type.
-         * 
-         * Default: 2m
-         * Group: mongodb
-         * 
-         * @param connectBackoffMaxDelayMs the value to set
-         * @return the dsl builder
-         */
-        default DebeziumMongodbEndpointBuilder connectBackoffMaxDelayMs(
-                long connectBackoffMaxDelayMs) {
-            doSetProperty("connectBackoffMaxDelayMs", connectBackoffMaxDelayMs);
-            return this;
-        }
-        /**
-         * The maximum delay when trying to reconnect to a primary after a
-         * connection cannot be made or when no primary is available, given in
-         * milliseconds. Defaults to 120 second (120,000 ms).
-         * 
-         * The option will be converted to a &lt;code&gt;long&lt;/code&gt; type.
-         * 
-         * Default: 2m
-         * Group: mongodb
-         * 
-         * @param connectBackoffMaxDelayMs the value to set
-         * @return the dsl builder
-         */
-        default DebeziumMongodbEndpointBuilder connectBackoffMaxDelayMs(
-                String connectBackoffMaxDelayMs) {
-            doSetProperty("connectBackoffMaxDelayMs", connectBackoffMaxDelayMs);
-            return this;
-        }
-        /**
-         * Maximum number of failed connection attempts to a replica set primary
-         * before an exception occurs and task is aborted. Defaults to 16, which
-         * with the defaults for 'connect.backoff.initial.delay.ms' and
-         * 'connect.backoff.max.delay.ms' results in just over 20 minutes of
-         * attempts before failing.
-         * 
-         * The option is a: &lt;code&gt;int&lt;/code&gt; type.
-         * 
-         * Default: 16
-         * Group: mongodb
-         * 
-         * @param connectMaxAttempts the value to set
-         * @return the dsl builder
-         */
-        default DebeziumMongodbEndpointBuilder connectMaxAttempts(
-                int connectMaxAttempts) {
-            doSetProperty("connectMaxAttempts", connectMaxAttempts);
-            return this;
-        }
-        /**
-         * Maximum number of failed connection attempts to a replica set primary
-         * before an exception occurs and task is aborted. Defaults to 16, which
-         * with the defaults for 'connect.backoff.initial.delay.ms' and
-         * 'connect.backoff.max.delay.ms' results in just over 20 minutes of
-         * attempts before failing.
-         * 
-         * The option will be converted to a &lt;code&gt;int&lt;/code&gt; type.
-         * 
-         * Default: 16
-         * Group: mongodb
-         * 
-         * @param connectMaxAttempts the value to set
-         * @return the dsl builder
-         */
-        default DebeziumMongodbEndpointBuilder connectMaxAttempts(
-                String connectMaxAttempts) {
-            doSetProperty("connectMaxAttempts", connectMaxAttempts);
-            return this;
-        }
-        /**
          * Optional list of custom converters that would be used instead of
          * default ones. The converters are defined using '.type' config option
          * and configured using options '.'.
@@ -570,6 +458,40 @@ public interface DebeziumMongodbEndpointBuilderFactory {
         default DebeziumMongodbEndpointBuilder databaseIncludeList(
                 String databaseIncludeList) {
             doSetProperty("databaseIncludeList", databaseIncludeList);
+            return this;
+        }
+        /**
+         * The maximum number of retries on connection errors before failing (-1
+         * = no limit, 0 = disabled, 0 = num of retries).
+         * 
+         * The option is a: &lt;code&gt;int&lt;/code&gt; type.
+         * 
+         * Default: -1
+         * Group: mongodb
+         * 
+         * @param errorsMaxRetries the value to set
+         * @return the dsl builder
+         */
+        default DebeziumMongodbEndpointBuilder errorsMaxRetries(
+                int errorsMaxRetries) {
+            doSetProperty("errorsMaxRetries", errorsMaxRetries);
+            return this;
+        }
+        /**
+         * The maximum number of retries on connection errors before failing (-1
+         * = no limit, 0 = disabled, 0 = num of retries).
+         * 
+         * The option will be converted to a &lt;code&gt;int&lt;/code&gt; type.
+         * 
+         * Default: -1
+         * Group: mongodb
+         * 
+         * @param errorsMaxRetries the value to set
+         * @return the dsl builder
+         */
+        default DebeziumMongodbEndpointBuilder errorsMaxRetries(
+                String errorsMaxRetries) {
+            doSetProperty("errorsMaxRetries", errorsMaxRetries);
             return this;
         }
         /**
@@ -796,6 +718,25 @@ public interface DebeziumMongodbEndpointBuilderFactory {
             return this;
         }
         /**
+         * The method used to connect to MongoDB cluster. Options include:
+         * 'replica_set' (the default) to individually connect to each replica
+         * set / shard 'sharded' to connect via single connection obtained from
+         * connection string.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Default: replica_set
+         * Group: mongodb
+         * 
+         * @param mongodbConnectionMode the value to set
+         * @return the dsl builder
+         */
+        default DebeziumMongodbEndpointBuilder mongodbConnectionMode(
+                String mongodbConnectionMode) {
+            doSetProperty("mongodbConnectionMode", mongodbConnectionMode);
+            return this;
+        }
+        /**
          * Database connection string.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -876,60 +817,6 @@ public interface DebeziumMongodbEndpointBuilderFactory {
         default DebeziumMongodbEndpointBuilder mongodbHeartbeatFrequencyMs(
                 String mongodbHeartbeatFrequencyMs) {
             doSetProperty("mongodbHeartbeatFrequencyMs", mongodbHeartbeatFrequencyMs);
-            return this;
-        }
-        /**
-         * The hostname and port pairs (in the form 'host' or 'host:port') of
-         * the MongoDB server(s) in the replica set.
-         * 
-         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
-         * 
-         * Group: mongodb
-         * 
-         * @param mongodbHosts the value to set
-         * @return the dsl builder
-         */
-        default DebeziumMongodbEndpointBuilder mongodbHosts(String mongodbHosts) {
-            doSetProperty("mongodbHosts", mongodbHosts);
-            return this;
-        }
-        /**
-         * Specifies whether the addresses in 'hosts' are seeds that should be
-         * used to discover all members of the cluster or replica set ('true'),
-         * or whether the address(es) in 'hosts' should be used as is ('false').
-         * The default is 'true'.
-         * 
-         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
-         * 
-         * Default: true
-         * Group: mongodb
-         * 
-         * @param mongodbMembersAutoDiscover the value to set
-         * @return the dsl builder
-         */
-        default DebeziumMongodbEndpointBuilder mongodbMembersAutoDiscover(
-                boolean mongodbMembersAutoDiscover) {
-            doSetProperty("mongodbMembersAutoDiscover", mongodbMembersAutoDiscover);
-            return this;
-        }
-        /**
-         * Specifies whether the addresses in 'hosts' are seeds that should be
-         * used to discover all members of the cluster or replica set ('true'),
-         * or whether the address(es) in 'hosts' should be used as is ('false').
-         * The default is 'true'.
-         * 
-         * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
-         * type.
-         * 
-         * Default: true
-         * Group: mongodb
-         * 
-         * @param mongodbMembersAutoDiscover the value to set
-         * @return the dsl builder
-         */
-        default DebeziumMongodbEndpointBuilder mongodbMembersAutoDiscover(
-                String mongodbMembersAutoDiscover) {
-            doSetProperty("mongodbMembersAutoDiscover", mongodbMembersAutoDiscover);
             return this;
         }
         /**
@@ -1131,6 +1018,37 @@ public interface DebeziumMongodbEndpointBuilderFactory {
             return this;
         }
         /**
+         * List of notification channels names that are enabled.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: mongodb
+         * 
+         * @param notificationEnabledChannels the value to set
+         * @return the dsl builder
+         */
+        default DebeziumMongodbEndpointBuilder notificationEnabledChannels(
+                String notificationEnabledChannels) {
+            doSetProperty("notificationEnabledChannels", notificationEnabledChannels);
+            return this;
+        }
+        /**
+         * The name of the topic for the notifications. This is required in case
+         * 'sink' is in the list of enabled channels.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: mongodb
+         * 
+         * @param notificationSinkTopicName the value to set
+         * @return the dsl builder
+         */
+        default DebeziumMongodbEndpointBuilder notificationSinkTopicName(
+                String notificationSinkTopicName) {
+            doSetProperty("notificationSinkTopicName", notificationSinkTopicName);
+            return this;
+        }
+        /**
          * Time to wait for new change events to appear after receiving no
          * events, given in milliseconds. Defaults to 500 ms.
          * 
@@ -1265,39 +1183,6 @@ public interface DebeziumMongodbEndpointBuilderFactory {
             return this;
         }
         /**
-         * Whether field names will be sanitized to Avro naming conventions.
-         * 
-         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
-         * 
-         * Default: false
-         * Group: mongodb
-         * 
-         * @param sanitizeFieldNames the value to set
-         * @return the dsl builder
-         */
-        default DebeziumMongodbEndpointBuilder sanitizeFieldNames(
-                boolean sanitizeFieldNames) {
-            doSetProperty("sanitizeFieldNames", sanitizeFieldNames);
-            return this;
-        }
-        /**
-         * Whether field names will be sanitized to Avro naming conventions.
-         * 
-         * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
-         * type.
-         * 
-         * Default: false
-         * Group: mongodb
-         * 
-         * @param sanitizeFieldNames the value to set
-         * @return the dsl builder
-         */
-        default DebeziumMongodbEndpointBuilder sanitizeFieldNames(
-                String sanitizeFieldNames) {
-            doSetProperty("sanitizeFieldNames", sanitizeFieldNames);
-            return this;
-        }
-        /**
          * The path to the file that will be used to record the database schema
          * history.
          * 
@@ -1317,7 +1202,10 @@ public interface DebeziumMongodbEndpointBuilderFactory {
          * Specify how schema names should be adjusted for compatibility with
          * the message converter used by the connector, including: 'avro'
          * replaces the characters that cannot be used in the Avro type name
-         * with underscore; 'none' does not apply any adjustment (default).
+         * with underscore; 'avro_unicode' replaces the underscore or characters
+         * that cannot be used in the Avro type name with corresponding unicode
+         * like _uxxxx. Note: _ is an escape sequence like backslash in
+         * Java;'none' does not apply any adjustment (default).
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
@@ -1346,6 +1234,57 @@ public interface DebeziumMongodbEndpointBuilderFactory {
         default DebeziumMongodbEndpointBuilder signalDataCollection(
                 String signalDataCollection) {
             doSetProperty("signalDataCollection", signalDataCollection);
+            return this;
+        }
+        /**
+         * List of channels names that are enabled. Source channel is enabled by
+         * default.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Default: source
+         * Group: mongodb
+         * 
+         * @param signalEnabledChannels the value to set
+         * @return the dsl builder
+         */
+        default DebeziumMongodbEndpointBuilder signalEnabledChannels(
+                String signalEnabledChannels) {
+            doSetProperty("signalEnabledChannels", signalEnabledChannels);
+            return this;
+        }
+        /**
+         * Interval for looking for new signals in registered channels, given in
+         * milliseconds. Defaults to 5 seconds.
+         * 
+         * The option is a: &lt;code&gt;long&lt;/code&gt; type.
+         * 
+         * Default: 5s
+         * Group: mongodb
+         * 
+         * @param signalPollIntervalMs the value to set
+         * @return the dsl builder
+         */
+        default DebeziumMongodbEndpointBuilder signalPollIntervalMs(
+                long signalPollIntervalMs) {
+            doSetProperty("signalPollIntervalMs", signalPollIntervalMs);
+            return this;
+        }
+        /**
+         * Interval for looking for new signals in registered channels, given in
+         * milliseconds. Defaults to 5 seconds.
+         * 
+         * The option will be converted to a &lt;code&gt;long&lt;/code&gt; type.
+         * 
+         * Default: 5s
+         * Group: mongodb
+         * 
+         * @param signalPollIntervalMs the value to set
+         * @return the dsl builder
+         */
+        default DebeziumMongodbEndpointBuilder signalPollIntervalMs(
+                String signalPollIntervalMs) {
+            doSetProperty("signalPollIntervalMs", signalPollIntervalMs);
             return this;
         }
         /**
@@ -1503,9 +1442,13 @@ public interface DebeziumMongodbEndpointBuilderFactory {
         }
         /**
          * The criteria for running a snapshot upon startup of the connector.
-         * Options include: 'initial' (the default) to specify the connector
-         * should always perform an initial sync when required; 'never' to
-         * specify the connector should never perform an initial sync.
+         * Select one of the following snapshot options: 'initial' (default): If
+         * the connector does not detect any offsets for the logical server
+         * name, it runs a snapshot that captures the current full state of the
+         * configured tables. After the snapshot completes, the connector begins
+         * to stream changes from the oplog. 'never': The connector does not run
+         * a snapshot. Upon first startup, the connector immediately begins
+         * reading from the beginning of the oplog.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
@@ -1517,6 +1460,23 @@ public interface DebeziumMongodbEndpointBuilderFactory {
          */
         default DebeziumMongodbEndpointBuilder snapshotMode(String snapshotMode) {
             doSetProperty("snapshotMode", snapshotMode);
+            return this;
+        }
+        /**
+         * The name of the SourceInfoStructMaker class that returns SourceInfo
+         * schema and struct.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Default: io.debezium.connector.mongodb.MongoDbSourceInfoStructMaker
+         * Group: mongodb
+         * 
+         * @param sourceinfoStructMaker the value to set
+         * @return the dsl builder
+         */
+        default DebeziumMongodbEndpointBuilder sourceinfoStructMaker(
+                String sourceinfoStructMaker) {
+            doSetProperty("sourceinfoStructMaker", sourceinfoStructMaker);
             return this;
         }
         /**
@@ -1732,7 +1692,7 @@ public interface DebeziumMongodbEndpointBuilderFactory {
          * Debezium MongoDB Connector (camel-debezium-mongodb)
          * Capture changes from a MongoDB database.
          * 
-         * Category: database,nosql
+         * Category: database
          * Since: 3.0
          * Maven coordinates: org.apache.camel:camel-debezium-mongodb
          * 
@@ -1745,7 +1705,7 @@ public interface DebeziumMongodbEndpointBuilderFactory {
          * Debezium MongoDB Connector (camel-debezium-mongodb)
          * Capture changes from a MongoDB database.
          * 
-         * Category: database,nosql
+         * Category: database
          * Since: 3.0
          * Maven coordinates: org.apache.camel:camel-debezium-mongodb
          * 
@@ -1765,7 +1725,7 @@ public interface DebeziumMongodbEndpointBuilderFactory {
          * Debezium MongoDB Connector (camel-debezium-mongodb)
          * Capture changes from a MongoDB database.
          * 
-         * Category: database,nosql
+         * Category: database
          * Since: 3.0
          * Maven coordinates: org.apache.camel:camel-debezium-mongodb
          * 

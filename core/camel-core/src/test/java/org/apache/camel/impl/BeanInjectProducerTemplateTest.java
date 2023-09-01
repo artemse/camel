@@ -19,10 +19,10 @@ package org.apache.camel.impl;
 import org.apache.camel.BeanInject;
 import org.apache.camel.CamelContext;
 import org.apache.camel.ContextTestSupport;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.FluentProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.spi.CamelBeanPostProcessor;
+import org.apache.camel.support.PluginHelper;
 import org.junit.jupiter.api.Test;
 
 public class BeanInjectProducerTemplateTest extends ContextTestSupport {
@@ -36,7 +36,7 @@ public class BeanInjectProducerTemplateTest extends ContextTestSupport {
 
         // manual post process us as ContextTestSupport in camel-core doesn't do
         // that out of the box
-        CamelBeanPostProcessor post = context.adapt(ExtendedCamelContext.class).getBeanPostProcessor();
+        CamelBeanPostProcessor post = PluginHelper.getBeanPostProcessor(context);
         post.postProcessBeforeInitialization(this, "BeanInjectProducerTemplateTest");
         post.postProcessAfterInitialization(this, "BeanInjectProducerTemplateTest");
         return context;

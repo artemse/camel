@@ -20,12 +20,15 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.component.jms.AbstractSpringJMSTestSupport;
 import org.apache.camel.component.mock.MockEndpoint;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Tags;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * Simple unit test for transaction client EIP pattern and JMS.
  */
+@Tags({ @Tag("not-parallel"), @Tag("spring"), @Tag("tx") })
 public class JMSTransactionalClientTest extends AbstractSpringJMSTestSupport {
 
     @Override
@@ -43,7 +46,7 @@ public class JMSTransactionalClientTest extends AbstractSpringJMSTestSupport {
         // success at 3rd attempt
         mock.message(0).header("count").isEqualTo(3);
 
-        template.sendBody("activemq:queue:okay", "Hello World");
+        template.sendBody("activemq:queue:okay.JMSTransactionalClientTest", "Hello World");
 
         mock.assertIsSatisfied();
         // END SNIPPET: e1

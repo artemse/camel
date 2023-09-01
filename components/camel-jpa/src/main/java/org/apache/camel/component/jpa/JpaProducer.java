@@ -22,12 +22,13 @@ import java.util.Map;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.Query;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Expression;
 import org.apache.camel.Message;
-import org.apache.camel.language.simple.SimpleLanguage;
+import org.apache.camel.spi.Language;
 import org.apache.camel.support.DefaultProducer;
 import org.apache.camel.support.ExchangeHelper;
 import org.slf4j.Logger;
@@ -38,6 +39,11 @@ import static org.apache.camel.component.jpa.JpaHelper.getTargetEntityManager;
 public class JpaProducer extends DefaultProducer {
 
     private static final Logger LOG = LoggerFactory.getLogger(JpaProducer.class);
+
+    /* prefix for marking property in outputTarget */
+    private static final String PROPERTY_PREFIX = "property:";
+
+    private Language simple;
 
     private final EntityManagerFactory entityManagerFactory;
     private final TransactionStrategy transactionStrategy;
@@ -181,16 +187,16 @@ public class JpaProducer extends DefaultProducer {
                 entityManager.joinTransaction();
             }
 
-            Message target;
-            if (ExchangeHelper.isOutCapable(exchange)) {
-                target = exchange.getMessage();
-                // preserve headers
-                target.getHeaders().putAll(exchange.getIn().getHeaders());
+            final Object answer;
+            if (isUseExecuteUpdate()) {
+                answer = innerQuery.executeUpdate();
+            } else if (getEndpoint().isSingleResult()) {
+                answer = innerQuery.getSingleResult();
             } else {
-                target = exchange.getIn();
+                answer = innerQuery.getResultList();
             }
-            Object answer = isUseExecuteUpdate() ? innerQuery.executeUpdate() : innerQuery.getResultList();
-            target.setBody(answer);
+
+            putAnswer(exchange, answer, getEndpoint().getOutputTarget());
 
             if (getEndpoint().isFlushOnSend()) {
                 entityManager.flush();
@@ -200,9 +206,19 @@ public class JpaProducer extends DefaultProducer {
 
     @SuppressWarnings("unchecked")
     private void configureParameters(Query query, Exchange exchange) {
-        int maxResults = getEndpoint().getMaximumResults();
+        final int maxResults = exchange.getIn().getHeader(
+                JpaConstants.JPA_MAXIMUM_RESULTS,
+                getEndpoint().getMaximumResults(),
+                Integer.class);
         if (maxResults > 0) {
             query.setMaxResults(maxResults);
+        }
+        final int firstResult = exchange.getIn().getHeader(
+                JpaConstants.JPA_FIRST_RESULT,
+                getEndpoint().getFirstResult(),
+                Integer.class);
+        if (firstResult > 0) {
+            query.setFirstResult(firstResult);
         }
         // setup the parameters
         Map<String, ?> params;
@@ -215,7 +231,7 @@ public class JpaProducer extends DefaultProducer {
             params.forEach((key, value) -> {
                 Object resolvedValue = value;
                 if (value instanceof String) {
-                    resolvedValue = SimpleLanguage.expression((String) value).evaluate(exchange, Object.class);
+                    resolvedValue = simple.createExpression((String) value).evaluate(exchange, Object.class);
                 }
                 query.setParameter(key, resolvedValue);
             });
@@ -234,15 +250,14 @@ public class JpaProducer extends DefaultProducer {
                 Object answer = entityManager.find(getEndpoint().getEntityType(), key);
                 LOG.debug("Find: {} -> {}", key, answer);
 
-                Message target;
-                if (ExchangeHelper.isOutCapable(exchange)) {
-                    target = exchange.getMessage();
-                    // preserve headers
-                    target.getHeaders().putAll(exchange.getIn().getHeaders());
-                } else {
-                    target = exchange.getIn();
+                if (getEndpoint().isSingleResult() && answer == null) {
+                    throw new NoResultException(
+                            String.format(
+                                    "No results for key %s and singleResult requested",
+                                    key));
                 }
-                target.setBody(answer);
+
+                putAnswer(exchange, answer, getEndpoint().getOutputTarget());
 
                 if (getEndpoint().isFlushOnSend()) {
                     entityManager.flush();
@@ -356,4 +371,30 @@ public class JpaProducer extends DefaultProducer {
         }
     }
 
+    private static void putAnswer(final Exchange exchange, final Object answer, final String outputTarget) {
+        if (outputTarget == null || outputTarget.isBlank()) {
+            getTargetMessage(exchange).setBody(answer);
+        } else if (outputTarget.startsWith(PROPERTY_PREFIX)) {
+            exchange.setProperty(outputTarget.substring(PROPERTY_PREFIX.length()), answer);
+        } else {
+            getTargetMessage(exchange).setHeader(outputTarget, answer);
+        }
+    }
+
+    private static Message getTargetMessage(Exchange exchange) {
+        final Message target;
+        if (ExchangeHelper.isOutCapable(exchange)) {
+            target = exchange.getMessage();
+            // preserve headers
+            target.getHeaders().putAll(exchange.getIn().getHeaders());
+        } else {
+            target = exchange.getIn();
+        }
+        return target;
+    }
+
+    @Override
+    protected void doBuild() throws Exception {
+        simple = getEndpoint().getCamelContext().resolveLanguage("simple");
+    }
 }

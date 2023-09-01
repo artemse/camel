@@ -26,19 +26,19 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import org.apache.camel.AsyncCallback;
+import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.Message;
 import org.apache.camel.PooledExchange;
 import org.apache.camel.Processor;
 import org.apache.camel.Route;
+import org.apache.camel.StreamCache;
 import org.apache.camel.spi.InflightRepository;
+import org.apache.camel.spi.StreamCachingStrategy;
 import org.apache.camel.spi.Synchronization;
 import org.apache.camel.spi.SynchronizationVetoable;
 import org.apache.camel.spi.UnitOfWork;
-import org.apache.camel.support.DefaultMessage;
 import org.apache.camel.support.EventHelper;
-import org.apache.camel.support.MessageSupport;
 import org.apache.camel.support.UnitOfWorkHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,12 +51,13 @@ public class DefaultUnitOfWork implements UnitOfWork {
 
     // instances used by MDCUnitOfWork
     final InflightRepository inflightRepository;
+    final StreamCachingStrategy streamCachingStrategy;
     final boolean allowUseOriginalMessage;
     final boolean useBreadcrumb;
 
-    private final ExtendedCamelContext context;
+    private final CamelContext context;
     private final Deque<Route> routes = new ArrayDeque<>(8);
-    private Logger log;
+    private final Logger log;
     private Exchange exchange;
     private List<Synchronization> synchronizations;
     private Message originalInMessage;
@@ -69,18 +70,20 @@ public class DefaultUnitOfWork implements UnitOfWork {
 
     protected DefaultUnitOfWork(Exchange exchange, Logger logger, InflightRepository inflightRepository,
                                 boolean allowUseOriginalMessage, boolean useBreadcrumb) {
-        this(exchange, inflightRepository, allowUseOriginalMessage, useBreadcrumb);
+        this.allowUseOriginalMessage = allowUseOriginalMessage;
+        this.useBreadcrumb = useBreadcrumb;
+        this.context = exchange.getContext();
+        this.inflightRepository = inflightRepository;
+        this.streamCachingStrategy = exchange.getContext().getStreamCachingStrategy();
         this.log = logger;
+
+        doOnPrepare(exchange);
     }
 
     public DefaultUnitOfWork(Exchange exchange, InflightRepository inflightRepository, boolean allowUseOriginalMessage,
                              boolean useBreadcrumb) {
-        this.log = LOG;
-        this.allowUseOriginalMessage = allowUseOriginalMessage;
-        this.useBreadcrumb = useBreadcrumb;
-        this.context = (ExtendedCamelContext) exchange.getContext();
-        this.inflightRepository = inflightRepository;
-        doOnPrepare(exchange);
+        this(exchange, LOG, inflightRepository, allowUseOriginalMessage, useBreadcrumb);
+
     }
 
     UnitOfWork newInstance(Exchange exchange) {
@@ -97,22 +100,36 @@ public class DefaultUnitOfWork implements UnitOfWork {
         }
     }
 
+    private boolean isStreamCacheInUse(Exchange exchange) {
+        boolean inUse = streamCachingStrategy.isEnabled();
+        if (inUse) {
+            // the original route (from route) may have disabled stream caching
+            String rid = exchange.getFromRouteId();
+            if (rid != null) {
+                Route route = exchange.getContext().getRoute(rid);
+                if (route != null) {
+                    inUse = route.isStreamCaching() != null && route.isStreamCaching();
+                }
+            }
+        }
+        return inUse;
+    }
+
     private void doOnPrepare(Exchange exchange) {
         // unit of work is reused, so setup for this exchange
         this.exchange = exchange;
 
         if (allowUseOriginalMessage) {
-            // special for JmsMessage as it can cause it to loose headers later.
-            if (exchange.getIn().getClass().getName().equals("org.apache.camel.component.jms.JmsMessage")) {
-                this.originalInMessage = new DefaultMessage(context);
-                this.originalInMessage.setBody(exchange.getIn().getBody());
-                this.originalInMessage.getHeaders().putAll(exchange.getIn().getHeaders());
-            } else {
-                this.originalInMessage = exchange.getIn().copy();
-            }
-            // must preserve exchange on the original in message
-            if (this.originalInMessage instanceof MessageSupport) {
-                ((MessageSupport) this.originalInMessage).setExchange(exchange);
+            this.originalInMessage = exchange.getIn().copy();
+            if (isStreamCacheInUse(exchange)) {
+                // if the input body is streaming we need to cache it, so we can access the original input message (like stream caching advice does)
+                StreamCache cache
+                        = StreamCachingHelper.convertToStreamCache(streamCachingStrategy, exchange, this.originalInMessage);
+                if (cache != null) {
+                    this.originalInMessage.setBody(cache);
+                    // replace original incoming message with stream cache
+                    this.exchange.getIn().setBody(cache);
+                }
             }
         }
 
@@ -128,10 +145,10 @@ public class DefaultUnitOfWork implements UnitOfWork {
         }
 
         // fire event
-        if (context.isEventNotificationApplicable()) {
+        if (context.getCamelContextExtension().isEventNotificationApplicable()) {
             try {
                 EventHelper.notifyExchangeCreated(context, exchange);
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 // must catch exceptions to ensure the exchange is not failing due to notification event failed
                 log.warn("Exception occurred during event notification. This exception will be ignored.", e);
             }
@@ -230,23 +247,22 @@ public class DefaultUnitOfWork implements UnitOfWork {
             log.trace("UnitOfWork done for ExchangeId: {} with {}", exchange.getExchangeId(), exchange);
         }
 
-        boolean failed = exchange.isFailed();
-
         // at first done the synchronizations
-        UnitOfWorkHelper.doneSynchronizations(exchange, synchronizations, log);
+        UnitOfWorkHelper.doneSynchronizations(exchange, synchronizations);
 
         // unregister from inflight registry, before signalling we are done
         inflightRepository.remove(exchange);
 
-        if (context.isEventNotificationApplicable()) {
+        if (context.getCamelContextExtension().isEventNotificationApplicable()) {
             // then fire event to signal the exchange is done
             try {
+                final boolean failed = exchange.isFailed();
                 if (failed) {
                     EventHelper.notifyExchangeFailed(exchange.getContext(), exchange);
                 } else {
                     EventHelper.notifyExchangeDone(exchange.getContext(), exchange);
                 }
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 // must catch exceptions to ensure synchronizations is also invoked
                 log.warn("Exception occurred during event notification. This exception will be ignored.", e);
             }
@@ -262,7 +278,7 @@ public class DefaultUnitOfWork implements UnitOfWork {
                 if (pooled.isAutoRelease()) {
                     ((PooledExchange) exchange).done();
                 }
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 // must catch exceptions to ensure synchronizations is also invoked
                 log.warn("Exception occurred during exchange done. This exception will be ignored.", e);
             }

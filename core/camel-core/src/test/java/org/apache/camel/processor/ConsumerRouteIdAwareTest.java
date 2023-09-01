@@ -53,7 +53,7 @@ public class ConsumerRouteIdAwareTest extends ContextTestSupport {
         assertMockEndpointsSatisfied();
     }
 
-    private class MyComponent extends DefaultComponent {
+    private static class MyComponent extends DefaultComponent {
 
         public MyComponent(CamelContext context) {
             super(context);
@@ -86,21 +86,24 @@ public class ConsumerRouteIdAwareTest extends ContextTestSupport {
 
         public MyConsumer(Endpoint endpoint, Processor processor) {
             super(endpoint, processor);
+        }
+
+        @Override
+        protected void doStart() throws Exception {
+            super.doStart();
 
             Runnable run = () -> {
-                Exchange exchange = endpoint.createExchange();
+                Exchange exchange = getEndpoint().createExchange();
                 exchange.getMessage().setBody("Hello from consumer route " + getRouteId());
                 try {
-                    Thread.sleep(100);
-                    processor.process(exchange);
+                    getProcessor().process(exchange);
                 } catch (Exception e) {
-                    // ignore
+                    exchange.setException(e);
                 }
             };
             Thread t = new Thread(run);
             t.start();
         }
-
     }
 
 }

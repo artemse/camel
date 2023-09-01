@@ -1749,7 +1749,7 @@ public interface TwitterTimelineEndpointBuilderFactory {
          * Twitter Timeline (camel-twitter)
          * Send tweets and receive tweets from user's timeline.
          * 
-         * Category: api,cloud,social
+         * Category: saas,social
          * Since: 2.10
          * Maven coordinates: org.apache.camel:camel-twitter
          * 
@@ -1762,7 +1762,7 @@ public interface TwitterTimelineEndpointBuilderFactory {
          * Twitter Timeline (camel-twitter)
          * Send tweets and receive tweets from user's timeline.
          * 
-         * Category: api,cloud,social
+         * Category: saas,social
          * Since: 2.10
          * Maven coordinates: org.apache.camel:camel-twitter
          * 
@@ -1770,8 +1770,8 @@ public interface TwitterTimelineEndpointBuilderFactory {
          * 
          * Path parameter: timelineType (required)
          * The timeline type to produce/consume.
-         * There are 7 enums and the value can be one of: PUBLIC, HOME, USER,
-         * MENTIONS, RETWEETSOFME, LIST, UNKNOWN
+         * There are 6 enums and the value can be one of: PUBLIC, HOME, USER,
+         * MENTIONS, LIST, UNKNOWN
          * 
          * @param path timelineType
          * @return the dsl builder
@@ -1783,7 +1783,7 @@ public interface TwitterTimelineEndpointBuilderFactory {
          * Twitter Timeline (camel-twitter)
          * Send tweets and receive tweets from user's timeline.
          * 
-         * Category: api,cloud,social
+         * Category: saas,social
          * Since: 2.10
          * Maven coordinates: org.apache.camel:camel-twitter
          * 
@@ -1791,8 +1791,8 @@ public interface TwitterTimelineEndpointBuilderFactory {
          * 
          * Path parameter: timelineType (required)
          * The timeline type to produce/consume.
-         * There are 7 enums and the value can be one of: PUBLIC, HOME, USER,
-         * MENTIONS, RETWEETSOFME, LIST, UNKNOWN
+         * There are 6 enums and the value can be one of: PUBLIC, HOME, USER,
+         * MENTIONS, LIST, UNKNOWN
          * 
          * @param componentName to use a custom component name for the endpoint
          * instead of the default name

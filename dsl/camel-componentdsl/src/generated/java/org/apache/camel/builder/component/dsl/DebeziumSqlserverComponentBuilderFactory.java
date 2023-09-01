@@ -34,7 +34,7 @@ public interface DebeziumSqlserverComponentBuilderFactory {
      * Debezium SQL Server Connector (camel-debezium-sqlserver)
      * Capture changes from an SQL Server database.
      * 
-     * Category: database,sql
+     * Category: database
      * Since: 3.0
      * Maven coordinates: org.apache.camel:camel-debezium-sqlserver
      * 
@@ -519,6 +519,23 @@ public interface DebeziumSqlserverComponentBuilderFactory {
             return this;
         }
         /**
+         * The maximum number of retries on connection errors before failing (-1
+         * = no limit, 0 = disabled, 0 = num of retries).
+         * 
+         * The option is a: &lt;code&gt;int&lt;/code&gt; type.
+         * 
+         * Default: -1
+         * Group: sqlserver
+         * 
+         * @param errorsMaxRetries the value to set
+         * @return the dsl builder
+         */
+        default DebeziumSqlserverComponentBuilder errorsMaxRetries(
+                int errorsMaxRetries) {
+            doSetProperty("errorsMaxRetries", errorsMaxRetries);
+            return this;
+        }
+        /**
          * Specify how failures during processing of events (i.e. when
          * encountering a corrupted event) should be handled, including: 'fail'
          * (the default) an exception indicating the problematic event and its
@@ -656,7 +673,8 @@ public interface DebeziumSqlserverComponentBuilderFactory {
             return this;
         }
         /**
-         * The maximum size of chunk for incremental snapshotting.
+         * The maximum size of chunk (number of documents/rows) for incremental
+         * snapshotting.
          * 
          * The option is a: &lt;code&gt;int&lt;/code&gt; type.
          * 
@@ -781,6 +799,37 @@ public interface DebeziumSqlserverComponentBuilderFactory {
             return this;
         }
         /**
+         * List of notification channels names that are enabled.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: sqlserver
+         * 
+         * @param notificationEnabledChannels the value to set
+         * @return the dsl builder
+         */
+        default DebeziumSqlserverComponentBuilder notificationEnabledChannels(
+                java.lang.String notificationEnabledChannels) {
+            doSetProperty("notificationEnabledChannels", notificationEnabledChannels);
+            return this;
+        }
+        /**
+         * The name of the topic for the notifications. This is required in case
+         * 'sink' is in the list of enabled channels.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: sqlserver
+         * 
+         * @param notificationSinkTopicName the value to set
+         * @return the dsl builder
+         */
+        default DebeziumSqlserverComponentBuilder notificationSinkTopicName(
+                java.lang.String notificationSinkTopicName) {
+            doSetProperty("notificationSinkTopicName", notificationSinkTopicName);
+            return this;
+        }
+        /**
          * Time to wait for new change events to appear after receiving no
          * events, given in milliseconds. Defaults to 500 ms.
          * 
@@ -848,22 +897,6 @@ public interface DebeziumSqlserverComponentBuilderFactory {
             return this;
         }
         /**
-         * Whether field names will be sanitized to Avro naming conventions.
-         * 
-         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
-         * 
-         * Default: false
-         * Group: sqlserver
-         * 
-         * @param sanitizeFieldNames the value to set
-         * @return the dsl builder
-         */
-        default DebeziumSqlserverComponentBuilder sanitizeFieldNames(
-                boolean sanitizeFieldNames) {
-            doSetProperty("sanitizeFieldNames", sanitizeFieldNames);
-            return this;
-        }
-        /**
          * The name of the SchemaHistory class that should be used to store and
          * recover database schema changes. The configuration properties for the
          * history are prefixed with the 'schema.history.internal.' string.
@@ -919,6 +952,26 @@ public interface DebeziumSqlserverComponentBuilderFactory {
         }
         /**
          * Controls what DDL will Debezium store in database schema history. By
+         * default (true) only DDL that manipulates a table from captured
+         * schema/database will be stored. If set to false, then Debezium will
+         * store all incoming DDL statements.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: false
+         * Group: sqlserver
+         * 
+         * @param schemaHistoryInternalStoreOnlyCapturedDatabasesDdl the value
+         * to set
+         * @return the dsl builder
+         */
+        default DebeziumSqlserverComponentBuilder schemaHistoryInternalStoreOnlyCapturedDatabasesDdl(
+                boolean schemaHistoryInternalStoreOnlyCapturedDatabasesDdl) {
+            doSetProperty("schemaHistoryInternalStoreOnlyCapturedDatabasesDdl", schemaHistoryInternalStoreOnlyCapturedDatabasesDdl);
+            return this;
+        }
+        /**
+         * Controls what DDL will Debezium store in database schema history. By
          * default (false) Debezium will store all incoming DDL statements. If
          * set to true, then only DDL that manipulates a captured table will be
          * stored.
@@ -941,7 +994,10 @@ public interface DebeziumSqlserverComponentBuilderFactory {
          * Specify how schema names should be adjusted for compatibility with
          * the message converter used by the connector, including: 'avro'
          * replaces the characters that cannot be used in the Avro type name
-         * with underscore; 'none' does not apply any adjustment (default).
+         * with underscore; 'avro_unicode' replaces the underscore or characters
+         * that cannot be used in the Avro type name with corresponding unicode
+         * like _uxxxx. Note: _ is an escape sequence like backslash in
+         * Java;'none' does not apply any adjustment (default).
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
@@ -970,6 +1026,40 @@ public interface DebeziumSqlserverComponentBuilderFactory {
         default DebeziumSqlserverComponentBuilder signalDataCollection(
                 java.lang.String signalDataCollection) {
             doSetProperty("signalDataCollection", signalDataCollection);
+            return this;
+        }
+        /**
+         * List of channels names that are enabled. Source channel is enabled by
+         * default.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Default: source
+         * Group: sqlserver
+         * 
+         * @param signalEnabledChannels the value to set
+         * @return the dsl builder
+         */
+        default DebeziumSqlserverComponentBuilder signalEnabledChannels(
+                java.lang.String signalEnabledChannels) {
+            doSetProperty("signalEnabledChannels", signalEnabledChannels);
+            return this;
+        }
+        /**
+         * Interval for looking for new signals in registered channels, given in
+         * milliseconds. Defaults to 5 seconds.
+         * 
+         * The option is a: &lt;code&gt;long&lt;/code&gt; type.
+         * 
+         * Default: 5s
+         * Group: sqlserver
+         * 
+         * @param signalPollIntervalMs the value to set
+         * @return the dsl builder
+         */
+        default DebeziumSqlserverComponentBuilder signalPollIntervalMs(
+                long signalPollIntervalMs) {
+            doSetProperty("signalPollIntervalMs", signalPollIntervalMs);
             return this;
         }
         /**
@@ -1108,11 +1198,18 @@ public interface DebeziumSqlserverComponentBuilderFactory {
         }
         /**
          * The criteria for running a snapshot upon startup of the connector.
-         * Options include: 'initial' (the default) to specify the connector
-         * should run a snapshot only when no offsets are available for the
-         * logical server name; 'schema_only' to specify the connector should
-         * run a snapshot of the schema when no offsets are available for the
-         * logical server name.
+         * Select one of the following snapshot options: 'initial' (default): If
+         * the connector does not detect any offsets for the logical server
+         * name, it runs a snapshot that captures the current full state of the
+         * configured tables. After the snapshot completes, the connector begins
+         * to stream changes from the transaction log.; 'initial_only': The
+         * connector performs a snapshot as it does for the 'initial' option,
+         * but after the connector completes the snapshot, it stops, and does
+         * not stream changes from the transaction log.; 'schema_only': If the
+         * connector does not detect any offsets for the logical server name, it
+         * runs a snapshot that captures only the schema (table structures), but
+         * not any table data. After the snapshot completes, the connector
+         * begins to stream changes from the transaction log.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
@@ -1151,6 +1248,44 @@ public interface DebeziumSqlserverComponentBuilderFactory {
         default DebeziumSqlserverComponentBuilder snapshotSelectStatementOverrides(
                 java.lang.String snapshotSelectStatementOverrides) {
             doSetProperty("snapshotSelectStatementOverrides", snapshotSelectStatementOverrides);
+            return this;
+        }
+        /**
+         * Controls the order in which tables are processed in the initial
+         * snapshot. A descending value will order the tables by row count
+         * descending. A ascending value will order the tables by row count
+         * ascending. A value of disabled (the default) will disable ordering by
+         * row count.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Default: disabled
+         * Group: sqlserver
+         * 
+         * @param snapshotTablesOrderByRowCount the value to set
+         * @return the dsl builder
+         */
+        default DebeziumSqlserverComponentBuilder snapshotTablesOrderByRowCount(
+                java.lang.String snapshotTablesOrderByRowCount) {
+            doSetProperty("snapshotTablesOrderByRowCount", snapshotTablesOrderByRowCount);
+            return this;
+        }
+        /**
+         * The name of the SourceInfoStructMaker class that returns SourceInfo
+         * schema and struct.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Default:
+         * io.debezium.connector.sqlserver.SqlServerSourceInfoStructMaker
+         * Group: sqlserver
+         * 
+         * @param sourceinfoStructMaker the value to set
+         * @return the dsl builder
+         */
+        default DebeziumSqlserverComponentBuilder sourceinfoStructMaker(
+                java.lang.String sourceinfoStructMaker) {
+            doSetProperty("sourceinfoStructMaker", sourceinfoStructMaker);
             return this;
         }
         /**
@@ -1332,6 +1467,7 @@ public interface DebeziumSqlserverComponentBuilderFactory {
             case "databaseUser": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setDatabaseUser((java.lang.String) value); return true;
             case "datatypePropagateSourceType": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setDatatypePropagateSourceType((java.lang.String) value); return true;
             case "decimalHandlingMode": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setDecimalHandlingMode((java.lang.String) value); return true;
+            case "errorsMaxRetries": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setErrorsMaxRetries((int) value); return true;
             case "eventProcessingFailureHandlingMode": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setEventProcessingFailureHandlingMode((java.lang.String) value); return true;
             case "heartbeatActionQuery": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setHeartbeatActionQuery((java.lang.String) value); return true;
             case "heartbeatIntervalMs": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setHeartbeatIntervalMs((int) value); return true;
@@ -1346,17 +1482,21 @@ public interface DebeziumSqlserverComponentBuilderFactory {
             case "maxQueueSize": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setMaxQueueSize((int) value); return true;
             case "maxQueueSizeInBytes": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setMaxQueueSizeInBytes((long) value); return true;
             case "messageKeyColumns": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setMessageKeyColumns((java.lang.String) value); return true;
+            case "notificationEnabledChannels": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setNotificationEnabledChannels((java.lang.String) value); return true;
+            case "notificationSinkTopicName": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setNotificationSinkTopicName((java.lang.String) value); return true;
             case "pollIntervalMs": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setPollIntervalMs((long) value); return true;
             case "provideTransactionMetadata": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setProvideTransactionMetadata((boolean) value); return true;
             case "queryFetchSize": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setQueryFetchSize((int) value); return true;
             case "retriableRestartConnectorWaitMs": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setRetriableRestartConnectorWaitMs((long) value); return true;
-            case "sanitizeFieldNames": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setSanitizeFieldNames((boolean) value); return true;
             case "schemaHistoryInternal": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setSchemaHistoryInternal((java.lang.String) value); return true;
             case "schemaHistoryInternalFileFilename": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setSchemaHistoryInternalFileFilename((java.lang.String) value); return true;
             case "schemaHistoryInternalSkipUnparseableDdl": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setSchemaHistoryInternalSkipUnparseableDdl((boolean) value); return true;
+            case "schemaHistoryInternalStoreOnlyCapturedDatabasesDdl": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setSchemaHistoryInternalStoreOnlyCapturedDatabasesDdl((boolean) value); return true;
             case "schemaHistoryInternalStoreOnlyCapturedTablesDdl": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setSchemaHistoryInternalStoreOnlyCapturedTablesDdl((boolean) value); return true;
             case "schemaNameAdjustmentMode": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setSchemaNameAdjustmentMode((java.lang.String) value); return true;
             case "signalDataCollection": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setSignalDataCollection((java.lang.String) value); return true;
+            case "signalEnabledChannels": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setSignalEnabledChannels((java.lang.String) value); return true;
+            case "signalPollIntervalMs": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setSignalPollIntervalMs((long) value); return true;
             case "skippedOperations": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setSkippedOperations((java.lang.String) value); return true;
             case "snapshotDelayMs": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setSnapshotDelayMs((long) value); return true;
             case "snapshotFetchSize": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setSnapshotFetchSize((int) value); return true;
@@ -1366,6 +1506,8 @@ public interface DebeziumSqlserverComponentBuilderFactory {
             case "snapshotMaxThreads": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setSnapshotMaxThreads((int) value); return true;
             case "snapshotMode": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setSnapshotMode((java.lang.String) value); return true;
             case "snapshotSelectStatementOverrides": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setSnapshotSelectStatementOverrides((java.lang.String) value); return true;
+            case "snapshotTablesOrderByRowCount": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setSnapshotTablesOrderByRowCount((java.lang.String) value); return true;
+            case "sourceinfoStructMaker": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setSourceinfoStructMaker((java.lang.String) value); return true;
             case "tableExcludeList": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setTableExcludeList((java.lang.String) value); return true;
             case "tableIgnoreBuiltin": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setTableIgnoreBuiltin((boolean) value); return true;
             case "tableIncludeList": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setTableIncludeList((java.lang.String) value); return true;

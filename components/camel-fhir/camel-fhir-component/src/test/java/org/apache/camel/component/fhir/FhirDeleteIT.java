@@ -26,6 +26,7 @@ import org.apache.camel.component.fhir.api.ExtraParameters;
 import org.apache.camel.component.fhir.internal.FhirApiCollection;
 import org.apache.camel.component.fhir.internal.FhirDeleteApiMethod;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +38,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Test class for {@link org.apache.camel.component.fhir.api.FhirDelete} APIs. The class source won't be generated again
  * if the generator MOJO finds it under src/test/java.
  */
+@DisabledIfSystemProperty(named = "ci.env.name", matches = "apache.org",
+                          disabledReason = "Apache CI nodes are too resource constrained for this test - see CAMEL-19659")
 public class FhirDeleteIT extends AbstractFhirTestSupport {
 
     private static final Logger LOG = LoggerFactory.getLogger(FhirDeleteIT.class);
@@ -48,7 +51,7 @@ public class FhirDeleteIT extends AbstractFhirTestSupport {
         // using org.hl7.fhir.instance.model.api.IBaseResource message body for single parameter "resource"
         MethodOutcome result = requestBody("direct://RESOURCE", this.patient);
 
-        LOG.debug("resource: " + result);
+        LOG.debug("resource: {}", result);
         assertNotNull(result, "resource result");
         assertFalse(patientExists());
     }
@@ -60,7 +63,7 @@ public class FhirDeleteIT extends AbstractFhirTestSupport {
         // using org.hl7.fhir.instance.model.api.IIdType message body for single parameter "id"
         MethodOutcome result = requestBody("direct://RESOURCE_BY_ID", this.patient.getIdElement());
 
-        LOG.debug("resourceById: " + result);
+        LOG.debug("resourceById: {}", result);
         assertNotNull(result, "resourceById result");
         assertFalse(patientExists());
     }
@@ -77,7 +80,7 @@ public class FhirDeleteIT extends AbstractFhirTestSupport {
 
         MethodOutcome result = requestBodyAndHeaders("direct://RESOURCE_BY_STRING_ID", null, headers);
 
-        LOG.debug("resourceById: " + result);
+        LOG.debug("resourceById: {}", result);
         assertNotNull(result, "resourceById result");
         assertFalse(patientExists());
     }
@@ -89,7 +92,7 @@ public class FhirDeleteIT extends AbstractFhirTestSupport {
         MethodOutcome result
                 = requestBody("direct://RESOURCE_CONDITIONAL_BY_URL", "Patient?given=Vincent&family=Freeman");
 
-        LOG.debug("resourceConditionalByUrl: " + result);
+        LOG.debug("resourceConditionalByUrl: {}", result);
         assertNotNull(result, "resourceConditionalByUrl result");
         assertFalse(patientExists());
     }
@@ -103,7 +106,7 @@ public class FhirDeleteIT extends AbstractFhirTestSupport {
         MethodOutcome result = requestBodyAndHeaders("direct://RESOURCE_CONDITIONAL_BY_URL",
                 "Patient?given=Vincent&family=Freeman", headers);
 
-        LOG.debug("resourceConditionalByUrl: " + result);
+        LOG.debug("resourceConditionalByUrl: {}", result);
         assertNotNull(result, "resourceConditionalByUrl result");
         assertFalse(patientExists());
     }

@@ -115,6 +115,42 @@ public interface FtpsComponentBuilderFactory {
             return this;
         }
         /**
+         * Used for enabling or disabling all consumer based health checks from
+         * this component.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: true
+         * Group: health
+         * 
+         * @param healthCheckConsumerEnabled the value to set
+         * @return the dsl builder
+         */
+        default FtpsComponentBuilder healthCheckConsumerEnabled(
+                boolean healthCheckConsumerEnabled) {
+            doSetProperty("healthCheckConsumerEnabled", healthCheckConsumerEnabled);
+            return this;
+        }
+        /**
+         * Used for enabling or disabling all producer based health checks from
+         * this component. Notice: Camel has by default disabled all producer
+         * based health-checks. You can turn on producer checks globally by
+         * setting camel.health.producersEnabled=true.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: true
+         * Group: health
+         * 
+         * @param healthCheckProducerEnabled the value to set
+         * @return the dsl builder
+         */
+        default FtpsComponentBuilder healthCheckProducerEnabled(
+                boolean healthCheckProducerEnabled) {
+            doSetProperty("healthCheckProducerEnabled", healthCheckProducerEnabled);
+            return this;
+        }
+        /**
          * Enable usage of global SSL context parameters.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
@@ -150,6 +186,8 @@ public interface FtpsComponentBuilderFactory {
             case "bridgeErrorHandler": ((FtpsComponent) component).setBridgeErrorHandler((boolean) value); return true;
             case "lazyStartProducer": ((FtpsComponent) component).setLazyStartProducer((boolean) value); return true;
             case "autowiredEnabled": ((FtpsComponent) component).setAutowiredEnabled((boolean) value); return true;
+            case "healthCheckConsumerEnabled": ((FtpsComponent) component).setHealthCheckConsumerEnabled((boolean) value); return true;
+            case "healthCheckProducerEnabled": ((FtpsComponent) component).setHealthCheckProducerEnabled((boolean) value); return true;
             case "useGlobalSslContextParameters": ((FtpsComponent) component).setUseGlobalSslContextParameters((boolean) value); return true;
             default: return false;
             }

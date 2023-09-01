@@ -24,17 +24,13 @@
     <parent>
         <groupId>org.apache.camel</groupId>
         <artifactId>components</artifactId>
-        <version>4.0.0-SNAPSHOT</version>
+        <version>4.1.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>camel-grpc</artifactId>
     <packaging>jar</packaging>
     <name>Camel :: gRPC</name>
     <description>Camel component for gRPC (Remote Procedure Call) support</description>
-
-    <properties>
-        <protobuf-version>${grpc-protobuf-version}</protobuf-version>
-    </properties>
 
     <dependencies>
 
@@ -47,7 +43,6 @@
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-auth</artifactId>
-            <version>${grpc-version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.google.code.findbugs</groupId>
@@ -58,44 +53,26 @@
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-netty</artifactId>
-            <version>${grpc-version}</version>
         </dependency>
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-protobuf</artifactId>
-            <version>${grpc-version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.google.code.findbugs</groupId>
                     <artifactId>jsr305</artifactId>
                 </exclusion>
-                <exclusion>
-                    <groupId>com.google.protobuf</groupId>
-                    <artifactId>protobuf-java</artifactId>
-                </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.google.protobuf</groupId>
-            <artifactId>protobuf-java</artifactId>
-            <version>${protobuf-version}</version>
         </dependency>
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-stub</artifactId>
-            <version>${grpc-version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.javassist</groupId>
             <artifactId>javassist</artifactId>
             <version>${javassist-version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-tcnative-boringssl-static</artifactId>
-            <version>${grpc-netty-tcnative-boringssl-static-version}</version>
         </dependency>
 
         <dependency>
@@ -126,6 +103,12 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-test-junit5</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito-version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -200,13 +183,13 @@
                 </executions>
                 <dependencies>
                     <dependency>
-                        <groupId>org.codehaus.groovy</groupId>
+                        <groupId>org.apache.groovy</groupId>
                         <artifactId>groovy</artifactId>
                         <version>${groovy-version}</version>
                         <scope>runtime</scope>
                     </dependency>
                     <dependency>
-                        <groupId>org.codehaus.groovy</groupId>
+                        <groupId>org.apache.groovy</groupId>
                         <artifactId>groovy-ant</artifactId>
                         <version>${groovy-version}</version>
                         <scope>runtime</scope>
@@ -254,13 +237,6 @@
                 </executions>
             </plugin>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <skipTests>${skipTests}</skipTests>
-                </configuration>
-            </plugin>
             <!-- Force the version of guava to camel-package-maven-plugin to prevent build failure due to the
              usage of an old/incompatible version of guava -->
             <plugin>
@@ -270,7 +246,7 @@
                     <dependency>
                         <groupId>com.google.guava</groupId>
                         <artifactId>guava</artifactId>
-                        <version>${grpc-guava-version}</version>
+                        <version>${guava-version}</version>
                     </dependency>
                 </dependencies>
             </plugin>

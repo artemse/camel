@@ -18,6 +18,7 @@ package org.apache.camel.dsl.jbang.core.commands.process;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -34,13 +35,26 @@ import org.apache.camel.util.json.Jsoner;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
-@Command(name = "processor", description = "Get status of Camel processors")
+@Command(name = "processor", description = "Get status of Camel processors",
+         sortOptions = false)
 public class CamelProcessorStatus extends ProcessWatchCommand {
+
+    public static class PidNameCompletionCandidates implements Iterable<String> {
+
+        public PidNameCompletionCandidates() {
+        }
+
+        @Override
+        public Iterator<String> iterator() {
+            return List.of("pid", "name").iterator();
+        }
+
+    }
 
     @CommandLine.Parameters(description = "Name or pid of running Camel integration", arity = "0..1")
     String name = "*";
 
-    @CommandLine.Option(names = { "--sort" },
+    @CommandLine.Option(names = { "--sort" }, completionCandidates = PidNameCompletionCandidates.class,
                         description = "Sort by pid or name", defaultValue = "pid")
     String sort;
 
@@ -61,7 +75,7 @@ public class CamelProcessorStatus extends ProcessWatchCommand {
     }
 
     @Override
-    public Integer doCall() throws Exception {
+    public Integer doProcessWatchCall() throws Exception {
         List<Row> rows = new ArrayList<>();
 
         List<Long> pids = findPids(name);
@@ -82,7 +96,7 @@ public class CamelProcessorStatus extends ProcessWatchCommand {
                             if ("CamelJBang".equals(row.name)) {
                                 row.name = ProcessHelper.extractName(root, ph);
                             }
-                            row.pid = "" + ph.pid();
+                            row.pid = Long.toString(ph.pid());
                             row.routeId = o.getString("routeId");
                             row.processor = o.getString("from");
                             row.source = o.getString("source");

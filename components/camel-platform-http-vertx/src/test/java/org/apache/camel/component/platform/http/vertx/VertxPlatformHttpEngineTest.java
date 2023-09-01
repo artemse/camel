@@ -45,6 +45,7 @@ import org.apache.camel.component.platform.http.HttpEndpointModel;
 import org.apache.camel.component.platform.http.PlatformHttpComponent;
 import org.apache.camel.component.platform.http.spi.Method;
 import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.model.rest.RestBindingMode;
 import org.apache.camel.model.rest.RestParamType;
 import org.apache.camel.spi.RestConfiguration;
 import org.apache.camel.support.jsse.KeyManagersParameters;
@@ -676,6 +677,110 @@ public class VertxPlatformHttpEngineTest {
                             .statusCode(500);
                 }
             }
+        } finally {
+            context.stop();
+        }
+    }
+
+    @Test
+    public void responseHeaders() throws Exception {
+        final CamelContext context = createCamelContext();
+
+        try {
+            context.addRoutes(new RouteBuilder() {
+                @Override
+                public void configure() {
+                    from("platform-http:/test")
+                            .setHeader("nonEmptyFromRoute", constant("nonEmptyFromRouteValue"))
+                            .setHeader("emptyFromRoute", constant(""))
+                            .setBody().simple("Hello World");
+                }
+            });
+
+            context.start();
+
+            RestAssured.given()
+                    .header("nonEmpty", "nonEmptyValue")
+                    .header("empty", "")
+                    .get("/test")
+                    .then()
+                    .statusCode(200)
+                    .body(equalTo("Hello World"))
+                    .header("nonEmpty", "nonEmptyValue")
+                    .header("empty", "")
+                    .header("nonEmptyFromRoute", "nonEmptyFromRouteValue")
+                    .header("emptyFromRoute", "");
+        } finally {
+            context.stop();
+        }
+    }
+
+    @Test
+    public void testConsumerSuspended() throws Exception {
+        final CamelContext context = createCamelContext();
+
+        try {
+            context.addRoutes(new RouteBuilder() {
+                @Override
+                public void configure() {
+                    from("platform-http:/get")
+                            .routeId("get")
+                            .setBody().constant("get");
+                }
+            });
+
+            context.start();
+
+            given()
+                    .when()
+                    .get("/get")
+                    .then()
+                    .statusCode(200)
+                    .body(equalTo("get"));
+
+            context.getRouteController().suspendRoute("get");
+
+            given()
+                    .when()
+                    .get("/get")
+                    .then()
+                    .statusCode(503);
+
+        } finally {
+            context.stop();
+        }
+    }
+
+    @Test
+    public void testInvalidContentTypeClientRequestValidation() throws Exception {
+        final CamelContext context = createCamelContext();
+
+        try {
+            context.addRoutes(new RouteBuilder() {
+                @Override
+                public void configure() {
+                    restConfiguration()
+                            .component("platform-http")
+                            .bindingMode(RestBindingMode.json)
+                            .clientRequestValidation(true);
+
+                    rest("/rest")
+                            .post("/validate/body").consumes("text/plain").produces("application/json")
+                            .to("direct:rest");
+                    from("direct:rest")
+                            .setBody(simple("Hello ${body}"));
+                }
+            });
+
+            context.start();
+
+            given()
+                    .when()
+                    .body("{\"name\": \"Donald\"}")
+                    .contentType("application/json")
+                    .post("/rest/validate/body")
+                    .then()
+                    .statusCode(415);
         } finally {
             context.stop();
         }

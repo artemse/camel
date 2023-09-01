@@ -46,7 +46,7 @@ public interface PdfEndpointBuilderFactory {
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
-         * Default: Helvetica
+         * Default: HELVETICA
          * Group: producer
          * 
          * @param font the value to set
@@ -335,7 +335,7 @@ public interface PdfEndpointBuilderFactory {
          * PDF (camel-pdf)
          * Create, modify or extract content from PDF documents.
          * 
-         * Category: document,transformation,printing
+         * Category: document,transformation
          * Since: 2.16
          * Maven coordinates: org.apache.camel:camel-pdf
          * 
@@ -348,7 +348,7 @@ public interface PdfEndpointBuilderFactory {
          * PDF (camel-pdf)
          * Create, modify or extract content from PDF documents.
          * 
-         * Category: document,transformation,printing
+         * Category: document,transformation
          * Since: 2.16
          * Maven coordinates: org.apache.camel:camel-pdf
          * 
@@ -369,7 +369,7 @@ public interface PdfEndpointBuilderFactory {
          * PDF (camel-pdf)
          * Create, modify or extract content from PDF documents.
          * 
-         * Category: document,transformation,printing
+         * Category: document,transformation
          * Since: 2.16
          * Maven coordinates: org.apache.camel:camel-pdf
          * 

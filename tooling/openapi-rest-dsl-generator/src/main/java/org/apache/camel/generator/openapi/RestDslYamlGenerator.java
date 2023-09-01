@@ -48,10 +48,11 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
-import io.apicurio.datamodels.openapi.models.OasDocument;
+import io.apicurio.datamodels.models.openapi.OpenApiDocument;
+import io.apicurio.datamodels.models.openapi.OpenApiPathItem;
 import org.apache.camel.CamelContext;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.model.rest.RestsDefinition;
+import org.apache.camel.support.PluginHelper;
 import org.apache.camel.util.ObjectHelper;
 
 public class RestDslYamlGenerator extends RestDslGenerator<RestDslYamlGenerator> {
@@ -60,7 +61,7 @@ public class RestDslYamlGenerator extends RestDslGenerator<RestDslYamlGenerator>
     private static final String[] FIELD_ORDER
             = new String[] { "id", "path", "description", "consumes", "produces", "type", "outType", "param" };
 
-    RestDslYamlGenerator(final OasDocument document) {
+    RestDslYamlGenerator(final OpenApiDocument document) {
         super(document);
     }
 
@@ -75,11 +76,13 @@ public class RestDslYamlGenerator extends RestDslGenerator<RestDslYamlGenerator>
                 basePath, emitter, filter,
                 destinationGenerator());
 
-        document.paths.getPathItems().forEach(restDslStatement::visit);
+        for (String name : document.getPaths().getItemNames()) {
+            OpenApiPathItem item = document.getPaths().getItem(name);
+            restDslStatement.visit(name, item);
+        }
 
         final RestsDefinition rests = emitter.result();
-        final ExtendedCamelContext ecc = context.adapt(ExtendedCamelContext.class);
-        final String xml = ecc.getModelToXMLDumper().dumpModelAsXml(context, rests);
+        final String xml = PluginHelper.getModelToXMLDumper(context).dumpModelAsXml(context, rests);
 
         final DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
         builderFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
@@ -99,22 +102,21 @@ public class RestDslYamlGenerator extends RestDslGenerator<RestDslYamlGenerator>
             element.removeAttribute("customId");
         }
 
-        if (restComponent != null) {
+        boolean restConfig = restComponent != null || restContextPath != null || clientRequestValidation;
+        if (restConfig) {
             final Element configuration = document.createElement("restConfiguration");
-            configuration.setAttribute("component", restComponent);
-
-            if (restContextPath != null) {
+            if (ObjectHelper.isNotEmpty(restComponent)) {
+                configuration.setAttribute("component", restComponent);
+            }
+            if (ObjectHelper.isNotEmpty(restContextPath)) {
                 configuration.setAttribute("contextPath", restContextPath);
             }
-
             if (ObjectHelper.isNotEmpty(apiContextPath)) {
                 configuration.setAttribute("apiContextPath", apiContextPath);
             }
-
             if (clientRequestValidation) {
                 configuration.setAttribute("clientRequestValidation", "true");
             }
-
             root.insertBefore(configuration, root.getFirstChild());
         }
 
@@ -155,10 +157,10 @@ public class RestDslYamlGenerator extends RestDslGenerator<RestDslYamlGenerator>
 
         // add Routes
         if (generateRoutes) {
-            for (String uri : toTagData.keySet()) {
+            for (Map.Entry<String, String> entry : toTagData.entrySet()) {
                 ObjectNode from = JsonNodeFactory.instance.objectNode();
-                from.set("uri", new TextNode(uri));
-                String description = toTagData.get(uri);
+                from.set("uri", new TextNode(entry.getKey()));
+                String description = entry.getValue();
                 if (description != null && !description.isBlank()) {
                     from.set("description", new TextNode(description));
                 }
@@ -169,8 +171,7 @@ public class RestDslYamlGenerator extends RestDslGenerator<RestDslYamlGenerator>
         }
 
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER));
-        String yaml = mapper.writeValueAsString(node);
-        return yaml;
+        return mapper.writeValueAsString(node);
     }
 
     private static JsonNode fixRootNode(XmlMapper xmlMapper, JsonNode node) {
@@ -180,7 +181,7 @@ public class RestDslYamlGenerator extends RestDslGenerator<RestDslYamlGenerator>
             // if rest configuration is present then put it in the top
             JsonNode rc = node.get("restConfiguration");
             if (rc != null) {
-                arr.add(xmlMapper.createObjectNode().set("rest-configuration", rc));
+                arr.add(xmlMapper.createObjectNode().set("restConfiguration", rc));
             }
             arr.add(xmlMapper.createObjectNode().set("rest", r));
             node = arr;

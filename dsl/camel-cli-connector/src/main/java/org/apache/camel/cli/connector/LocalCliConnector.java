@@ -18,12 +18,15 @@ package org.apache.camel.cli.connector;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.lang.management.ClassLoadingMXBean;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.RuntimeMXBean;
 import java.lang.management.ThreadMXBean;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -33,12 +36,15 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.CamelContextAware;
+import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
-import org.apache.camel.ExtendedCamelContext;
+import org.apache.camel.ExchangePattern;
+import org.apache.camel.NoSuchEndpointException;
+import org.apache.camel.Processor;
+import org.apache.camel.ProducerTemplate;
 import org.apache.camel.Route;
 import org.apache.camel.api.management.ManagedCamelContext;
 import org.apache.camel.console.DevConsole;
@@ -46,12 +52,16 @@ import org.apache.camel.console.DevConsoleRegistry;
 import org.apache.camel.spi.CliConnector;
 import org.apache.camel.spi.CliConnectorFactory;
 import org.apache.camel.spi.ContextReloadStrategy;
-import org.apache.camel.support.DefaultContextReloadStrategy;
+import org.apache.camel.spi.ResourceReloadStrategy;
+import org.apache.camel.support.EndpointHelper;
+import org.apache.camel.support.MessageHelper;
 import org.apache.camel.support.PatternHelper;
+import org.apache.camel.support.PluginHelper;
 import org.apache.camel.support.service.ServiceHelper;
 import org.apache.camel.support.service.ServiceSupport;
 import org.apache.camel.util.FileUtil;
 import org.apache.camel.util.IOHelper;
+import org.apache.camel.util.StopWatch;
 import org.apache.camel.util.concurrent.ThreadHelper;
 import org.apache.camel.util.json.JsonArray;
 import org.apache.camel.util.json.JsonObject;
@@ -66,6 +76,8 @@ public class LocalCliConnector extends ServiceSupport implements CliConnector, C
 
     private static final Logger LOG = LoggerFactory.getLogger(LocalCliConnector.class);
 
+    private static final int BODY_MAX_CHARS = 128 * 1024;
+
     private final CliConnectorFactory cliConnectorFactory;
     private CamelContext camelContext;
     private int delay = 2000;
@@ -75,6 +87,7 @@ public class LocalCliConnector extends ServiceSupport implements CliConnector, C
     private final AtomicBoolean terminating = new AtomicBoolean();
     private ScheduledExecutorService executor;
     private volatile ExecutorService terminateExecutor;
+    private ProducerTemplate producer;
     private File lockFile;
     private File statusFile;
     private File actionFile;
@@ -126,6 +139,7 @@ public class LocalCliConnector extends ServiceSupport implements CliConnector, C
             }
         }
         platformVersion = cliConnectorFactory.getRuntimeVersion();
+        producer = camelContext.createProducerTemplate();
 
         // create thread from JDK so it is not managed by Camel because we want the pool to be independent when
         // camel is being stopped which otherwise can lead to stopping the thread pool while the task is running
@@ -210,7 +224,7 @@ public class LocalCliConnector extends ServiceSupport implements CliConnector, C
                             }
                             return false;
                         })
-                        .collect(Collectors.toList());
+                        .toList();
                 for (String id : ids) {
                     try {
                         String command = root.getString("command");
@@ -249,57 +263,215 @@ public class LocalCliConnector extends ServiceSupport implements CliConnector, C
             } else if ("gc".equals(action)) {
                 System.gc();
             } else if ("reload".equals(action)) {
-                ContextReloadStrategy reloader = camelContext.hasService(ContextReloadStrategy.class);
-                if (reloader == null) {
-                    reloader = new DefaultContextReloadStrategy();
-                    camelContext.addService(reloader);
+                ContextReloadStrategy cr = camelContext.hasService(ContextReloadStrategy.class);
+                if (cr != null) {
+                    cr.onReload("Camel CLI");
+                } else {
+                    ResourceReloadStrategy rr = camelContext.hasService(ResourceReloadStrategy.class);
+                    if (rr != null) {
+                        rr.onReload("Camel CLI");
+                    }
                 }
-                reloader.onReload("Camel CLI");
             } else if ("reset-stats".equals(action)) {
-                ManagedCamelContext mcc = camelContext.getExtension(ManagedCamelContext.class);
+                ManagedCamelContext mcc = camelContext.getCamelContextExtension().getContextPlugin(ManagedCamelContext.class);
                 if (mcc != null) {
                     mcc.getManagedCamelContext().reset(true);
                 }
             } else if ("thread-dump".equals(action)) {
-                DevConsole dc = camelContext.getExtension(DevConsoleRegistry.class).resolveById("thread");
+                DevConsole dc = camelContext.getCamelContextExtension().getContextPlugin(DevConsoleRegistry.class)
+                        .resolveById("thread");
                 if (dc != null) {
                     JsonObject json = (JsonObject) dc.call(DevConsole.MediaType.JSON, Map.of("stackTrace", "true"));
                     LOG.trace("Updating output file: {}", outputFile);
                     IOHelper.writeText(json.toJson(), outputFile);
                 }
             } else if ("top-processors".equals(action)) {
-                DevConsole dc = camelContext.getExtension(DevConsoleRegistry.class).resolveById("top");
+                DevConsole dc
+                        = camelContext.getCamelContextExtension().getContextPlugin(DevConsoleRegistry.class).resolveById("top");
                 if (dc != null) {
                     JsonObject json = (JsonObject) dc.call(DevConsole.MediaType.JSON, Map.of(Exchange.HTTP_PATH, "/*"));
                     LOG.trace("Updating output file: {}", outputFile);
                     IOHelper.writeText(json.toJson(), outputFile);
                 }
             } else if ("source".equals(action)) {
-                DevConsole dc = camelContext.getExtension(DevConsoleRegistry.class).resolveById("source");
+                DevConsole dc = camelContext.getCamelContextExtension().getContextPlugin(DevConsoleRegistry.class)
+                        .resolveById("source");
                 if (dc != null) {
                     String filter = root.getString("filter");
                     JsonObject json = (JsonObject) dc.call(DevConsole.MediaType.JSON, Map.of("filter", filter));
                     LOG.trace("Updating output file: {}", outputFile);
                     IOHelper.writeText(json.toJson(), outputFile);
                 }
+            } else if ("route-dump".equals(action)) {
+                DevConsole dc = camelContext.getCamelContextExtension().getContextPlugin(DevConsoleRegistry.class)
+                        .resolveById("route-dump");
+                if (dc != null) {
+                    String filter = root.getString("filter");
+                    String format = root.getString("format");
+                    String uriAsParameters = root.getString("uriAsParameters");
+                    JsonObject json
+                            = (JsonObject) dc.call(DevConsole.MediaType.JSON,
+                                    Map.of("filter", filter, "format", format, "uriAsParameters", uriAsParameters));
+                    LOG.trace("Updating output file: {}", outputFile);
+                    IOHelper.writeText(json.toJson(), outputFile);
+                }
             } else if ("route-controller".equals(action)) {
-                DevConsole dc = camelContext.getExtension(DevConsoleRegistry.class).resolveById("route-controller");
+                DevConsole dc = camelContext.getCamelContextExtension().getContextPlugin(DevConsoleRegistry.class)
+                        .resolveById("route-controller");
                 if (dc != null) {
                     String stacktrace = root.getString("stacktrace");
                     JsonObject json = (JsonObject) dc.call(DevConsole.MediaType.JSON, Map.of("stacktrace", stacktrace));
                     LOG.trace("Updating output file: {}", outputFile);
                     IOHelper.writeText(json.toJson(), outputFile);
                 }
+            } else if ("stub".equals(action)) {
+                String filter = root.getString("filter");
+                String limit = root.getString("limit");
+                String browse = root.getString("browse");
+
+                DevConsole dc = camelContext.getCamelContextExtension().getContextPlugin(DevConsoleRegistry.class)
+                        .resolveById("stub");
+                if (dc != null) {
+                    JsonObject json = (JsonObject) dc.call(DevConsole.MediaType.JSON,
+                            Map.of("filter", filter, "limit", limit, "browse", browse));
+                    LOG.trace("Updating output file: {}", outputFile);
+                    IOHelper.writeText(json.toJson(), outputFile);
+                }
+            } else if ("send".equals(action)) {
+                StopWatch watch = new StopWatch();
+                long timestamp = System.currentTimeMillis();
+                String endpoint = root.getString("endpoint");
+                String body = root.getString("body");
+                String exchangePattern = root.getString("exchangePattern");
+                Collection<JsonObject> headers = root.getCollection("headers");
+                if (body != null) {
+                    InputStream is = null;
+                    Object b = body;
+                    Map<String, Object> map = null;
+                    if (body.startsWith("file:")) {
+                        File file = new File(body.substring(5));
+                        is = new FileInputStream(file);
+                        b = is;
+                    }
+                    if (headers != null) {
+                        map = new HashMap<>();
+                        for (JsonObject jo : headers) {
+                            map.put(jo.getString("key"), jo.getString("value"));
+                        }
+                    }
+                    final Object inputBody = b;
+                    final Map<String, Object> inputHeaders = map;
+                    Exchange out;
+                    Endpoint target = null;
+                    if (endpoint == null) {
+                        List<Route> routes = camelContext.getRoutes();
+                        if (!routes.isEmpty()) {
+                            // grab endpoint from 1st route
+                            target = routes.get(0).getEndpoint();
+                        }
+                    } else {
+                        // is the endpoint a pattern or route id
+                        boolean scheme = endpoint.contains(":");
+                        boolean pattern = endpoint.endsWith("*");
+                        if (!scheme || pattern) {
+                            if (!scheme) {
+                                endpoint = endpoint + "*";
+                            }
+                            for (Route route : camelContext.getRoutes()) {
+                                Endpoint e = route.getEndpoint();
+                                if (EndpointHelper.matchEndpoint(camelContext, e.getEndpointUri(), endpoint)) {
+                                    target = e;
+                                    break;
+                                }
+                            }
+                            if (target == null) {
+                                // okay it may refer to a route id
+                                for (Route route : camelContext.getRoutes()) {
+                                    String id = route.getRouteId();
+                                    Endpoint e = route.getEndpoint();
+                                    if (EndpointHelper.matchEndpoint(camelContext, id, endpoint)) {
+                                        target = e;
+                                        break;
+                                    }
+                                }
+                            }
+                        } else {
+                            target = camelContext.getEndpoint(endpoint);
+                        }
+                    }
+
+                    if (target != null) {
+                        out = producer.send(target, new Processor() {
+                            @Override
+                            public void process(Exchange exchange) throws Exception {
+                                exchange.getMessage().setBody(inputBody);
+                                if (inputHeaders != null) {
+                                    exchange.getMessage().setHeaders(inputHeaders);
+                                }
+                                exchange.setPattern(
+                                        "InOut".equals(exchangePattern) ? ExchangePattern.InOut : ExchangePattern.InOnly);
+                            }
+                        });
+                        IOHelper.close(is);
+                        LOG.trace("Updating output file: {}", outputFile);
+                        if (out.getException() != null) {
+                            JsonObject jo = new JsonObject();
+                            jo.put("endpoint", target.getEndpointUri());
+                            jo.put("exchangeId", out.getExchangeId());
+                            jo.put("exchangePattern", exchangePattern);
+                            jo.put("timestamp", timestamp);
+                            jo.put("elapsed", watch.taken());
+                            jo.put("status", "failed");
+                            // avoid double wrap
+                            jo.put("exception",
+                                    MessageHelper.dumpExceptionAsJSonObject(out.getException()).getMap("exception"));
+                            IOHelper.writeText(jo.toJson(), outputFile);
+                        } else if ("InOut".equals(exchangePattern)) {
+                            JsonObject jo = new JsonObject();
+                            jo.put("endpoint", target.getEndpointUri());
+                            jo.put("exchangeId", out.getExchangeId());
+                            jo.put("exchangePattern", exchangePattern);
+                            jo.put("timestamp", timestamp);
+                            jo.put("elapsed", watch.taken());
+                            jo.put("status", "success");
+                            // avoid double wrap
+                            jo.put("message", MessageHelper.dumpAsJSonObject(out.getMessage(), true, true, true, true, true,
+                                    BODY_MAX_CHARS).getMap("message"));
+                            IOHelper.writeText(jo.toJson(), outputFile);
+                        } else {
+                            JsonObject jo = new JsonObject();
+                            jo.put("endpoint", target.getEndpointUri());
+                            jo.put("exchangeId", out.getExchangeId());
+                            jo.put("exchangePattern", exchangePattern);
+                            jo.put("timestamp", timestamp);
+                            jo.put("elapsed", watch.taken());
+                            jo.put("status", "success");
+                            IOHelper.writeText(jo.toJson(), outputFile);
+                        }
+                    } else {
+                        // there is no valid endpoint
+                        JsonObject jo = new JsonObject();
+                        jo.put("endpoint", root.getString("endpoint"));
+                        jo.put("exchangeId", "");
+                        jo.put("exchangePattern", exchangePattern);
+                        jo.put("timestamp", timestamp);
+                        jo.put("elapsed", watch.taken());
+                        jo.put("status", "failed");
+                        // avoid double wrap
+                        jo.put("exception",
+                                MessageHelper.dumpExceptionAsJSonObject(new NoSuchEndpointException(root.getString("endpoint")))
+                                        .getMap("exception"));
+                        IOHelper.writeText(jo.toJson(), outputFile);
+                    }
+                }
             }
 
             // action done so delete file
             FileUtil.deleteFile(actionFile);
 
-        } catch (Throwable e) {
+        } catch (Exception e) {
             // ignore
-            LOG.debug(
-                    "Error executing action file: " + actionFile + " due to: " + e.getMessage()
-                      + ". This exception is ignored.",
+            LOG.debug("Error executing action file: {} due to: {}. This exception is ignored.", actionFile, e.getMessage(),
                     e);
         }
     }
@@ -314,7 +486,7 @@ public class LocalCliConnector extends ServiceSupport implements CliConnector, C
                     return (JsonObject) Jsoner.deserialize(text);
                 }
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
             // ignore
         }
         return null;
@@ -345,7 +517,7 @@ public class LocalCliConnector extends ServiceSupport implements CliConnector, C
             }
             root.put("runtime", rc);
 
-            DevConsoleRegistry dcr = camelContext.getExtension(DevConsoleRegistry.class);
+            DevConsoleRegistry dcr = camelContext.getCamelContextExtension().getContextPlugin(DevConsoleRegistry.class);
             if (dcr != null) {
                 // collect details via console
                 DevConsole dc = dcr.resolveById("context");
@@ -422,7 +594,15 @@ public class LocalCliConnector extends ServiceSupport implements CliConnector, C
                         root.put("fault-tolerance", json);
                     }
                 }
-                DevConsole dc12 = camelContext.getExtension(DevConsoleRegistry.class).resolveById("trace");
+                DevConsole dc12a = dcr.resolveById("route-circuit-breaker");
+                if (dc12a != null) {
+                    JsonObject json = (JsonObject) dc12a.call(DevConsole.MediaType.JSON);
+                    if (json != null && !json.isEmpty()) {
+                        root.put("route-circuit-breaker", json);
+                    }
+                }
+                DevConsole dc12 = camelContext.getCamelContextExtension().getContextPlugin(DevConsoleRegistry.class)
+                        .resolveById("trace");
                 if (dc12 != null) {
                     JsonObject json = (JsonObject) dc12.call(DevConsole.MediaType.JSON);
                     JsonArray arr = json.getCollection("traces");
@@ -433,7 +613,7 @@ public class LocalCliConnector extends ServiceSupport implements CliConnector, C
                             return jo.getLong("uid") <= traceFilePos;
                         });
                     }
-                    if (!arr.isEmpty()) {
+                    if (arr != null && !arr.isEmpty()) {
                         // store traces in a special file
                         LOG.trace("Updating trace file: {}", traceFile);
                         String data = json.toJson() + System.lineSeparator();
@@ -470,11 +650,10 @@ public class LocalCliConnector extends ServiceSupport implements CliConnector, C
             }
             LOG.trace("Updating status file: {}", statusFile);
             IOHelper.writeText(root.toJson(), statusFile);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             // ignore
-            LOG.trace(
-                    "Error updating status file: " + statusFile + " due to: " + e.getMessage() + ". This exception is ignored.",
-                    e);
+            LOG.trace("Error updating status file: {} due to: {}. This exception is ignored.",
+                    statusFile, e.getMessage(), e);
         }
     }
 
@@ -535,8 +714,7 @@ public class LocalCliConnector extends ServiceSupport implements CliConnector, C
     private JsonObject collectVaults() {
         JsonObject root = new JsonObject();
         // aws-secrets is optional
-        Optional<DevConsole> dcAws = camelContext.adapt(ExtendedCamelContext.class)
-                .getDevConsoleResolver().lookupDevConsole("aws-secrets");
+        Optional<DevConsole> dcAws = PluginHelper.getDevConsoleResolver(camelContext).lookupDevConsole("aws-secrets");
         if (dcAws.isPresent()) {
             JsonObject json = (JsonObject) dcAws.get().call(DevConsole.MediaType.JSON);
             if (json != null) {
@@ -544,8 +722,7 @@ public class LocalCliConnector extends ServiceSupport implements CliConnector, C
             }
         }
         // gcp-secrets is optional
-        Optional<DevConsole> dcGcp = camelContext.adapt(ExtendedCamelContext.class)
-                .getDevConsoleResolver().lookupDevConsole("gcp-secrets");
+        Optional<DevConsole> dcGcp = PluginHelper.getDevConsoleResolver(camelContext).lookupDevConsole("gcp-secrets");
         if (dcGcp.isPresent()) {
             JsonObject json = (JsonObject) dcGcp.get().call(DevConsole.MediaType.JSON);
             if (json != null) {
@@ -553,8 +730,7 @@ public class LocalCliConnector extends ServiceSupport implements CliConnector, C
             }
         }
         // azure-secrets is optional
-        Optional<DevConsole> dcAzure = camelContext.adapt(ExtendedCamelContext.class)
-                .getDevConsoleResolver().lookupDevConsole("azure-secrets");
+        Optional<DevConsole> dcAzure = PluginHelper.getDevConsoleResolver(camelContext).lookupDevConsole("azure-secrets");
         if (dcAzure.isPresent()) {
             JsonObject json = (JsonObject) dcAzure.get().call(DevConsole.MediaType.JSON);
             if (json != null) {
@@ -569,8 +745,7 @@ public class LocalCliConnector extends ServiceSupport implements CliConnector, C
 
         // platform-http is optional
         if (camelContext.hasComponent("platform-http") != null) {
-            Optional<DevConsole> dc = camelContext.adapt(ExtendedCamelContext.class)
-                    .getDevConsoleResolver().lookupDevConsole("platform-http");
+            Optional<DevConsole> dc = PluginHelper.getDevConsoleResolver(camelContext).lookupDevConsole("platform-http");
             if (dc.isPresent()) {
                 JsonObject json = (JsonObject) dc.get().call(DevConsole.MediaType.JSON);
                 if (json != null) {
@@ -579,8 +754,7 @@ public class LocalCliConnector extends ServiceSupport implements CliConnector, C
             }
         }
         // netty is optional
-        Optional<DevConsole> dc = camelContext.adapt(ExtendedCamelContext.class)
-                .getDevConsoleResolver().lookupDevConsole("netty");
+        Optional<DevConsole> dc = PluginHelper.getDevConsoleResolver(camelContext).lookupDevConsole("netty");
         if (dc.isPresent()) {
             JsonObject json = (JsonObject) dc.get().call(DevConsole.MediaType.JSON);
             if (json != null) {
@@ -588,8 +762,7 @@ public class LocalCliConnector extends ServiceSupport implements CliConnector, C
             }
         }
         // mina is optional
-        dc = camelContext.adapt(ExtendedCamelContext.class)
-                .getDevConsoleResolver().lookupDevConsole("mina");
+        dc = PluginHelper.getDevConsoleResolver(camelContext).lookupDevConsole("mina");
         if (dc.isPresent()) {
             JsonObject json = (JsonObject) dc.get().call(DevConsole.MediaType.JSON);
             if (json != null) {
@@ -597,8 +770,7 @@ public class LocalCliConnector extends ServiceSupport implements CliConnector, C
             }
         }
         // mllp is optional
-        dc = camelContext.adapt(ExtendedCamelContext.class)
-                .getDevConsoleResolver().lookupDevConsole("mllp");
+        dc = PluginHelper.getDevConsoleResolver(camelContext).lookupDevConsole("mllp");
         if (dc.isPresent()) {
             JsonObject json = (JsonObject) dc.get().call(DevConsole.MediaType.JSON);
             if (json != null) {
@@ -631,14 +803,11 @@ public class LocalCliConnector extends ServiceSupport implements CliConnector, C
             camelContext.getExecutorServiceManager().shutdown(executor);
             executor = null;
         }
+        ServiceHelper.stopService(producer);
     }
 
     private static String getPid() {
-        try {
-            return "" + ProcessHandle.current().pid();
-        } catch (Throwable e) {
-            return null;
-        }
+        return String.valueOf(ProcessHandle.current().pid());
     }
 
     private static File createLockFile(String name) {

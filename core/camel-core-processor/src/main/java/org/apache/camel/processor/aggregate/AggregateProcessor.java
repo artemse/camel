@@ -41,7 +41,6 @@ import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePropertyKey;
 import org.apache.camel.Expression;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.Navigate;
 import org.apache.camel.NoSuchEndpointException;
 import org.apache.camel.Predicate;
@@ -240,7 +239,7 @@ public class AggregateProcessor extends AsyncProcessorSupport
     private Expression completionSizeExpression;
     private boolean completionFromBatchConsumer;
     private boolean completionOnNewCorrelationGroup;
-    private AtomicInteger batchConsumerCounter = new AtomicInteger();
+    private final AtomicInteger batchConsumerCounter = new AtomicInteger();
     private boolean discardOnCompletionTimeout;
     private boolean discardOnAggregationFailure;
     private boolean forceCompletionOnStop;
@@ -259,7 +258,7 @@ public class AggregateProcessor extends AsyncProcessorSupport
         ObjectHelper.notNull(aggregationStrategy, "aggregationStrategy");
         ObjectHelper.notNull(executorService, "executorService");
         this.camelContext = camelContext;
-        this.reactiveExecutor = camelContext.adapt(ExtendedCamelContext.class).getReactiveExecutor();
+        this.reactiveExecutor = camelContext.getCamelContextExtension().getReactiveExecutor();
         this.processor = processor;
         this.correlationExpression = correlationExpression;
         this.aggregationStrategy = aggregationStrategy;
@@ -315,7 +314,7 @@ public class AggregateProcessor extends AsyncProcessorSupport
     public boolean process(Exchange exchange, AsyncCallback callback) {
         try {
             return doProcess(exchange, callback);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             exchange.setException(e);
             callback.done(true);
             return true;
@@ -512,7 +511,7 @@ public class AggregateProcessor extends AsyncProcessorSupport
                 // remove it afterwards
                 newExchange.removeProperty(ExchangePropertyKey.AGGREGATED_SIZE);
                 newExchange.removeProperty(ExchangePropertyKey.AGGREGATED_CORRELATION_KEY);
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 // must catch any exception from aggregation
                 throw new CamelExchangeException("Error occurred during preComplete", newExchange, e);
             }
@@ -548,7 +547,7 @@ public class AggregateProcessor extends AsyncProcessorSupport
         boolean aggregateFailed = false;
         try {
             answer = onAggregation(oldExchange, newExchange);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             aggregateFailed = true;
             if (isDiscardOnAggregationFailure()) {
                 // discard due failure in aggregation strategy
@@ -915,14 +914,16 @@ public class AggregateProcessor extends AsyncProcessorSupport
 
         for (String key : keys) {
             Exchange exchange = aggregationRepository.get(camelContext, key);
-            // grab the timeout value
-            long timeout = exchange.getProperty(ExchangePropertyKey.AGGREGATED_TIMEOUT, 0L, long.class);
-            if (timeout > 0) {
-                if (LOG.isTraceEnabled()) {
-                    LOG.trace("Restoring CompletionTimeout for exchangeId: {} with timeout: {} millis.",
-                            exchange.getExchangeId(), timeout);
+            if (exchange != null) {
+                // grab the timeout value
+                long timeout = exchange.getProperty(ExchangePropertyKey.AGGREGATED_TIMEOUT, 0L, long.class);
+                if (timeout > 0) {
+                    if (LOG.isTraceEnabled()) {
+                        LOG.trace("Restoring CompletionTimeout for exchangeId: {} with timeout: {} millis.",
+                                exchange.getExchangeId(), timeout);
+                    }
+                    addExchangeToTimeoutMap(key, exchange, timeout);
                 }
-                addExchangeToTimeoutMap(key, exchange, timeout);
             }
         }
 
@@ -1437,7 +1438,7 @@ public class AggregateProcessor extends AsyncProcessorSupport
                                         exchange.getExchangeExtension().setRedeliveryExhausted(false);
                                         exchange.setRollbackOnly(false);
                                         deadLetterProducerTemplate.send(recoverable.getDeadLetterUri(), exchange);
-                                    } catch (Throwable e) {
+                                    } catch (Exception e) {
                                         exchange.setException(e);
                                     }
 
@@ -1446,6 +1447,7 @@ public class AggregateProcessor extends AsyncProcessorSupport
                                         getExceptionHandler()
                                                 .handleException("Failed to move recovered Exchange to dead letter channel: "
                                                                  + recoverable.getDeadLetterUri(),
+                                                        exchange,
                                                         exchange.getException());
                                     } else {
                                         // it was ok, so confirm after it has been moved to dead letter channel, so we wont recover it again

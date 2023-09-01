@@ -19,7 +19,6 @@ package org.apache.camel.test.infra.kafka.services;
 
 import org.apache.camel.test.infra.common.services.SimpleTestServiceBuilder;
 import org.apache.camel.test.infra.common.services.SingletonService;
-import org.junit.jupiter.api.extension.ExtensionContext;
 
 public final class KafkaServiceFactory {
     static class SingletonKafkaService extends SingletonService<KafkaService> implements KafkaService {
@@ -31,20 +30,7 @@ public final class KafkaServiceFactory {
         public String getBootstrapServers() {
             return getService().getBootstrapServers();
         }
-
-        @Override
-        public void beforeAll(ExtensionContext extensionContext) {
-            addToStore(extensionContext);
-        }
-
-        @Override
-        public void afterAll(ExtensionContext extensionContext) {
-            // NO-OP
-        }
     }
-
-    private static SimpleTestServiceBuilder<KafkaService> instance;
-    private static KafkaService kafkaService;
 
     private KafkaServiceFactory() {
 
@@ -61,34 +47,33 @@ public final class KafkaServiceFactory {
                 .addMapping("local-strimzi-container", StrimziService::new)
                 .addRemoteMapping(RemoteKafkaService::new)
                 .addMapping("local-kafka3-container", ContainerLocalKafkaService::kafka3Container)
-                .addMapping("local-kafka2-container", ContainerLocalKafkaService::new)
+                .addMapping("local-kafka2-container", ContainerLocalKafkaService::kafka2Container)
                 .addMapping("local-redpanda-container", RedpandaService::new)
                 .build();
     }
 
-    public static synchronized KafkaService createSingletonService() {
-        if (kafkaService == null) {
-            if (instance == null) {
-                instance = builder();
-
-                instance.addLocalMapping(
-                        () -> new SingletonKafkaService(ContainerLocalKafkaService.kafka3Container(), "kafka"))
-                        .addRemoteMapping(RemoteKafkaService::new)
-                        .addMapping("local-kafka3-container",
-                                () -> new SingletonKafkaService(ContainerLocalKafkaService.kafka3Container(), "kafka3"))
-                        .addMapping("local-kafka2-container",
-                                () -> new SingletonKafkaService(new ContainerLocalKafkaService(), "kafka2"))
-                        .addMapping("local-strimzi-container",
-                                () -> new SingletonKafkaService(new StrimziService(), "strimzi"))
-                        .addMapping("local-redpanda-container",
-                                () -> new SingletonKafkaService(new RedpandaService(), "redpanda"));
-
-            }
-
-            kafkaService = instance.build();
-        }
-
-        return kafkaService;
+    public static KafkaService createSingletonService() {
+        return SingletonServiceHolder.INSTANCE;
     }
 
+    private static class SingletonServiceHolder {
+        static final KafkaService INSTANCE;
+        static {
+            SimpleTestServiceBuilder<KafkaService> instance = builder();
+
+            instance.addLocalMapping(
+                    () -> new SingletonKafkaService(ContainerLocalKafkaService.kafka3Container(), "kafka"))
+                    .addRemoteMapping(RemoteKafkaService::new)
+                    .addMapping("local-kafka3-container",
+                            () -> new SingletonKafkaService(ContainerLocalKafkaService.kafka3Container(), "kafka3"))
+                    .addMapping("local-kafka2-container",
+                            () -> new SingletonKafkaService(ContainerLocalKafkaService.kafka2Container(), "kafka2"))
+                    .addMapping("local-strimzi-container",
+                            () -> new SingletonKafkaService(new StrimziService(), "strimzi"))
+                    .addMapping("local-redpanda-container",
+                            () -> new SingletonKafkaService(new RedpandaService(), "redpanda"));
+
+            INSTANCE = instance.build();
+        }
+    }
 }

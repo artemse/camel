@@ -29,6 +29,7 @@ import javax.xml.transform.URIResolver;
 import org.xml.sax.EntityResolver;
 
 import org.apache.camel.CamelContext;
+import org.apache.camel.Category;
 import org.apache.camel.Component;
 import org.apache.camel.Exchange;
 import org.apache.camel.api.management.ManagedAttribute;
@@ -52,7 +53,7 @@ import org.slf4j.LoggerFactory;
  */
 @ManagedResource(description = "Managed XsltEndpoint")
 @UriEndpoint(firstVersion = "1.3.0", scheme = "xslt", title = "XSLT", syntax = "xslt:resourceUri", producerOnly = true,
-             label = "core,transformation", headersClass = XsltConstants.class)
+             category = { Category.CORE, Category.TRANSFORMATION }, headersClass = XsltConstants.class)
 public class XsltEndpoint extends ProcessorEndpoint {
 
     private static final Logger LOG = LoggerFactory.getLogger(XsltEndpoint.class);
@@ -88,6 +89,8 @@ public class XsltEndpoint extends ProcessorEndpoint {
     private EntityResolver entityResolver;
     @UriParam(label = "advanced")
     private TransformerFactoryConfigurationStrategy transformerFactoryConfigurationStrategy;
+    @UriParam(label = "advanced")
+    private XsltMessageLogger xsltMessageLogger;
 
     public XsltEndpoint(String endpointUri, Component component) {
         super(endpointUri, component);
@@ -310,6 +313,17 @@ public class XsltEndpoint extends ProcessorEndpoint {
         this.transformerFactoryConfigurationStrategy = transformerFactoryConfigurationStrategy;
     }
 
+    public XsltMessageLogger getXsltMessageLogger() {
+        return xsltMessageLogger;
+    }
+
+    /**
+     * A consumer to messages generated during XSLT transformations.
+     */
+    public void setXsltMessageLogger(XsltMessageLogger xsltMessageLogger) {
+        this.xsltMessageLogger = xsltMessageLogger;
+    }
+
     /**
      * Loads the resource.
      *
@@ -400,6 +414,10 @@ public class XsltEndpoint extends ProcessorEndpoint {
 
         if (resultHandlerFactory != null) {
             xslt.setResultHandlerFactory(resultHandlerFactory);
+        }
+
+        if (xsltMessageLogger != null) {
+            xslt.setXsltMessageLogger(xsltMessageLogger);
         }
 
         // any additional transformer parameters then make a copy to avoid side-effects

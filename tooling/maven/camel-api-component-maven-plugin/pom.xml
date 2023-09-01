@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.apache.camel</groupId>
         <artifactId>maven-plugins</artifactId>
-        <version>4.0.0-SNAPSHOT</version>
+        <version>4.1.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>camel-api-component-maven-plugin</artifactId>
@@ -82,14 +82,10 @@
         </dependency>
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-utils</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.sonatype.plexus</groupId>
+            <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-build-api</artifactId>
         </dependency>
         <dependency>
@@ -98,31 +94,6 @@
             <version>3.3</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.apache.maven.doxia</groupId>
-            <artifactId>doxia-module-xhtml</artifactId>
-            <version>1.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.maven.doxia</groupId>
-            <artifactId>doxia-site-renderer</artifactId>
-            <version>1.11.1</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.velocity</groupId>
-                    <artifactId>velocity</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.velocity</groupId>
-                    <artifactId>velocity-tools</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>commons-beanutils</groupId>
-                    <artifactId>commons-beanutils</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-core</artifactId>
@@ -144,7 +115,6 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>30.1-jre</version>
         </dependency>
 
         <!-- logging -->

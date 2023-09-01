@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.apache.camel</groupId>
         <artifactId>maven-plugins</artifactId>
-        <version>4.0.0-SNAPSHOT</version>
+        <version>4.1.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>camel-maven-plugin</artifactId>
@@ -53,6 +53,7 @@
         <dependency>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
+            <version>${exec-maven-plugin-version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.maven</groupId>
@@ -104,18 +105,28 @@
 
     </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-plugin-plugin</artifactId>
-                <configuration>
-                    <mojoDependencies>
-                        <dep>org.codehaus.mojo:exec-maven-plugin</dep>
-                        <dep>org.apache.maven:maven-plugin-api</dep>
-                    </mojoDependencies>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+    <profiles>
+        <profile>
+            <id>full</id>
+            <activation>
+                <property>
+                    <name>!quickly</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-plugin-plugin</artifactId>
+                        <configuration>
+                            <mojoDependencies>
+                                <dep>org.codehaus.mojo:exec-maven-plugin</dep>
+                                <dep>org.apache.maven:maven-plugin-api</dep>
+                            </mojoDependencies>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

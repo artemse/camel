@@ -52,7 +52,7 @@ public class ConfigMapPropertiesFunctionRouteTest extends KubernetesTestSupport 
             @Override
             public void configure() throws Exception {
                 from("direct:start")
-                        .transform().simple("Hello ${body} we are at {{configmap:myconfig/bar}}");
+                        .transform().simple("Hello ${body} we are at {{configmap:myconfig/bar.txt}}");
             }
         };
     }
@@ -69,7 +69,7 @@ public class ConfigMapPropertiesFunctionRouteTest extends KubernetesTestSupport 
 
         Map<String, String> data = Map.of("foo", "123", "bar", "Moes Bar");
         ConfigMap cm = new ConfigMapBuilder().editOrNewMetadata().withName("myconfig").endMetadata().withData(data).build();
-        this.cm = client.resource(cm).createOrReplace();
+        this.cm = client.resource(cm).serverSideApply();
 
         return context;
     }

@@ -27,7 +27,6 @@ import org.apache.camel.CamelContextAware;
 import org.apache.camel.Component;
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.NamedNode;
 import org.apache.camel.Route;
 import org.apache.camel.RuntimeCamelException;
@@ -44,7 +43,6 @@ import org.apache.camel.support.EventNotifierSupport;
 import org.apache.camel.support.RoutePolicySupport;
 import org.apache.camel.support.service.ServiceHelper;
 import org.apache.camel.support.service.ServiceSupport;
-import org.apache.camel.tracing.decorators.AbstractInternalSpanDecorator;
 import org.apache.camel.util.ObjectHelper;
 import org.apache.camel.util.StringHelper;
 import org.slf4j.Logger;
@@ -78,9 +76,10 @@ public abstract class Tracer extends ServiceSupport implements RoutePolicyFactor
 
     protected abstract void initTracer();
 
-    protected abstract void initContextPropagators();
+    protected abstract SpanAdapter startSendingEventSpan(
+            String operationName, SpanKind kind, SpanAdapter parent, Exchange exchange, InjectAdapter injectAdapter);
 
-    protected abstract SpanAdapter startSendingEventSpan(String operationName, SpanKind kind, SpanAdapter parent);
+    protected abstract void initContextPropagators();
 
     protected abstract SpanAdapter startExchangeBeginSpan(
             Exchange exchange, SpanDecorator sd, String operationName, SpanKind kind, SpanAdapter parent);
@@ -175,10 +174,10 @@ public abstract class Tracer extends ServiceSupport implements RoutePolicyFactor
         if (!camelContext.getRoutePolicyFactories().contains(this)) {
             camelContext.addRoutePolicyFactory(this);
         }
-        camelContext.adapt(ExtendedCamelContext.class).addLogListener(logListener);
+        camelContext.getCamelContextExtension().addLogListener(logListener);
 
         if (tracingStrategy != null) {
-            camelContext.adapt(ExtendedCamelContext.class).addInterceptStrategy(tracingStrategy);
+            camelContext.getCamelContextExtension().addInterceptStrategy(tracingStrategy);
         }
         initTracer();
         initContextPropagators();
@@ -199,7 +198,7 @@ public abstract class Tracer extends ServiceSupport implements RoutePolicyFactor
         SpanDecorator sd = null;
 
         String uri = endpoint.getEndpointUri();
-        String splitURI[] = StringHelper.splitOnCharacter(uri, ":", 2);
+        String[] splitURI = StringHelper.splitOnCharacter(uri, ":", 2);
         if (splitURI[1] != null) {
             String scheme = splitURI[0];
             sd = DECORATORS.get(scheme);
@@ -255,10 +254,11 @@ public abstract class Tracer extends ServiceSupport implements RoutePolicyFactor
                     }
 
                     SpanAdapter parent = ActiveSpanManager.getSpan(ese.getExchange());
+                    InjectAdapter injectAdapter = sd.getInjectAdapter(ese.getExchange().getIn().getHeaders(), encoding);
                     SpanAdapter span = startSendingEventSpan(sd.getOperationName(ese.getExchange(), ese.getEndpoint()),
-                            sd.getInitiatorSpanKind(), parent);
+                            sd.getInitiatorSpanKind(), parent, ese.getExchange(), injectAdapter);
                     sd.pre(span, ese.getExchange(), ese.getEndpoint());
-                    inject(span, sd.getInjectAdapter(ese.getExchange().getIn().getHeaders(), encoding));
+                    inject(span, injectAdapter);
                     ActiveSpanManager.activate(ese.getExchange(), span);
                     if (LOG.isTraceEnabled()) {
                         LOG.trace("Tracing: start client span={}", span);
@@ -273,7 +273,7 @@ public abstract class Tracer extends ServiceSupport implements RoutePolicyFactor
                     SpanAdapter span = ActiveSpanManager.getSpan(ese.getExchange());
                     if (span != null) {
                         if (LOG.isTraceEnabled()) {
-                            LOG.trace("Tracing: start client span={}", span);
+                            LOG.trace("Tracing: stop client span={}", span);
                         }
                         sd.post(span, ese.getExchange(), ese.getEndpoint());
                         ActiveSpanManager.deactivate(ese.getExchange());
@@ -296,7 +296,7 @@ public abstract class Tracer extends ServiceSupport implements RoutePolicyFactor
         }
 
         private boolean shouldExclude(SpanDecorator sd, Exchange exchange, Endpoint endpoint) {
-            return sd instanceof AbstractInternalSpanDecorator || !sd.newSpan()
+            return !sd.newSpan()
                     || isExcluded(exchange, endpoint);
         }
     }

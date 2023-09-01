@@ -38,6 +38,7 @@ import org.snakeyaml.engine.v2.nodes.Node;
                   @YamlProperty(name = "id",
                                 type = "string",
                                 required = true),
+                  @YamlProperty(name = "description", type = "string"),
                   @YamlProperty(name = "route",
                                 type = "object:org.apache.camel.model.RouteDefinition"),
                   @YamlProperty(name = "from",
@@ -45,7 +46,7 @@ import org.snakeyaml.engine.v2.nodes.Node;
                   @YamlProperty(name = "parameters",
                                 type = "array:org.apache.camel.model.RouteTemplateParameterDefinition"),
                   @YamlProperty(name = "beans",
-                                type = "array:org.apache.camel.dsl.yaml.deserializers.NamedBeanDefinition")
+                                type = "array:org.apache.camel.model.RouteTemplateBeanDefinition")
           })
 public class RouteTemplateDefinitionDeserializer extends YamlDeserializerBase<RouteTemplateDefinition> {
     public RouteTemplateDefinitionDeserializer() {
@@ -64,6 +65,10 @@ public class RouteTemplateDefinitionDeserializer extends YamlDeserializerBase<Ro
         switch (propertyKey) {
             case "id": {
                 target.setId(asText(node));
+                break;
+            }
+            case "description": {
+                target.setDescription(asText(node));
                 break;
             }
             case "route": {

@@ -149,6 +149,42 @@ public interface TelegramComponentBuilderFactory {
             return this;
         }
         /**
+         * Used for enabling or disabling all consumer based health checks from
+         * this component.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: true
+         * Group: health
+         * 
+         * @param healthCheckConsumerEnabled the value to set
+         * @return the dsl builder
+         */
+        default TelegramComponentBuilder healthCheckConsumerEnabled(
+                boolean healthCheckConsumerEnabled) {
+            doSetProperty("healthCheckConsumerEnabled", healthCheckConsumerEnabled);
+            return this;
+        }
+        /**
+         * Used for enabling or disabling all producer based health checks from
+         * this component. Notice: Camel has by default disabled all producer
+         * based health-checks. You can turn on producer checks globally by
+         * setting camel.health.producersEnabled=true.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: true
+         * Group: health
+         * 
+         * @param healthCheckProducerEnabled the value to set
+         * @return the dsl builder
+         */
+        default TelegramComponentBuilder healthCheckProducerEnabled(
+                boolean healthCheckProducerEnabled) {
+            doSetProperty("healthCheckProducerEnabled", healthCheckProducerEnabled);
+            return this;
+        }
+        /**
          * The default Telegram authorization token to be used when the
          * information is not provided in the endpoints.
          * 
@@ -186,6 +222,8 @@ public interface TelegramComponentBuilderFactory {
             case "autowiredEnabled": ((TelegramComponent) component).setAutowiredEnabled((boolean) value); return true;
             case "baseUri": ((TelegramComponent) component).setBaseUri((java.lang.String) value); return true;
             case "client": ((TelegramComponent) component).setClient((java.net.http.HttpClient) value); return true;
+            case "healthCheckConsumerEnabled": ((TelegramComponent) component).setHealthCheckConsumerEnabled((boolean) value); return true;
+            case "healthCheckProducerEnabled": ((TelegramComponent) component).setHealthCheckProducerEnabled((boolean) value); return true;
             case "authorizationToken": ((TelegramComponent) component).setAuthorizationToken((java.lang.String) value); return true;
             default: return false;
             }

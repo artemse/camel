@@ -22,9 +22,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.camel.EndpointInject;
-import org.apache.camel.Exchange;
 import org.apache.camel.Message;
-import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.aws2.kinesis.Kinesis2Constants;
 import org.apache.camel.component.mock.MockEndpoint;
@@ -47,6 +45,7 @@ import software.amazon.awssdk.services.kinesis.KinesisClient;
 import static org.apache.camel.test.infra.aws2.clients.KinesisUtils.createStream;
 import static org.apache.camel.test.infra.aws2.clients.KinesisUtils.putRecords;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
@@ -90,20 +89,17 @@ public class KinesisConsumerIT extends CamelTestSupport {
                 String kinesisEndpointUri = "aws2-kinesis://%s?amazonKinesisClient=#amazonKinesisClient";
 
                 fromF(kinesisEndpointUri, streamName)
-                        .process(new Processor() {
-                            @Override
-                            public void process(Exchange exchange) {
-                                KinesisData data = new KinesisData();
+                        .process(exchange -> {
+                            KinesisData data = new KinesisData();
 
-                                final Message message = exchange.getMessage();
+                            final Message message = exchange.getMessage();
 
-                                if (message != null) {
-                                    data.body = message.getBody(String.class);
-                                    data.partition = message.getHeader(Kinesis2Constants.PARTITION_KEY, String.class);
-                                }
-
-                                receivedMessages.add(data);
+                            if (message != null) {
+                                data.body = message.getBody(String.class);
+                                data.partition = message.getHeader(Kinesis2Constants.PARTITION_KEY, String.class);
                             }
+
+                            receivedMessages.add(data);
                         })
                         .to("mock:result");
             }
@@ -112,7 +108,7 @@ public class KinesisConsumerIT extends CamelTestSupport {
 
     @BeforeEach
     public void prepareEnvironment() {
-        createStream(client, streamName);
+        createStream(client, streamName, 2);
 
         putRecords(client, streamName, messageCount);
     }
@@ -127,6 +123,7 @@ public class KinesisConsumerIT extends CamelTestSupport {
                 .untilAsserted(() -> result.assertIsSatisfied());
 
         assertEquals(messageCount, receivedMessages.size());
+        String partitionKey = null;
         for (KinesisData data : receivedMessages) {
             ObjectHelper.notNull(data, "data");
             assertNotNull(data.body, "The body should not be null");
@@ -136,6 +133,8 @@ public class KinesisConsumerIT extends CamelTestSupport {
              and so on. This is just testing that the code is not mixing things up.
              */
             assertTrue(data.partition.endsWith(data.body), "The data/partition mismatch for record: " + data);
+            assertNotEquals(partitionKey, data.partition);
+            partitionKey = data.partition;
         }
     }
 }

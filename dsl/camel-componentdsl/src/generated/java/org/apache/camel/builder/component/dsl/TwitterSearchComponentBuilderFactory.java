@@ -34,7 +34,7 @@ public interface TwitterSearchComponentBuilderFactory {
      * Twitter Search (camel-twitter)
      * Access Twitter Search.
      * 
-     * Category: cloud,api,search,social
+     * Category: saas,social
      * Since: 2.10
      * Maven coordinates: org.apache.camel:camel-twitter
      * 
@@ -115,6 +115,42 @@ public interface TwitterSearchComponentBuilderFactory {
         default TwitterSearchComponentBuilder autowiredEnabled(
                 boolean autowiredEnabled) {
             doSetProperty("autowiredEnabled", autowiredEnabled);
+            return this;
+        }
+        /**
+         * Used for enabling or disabling all consumer based health checks from
+         * this component.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: true
+         * Group: health
+         * 
+         * @param healthCheckConsumerEnabled the value to set
+         * @return the dsl builder
+         */
+        default TwitterSearchComponentBuilder healthCheckConsumerEnabled(
+                boolean healthCheckConsumerEnabled) {
+            doSetProperty("healthCheckConsumerEnabled", healthCheckConsumerEnabled);
+            return this;
+        }
+        /**
+         * Used for enabling or disabling all producer based health checks from
+         * this component. Notice: Camel has by default disabled all producer
+         * based health-checks. You can turn on producer checks globally by
+         * setting camel.health.producersEnabled=true.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: true
+         * Group: health
+         * 
+         * @param healthCheckProducerEnabled the value to set
+         * @return the dsl builder
+         */
+        default TwitterSearchComponentBuilder healthCheckProducerEnabled(
+                boolean healthCheckProducerEnabled) {
+            doSetProperty("healthCheckProducerEnabled", healthCheckProducerEnabled);
             return this;
         }
         /**
@@ -256,6 +292,8 @@ public interface TwitterSearchComponentBuilderFactory {
             case "bridgeErrorHandler": ((TwitterSearchComponent) component).setBridgeErrorHandler((boolean) value); return true;
             case "lazyStartProducer": ((TwitterSearchComponent) component).setLazyStartProducer((boolean) value); return true;
             case "autowiredEnabled": ((TwitterSearchComponent) component).setAutowiredEnabled((boolean) value); return true;
+            case "healthCheckConsumerEnabled": ((TwitterSearchComponent) component).setHealthCheckConsumerEnabled((boolean) value); return true;
+            case "healthCheckProducerEnabled": ((TwitterSearchComponent) component).setHealthCheckProducerEnabled((boolean) value); return true;
             case "httpProxyHost": ((TwitterSearchComponent) component).setHttpProxyHost((java.lang.String) value); return true;
             case "httpProxyPassword": ((TwitterSearchComponent) component).setHttpProxyPassword((java.lang.String) value); return true;
             case "httpProxyPort": ((TwitterSearchComponent) component).setHttpProxyPort((int) value); return true;

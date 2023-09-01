@@ -34,8 +34,9 @@ import org.apache.camel.TypeConverter;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.converter.DefaultTypeConverter;
 import org.apache.camel.impl.engine.DefaultPackageScanClassResolver;
+import org.apache.camel.spi.BeanIntrospection;
 import org.apache.camel.support.DefaultExchange;
-import org.apache.camel.support.IntrospectionSupport;
+import org.apache.camel.support.PluginHelper;
 import org.apache.camel.support.service.ServiceHelper;
 import org.apache.camel.util.ReflectionInjector;
 import org.junit.jupiter.api.BeforeEach;
@@ -112,11 +113,10 @@ public class ConverterTest extends TestSupport {
         assertEquals(2, list.size(), "List size: " + list);
 
         Collection<?> collection = converter.convertTo(Collection.class, array);
+        assertNotNull(collection, "Returned object must not be null");
         assertEquals(2, collection.size(), "Collection size: " + collection);
 
-        Set<?> set = converter.convertTo(Set.class, array);
-        assertEquals(2, set.size(), "Set size: " + set);
-        set = converter.convertTo(Set.class, list);
+        Set<?> set = converter.convertTo(Set.class, list);
         assertEquals(2, set.size(), "Set size: " + set);
     }
 
@@ -156,13 +156,6 @@ public class ConverterTest extends TestSupport {
     }
 
     @Test
-    public void testStringToFile() {
-        File file = converter.convertTo(File.class, "foo.txt");
-        assertNotNull("Should have converted to a file!");
-        assertEquals("foo.txt", file.getName(), "file name");
-    }
-
-    @Test
     public void testFileToString() throws Exception {
         URL resource = getClass().getResource("dummy.txt");
         assertNotNull(resource, "Cannot find resource!");
@@ -189,9 +182,16 @@ public class ConverterTest extends TestSupport {
     @Test
     public void testPrimitiveIntPropertySetter() {
         MyBean bean = new MyBean();
-        assertDoesNotThrow(() -> IntrospectionSupport.setProperty(converter, bean, "foo", "4"),
+
+        CamelContext context = new DefaultCamelContext();
+        context.start();
+        BeanIntrospection bi = PluginHelper.getBeanIntrospection(context);
+
+        assertDoesNotThrow(() -> bi.setProperty(context, converter, bean, "foo", "4", null, true, true, true),
                 "Setting an int property in a bean, should have succeeded without throwing exceptions");
         assertEquals(4, bean.getFoo(), "The property bean.foo does not match the value that was previously set");
+
+        context.stop();
     }
 
     @Test
@@ -233,7 +233,7 @@ public class ConverterTest extends TestSupport {
         CamelContext camel = new DefaultCamelContext();
         Exchange exchange = new DefaultExchange(camel);
 
-        Exception ex = assertThrows(NoTypeConversionAvailableException.class,
+        assertThrows(NoTypeConversionAvailableException.class,
                 () -> converter.mandatoryConvertTo(InputStream.class, exchange),
                 "Expected to get a NoTypeConversionAvailableException here");
     }

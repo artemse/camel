@@ -823,7 +823,7 @@ public interface IgniteCacheEndpointBuilderFactory {
          * Perform cache operations on an Ignite cache or consume changes from a
          * continuous query.
          * 
-         * Category: cache,datagrid
+         * Category: cache,clustering
          * Since: 2.17
          * Maven coordinates: org.apache.camel:camel-ignite
          * 
@@ -837,7 +837,7 @@ public interface IgniteCacheEndpointBuilderFactory {
          * Perform cache operations on an Ignite cache or consume changes from a
          * continuous query.
          * 
-         * Category: cache,datagrid
+         * Category: cache,clustering
          * Since: 2.17
          * Maven coordinates: org.apache.camel:camel-ignite
          * 
@@ -857,7 +857,7 @@ public interface IgniteCacheEndpointBuilderFactory {
          * Perform cache operations on an Ignite cache or consume changes from a
          * continuous query.
          * 
-         * Category: cache,datagrid
+         * Category: cache,clustering
          * Since: 2.17
          * Maven coordinates: org.apache.camel:camel-ignite
          * 
@@ -973,12 +973,13 @@ public interface IgniteCacheEndpointBuilderFactory {
         }
 
         /**
-         * This header carries the old cache value when passed in the incoming
-         * cache event.
+         * (producer) The old cache value to be replaced when invoking the
+         * REPLACE operation. (consumer) This header carries the old cache value
+         * when passed in the incoming cache event.
          * 
          * The option is a: {@code Object} type.
          * 
-         * Group: consumer
+         * Group: common
          * 
          * @return the name of the header {@code IgniteCacheOldValue}.
          */

@@ -34,10 +34,8 @@ import java.util.function.BiConsumer;
 public final class URISupport {
 
     public static final String RAW_TOKEN_PREFIX = "RAW";
-    // CHECKSTYLE:OFF
     public static final char[] RAW_TOKEN_START = { '(', '{' };
     public static final char[] RAW_TOKEN_END = { ')', '}' };
-    // CHECKSTYLE:ON
 
     private static final String CHARSET = "UTF-8";
 
@@ -85,6 +83,20 @@ public final class URISupport {
             uri = uri.substring(0, idx);
         }
         return uri;
+    }
+
+    /**
+     * Extracts the query parameters from the uri
+     *
+     * @param  uri the uri
+     * @return     query parameters, or <tt>null</tt> if no parameters
+     */
+    public static String extractQuery(String uri) {
+        int idx = uri.indexOf('?');
+        if (idx > -1) {
+            return uri.substring(idx + 1);
+        }
+        return null;
     }
 
     /**
@@ -397,14 +409,13 @@ public final class URISupport {
             if (options.size() > 0) {
                 StringBuilder rc = new StringBuilder();
                 boolean first = true;
-                for (Object o : options.keySet()) {
+                for (String key : options.keySet()) {
                     if (first) {
                         first = false;
                     } else {
                         rc.append(ampersand);
                     }
 
-                    String key = (String) o;
                     Object value = options.get(key);
 
                     // use the value as a String
@@ -468,8 +479,7 @@ public final class URISupport {
     public static boolean isNotEmpty(Object value) {
         if (value == null) {
             return false;
-        } else if (value instanceof String) {
-            String text = (String) value;
+        } else if (value instanceof String text) {
             return text.trim().length() > 0;
         } else {
             return true;

@@ -76,6 +76,7 @@ import org.apache.camel.spi.Registry;
 import org.apache.camel.spring.SpringCamelContext;
 import org.apache.camel.spring.spi.BridgePropertyPlaceholderConfigurer;
 import org.apache.camel.support.CamelContextHelper;
+import org.apache.camel.support.PluginHelper;
 import org.apache.camel.util.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -318,15 +319,15 @@ public class CamelContextFactoryBean extends AbstractCamelContextFactoryBean<Spr
     protected void findRouteBuildersByPackageScan(String[] packages, PackageScanFilter filter, List<RoutesBuilder> builders)
             throws Exception {
         // add filter to class resolver which then will filter
-        getContext().getPackageScanClassResolver().addFilter(filter);
+        PluginHelper.getPackageScanClassResolver(getContext()).addFilter(filter);
 
         PackageScanRouteBuilderFinder finder = new PackageScanRouteBuilderFinder(
                 getContext(), packages, getContextClassLoaderOnStart(),
-                getBeanPostProcessor(), getContext().getPackageScanClassResolver());
+                getBeanPostProcessor(), PluginHelper.getPackageScanClassResolver(getContext()));
         finder.appendBuilders(builders);
 
         // and remove the filter
-        getContext().getPackageScanClassResolver().removeFilter(filter);
+        PluginHelper.getPackageScanClassResolver(getContext()).removeFilter(filter);
     }
 
     @Override
@@ -348,7 +349,8 @@ public class CamelContextFactoryBean extends AbstractCamelContextFactoryBean<Spr
             }
             // register the bean post processor on camel context
             if (beanPostProcessor instanceof org.apache.camel.spi.CamelBeanPostProcessor) {
-                context.setBeanPostProcessor((org.apache.camel.spi.CamelBeanPostProcessor) beanPostProcessor);
+                context.getCamelContextExtension().addContextPlugin(org.apache.camel.spi.CamelBeanPostProcessor.class,
+                        (org.apache.camel.spi.CamelBeanPostProcessor) beanPostProcessor);
             }
         }
     }
@@ -381,7 +383,7 @@ public class CamelContextFactoryBean extends AbstractCamelContextFactoryBean<Spr
         Registry registry = getBeanForType(Registry.class);
         if (registry != null) {
             LOG.info("Using custom Registry: {}", registry);
-            context.setRegistry(registry);
+            context.getCamelContextExtension().setRegistry(registry);
         }
     }
 

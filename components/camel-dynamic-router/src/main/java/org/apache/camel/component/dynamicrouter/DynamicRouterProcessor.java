@@ -140,7 +140,7 @@ public class DynamicRouterProcessor extends AsyncProcessorSupport implements Tra
     @Override
     protected void doInit() throws Exception {
         super.doInit();
-        final ExtendedCamelContext extendedCamelContext = camelContext.adapt(ExtendedCamelContext.class);
+        final ExtendedCamelContext extendedCamelContext = camelContext.getCamelContextExtension();
         this.reactiveExecutor = extendedCamelContext.getReactiveExecutor();
         this.executorService = camelContext.getExecutorServiceManager()
                 .newDefaultThreadPool(this, "dynamicRouterMulticastPool");
@@ -237,6 +237,7 @@ public class DynamicRouterProcessor extends AsyncProcessorSupport implements Tra
     List<PrioritizedFilterProcessor> matchFilters(final Exchange exchange) {
         return Optional.of(
                 filterMap.values().stream()
+                        .sorted()
                         .filter(f -> f.matches(exchange))
                         .limit(MODE_FIRST_MATCH.equals(recipientMode) ? 1 : Integer.MAX_VALUE)
                         .collect(Collectors.toList()))

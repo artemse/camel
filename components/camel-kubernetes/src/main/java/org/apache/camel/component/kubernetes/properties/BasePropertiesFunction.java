@@ -21,7 +21,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Locale;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.fabric8.kubernetes.client.ConfigBuilder;
@@ -29,11 +28,11 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import org.apache.camel.CamelContext;
 import org.apache.camel.CamelContextAware;
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.spi.PropertiesComponent;
 import org.apache.camel.spi.PropertiesFunction;
 import org.apache.camel.spi.PropertyConfigurer;
 import org.apache.camel.support.CamelContextHelper;
+import org.apache.camel.support.PluginHelper;
 import org.apache.camel.support.PropertyBindingSupport;
 import org.apache.camel.support.service.ServiceSupport;
 import org.apache.camel.util.LocationHelper;
@@ -106,15 +105,15 @@ abstract class BasePropertiesFunction extends ServiceSupport implements Properti
             if (!properties.isEmpty()) {
                 ConfigBuilder config = new ConfigBuilder();
 
-                PropertyConfigurer configurer = camelContext.adapt(ExtendedCamelContext.class)
-                        .getConfigurerResolver().resolvePropertyConfigurer(ConfigBuilder.class.getName(), camelContext);
+                PropertyConfigurer configurer = PluginHelper.getConfigurerResolver(camelContext)
+                        .resolvePropertyConfigurer(ConfigBuilder.class.getName(), camelContext);
 
-                // use copy to keep track of which options was configureed or not
+                // use copy to keep track of which options was configured or not
                 OrderedLocationProperties copy = new OrderedLocationProperties();
                 copy.putAll(properties);
 
                 PropertyBindingSupport.build()
-                        .withProperties((Map) copy)
+                        .withProperties(copy.asMap())
                         .withFluentBuilder(true)
                         .withIgnoreCase(true)
                         .withReflection(false)

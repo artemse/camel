@@ -16,14 +16,12 @@
  */
 package org.apache.camel.dsl.yaml.deserializers;
 
-import java.net.URISyntaxException;
 import java.util.Map;
 
 import org.apache.camel.dsl.yaml.common.YamlDeserializationContext;
 import org.apache.camel.dsl.yaml.common.YamlDeserializerBase;
 import org.apache.camel.dsl.yaml.common.YamlDeserializerResolver;
 import org.apache.camel.dsl.yaml.common.exception.UnsupportedFieldException;
-import org.apache.camel.dsl.yaml.common.exception.YamlDeserializationException;
 import org.apache.camel.model.KameletDefinition;
 import org.apache.camel.spi.annotations.YamlProperty;
 import org.apache.camel.spi.annotations.YamlType;
@@ -94,11 +92,7 @@ public class KameletDeserializer extends YamlDeserializerBase<KameletDefinition>
         }
 
         if (parameters != null) {
-            try {
-                name += "?" + URISupport.createQueryString(parameters, false);
-            } catch (URISyntaxException e) {
-                throw new YamlDeserializationException(node, "Error creating endpoint query string", e);
-            }
+            name += "?" + URISupport.createQueryString(parameters, false);
         }
 
         target.setName(name);

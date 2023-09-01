@@ -314,6 +314,54 @@ public interface PulsarEndpointBuilderFactory {
             return this;
         }
         /**
+         * To enable retry letter topic mode. The default retry letter topic
+         * uses this format: topicname-subscriptionname-RETRY.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: false
+         * Group: consumer
+         * 
+         * @param enableRetry the value to set
+         * @return the dsl builder
+         */
+        default PulsarEndpointConsumerBuilder enableRetry(boolean enableRetry) {
+            doSetProperty("enableRetry", enableRetry);
+            return this;
+        }
+        /**
+         * To enable retry letter topic mode. The default retry letter topic
+         * uses this format: topicname-subscriptionname-RETRY.
+         * 
+         * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
+         * type.
+         * 
+         * Default: false
+         * Group: consumer
+         * 
+         * @param enableRetry the value to set
+         * @return the dsl builder
+         */
+        default PulsarEndpointConsumerBuilder enableRetry(String enableRetry) {
+            doSetProperty("enableRetry", enableRetry);
+            return this;
+        }
+        /**
+         * Policy to use by consumer when using key-shared subscription type.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: consumer
+         * 
+         * @param keySharedPolicy the value to set
+         * @return the dsl builder
+         */
+        default PulsarEndpointConsumerBuilder keySharedPolicy(
+                String keySharedPolicy) {
+            doSetProperty("keySharedPolicy", keySharedPolicy);
+            return this;
+        }
+        /**
          * Maximum number of times that a message will be redelivered before
          * being sent to the dead letter queue. If this value is not set, no
          * Dead Letter Policy will be created.
@@ -543,6 +591,22 @@ public interface PulsarEndpointBuilderFactory {
          */
         default PulsarEndpointConsumerBuilder readCompacted(String readCompacted) {
             doSetProperty("readCompacted", readCompacted);
+            return this;
+        }
+        /**
+         * Name of the topic to use in retry mode. Note: if not set, default
+         * topic name will be topicName-subscriptionName-RETRY.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: consumer
+         * 
+         * @param retryLetterTopic the value to set
+         * @return the dsl builder
+         */
+        default PulsarEndpointConsumerBuilder retryLetterTopic(
+                String retryLetterTopic) {
+            doSetProperty("retryLetterTopic", retryLetterTopic);
             return this;
         }
         /**
@@ -1739,6 +1803,25 @@ public interface PulsarEndpointBuilderFactory {
          */
         public String pulsarProducerMessageEventTime() {
             return "PulsarProducerMessageEventTime";
+        }
+
+        /**
+         * Deliver the message only at or after the specified absolute
+         * timestamp. The timestamp is milliseconds and based on UTC (eg:
+         * System.currentTimeMillis) Note: messages are only delivered with
+         * delay when a consumer is consuming through a Shared subscription.
+         * With other subscription types, the messages will still be delivered
+         * immediately.
+         * 
+         * The option is a: {@code Long} type.
+         * 
+         * Group: producer
+         * 
+         * @return the name of the header {@code
+         * PulsarProducerMessageDeliverAt}.
+         */
+        public String pulsarProducerMessageDeliverAt() {
+            return "PulsarProducerMessageDeliverAt";
         }
 
         /**

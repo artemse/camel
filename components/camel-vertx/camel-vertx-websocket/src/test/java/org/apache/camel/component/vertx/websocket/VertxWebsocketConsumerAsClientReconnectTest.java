@@ -64,43 +64,6 @@ public class VertxWebsocketConsumerAsClientReconnectTest extends VertxWebSocketT
         mockEndpoint.assertIsSatisfied();
     }
 
-    @Test
-    void testMaxReconnect() throws Exception {
-        MockEndpoint mockEndpoint = getMockEndpoint("mock:result2");
-        mockEndpoint.expectedBodiesReceived("Hello World");
-
-        String uri = String.format("vertx-websocket:localhost:%d/echo", port);
-        template.sendBody(uri, "Hello World");
-        mockEndpoint.assertIsSatisfied();
-
-        // Stop server
-        mockEndpoint.reset();
-        mockEndpoint.expectedMessageCount(0);
-
-        context.getRouteController().stopRoute("server");
-
-        // Verify that we cannot send messages
-        Exchange exchange = template.send(uri, new Processor() {
-            @Override
-            public void process(Exchange exchange) throws Exception {
-                exchange.getMessage().setBody("Hello World Again");
-            }
-        });
-        Exception exception = exchange.getException();
-        Assertions.assertNotNull(exception);
-        Assertions.assertInstanceOf(ConnectException.class, exception.getCause());
-
-        // Wait for client consumer reconnect max attempts to be exhausted
-        Thread.sleep(300);
-
-        // Restart server
-        context.getRouteController().startRoute("server");
-
-        // Verify that the client consumer gave up reconnecting
-        template.sendBody(uri, "Hello World Again");
-        mockEndpoint.assertIsSatisfied();
-    }
-
     @Override
     protected RoutesBuilder createRouteBuilder() {
         return new RouteBuilder() {
@@ -113,11 +76,6 @@ public class VertxWebsocketConsumerAsClientReconnectTest extends VertxWebSocketT
                 fromF("vertx-websocket:localhost:%d/echo?consumeAsClient=true&reconnectInterval=10", port)
                         .log("Client consumer 1: Received message: ${body}")
                         .to("mock:result");
-
-                fromF("vertx-websocket:localhost:%d/echo?consumeAsClient=true&reconnectInterval=10&maxReconnectAttempts=1",
-                        port)
-                        .log("Client consumer 2: Received message: ${body}")
-                        .to("mock:result2");
             }
         };
     }

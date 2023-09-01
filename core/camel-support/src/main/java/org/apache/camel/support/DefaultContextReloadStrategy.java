@@ -48,6 +48,11 @@ public class DefaultContextReloadStrategy extends ServiceSupport implements Cont
         this.camelContext = camelContext;
     }
 
+    @ManagedOperation(description = "Trigger on-demand reloading")
+    public void onReload() {
+        onReload("JMX Management");
+    }
+
     @Override
     public void onReload(Object source) {
         LOG.info("Reloading CamelContext ({}) triggered by: {}", camelContext.getName(), source);
@@ -59,7 +64,7 @@ public class DefaultContextReloadStrategy extends ServiceSupport implements Cont
             EventHelper.notifyContextReloaded(getCamelContext(), source);
         } catch (Exception e) {
             incFailedCounter();
-            LOG.warn("Error reloading CamelContext (" + camelContext.getName() + ") due to: " + e.getMessage(), e);
+            LOG.warn("Error reloading CamelContext ({}) due to: {}", camelContext.getName(), e.getMessage(), e);
             EventHelper.notifyContextReloadFailure(getCamelContext(), source, e);
         }
     }
@@ -107,16 +112,6 @@ public class DefaultContextReloadStrategy extends ServiceSupport implements Cont
 
     protected void incFailedCounter() {
         failed++;
-    }
-
-    @Override
-    protected void doStart() throws Exception {
-        // noop
-    }
-
-    @Override
-    protected void doStop() throws Exception {
-        // noop
     }
 
 }

@@ -34,7 +34,7 @@ public interface SpringRedisComponentBuilderFactory {
      * Spring Redis (camel-spring-redis)
      * Send and receive messages from Redis.
      * 
-     * Category: spring,nosql
+     * Category: cache
      * Since: 2.11
      * Maven coordinates: org.apache.camel:camel-spring-redis
      * 
@@ -54,7 +54,7 @@ public interface SpringRedisComponentBuilderFactory {
          * Reference to a pre-configured RedisTemplate instance to use.
          * 
          * The option is a:
-         * &lt;code&gt;org.springframework.data.redis.core.RedisTemplate&lt;/code&gt; type.
+         * &lt;code&gt;org.springframework.data.redis.core.RedisTemplate&amp;lt;java.lang.Object, java.lang.Object&amp;gt;&lt;/code&gt; type.
          * 
          * Group: common
          * 
@@ -62,7 +62,7 @@ public interface SpringRedisComponentBuilderFactory {
          * @return the dsl builder
          */
         default SpringRedisComponentBuilder redisTemplate(
-                org.springframework.data.redis.core.RedisTemplate redisTemplate) {
+                org.springframework.data.redis.core.RedisTemplate<java.lang.Object, java.lang.Object> redisTemplate) {
             doSetProperty("redisTemplate", redisTemplate);
             return this;
         }

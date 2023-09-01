@@ -32,11 +32,11 @@ import org.apache.camel.util.json.Jsoner;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
-@Command(name = "source", description = "List top processors (source) in a running Camel integration")
+@Command(name = "source", description = "List top processors (source) in a running Camel integration", sortOptions = false)
 public class CamelSourceTop extends ActionWatchCommand {
 
-    @CommandLine.Parameters(description = "Name or pid of running Camel integration", arity = "1")
-    String name;
+    @CommandLine.Parameters(description = "Name or pid of running Camel integration", arity = "0..1")
+    String name = "*";
 
     @CommandLine.Option(names = { "--limit" },
                         description = "Filter processors by limiting to the given number of rows")
@@ -53,7 +53,7 @@ public class CamelSourceTop extends ActionWatchCommand {
     }
 
     @Override
-    public Integer doCall() throws Exception {
+    public Integer doWatchCall() throws Exception {
         List<Row> rows = new ArrayList<>();
 
         List<Long> pids = findPids(name);
@@ -68,12 +68,12 @@ public class CamelSourceTop extends ActionWatchCommand {
         this.pid = pids.get(0);
 
         // ensure output file is deleted before executing action
-        File outputFile = getOutputFile("" + pid);
+        File outputFile = getOutputFile(Long.toString(pid));
         FileUtil.deleteFile(outputFile);
 
         JsonObject root = new JsonObject();
         root.put("action", "top-processors");
-        File f = getActionFile("" + pid);
+        File f = getActionFile(Long.toString(pid));
         try {
             IOHelper.writeText(root.toJson(), f);
         } catch (Exception e) {
@@ -140,7 +140,9 @@ public class CamelSourceTop extends ActionWatchCommand {
         // sort rows
         rows.sort(this::sortRow);
 
-        clearScreen();
+        if (watch) {
+            clearScreen();
+        }
         if (!rows.isEmpty()) {
             printSource(rows);
         }

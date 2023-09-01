@@ -23,6 +23,7 @@ import java.util.function.Function;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.RouteTemplateContext;
+import org.apache.camel.model.app.RegistryBeanDefinition;
 import org.apache.camel.model.cloud.ServiceCallConfigurationDefinition;
 import org.apache.camel.model.rest.RestDefinition;
 import org.apache.camel.model.transformer.TransformerDefinition;
@@ -236,18 +237,6 @@ public interface Model {
     String addRouteFromTemplate(
             String routeId, String routeTemplateId, String prefixId,
             Map<String, Object> parameters)
-            throws Exception;
-
-    /**
-     * Adds a new route from a given route template
-     *
-     * @param  routeId              the id of the new route to add (optional)
-     * @param  routeTemplateId      the id of the route template (mandatory)
-     * @param  routeTemplateContext the route template context (mandatory)
-     * @return                      the id of the route added (for example when an id was auto assigned)
-     * @throws Exception            is thrown if error creating and adding the new route
-     */
-    String addRouteFromTemplate(String routeId, String routeTemplateId, RouteTemplateContext routeTemplateContext)
             throws Exception;
 
     /**
@@ -500,5 +489,15 @@ public interface Model {
      * Sets a custom {@link ModelReifierFactory}
      */
     void setModelReifierFactory(ModelReifierFactory modelReifierFactory);
+
+    /**
+     * Adds the custom bean
+     */
+    void addRegistryBean(RegistryBeanDefinition bean);
+
+    /**
+     * Gets the custom beans
+     */
+    List<RegistryBeanDefinition> getRegistryBeans();
 
 }

@@ -32,7 +32,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.zip.GZIPInputStream;
 
-import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.spi.ContentTypeAware;
 import org.apache.camel.spi.Resource;
 import org.apache.camel.spi.annotations.ResourceResolver;
@@ -88,7 +87,7 @@ public final class DefaultResourceResolvers {
         protected String tryDecodeUri(String uri) {
             try {
                 // try to decode as the uri may contain %20 for spaces etc
-                uri = URLDecoder.decode(uri, StandardCharsets.UTF_8.name());
+                uri = URLDecoder.decode(uri, StandardCharsets.UTF_8);
             } catch (Exception e) {
                 getLogger().trace("Error URL decoding uri using UTF-8 encoding: {}. This exception is ignored.", uri);
                 // ignore
@@ -156,7 +155,6 @@ public final class DefaultResourceResolvers {
                 @Override
                 public URI getURI() {
                     URL url = getCamelContext()
-                            .adapt(ExtendedCamelContext.class)
                             .getClassResolver()
                             .loadResourceAsURL(path);
 
@@ -171,7 +169,6 @@ public final class DefaultResourceResolvers {
                 @Override
                 public InputStream getInputStream() throws IOException {
                     return getCamelContext()
-                            .adapt(ExtendedCamelContext.class)
                             .getClassResolver()
                             .loadResourceAsStream(path);
                 }
@@ -186,7 +183,7 @@ public final class DefaultResourceResolvers {
         protected String tryDecodeUri(String uri) {
             try {
                 // try to decode as the uri may contain %20 for spaces etc
-                uri = URLDecoder.decode(uri, StandardCharsets.UTF_8.name());
+                uri = URLDecoder.decode(uri, StandardCharsets.UTF_8);
             } catch (Exception e) {
                 getLogger().trace("Error URL decoding uri using UTF-8 encoding: {}. This exception is ignored.", uri);
                 // ignore

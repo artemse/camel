@@ -169,9 +169,15 @@ public class KafkaProducer extends DefaultAsyncProducer {
 
         // if we are in asynchronous mode we need a worker pool
         if (!configuration.isSynchronous() && workerPool == null) {
-            workerPool = endpoint.createProducerExecutor();
-            // we create a thread pool so we should also shut it down
-            shutdownWorkerPool = true;
+            // If custom worker pool is provided, then use it, else create a new one.
+            if (configuration.getWorkerPool() != null) {
+                workerPool = configuration.getWorkerPool();
+                shutdownWorkerPool = false;
+            } else {
+                workerPool = endpoint.createProducerExecutor();
+                // we create a thread pool so we should also shut it down
+                shutdownWorkerPool = true;
+            }
         }
 
         // init client id which we may need to get from the kafka producer via reflection
@@ -191,11 +197,12 @@ public class KafkaProducer extends DefaultAsyncProducer {
         // health-check is optional so discover and resolve
         healthCheckRepository = HealthCheckHelper.getHealthCheckRepository(
                 endpoint.getCamelContext(),
-                "components",
+                "producers",
                 WritableHealthCheckRepository.class);
 
         if (healthCheckRepository != null) {
             producerHealthCheck = new KafkaProducerHealthCheck(this, clientId);
+            producerHealthCheck.setEnabled(getEndpoint().getComponent().isHealthCheckProducerEnabled());
             healthCheckRepository.addHealthCheck(producerHealthCheck);
         }
     }
@@ -550,12 +557,13 @@ class KafkaTransactionSynchronization extends SynchronizationAdapter {
                 LOG.debug("Commit kafka transaction {} with exchange {}", transactionId, exchange.getExchangeId());
                 kafkaProducer.commitTransaction();
             }
-        } catch (Throwable t) {
-            exchange.setException(t);
-            if (!(t instanceof KafkaException)) {
-                LOG.warn("Abort kafka transaction {} with exchange {} due to {} ", transactionId, exchange.getExchangeId(), t);
-                kafkaProducer.abortTransaction();
-            }
+        } catch (KafkaException e) {
+            exchange.setException(e);
+        } catch (Exception e) {
+            exchange.setException(e);
+            LOG.warn("Abort kafka transaction {} with exchange {} due to {} ", transactionId, exchange.getExchangeId(),
+                    e.getMessage(), e);
+            kafkaProducer.abortTransaction();
         } finally {
             exchange.getUnitOfWork().endTransactedBy(transactionId);
         }

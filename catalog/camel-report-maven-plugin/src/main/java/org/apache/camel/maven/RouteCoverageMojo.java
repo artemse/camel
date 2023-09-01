@@ -32,7 +32,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -48,6 +47,7 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import org.apache.camel.maven.htmlxlsx.process.CoverageResultsProcessor;
 import org.apache.camel.maven.model.RouteCoverageNode;
 import org.apache.camel.parser.RouteBuilderParser;
 import org.apache.camel.parser.XmlRouteParser;
@@ -143,7 +143,12 @@ public class RouteCoverageMojo extends AbstractExecMojo {
     @Parameter(property = "camel.generateJacocoXmlReport", defaultValue = "false")
     private boolean generateJacocoXmlReport;
 
-    // CHECKSTYLE:OFF
+    /**
+     * Whether to generate a coverage-report in HTML format.
+     */
+    @Parameter(property = "camel.generateHtmlReport", defaultValue = "false")
+    private boolean generateHtmlReport;
+
     @Override
     public void execute() throws MojoExecutionException {
 
@@ -162,10 +167,9 @@ public class RouteCoverageMojo extends AbstractExecMojo {
                 try {
                     // parse the java source code and find Camel RouteBuilder classes
                     String fqn = file.getPath();
-                    JavaType out = Roaster.parse(file);
+                    JavaType<?> out = Roaster.parse(file);
                     // we should only parse java classes (not interfaces and enums etc)
-                    if (out instanceof JavaClassSource) {
-                        JavaClassSource clazz = (JavaClassSource) out;
+                    if (out instanceof JavaClassSource clazz) {
                         List<CamelNodeDetails> result = RouteBuilderParser.parseRouteBuilderTree(clazz, fqn, true);
                         routeTrees.addAll(result);
                     }
@@ -196,15 +200,16 @@ public class RouteCoverageMojo extends AbstractExecMojo {
 
         long anonymous = routeTrees.stream().filter(t -> t.getRouteId() == null).count();
         if (!anonymousRoutes && anonymous > 0) {
-            getLog().warn("Discovered " + anonymous + " anonymous routes. Add route ids to these routes for route coverage support");
+            getLog().warn(
+                    "Discovered " + anonymous + " anonymous routes. Add route ids to these routes for route coverage support");
         }
 
         final AtomicInteger notCovered = new AtomicInteger();
         final AtomicInteger coveredNodes = new AtomicInteger();
         int totalNumberOfNodes = 0;
 
-        List<CamelNodeDetails> routeIdTrees = routeTrees.stream().filter(t -> t.getRouteId() != null).collect(Collectors.toList());
-        List<CamelNodeDetails> anonymousRouteTrees = routeTrees.stream().filter(t -> t.getRouteId() == null).collect(Collectors.toList());
+        List<CamelNodeDetails> routeIdTrees = routeTrees.stream().filter(t -> t.getRouteId() != null).toList();
+        List<CamelNodeDetails> anonymousRouteTrees = routeTrees.stream().filter(t -> t.getRouteId() == null).toList();
         Document document = null;
         File file = null;
         Element report = null;
@@ -244,10 +249,11 @@ public class RouteCoverageMojo extends AbstractExecMojo {
 
             // grab dump data for the route
             try {
-                List<CoverageData> coverageData = RouteCoverageHelper.parseDumpRouteCoverageByRouteId(project.getBasedir() + "/target/camel-route-coverage", routeId);
+                List<CoverageData> coverageData = RouteCoverageHelper
+                        .parseDumpRouteCoverageByRouteId(project.getBasedir() + "/target/camel-route-coverage", routeId);
                 if (coverageData.isEmpty()) {
                     getLog().warn("No route coverage data found for route: " + routeId
-                        + ". Make sure to enable route coverage in your unit tests and assign unique route ids to your routes. Also remember to run unit tests first.");
+                                  + ". Make sure to enable route coverage in your unit tests and assign unique route ids to your routes. Also remember to run unit tests first.");
                 } else {
                     List<RouteCoverageNode> coverage = gatherRouteCoverageSummary(List.of(t), coverageData);
                     totalNumberOfNodes += coverage.size();
@@ -267,7 +273,7 @@ public class RouteCoverageMojo extends AbstractExecMojo {
 
         if (generateJacocoXmlReport && report != null) {
             try {
-                getLog().info("Generating Jacoco XML report: " + file);
+                getLog().info("Generating Jacoco XML report: " + file + "\n\n");
                 createJacocoXmlFile(document, file);
             } catch (Exception e) {
                 getLog().warn("Error generating Jacoco XML report due " + e.getMessage());
@@ -277,10 +283,11 @@ public class RouteCoverageMojo extends AbstractExecMojo {
         if (anonymousRoutes && !anonymousRouteTrees.isEmpty()) {
             // grab dump data for the route
             try {
-                Map<String, List<CoverageData>> datas = RouteCoverageHelper.parseDumpRouteCoverageByClassAndTestMethod(project.getBasedir() + "/target/camel-route-coverage");
+                Map<String, List<CoverageData>> datas = RouteCoverageHelper
+                        .parseDumpRouteCoverageByClassAndTestMethod(project.getBasedir() + "/target/camel-route-coverage");
                 if (datas.isEmpty()) {
                     getLog().warn("No route coverage data found"
-                        + ". Make sure to enable route coverage in your unit tests. Also remember to run unit tests first.");
+                                  + ". Make sure to enable route coverage in your unit tests. Also remember to run unit tests first.");
                 } else {
                     Map<String, List<CamelNodeDetails>> routes = groupAnonymousRoutesByClassName(anonymousRouteTrees);
                     // attempt to match anonymous routes via the unit test class
@@ -302,7 +309,8 @@ public class RouteCoverageMojo extends AbstractExecMojo {
 
                         if (!coverage.isEmpty()) {
                             totalNumberOfNodes += coverage.size();
-                            String fileName = stripRootPath(asRelativeFile(t.getValue().get(0).getFileName(), project), project);
+                            String fileName
+                                    = stripRootPath(asRelativeFile(t.getValue().get(0).getFileName(), project), project);
                             String out = templateCoverageData(fileName, null, coverage, notCovered, coveredNodes);
                             getLog().info("Route coverage summary:\n\n" + out);
                             getLog().info("");
@@ -310,7 +318,35 @@ public class RouteCoverageMojo extends AbstractExecMojo {
                     }
                 }
             } catch (Exception e) {
-                throw new MojoExecutionException("Error during gathering route coverage data", e);
+                throw new MojoExecutionException("Error during gathering route coverage data ", e);
+            }
+        }
+
+        if (generateHtmlReport) {
+            try {
+                final String baseHtmlPath = "/target/site/route-coverage/html";
+                final File htmlPath = new File(project.getBasedir() + baseHtmlPath);
+                if (!htmlPath.exists()) {
+                    htmlPath.mkdirs();
+                }
+                final File cssPath = new File(project.getBasedir() + baseHtmlPath + "/static/css");
+                if (!cssPath.exists()) {
+                    cssPath.mkdirs();
+                }
+                final File jsPath = new File(project.getBasedir() + baseHtmlPath + "/static/js");
+                if (!jsPath.exists()) {
+                    jsPath.mkdirs();
+                }
+                getLog().info("");
+                getLog().info("Generating HTML route coverage reports: " + htmlPath + "\n");
+                CoverageResultsProcessor processor = new CoverageResultsProcessor();
+                processor.writeCSS(cssPath);
+                processor.writeJS(jsPath);
+                File xmlPath = new File(project.getBasedir() + "/target/camel-route-coverage");
+                String out = processor.generateReport(project, xmlPath, htmlPath);
+                getLog().info(out);
+            } catch (Exception e) {
+                getLog().warn("Error generating HTML route coverage reports " + e.getMessage());
             }
         }
 
@@ -362,7 +398,8 @@ public class RouteCoverageMojo extends AbstractExecMojo {
         }
     }
 
-    private ListIterator<RouteCoverageNode> positionToLineNumber(ListIterator<RouteCoverageNode> it, List<RouteCoverageNode> coverage, int lineNumber) {
+    private ListIterator<RouteCoverageNode> positionToLineNumber(
+            ListIterator<RouteCoverageNode> it, List<RouteCoverageNode> coverage, int lineNumber) {
         // restart
         if (it == null || !it.hasNext()) {
             it = coverage.listIterator();
@@ -377,8 +414,6 @@ public class RouteCoverageMojo extends AbstractExecMojo {
         }
         return it;
     }
-
-    // CHECKSTYLE:ON
 
     @SuppressWarnings("unchecked")
     private String templateCoverageData(
@@ -396,8 +431,8 @@ public class RouteCoverageMojo extends AbstractExecMojo {
             sw.println("Route:\t" + routeId);
         }
         sw.println();
-        sw.println(String.format("%8s    %8s    %s", "Line #", "Count", "Route"));
-        sw.println(String.format("%8s    %8s    %s", "------", "-----", "-----"));
+        sw.printf("%8s    %8s    %s%n", "Line #", "Count", "Route");
+        sw.printf("%8s    %8s    %s%n", "------", "-----", "-----");
 
         int covered = 0;
         for (RouteCoverageNode node : model) {
@@ -405,7 +440,7 @@ public class RouteCoverageMojo extends AbstractExecMojo {
                 covered++;
             }
             String pad = padString(node.getLevel());
-            sw.println(String.format("%8s    %8s    %s", node.getLineNumber(), node.getCount(), pad + node.getName()));
+            sw.printf("%8s    %8s    %s%n", node.getLineNumber(), node.getCount(), pad + node.getName());
         }
 
         coveredNodes.addAndGet(covered);
@@ -472,6 +507,11 @@ public class RouteCoverageMojo extends AbstractExecMojo {
             return;
         }
 
+        // end block to make doTry .. doCatch .. doFinally aligned
+        if ("doCatch".equals(node.getName()) || "doFinally".equals(node.getName())) {
+            level.decrementAndGet();
+        }
+
         RouteCoverageNode data = new RouteCoverageNode();
         data.setName(node.getName());
         data.setLineNumber(Integer.parseInt(node.getLineNumber()));
@@ -502,11 +542,7 @@ public class RouteCoverageMojo extends AbstractExecMojo {
     }
 
     private static String padString(int level) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < level; i++) {
-            sb.append("  ");
-        }
-        return sb.toString();
+        return "  ".repeat(level);
     }
 
     private boolean matchFile(File file) {

@@ -62,7 +62,7 @@ public abstract class AbstractCamelInvocationHandler implements InvocationHandle
         EXCLUDED_METHODS.addAll(Arrays.asList(Object.class.getMethods()));
     }
 
-    public AbstractCamelInvocationHandler(Endpoint endpoint, Producer producer) {
+    protected AbstractCamelInvocationHandler(Endpoint endpoint, Producer producer) {
         this.endpoint = endpoint;
         this.producer = producer;
     }
@@ -111,6 +111,7 @@ public abstract class AbstractCamelInvocationHandler implements InvocationHandle
                         || parameter.isAnnotationPresent(ExchangeProperty.class)
                         || parameter.isAnnotationPresent(Body.class)) {
                     canUseBinding = true;
+                    break;
                 }
             }
         }
@@ -132,7 +133,8 @@ public abstract class AbstractCamelInvocationHandler implements InvocationHandle
                             String name = header.value();
                             exchange.getIn().setHeader(name, value);
                         } else if (ann.annotationType().isAssignableFrom(Headers.class)) {
-                            Map map = exchange.getContext().getTypeConverter().tryConvertTo(Map.class, exchange, value);
+                            Map<String, Object> map
+                                    = exchange.getContext().getTypeConverter().tryConvertTo(Map.class, exchange, value);
                             if (map != null) {
                                 exchange.getIn().getHeaders().putAll(map);
                             }
