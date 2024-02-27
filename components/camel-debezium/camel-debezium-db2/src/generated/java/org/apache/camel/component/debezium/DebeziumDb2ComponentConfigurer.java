@@ -42,6 +42,8 @@ public class DebeziumDb2ComponentConfigurer extends PropertyConfigurerSupport im
         case "columnPropagateSourceType": getOrCreateConfiguration(target).setColumnPropagateSourceType(property(camelContext, java.lang.String.class, value)); return true;
         case "configuration": target.setConfiguration(property(camelContext, org.apache.camel.component.debezium.configuration.Db2ConnectorEmbeddedDebeziumConfiguration.class, value)); return true;
         case "converters": getOrCreateConfiguration(target).setConverters(property(camelContext, java.lang.String.class, value)); return true;
+        case "custommetrictags":
+        case "customMetricTags": getOrCreateConfiguration(target).setCustomMetricTags(property(camelContext, java.lang.String.class, value)); return true;
         case "databasedbname":
         case "databaseDbname": getOrCreateConfiguration(target).setDatabaseDbname(property(camelContext, java.lang.String.class, value)); return true;
         case "databasehostname":
@@ -68,6 +70,8 @@ public class DebeziumDb2ComponentConfigurer extends PropertyConfigurerSupport im
         case "includeSchemaChanges": getOrCreateConfiguration(target).setIncludeSchemaChanges(property(camelContext, boolean.class, value)); return true;
         case "incrementalsnapshotchunksize":
         case "incrementalSnapshotChunkSize": getOrCreateConfiguration(target).setIncrementalSnapshotChunkSize(property(camelContext, int.class, value)); return true;
+        case "incrementalsnapshotwatermarkingstrategy":
+        case "incrementalSnapshotWatermarkingStrategy": getOrCreateConfiguration(target).setIncrementalSnapshotWatermarkingStrategy(property(camelContext, java.lang.String.class, value)); return true;
         case "internalkeyconverter":
         case "internalKeyConverter": getOrCreateConfiguration(target).setInternalKeyConverter(property(camelContext, java.lang.String.class, value)); return true;
         case "internalvalueconverter":
@@ -102,6 +106,8 @@ public class DebeziumDb2ComponentConfigurer extends PropertyConfigurerSupport im
         case "offsetStorageTopic": getOrCreateConfiguration(target).setOffsetStorageTopic(property(camelContext, java.lang.String.class, value)); return true;
         case "pollintervalms":
         case "pollIntervalMs": getOrCreateConfiguration(target).setPollIntervalMs(property(camelContext, java.time.Duration.class, value).toMillis()); return true;
+        case "postprocessors":
+        case "postProcessors": getOrCreateConfiguration(target).setPostProcessors(property(camelContext, java.lang.String.class, value)); return true;
         case "providetransactionmetadata":
         case "provideTransactionMetadata": getOrCreateConfiguration(target).setProvideTransactionMetadata(property(camelContext, boolean.class, value)); return true;
         case "queryfetchsize":
@@ -179,6 +185,8 @@ public class DebeziumDb2ComponentConfigurer extends PropertyConfigurerSupport im
         case "columnPropagateSourceType": return java.lang.String.class;
         case "configuration": return org.apache.camel.component.debezium.configuration.Db2ConnectorEmbeddedDebeziumConfiguration.class;
         case "converters": return java.lang.String.class;
+        case "custommetrictags":
+        case "customMetricTags": return java.lang.String.class;
         case "databasedbname":
         case "databaseDbname": return java.lang.String.class;
         case "databasehostname":
@@ -205,6 +213,8 @@ public class DebeziumDb2ComponentConfigurer extends PropertyConfigurerSupport im
         case "includeSchemaChanges": return boolean.class;
         case "incrementalsnapshotchunksize":
         case "incrementalSnapshotChunkSize": return int.class;
+        case "incrementalsnapshotwatermarkingstrategy":
+        case "incrementalSnapshotWatermarkingStrategy": return java.lang.String.class;
         case "internalkeyconverter":
         case "internalKeyConverter": return java.lang.String.class;
         case "internalvalueconverter":
@@ -239,6 +249,8 @@ public class DebeziumDb2ComponentConfigurer extends PropertyConfigurerSupport im
         case "offsetStorageTopic": return java.lang.String.class;
         case "pollintervalms":
         case "pollIntervalMs": return long.class;
+        case "postprocessors":
+        case "postProcessors": return java.lang.String.class;
         case "providetransactionmetadata":
         case "provideTransactionMetadata": return boolean.class;
         case "queryfetchsize":
@@ -317,6 +329,8 @@ public class DebeziumDb2ComponentConfigurer extends PropertyConfigurerSupport im
         case "columnPropagateSourceType": return getOrCreateConfiguration(target).getColumnPropagateSourceType();
         case "configuration": return target.getConfiguration();
         case "converters": return getOrCreateConfiguration(target).getConverters();
+        case "custommetrictags":
+        case "customMetricTags": return getOrCreateConfiguration(target).getCustomMetricTags();
         case "databasedbname":
         case "databaseDbname": return getOrCreateConfiguration(target).getDatabaseDbname();
         case "databasehostname":
@@ -343,6 +357,8 @@ public class DebeziumDb2ComponentConfigurer extends PropertyConfigurerSupport im
         case "includeSchemaChanges": return getOrCreateConfiguration(target).isIncludeSchemaChanges();
         case "incrementalsnapshotchunksize":
         case "incrementalSnapshotChunkSize": return getOrCreateConfiguration(target).getIncrementalSnapshotChunkSize();
+        case "incrementalsnapshotwatermarkingstrategy":
+        case "incrementalSnapshotWatermarkingStrategy": return getOrCreateConfiguration(target).getIncrementalSnapshotWatermarkingStrategy();
         case "internalkeyconverter":
         case "internalKeyConverter": return getOrCreateConfiguration(target).getInternalKeyConverter();
         case "internalvalueconverter":
@@ -377,6 +393,8 @@ public class DebeziumDb2ComponentConfigurer extends PropertyConfigurerSupport im
         case "offsetStorageTopic": return getOrCreateConfiguration(target).getOffsetStorageTopic();
         case "pollintervalms":
         case "pollIntervalMs": return getOrCreateConfiguration(target).getPollIntervalMs();
+        case "postprocessors":
+        case "postProcessors": return getOrCreateConfiguration(target).getPostProcessors();
         case "providetransactionmetadata":
         case "provideTransactionMetadata": return getOrCreateConfiguration(target).isProvideTransactionMetadata();
         case "queryfetchsize":

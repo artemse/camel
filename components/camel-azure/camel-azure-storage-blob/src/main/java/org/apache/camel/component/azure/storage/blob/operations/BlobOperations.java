@@ -71,6 +71,7 @@ import org.slf4j.LoggerFactory;
 public class BlobOperations {
 
     private static final Logger LOG = LoggerFactory.getLogger(BlobOperations.class);
+    public static final String MISSING_EXCHANGE = "exchange cannot be null";
 
     private final BlobClientWrapper client;
     private final BlobConfigurationOptionsProxy configurationProxy;
@@ -83,7 +84,9 @@ public class BlobOperations {
     }
 
     public BlobOperationResponse getBlob(final Exchange exchange) throws IOException {
-        LOG.trace("Getting a blob [{}] from exchange [{}]...", configurationProxy.getBlobName(exchange), exchange);
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Getting a blob [{}] from exchange [{}]...", configurationProxy.getBlobName(exchange), exchange);
+        }
 
         final Message message = BlobUtils.getInMessage(exchange);
         final OutputStream outputStream = ObjectHelper.isEmpty(message) ? null : message.getBody(OutputStream.class);
@@ -177,12 +180,14 @@ public class BlobOperations {
     }
 
     public BlobOperationResponse uploadBlockBlob(final Exchange exchange) throws IOException {
-        ObjectHelper.notNull(exchange, "exchange cannot be null");
+        ObjectHelper.notNull(exchange, MISSING_EXCHANGE);
 
         final BlobStreamAndLength blobStreamAndLength = BlobStreamAndLength.createBlobStreamAndLengthFromExchangeBody(exchange);
         final BlobCommonRequestOptions commonRequestOptions = getCommonRequestOptions(exchange);
 
-        LOG.trace("Putting a block blob [{}] from exchange [{}]...", configurationProxy.getBlobName(exchange), exchange);
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Putting a block blob [{}] from exchange [{}]...", configurationProxy.getBlobName(exchange), exchange);
+        }
 
         try {
             final Response<BlockBlobItem> response = client.uploadBlockBlob(blobStreamAndLength.getInputStream(),
@@ -198,7 +203,7 @@ public class BlobOperations {
     }
 
     public BlobOperationResponse stageBlockBlobList(final Exchange exchange) throws Exception {
-        ObjectHelper.notNull(exchange, "exchange cannot be null");
+        ObjectHelper.notNull(exchange, MISSING_EXCHANGE);
 
         final Object object = exchange.getIn().getMandatoryBody();
 
@@ -213,7 +218,10 @@ public class BlobOperations {
             throw new IllegalArgumentException("Illegal storageBlocks payload");
         }
 
-        LOG.trace("Putting a blob [{}] from blocks from exchange [{}]...", configurationProxy.getBlobName(exchange), exchange);
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Putting a blob [{}] from blocks from exchange [{}]...", configurationProxy.getBlobName(exchange),
+                    exchange);
+        }
 
         final BlobCommonRequestOptions commonRequestOptions = getCommonRequestOptions(exchange);
 
@@ -242,7 +250,7 @@ public class BlobOperations {
 
     @SuppressWarnings("unchecked")
     public BlobOperationResponse commitBlobBlockList(final Exchange exchange) throws Exception {
-        ObjectHelper.notNull(exchange, "exchange cannot be null");
+        ObjectHelper.notNull(exchange, MISSING_EXCHANGE);
 
         final Object object = exchange.getIn().getMandatoryBody();
 
@@ -256,7 +264,10 @@ public class BlobOperations {
             throw new IllegalArgumentException("Illegal commit block list payload");
         }
 
-        LOG.trace("Putting a blob [{}] block list from exchange [{}]...", configurationProxy.getBlobName(exchange), exchange);
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Putting a blob [{}] block list from exchange [{}]...", configurationProxy.getBlobName(exchange),
+                    exchange);
+        }
 
         final BlobCommonRequestOptions commonRequestOptions = getCommonRequestOptions(exchange);
 
@@ -273,7 +284,10 @@ public class BlobOperations {
     }
 
     public BlobOperationResponse getBlobBlockList(final Exchange exchange) {
-        LOG.trace("Getting the blob block list [{}] from exchange [{}]...", configurationProxy.getBlobName(exchange), exchange);
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Getting the blob block list [{}] from exchange [{}]...", configurationProxy.getBlobName(exchange),
+                    exchange);
+        }
 
         final BlockListType blockListType = configurationProxy.getBlockListType(exchange);
         final BlobCommonRequestOptions commonRequestOptions = getCommonRequestOptions(exchange);
@@ -285,7 +299,9 @@ public class BlobOperations {
     }
 
     public BlobOperationResponse createAppendBlob(final Exchange exchange) {
-        LOG.trace("Creating an append blob [{}] from exchange [{}]...", configurationProxy.getBlobName(exchange), exchange);
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Creating an append blob [{}] from exchange [{}]...", configurationProxy.getBlobName(exchange), exchange);
+        }
 
         final BlobCommonRequestOptions commonRequestOptions = getCommonRequestOptions(exchange);
 
@@ -297,7 +313,9 @@ public class BlobOperations {
     }
 
     public BlobOperationResponse copyBlob(final Exchange exchange) {
-        LOG.trace("Creating an append blob [{}] from exchange [{}]...", configurationProxy.getBlobName(exchange), exchange);
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Creating an append blob [{}] from exchange [{}]...", configurationProxy.getBlobName(exchange), exchange);
+        }
 
         String sourceBlobName = configurationProxy.getBlobName(exchange);
         String sourceAccountName = exchange.getMessage().getHeader(BlobConstants.SOURCE_BLOB_ACCOUNT_NAME, String.class);
@@ -316,7 +334,7 @@ public class BlobOperations {
     }
 
     public BlobOperationResponse commitAppendBlob(final Exchange exchange) throws IOException {
-        ObjectHelper.notNull(exchange, "exchange cannot be null");
+        ObjectHelper.notNull(exchange, MISSING_EXCHANGE);
 
         final BlobCommonRequestOptions commonRequestOptions = getCommonRequestOptions(exchange);
         final boolean createAppendBlob = configurationProxy.isCreateAppendBlob(exchange);
@@ -341,7 +359,9 @@ public class BlobOperations {
     }
 
     public BlobOperationResponse createPageBlob(final Exchange exchange) {
-        LOG.trace("Creating a page blob [{}] from exchange [{}]...", configurationProxy.getBlobName(exchange), exchange);
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Creating a page blob [{}] from exchange [{}]...", configurationProxy.getBlobName(exchange), exchange);
+        }
 
         final Long pageSize = getPageBlobSize(exchange);
         final BlobCommonRequestOptions requestOptions = getCommonRequestOptions(exchange);
@@ -355,7 +375,7 @@ public class BlobOperations {
     }
 
     public BlobOperationResponse uploadPageBlob(final Exchange exchange) throws IOException {
-        ObjectHelper.notNull(exchange, "exchange cannot be null");
+        ObjectHelper.notNull(exchange, MISSING_EXCHANGE);
 
         final boolean createPageBlob = configurationProxy.isCreatePageBlob(exchange);
 
@@ -384,7 +404,9 @@ public class BlobOperations {
     }
 
     public BlobOperationResponse resizePageBlob(final Exchange exchange) {
-        LOG.trace("Resizing a page blob [{}] from exchange [{}]...", configurationProxy.getBlobName(exchange), exchange);
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Resizing a page blob [{}] from exchange [{}]...", configurationProxy.getBlobName(exchange), exchange);
+        }
 
         final Long pageSize = getPageBlobSize(exchange);
         final BlobCommonRequestOptions requestOptions = getCommonRequestOptions(exchange);
@@ -396,7 +418,7 @@ public class BlobOperations {
     }
 
     public BlobOperationResponse clearPageBlob(final Exchange exchange) {
-        ObjectHelper.notNull(exchange, "exchange cannot be null");
+        ObjectHelper.notNull(exchange, MISSING_EXCHANGE);
 
         final PageRange pageRange = configurationProxy.getPageRange(exchange);
         final BlobCommonRequestOptions requestOptions = getCommonRequestOptions(exchange);
@@ -412,13 +434,15 @@ public class BlobOperations {
     }
 
     public BlobOperationResponse getPageBlobRanges(final Exchange exchange) {
-        ObjectHelper.notNull(exchange, "exchange cannot be null");
+        ObjectHelper.notNull(exchange, MISSING_EXCHANGE);
 
         final BlobRange blobRange = configurationProxy.getBlobRange(exchange);
         final BlobCommonRequestOptions commonRequestOptions = getCommonRequestOptions(exchange);
 
-        LOG.trace("Getting the page blob ranges [{}] from exchange [{}]...", configurationProxy.getBlobName(exchange),
-                exchange);
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Getting the page blob ranges [{}] from exchange [{}]...", configurationProxy.getBlobName(exchange),
+                    exchange);
+        }
 
         final PagedIterable<PageRangeItem> response
                 = client.getPageBlobRanges(blobRange, commonRequestOptions.getBlobRequestConditions(),

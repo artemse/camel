@@ -653,12 +653,17 @@ public interface ZendeskEndpointBuilderFactory {
         }
         /**
          * Allows for bridging the consumer to the Camel routing Error Handler,
-         * which mean any exceptions occurred while the consumer is trying to
-         * pickup incoming messages, or the likes, will now be processed as a
-         * message and handled by the routing Error Handler. By default the
-         * consumer will use the org.apache.camel.spi.ExceptionHandler to deal
-         * with exceptions, that will be logged at WARN or ERROR level and
-         * ignored.
+         * which mean any exceptions (if possible) occurred while the Camel
+         * consumer is trying to pickup incoming messages, or the likes, will
+         * now be processed as a message and handled by the routing Error
+         * Handler. Important: This is only possible if the 3rd party component
+         * allows Camel to be alerted if an exception was thrown. Some
+         * components handle this internally only, and therefore
+         * bridgeErrorHandler is not possible. In other situations we may
+         * improve the Camel component to hook into the 3rd party component and
+         * make this possible for future releases. By default the consumer will
+         * use the org.apache.camel.spi.ExceptionHandler to deal with
+         * exceptions, that will be logged at WARN or ERROR level and ignored.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -675,12 +680,17 @@ public interface ZendeskEndpointBuilderFactory {
         }
         /**
          * Allows for bridging the consumer to the Camel routing Error Handler,
-         * which mean any exceptions occurred while the consumer is trying to
-         * pickup incoming messages, or the likes, will now be processed as a
-         * message and handled by the routing Error Handler. By default the
-         * consumer will use the org.apache.camel.spi.ExceptionHandler to deal
-         * with exceptions, that will be logged at WARN or ERROR level and
-         * ignored.
+         * which mean any exceptions (if possible) occurred while the Camel
+         * consumer is trying to pickup incoming messages, or the likes, will
+         * now be processed as a message and handled by the routing Error
+         * Handler. Important: This is only possible if the 3rd party component
+         * allows Camel to be alerted if an exception was thrown. Some
+         * components handle this internally only, and therefore
+         * bridgeErrorHandler is not possible. In other situations we may
+         * improve the Camel component to hook into the 3rd party component and
+         * make this possible for future releases. By default the consumer will
+         * use the org.apache.camel.spi.ExceptionHandler to deal with
+         * exceptions, that will be logged at WARN or ERROR level and ignored.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -1082,7 +1092,7 @@ public interface ZendeskEndpointBuilderFactory {
          * 
          * Path parameter: methodName (required)
          * What operation to use
-         * There are 371 enums and the value can be one of:
+         * There are 373 enums and the value can be one of:
          * ADD_TAG_TO_ORGANISATIONS, ADD_TAG_TO_TICKET, ADD_TAG_TO_TOPICS,
          * ASSOCIATE_ATTACHMENTS_TO_ARTICLE, CHANGE_USER_PASSWORD,
          * CREATE_ARTICLE, CREATE_ARTICLE_1, CREATE_ARTICLE_TRANSLATION,
@@ -1141,7 +1151,8 @@ public interface ZendeskEndpointBuilderFactory {
          * GET_CCD_TICKETS_COUNT_FOR_USER, GET_COMPLIANCE_DELETION_STATUSES,
          * GET_CONTENT_TAG, GET_CONTENT_TAGS, GET_CONTENT_TAGS_1,
          * GET_CONTENT_TAGS_2, GET_CURRENT_USER, GET_CUSTOM_AGENT_ROLES,
-         * GET_DELETED_TICKETS, GET_DELETED_TICKETS_1, GET_DYNAMIC_CONTENT_ITEM,
+         * GET_CUSTOM_TICKET_STATUSES, GET_DELETED_TICKETS,
+         * GET_DELETED_TICKETS_1, GET_DYNAMIC_CONTENT_ITEM,
          * GET_DYNAMIC_CONTENT_ITEM_VARIANT, GET_DYNAMIC_CONTENT_ITEM_VARIANTS,
          * GET_DYNAMIC_CONTENT_ITEMS, GET_FORUM, GET_FORUMS, GET_FORUMS_1,
          * GET_GROUP, GET_GROUP_MEMBERSHIP, GET_GROUP_MEMBERSHIP_1,
@@ -1150,8 +1161,8 @@ public interface ZendeskEndpointBuilderFactory {
          * GET_GROUPS, GET_HELP_CENTER_LOCALES, GET_HOLIDAYS_FOR_SCHEDULE,
          * GET_HOLIDAYS_FOR_SCHEDULE_1, GET_INCREMENTAL_TICKETS_RESULT,
          * GET_JOB_STATUS, GET_JOB_STATUS_ASYNC, GET_JOB_STATUSES,
-         * GET_JOB_STATUSES_ASYNC, GET_MACRO, GET_MACROS, GET_OPEN_REQUESTS,
-         * GET_ORGANIZATION, GET_ORGANIZATION_FIELDS,
+         * GET_JOB_STATUSES_ASYNC, GET_LOCALES, GET_MACRO, GET_MACROS,
+         * GET_OPEN_REQUESTS, GET_ORGANIZATION, GET_ORGANIZATION_FIELDS,
          * GET_ORGANIZATION_MEMBERSHIP, GET_ORGANIZATION_MEMBERSHIP_BY_USER,
          * GET_ORGANIZATION_MEMBERSHIP_FOR_USER, GET_ORGANIZATION_MEMBERSHIPS,
          * GET_ORGANIZATION_MEMBERSHIPS_FOR_ORG,
@@ -1240,7 +1251,7 @@ public interface ZendeskEndpointBuilderFactory {
          * 
          * Path parameter: methodName (required)
          * What operation to use
-         * There are 371 enums and the value can be one of:
+         * There are 373 enums and the value can be one of:
          * ADD_TAG_TO_ORGANISATIONS, ADD_TAG_TO_TICKET, ADD_TAG_TO_TOPICS,
          * ASSOCIATE_ATTACHMENTS_TO_ARTICLE, CHANGE_USER_PASSWORD,
          * CREATE_ARTICLE, CREATE_ARTICLE_1, CREATE_ARTICLE_TRANSLATION,
@@ -1299,7 +1310,8 @@ public interface ZendeskEndpointBuilderFactory {
          * GET_CCD_TICKETS_COUNT_FOR_USER, GET_COMPLIANCE_DELETION_STATUSES,
          * GET_CONTENT_TAG, GET_CONTENT_TAGS, GET_CONTENT_TAGS_1,
          * GET_CONTENT_TAGS_2, GET_CURRENT_USER, GET_CUSTOM_AGENT_ROLES,
-         * GET_DELETED_TICKETS, GET_DELETED_TICKETS_1, GET_DYNAMIC_CONTENT_ITEM,
+         * GET_CUSTOM_TICKET_STATUSES, GET_DELETED_TICKETS,
+         * GET_DELETED_TICKETS_1, GET_DYNAMIC_CONTENT_ITEM,
          * GET_DYNAMIC_CONTENT_ITEM_VARIANT, GET_DYNAMIC_CONTENT_ITEM_VARIANTS,
          * GET_DYNAMIC_CONTENT_ITEMS, GET_FORUM, GET_FORUMS, GET_FORUMS_1,
          * GET_GROUP, GET_GROUP_MEMBERSHIP, GET_GROUP_MEMBERSHIP_1,
@@ -1308,8 +1320,8 @@ public interface ZendeskEndpointBuilderFactory {
          * GET_GROUPS, GET_HELP_CENTER_LOCALES, GET_HOLIDAYS_FOR_SCHEDULE,
          * GET_HOLIDAYS_FOR_SCHEDULE_1, GET_INCREMENTAL_TICKETS_RESULT,
          * GET_JOB_STATUS, GET_JOB_STATUS_ASYNC, GET_JOB_STATUSES,
-         * GET_JOB_STATUSES_ASYNC, GET_MACRO, GET_MACROS, GET_OPEN_REQUESTS,
-         * GET_ORGANIZATION, GET_ORGANIZATION_FIELDS,
+         * GET_JOB_STATUSES_ASYNC, GET_LOCALES, GET_MACRO, GET_MACROS,
+         * GET_OPEN_REQUESTS, GET_ORGANIZATION, GET_ORGANIZATION_FIELDS,
          * GET_ORGANIZATION_MEMBERSHIP, GET_ORGANIZATION_MEMBERSHIP_BY_USER,
          * GET_ORGANIZATION_MEMBERSHIP_FOR_USER, GET_ORGANIZATION_MEMBERSHIPS,
          * GET_ORGANIZATION_MEMBERSHIPS_FOR_ORG,

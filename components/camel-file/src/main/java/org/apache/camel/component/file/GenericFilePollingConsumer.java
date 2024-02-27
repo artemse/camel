@@ -60,16 +60,6 @@ public class GenericFilePollingConsumer extends EventDrivenPollingConsumer {
     }
 
     @Override
-    protected void doStop() throws Exception {
-        super.doStop();
-    }
-
-    @Override
-    protected void doShutdown() throws Exception {
-        super.doShutdown();
-    }
-
-    @Override
     protected GenericFileConsumer getConsumer() {
         return (GenericFileConsumer) super.getConsumer();
     }
@@ -186,7 +176,7 @@ public class GenericFilePollingConsumer extends EventDrivenPollingConsumer {
                         // sleep for next pool
                         sleep(min);
                     } catch (InterruptedException e) {
-                        // ignore
+                        Thread.currentThread().interrupt();
                     }
                 } else {
                     // timeout hit

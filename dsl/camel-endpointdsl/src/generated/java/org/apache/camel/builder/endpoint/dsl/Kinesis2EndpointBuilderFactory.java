@@ -76,7 +76,7 @@ public interface Kinesis2EndpointBuilderFactory {
             return this;
         }
         /**
-         * Set the need for overidding the endpoint. This option needs to be
+         * Set the need for overriding the endpoint. This option needs to be
          * used in combination with uriEndpointOverride option.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
@@ -93,7 +93,7 @@ public interface Kinesis2EndpointBuilderFactory {
             return this;
         }
         /**
-         * Set the need for overidding the endpoint. This option needs to be
+         * Set the need for overriding the endpoint. This option needs to be
          * used in combination with uriEndpointOverride option.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
@@ -915,6 +915,21 @@ public interface Kinesis2EndpointBuilderFactory {
             return this;
         }
         /**
+         * Amazon AWS Session Token used when the user needs to assume a IAM
+         * role.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: security
+         * 
+         * @param sessionToken the value to set
+         * @return the dsl builder
+         */
+        default Kinesis2EndpointConsumerBuilder sessionToken(String sessionToken) {
+            doSetProperty("sessionToken", sessionToken);
+            return this;
+        }
+        /**
          * If we want to trust all certificates in case of overriding the
          * endpoint.
          * 
@@ -1021,6 +1036,43 @@ public interface Kinesis2EndpointBuilderFactory {
             doSetProperty("useProfileCredentialsProvider", useProfileCredentialsProvider);
             return this;
         }
+        /**
+         * Set whether the Kinesis client should expect to use Session
+         * Credentials. This is useful in situation in which the user needs to
+         * assume a IAM role for doing operations in Kinesis.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default Kinesis2EndpointConsumerBuilder useSessionCredentials(
+                boolean useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
+            return this;
+        }
+        /**
+         * Set whether the Kinesis client should expect to use Session
+         * Credentials. This is useful in situation in which the user needs to
+         * assume a IAM role for doing operations in Kinesis.
+         * 
+         * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
+         * type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default Kinesis2EndpointConsumerBuilder useSessionCredentials(
+                String useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
+            return this;
+        }
     }
 
     /**
@@ -1034,12 +1086,17 @@ public interface Kinesis2EndpointBuilderFactory {
         }
         /**
          * Allows for bridging the consumer to the Camel routing Error Handler,
-         * which mean any exceptions occurred while the consumer is trying to
-         * pickup incoming messages, or the likes, will now be processed as a
-         * message and handled by the routing Error Handler. By default the
-         * consumer will use the org.apache.camel.spi.ExceptionHandler to deal
-         * with exceptions, that will be logged at WARN or ERROR level and
-         * ignored.
+         * which mean any exceptions (if possible) occurred while the Camel
+         * consumer is trying to pickup incoming messages, or the likes, will
+         * now be processed as a message and handled by the routing Error
+         * Handler. Important: This is only possible if the 3rd party component
+         * allows Camel to be alerted if an exception was thrown. Some
+         * components handle this internally only, and therefore
+         * bridgeErrorHandler is not possible. In other situations we may
+         * improve the Camel component to hook into the 3rd party component and
+         * make this possible for future releases. By default the consumer will
+         * use the org.apache.camel.spi.ExceptionHandler to deal with
+         * exceptions, that will be logged at WARN or ERROR level and ignored.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -1056,12 +1113,17 @@ public interface Kinesis2EndpointBuilderFactory {
         }
         /**
          * Allows for bridging the consumer to the Camel routing Error Handler,
-         * which mean any exceptions occurred while the consumer is trying to
-         * pickup incoming messages, or the likes, will now be processed as a
-         * message and handled by the routing Error Handler. By default the
-         * consumer will use the org.apache.camel.spi.ExceptionHandler to deal
-         * with exceptions, that will be logged at WARN or ERROR level and
-         * ignored.
+         * which mean any exceptions (if possible) occurred while the Camel
+         * consumer is trying to pickup incoming messages, or the likes, will
+         * now be processed as a message and handled by the routing Error
+         * Handler. Important: This is only possible if the 3rd party component
+         * allows Camel to be alerted if an exception was thrown. Some
+         * components handle this internally only, and therefore
+         * bridgeErrorHandler is not possible. In other situations we may
+         * improve the Camel component to hook into the 3rd party component and
+         * make this possible for future releases. By default the consumer will
+         * use the org.apache.camel.spi.ExceptionHandler to deal with
+         * exceptions, that will be logged at WARN or ERROR level and ignored.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -1293,7 +1355,7 @@ public interface Kinesis2EndpointBuilderFactory {
             return this;
         }
         /**
-         * Set the need for overidding the endpoint. This option needs to be
+         * Set the need for overriding the endpoint. This option needs to be
          * used in combination with uriEndpointOverride option.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
@@ -1310,7 +1372,7 @@ public interface Kinesis2EndpointBuilderFactory {
             return this;
         }
         /**
-         * Set the need for overidding the endpoint. This option needs to be
+         * Set the need for overriding the endpoint. This option needs to be
          * used in combination with uriEndpointOverride option.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
@@ -1482,6 +1544,21 @@ public interface Kinesis2EndpointBuilderFactory {
             return this;
         }
         /**
+         * Amazon AWS Session Token used when the user needs to assume a IAM
+         * role.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: security
+         * 
+         * @param sessionToken the value to set
+         * @return the dsl builder
+         */
+        default Kinesis2EndpointProducerBuilder sessionToken(String sessionToken) {
+            doSetProperty("sessionToken", sessionToken);
+            return this;
+        }
+        /**
          * If we want to trust all certificates in case of overriding the
          * endpoint.
          * 
@@ -1586,6 +1663,43 @@ public interface Kinesis2EndpointBuilderFactory {
         default Kinesis2EndpointProducerBuilder useProfileCredentialsProvider(
                 String useProfileCredentialsProvider) {
             doSetProperty("useProfileCredentialsProvider", useProfileCredentialsProvider);
+            return this;
+        }
+        /**
+         * Set whether the Kinesis client should expect to use Session
+         * Credentials. This is useful in situation in which the user needs to
+         * assume a IAM role for doing operations in Kinesis.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default Kinesis2EndpointProducerBuilder useSessionCredentials(
+                boolean useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
+            return this;
+        }
+        /**
+         * Set whether the Kinesis client should expect to use Session
+         * Credentials. This is useful in situation in which the user needs to
+         * assume a IAM role for doing operations in Kinesis.
+         * 
+         * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
+         * type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default Kinesis2EndpointProducerBuilder useSessionCredentials(
+                String useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
             return this;
         }
     }
@@ -1757,7 +1871,7 @@ public interface Kinesis2EndpointBuilderFactory {
             return this;
         }
         /**
-         * Set the need for overidding the endpoint. This option needs to be
+         * Set the need for overriding the endpoint. This option needs to be
          * used in combination with uriEndpointOverride option.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
@@ -1774,7 +1888,7 @@ public interface Kinesis2EndpointBuilderFactory {
             return this;
         }
         /**
-         * Set the need for overidding the endpoint. This option needs to be
+         * Set the need for overriding the endpoint. This option needs to be
          * used in combination with uriEndpointOverride option.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
@@ -1944,6 +2058,21 @@ public interface Kinesis2EndpointBuilderFactory {
             return this;
         }
         /**
+         * Amazon AWS Session Token used when the user needs to assume a IAM
+         * role.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: security
+         * 
+         * @param sessionToken the value to set
+         * @return the dsl builder
+         */
+        default Kinesis2EndpointBuilder sessionToken(String sessionToken) {
+            doSetProperty("sessionToken", sessionToken);
+            return this;
+        }
+        /**
          * If we want to trust all certificates in case of overriding the
          * endpoint.
          * 
@@ -2048,6 +2177,43 @@ public interface Kinesis2EndpointBuilderFactory {
         default Kinesis2EndpointBuilder useProfileCredentialsProvider(
                 String useProfileCredentialsProvider) {
             doSetProperty("useProfileCredentialsProvider", useProfileCredentialsProvider);
+            return this;
+        }
+        /**
+         * Set whether the Kinesis client should expect to use Session
+         * Credentials. This is useful in situation in which the user needs to
+         * assume a IAM role for doing operations in Kinesis.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default Kinesis2EndpointBuilder useSessionCredentials(
+                boolean useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
+            return this;
+        }
+        /**
+         * Set whether the Kinesis client should expect to use Session
+         * Credentials. This is useful in situation in which the user needs to
+         * assume a IAM role for doing operations in Kinesis.
+         * 
+         * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
+         * type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default Kinesis2EndpointBuilder useSessionCredentials(
+                String useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
             return this;
         }
     }
@@ -2206,7 +2372,7 @@ public interface Kinesis2EndpointBuilderFactory {
          * @return the name of the header {@code AwsKinesisSequenceNumber}.
          */
         public String awsKinesisSequenceNumber() {
-            return "AwsKinesisSequenceNumber";
+            return "CamelAwsKinesisSequenceNumber";
         }
 
         /**
@@ -2220,7 +2386,7 @@ public interface Kinesis2EndpointBuilderFactory {
          * AwsKinesisApproximateArrivalTimestamp}.
          */
         public String awsKinesisApproximateArrivalTimestamp() {
-            return "AwsKinesisApproximateArrivalTimestamp";
+            return "CamelAwsKinesisApproximateArrivalTimestamp";
         }
 
         /**
@@ -2233,7 +2399,7 @@ public interface Kinesis2EndpointBuilderFactory {
          * @return the name of the header {@code AwsKinesisPartitionKey}.
          */
         public String awsKinesisPartitionKey() {
-            return "AwsKinesisPartitionKey";
+            return "CamelAwsKinesisPartitionKey";
         }
 
         /**
@@ -2246,7 +2412,7 @@ public interface Kinesis2EndpointBuilderFactory {
          * @return the name of the header {@code MessageTimestamp}.
          */
         public String messageTimestamp() {
-            return "MessageTimestamp";
+            return "CamelMessageTimestamp";
         }
 
         /**
@@ -2259,7 +2425,7 @@ public interface Kinesis2EndpointBuilderFactory {
          * @return the name of the header {@code AwsKinesisShardId}.
          */
         public String awsKinesisShardId() {
-            return "AwsKinesisShardId";
+            return "CamelAwsKinesisShardId";
         }
     }
     static Kinesis2EndpointBuilder endpointBuilder(

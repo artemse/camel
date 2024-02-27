@@ -21,7 +21,7 @@ public class DebeziumMongodbEndpointUriFactory extends org.apache.camel.support.
     private static final Set<String> SECRET_PROPERTY_NAMES;
     private static final Set<String> MULTI_VALUE_PREFIXES;
     static {
-        Set<String> props = new HashSet<>(65);
+        Set<String> props = new HashSet<>(68);
         props.add("additionalProperties");
         props.add("bridgeErrorHandler");
         props.add("captureMode");
@@ -29,6 +29,7 @@ public class DebeziumMongodbEndpointUriFactory extends org.apache.camel.support.
         props.add("collectionIncludeList");
         props.add("converters");
         props.add("cursorMaxAwaitTimeMs");
+        props.add("customMetricTags");
         props.add("databaseExcludeList");
         props.add("databaseIncludeList");
         props.add("errorsMaxRetries");
@@ -39,6 +40,7 @@ public class DebeziumMongodbEndpointUriFactory extends org.apache.camel.support.
         props.add("fieldRenames");
         props.add("heartbeatIntervalMs");
         props.add("heartbeatTopicsPrefix");
+        props.add("incrementalSnapshotWatermarkingStrategy");
         props.add("internalKeyConverter");
         props.add("internalValueConverter");
         props.add("maxBatchSize");
@@ -68,6 +70,7 @@ public class DebeziumMongodbEndpointUriFactory extends org.apache.camel.support.
         props.add("offsetStorageReplicationFactor");
         props.add("offsetStorageTopic");
         props.add("pollIntervalMs");
+        props.add("postProcessors");
         props.add("provideTransactionMetadata");
         props.add("queryFetchSize");
         props.add("retriableRestartConnectorWaitMs");

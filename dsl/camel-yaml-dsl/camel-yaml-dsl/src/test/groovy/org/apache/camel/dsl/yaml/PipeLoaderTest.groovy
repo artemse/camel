@@ -33,9 +33,9 @@ class PipeLoaderTest extends YamlTestSupport {
         context.start()
     }
 
-    def "Pipe from kamelet to kamelet"() {
+    def "Pipe from kamelet to kamelet with pipe.yaml extension"() {
         when:
-            loadBindings('''
+            loadBindingsExt("pipe.yaml", '''
                 apiVersion: camel.apache.org/v1
                 kind: Pipe
                 metadata:
@@ -516,7 +516,7 @@ class PipeLoaderTest extends YamlTestSupport {
         }
     }
 
-    def "Pipe from kamelet to knative"() {
+    def "Pipe from kamelet to knative channel"() {
         when:
 
         // stub knative for testing as it requires to setup connection to a real knative broker
@@ -551,6 +551,127 @@ class PipeLoaderTest extends YamlTestSupport {
             outputs.size() == 1
             with (outputs[0], ToDefinition) {
                 endpointUri == 'knative:channel/my-messages'
+            }
+        }
+    }
+
+    def "Pipe from knative channel to kamelet"() {
+        when:
+
+        // stub knative for testing as it requires to setup connection to a real knative broker
+        context.removeComponent("knative")
+        context.addComponent("knative", context.getComponent("stub"))
+
+        loadBindings('''
+                apiVersion: camel.apache.org/v1
+                kind: Pipe
+                metadata:
+                  name: knative-event-source                  
+                spec:
+                  source:
+                    ref:
+                      kind: InMemoryChannel
+                      apiVersion: messaging.knative.dev/v1
+                      name: my-messages
+                  sink:
+                    ref:
+                      kind: Kamelet
+                      apiVersion: camel.apache.org/v1
+                      name: log-sink
+                    properties:
+                      showHeaders: true
+            ''')
+        then:
+        context.routeDefinitions.size() == 2
+
+        with (context.routeDefinitions[0]) {
+            routeId == 'knative-event-source'
+            input.endpointUri == 'knative:channel/my-messages'
+            outputs.size() == 1
+            with (outputs[0], ToDefinition) {
+                endpointUri == 'kamelet:log-sink?showHeaders=true'
+            }
+        }
+    }
+
+    def "Pipe from kamelet to knative broker"() {
+        when:
+
+        // stub knative for testing as it requires to setup connection to a real knative broker
+        context.removeComponent("knative")
+        context.addComponent("knative", context.getComponent("stub"))
+
+        loadBindings('''
+                apiVersion: camel.apache.org/v1
+                kind: Pipe
+                metadata:
+                  name: timer-event-source                  
+                spec:
+                  source:
+                    ref:
+                      kind: Kamelet
+                      apiVersion: camel.apache.org/v1
+                      name: timer-source
+                    properties:
+                      message: "Hello world!"
+                  sink:
+                    ref:
+                      kind: Broker
+                      apiVersion: eventing.knative.dev/v1
+                      name: foo-broker
+                    properties:
+                      type: org.apache.camel.event.messages  
+            ''')
+        then:
+        context.routeDefinitions.size() == 2
+
+        with (context.routeDefinitions[0]) {
+            routeId == 'timer-event-source'
+            input.endpointUri == 'kamelet:timer-source?message=Hello+world%21'
+            outputs.size() == 1
+            with (outputs[0], ToDefinition) {
+                endpointUri == 'knative:event/org.apache.camel.event.messages?kind=Broker&name=foo-broker'
+            }
+        }
+    }
+
+    def "Pipe from knative broker to kamelet"() {
+        when:
+
+        // stub knative for testing as it requires to setup connection to a real knative broker
+        context.removeComponent("knative")
+        context.addComponent("knative", context.getComponent("stub"))
+
+        loadBindings('''
+                apiVersion: camel.apache.org/v1
+                kind: Pipe
+                metadata:
+                  name: knative-event-source                  
+                spec:
+                  source:
+                    ref:
+                      kind: Broker
+                      apiVersion: eventing.knative.dev/v1
+                      name: foo-broker
+                    properties:
+                      type: org.apache.camel.event.messages  
+                  sink:
+                    ref:
+                      kind: Kamelet
+                      apiVersion: camel.apache.org/v1
+                      name: log-sink
+                    properties:
+                      showHeaders: true
+            ''')
+        then:
+        context.routeDefinitions.size() == 2
+
+        with (context.routeDefinitions[0]) {
+            routeId == 'knative-event-source'
+            input.endpointUri == 'knative:event/org.apache.camel.event.messages?kind=Broker&name=foo-broker'
+            outputs.size() == 1
+            with (outputs[0], ToDefinition) {
+                endpointUri == 'kamelet:log-sink?showHeaders=true'
             }
         }
     }
@@ -702,6 +823,52 @@ class PipeLoaderTest extends YamlTestSupport {
         }
     }
 
+    def "Pipe with input/output data types and schemes"() {
+        when:
+        loadBindings('''
+                apiVersion: camel.apache.org/v1
+                kind: Pipe
+                metadata:
+                  name: timer-event-source                  
+                spec:
+                  source:
+                    ref:
+                      kind: Kamelet
+                      apiVersion: camel.apache.org/v1
+                      name: timer-source
+                    dataTypes:
+                      in:
+                        scheme: camel
+                        format: plain/text
+                    properties:
+                      message: "Hello world!"
+                  sink:
+                    ref:
+                      kind: Kamelet
+                      apiVersion: camel.apache.org/v1
+                      name: log-sink
+                    dataTypes:
+                      out:
+                        scheme: camel
+                        format: application/octet-stream   
+            ''')
+        then:
+        context.routeDefinitions.size() == 3
+
+        with (context.routeDefinitions[0]) {
+            routeId == 'timer-event-source'
+            input.endpointUri == 'kamelet:timer-source?message=Hello+world%21'
+            input.lineNumber == 7
+            inputType.urn == 'camel:plain/text'
+            outputType.urn == 'camel:application/octet-stream'
+            outputs.size() == 1
+            with (outputs[0], ToDefinition) {
+                endpointUri == 'kamelet:log-sink'
+                lineNumber == 18
+            }
+        }
+    }
+
     def "Pipe with data type transformation"() {
         when:
         loadBindings('''
@@ -750,6 +917,60 @@ class PipeLoaderTest extends YamlTestSupport {
             with (outputs[2], ToDefinition) {
                 endpointUri == 'kamelet:log-sink'
                 lineNumber == 17
+            }
+        }
+    }
+
+    def "Pipe with data type scheme transformation"() {
+        when:
+        loadBindings('''
+                apiVersion: camel.apache.org/v1
+                kind: Pipe
+                metadata:
+                  name: timer-event-source                  
+                spec:
+                  source:
+                    ref:
+                      kind: Kamelet
+                      apiVersion: camel.apache.org/v1
+                      name: timer-source
+                    dataTypes:
+                      out:
+                        scheme: camel
+                        format: application/octet-stream    
+                    properties:
+                      message: "Hello world!"
+                  sink:
+                    ref:
+                      kind: Kamelet
+                      apiVersion: camel.apache.org/v1
+                      name: log-sink
+                    dataTypes:
+                      in:
+                        scheme: camel
+                        format: plain/text
+            ''')
+        then:
+        context.routeDefinitions.size() == 3
+
+        with (context.routeDefinitions[0]) {
+            routeId == 'timer-event-source'
+            input.endpointUri == 'kamelet:timer-source?message=Hello+world%21'
+            input.lineNumber == 7
+            outputs.size() == 3
+            with (outputs[0], TransformDefinition) {
+                fromType == 'camel:any'
+                toType == 'camel:application/octet-stream'
+                lineNumber == -1
+            }
+            with (outputs[1], TransformDefinition) {
+                fromType == 'camel:any'
+                toType == 'camel:plain/text'
+                lineNumber == -1
+            }
+            with (outputs[2], ToDefinition) {
+                endpointUri == 'kamelet:log-sink'
+                lineNumber == 18
             }
         }
     }

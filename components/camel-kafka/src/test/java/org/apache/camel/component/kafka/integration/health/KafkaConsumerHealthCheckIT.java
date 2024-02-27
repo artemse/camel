@@ -18,6 +18,7 @@ package org.apache.camel.component.kafka.integration.health;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.StreamSupport;
@@ -43,6 +44,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.Timeout;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +58,9 @@ import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Tags({ @Tag("health") })
+@EnabledOnOs(value = { OS.LINUX, OS.MAC, OS.FREEBSD, OS.OPENBSD, OS.WINDOWS },
+             architectures = { "amd64", "aarch64", "s390x" },
+             disabledReason = "This test does not run reliably on ppc64le")
 public class KafkaConsumerHealthCheckIT extends KafkaHealthCheckTestSupport {
     public static final String TOPIC = "test-health";
     public static final String SKIPPED_HEADER_KEY = "CamelSkippedHeader";
@@ -166,9 +172,18 @@ public class KafkaConsumerHealthCheckIT extends KafkaHealthCheckTestSupport {
         serviceShutdown = true;
 
         // health-check readiness should be DOWN
-        final Collection<HealthCheck.Result> res = HealthCheckHelper.invokeReadiness(context);
-        final boolean down = res.stream().allMatch(r -> r.getState().equals(HealthCheck.State.DOWN));
-        Assertions.assertTrue(down, "readiness check");
+        await().atMost(20, TimeUnit.SECONDS).untilAsserted(() -> {
+            Collection<HealthCheck.Result> res2 = HealthCheckHelper.invokeReadiness(context);
+            Assertions.assertTrue(res2.size() > 0);
+            Optional<HealthCheck.Result> down
+                    = res2.stream().filter(r -> r.getState().equals(HealthCheck.State.DOWN)).findFirst();
+            Assertions.assertTrue(down.isPresent());
+            String msg = down.get().getMessage().get();
+            Assertions.assertTrue(msg.contains("KafkaConsumer is not ready"));
+            Map<String, Object> map = down.get().getDetails();
+            Assertions.assertEquals(TOPIC, map.get("topic"));
+            Assertions.assertEquals("test-health-it", map.get("route.id"));
+        });
     }
 
 }

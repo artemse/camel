@@ -186,7 +186,7 @@ public class TypeConverterLoaderGeneratorMojo extends AbstractGeneratorMojo {
         writer.append("import org.apache.camel.TypeConversionException;\n");
         writer.append("import org.apache.camel.TypeConverterLoaderException;\n");
         writer.append("import org.apache.camel.TypeConverter;\n");
-        writer.append("import org.apache.camel.converter.TypeConvertible;\n");
+        writer.append("import org.apache.camel.spi.TypeConvertible;\n");
         writer.append("import org.apache.camel.spi.BulkTypeConverters;\n");
         writer.append("import org.apache.camel.spi.TypeConverterLoader;\n");
         writer.append("import org.apache.camel.spi.TypeConverterRegistry;\n");
@@ -471,6 +471,8 @@ public class TypeConverterLoaderGeneratorMojo extends AbstractGeneratorMojo {
                 return "int";
             } else if ("java.lang.Long".equals(to)) {
                 return "long";
+            } else if ("java.lang.Short".equals(to)) {
+                return "short";
             } else if ("java.lang.Character".equals(to)) {
                 return "char";
             } else if ("java.lang.Boolean".equals(to)) {

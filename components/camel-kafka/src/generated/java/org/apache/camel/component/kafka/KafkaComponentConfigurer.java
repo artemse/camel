@@ -42,6 +42,7 @@ public class KafkaComponentConfigurer extends PropertyConfigurerSupport implemen
         case "autowiredEnabled": target.setAutowiredEnabled(property(camelContext, boolean.class, value)); return true;
         case "batchwithindividualheaders":
         case "batchWithIndividualHeaders": getOrCreateConfiguration(target).setBatchWithIndividualHeaders(property(camelContext, boolean.class, value)); return true;
+        case "batching": getOrCreateConfiguration(target).setBatching(property(camelContext, boolean.class, value)); return true;
         case "breakonfirsterror":
         case "breakOnFirstError": getOrCreateConfiguration(target).setBreakOnFirstError(property(camelContext, boolean.class, value)); return true;
         case "bridgeerrorhandler":
@@ -158,6 +159,8 @@ public class KafkaComponentConfigurer extends PropertyConfigurerSupport implemen
         case "pollOnError": getOrCreateConfiguration(target).setPollOnError(property(camelContext, org.apache.camel.component.kafka.PollOnError.class, value)); return true;
         case "polltimeoutms":
         case "pollTimeoutMs": getOrCreateConfiguration(target).setPollTimeoutMs(property(camelContext, java.lang.Long.class, value)); return true;
+        case "prevalidatehostandport":
+        case "preValidateHostAndPort": getOrCreateConfiguration(target).setPreValidateHostAndPort(property(camelContext, boolean.class, value)); return true;
         case "producerbatchsize":
         case "producerBatchSize": getOrCreateConfiguration(target).setProducerBatchSize(property(camelContext, java.lang.Integer.class, value)); return true;
         case "queuebufferingmaxmessages":
@@ -272,6 +275,7 @@ public class KafkaComponentConfigurer extends PropertyConfigurerSupport implemen
         case "autowiredEnabled": return boolean.class;
         case "batchwithindividualheaders":
         case "batchWithIndividualHeaders": return boolean.class;
+        case "batching": return boolean.class;
         case "breakonfirsterror":
         case "breakOnFirstError": return boolean.class;
         case "bridgeerrorhandler":
@@ -388,6 +392,8 @@ public class KafkaComponentConfigurer extends PropertyConfigurerSupport implemen
         case "pollOnError": return org.apache.camel.component.kafka.PollOnError.class;
         case "polltimeoutms":
         case "pollTimeoutMs": return java.lang.Long.class;
+        case "prevalidatehostandport":
+        case "preValidateHostAndPort": return boolean.class;
         case "producerbatchsize":
         case "producerBatchSize": return java.lang.Integer.class;
         case "queuebufferingmaxmessages":
@@ -498,6 +504,7 @@ public class KafkaComponentConfigurer extends PropertyConfigurerSupport implemen
         case "autowiredEnabled": return target.isAutowiredEnabled();
         case "batchwithindividualheaders":
         case "batchWithIndividualHeaders": return getOrCreateConfiguration(target).isBatchWithIndividualHeaders();
+        case "batching": return getOrCreateConfiguration(target).isBatching();
         case "breakonfirsterror":
         case "breakOnFirstError": return getOrCreateConfiguration(target).isBreakOnFirstError();
         case "bridgeerrorhandler":
@@ -614,6 +621,8 @@ public class KafkaComponentConfigurer extends PropertyConfigurerSupport implemen
         case "pollOnError": return getOrCreateConfiguration(target).getPollOnError();
         case "polltimeoutms":
         case "pollTimeoutMs": return getOrCreateConfiguration(target).getPollTimeoutMs();
+        case "prevalidatehostandport":
+        case "preValidateHostAndPort": return getOrCreateConfiguration(target).isPreValidateHostAndPort();
         case "producerbatchsize":
         case "producerBatchSize": return getOrCreateConfiguration(target).getProducerBatchSize();
         case "queuebufferingmaxmessages":

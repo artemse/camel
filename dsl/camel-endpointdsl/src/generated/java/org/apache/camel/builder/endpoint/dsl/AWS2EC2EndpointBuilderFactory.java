@@ -42,21 +42,7 @@ public interface AWS2EC2EndpointBuilderFactory {
             return (AdvancedAWS2EC2EndpointBuilder) this;
         }
         /**
-         * Amazon AWS Access Key.
-         * 
-         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
-         * 
-         * Group: producer
-         * 
-         * @param accessKey the value to set
-         * @return the dsl builder
-         */
-        default AWS2EC2EndpointBuilder accessKey(String accessKey) {
-            doSetProperty("accessKey", accessKey);
-            return this;
-        }
-        /**
-         * To use a existing configured AmazonEC2Client as client.
+         * To use an existing configured AmazonEC2Client client.
          * 
          * The option is a:
          * &lt;code&gt;software.amazon.awssdk.services.ec2.Ec2Client&lt;/code&gt; type.
@@ -72,7 +58,7 @@ public interface AWS2EC2EndpointBuilderFactory {
             return this;
         }
         /**
-         * To use a existing configured AmazonEC2Client as client.
+         * To use an existing configured AmazonEC2Client client.
          * 
          * The option will be converted to a
          * &lt;code&gt;software.amazon.awssdk.services.ec2.Ec2Client&lt;/code&gt; type.
@@ -126,8 +112,8 @@ public interface AWS2EC2EndpointBuilderFactory {
             return this;
         }
         /**
-         * Set the need for overidding the endpoint. This option needs to be
-         * used in combination with uriEndpointOverride option.
+         * Set the need for overriding the endpoint. This option needs to be
+         * used in combination with the uriEndpointOverride option.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -142,8 +128,8 @@ public interface AWS2EC2EndpointBuilderFactory {
             return this;
         }
         /**
-         * Set the need for overidding the endpoint. This option needs to be
-         * used in combination with uriEndpointOverride option.
+         * Set the need for overriding the endpoint. This option needs to be
+         * used in combination with the uriEndpointOverride option.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -192,7 +178,7 @@ public interface AWS2EC2EndpointBuilderFactory {
         /**
          * The region in which EC2 client needs to work. When using this
          * parameter, the configuration will expect the lowercase name of the
-         * region (for example ap-east-1) You'll need to use the name
+         * region (for example, ap-east-1) You'll need to use the name
          * Region.EU_WEST_1.id().
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -204,20 +190,6 @@ public interface AWS2EC2EndpointBuilderFactory {
          */
         default AWS2EC2EndpointBuilder region(String region) {
             doSetProperty("region", region);
-            return this;
-        }
-        /**
-         * Amazon AWS Secret Key.
-         * 
-         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
-         * 
-         * Group: producer
-         * 
-         * @param secretKey the value to set
-         * @return the dsl builder
-         */
-        default AWS2EC2EndpointBuilder secretKey(String secretKey) {
-            doSetProperty("secretKey", secretKey);
             return this;
         }
         /**
@@ -313,7 +285,21 @@ public interface AWS2EC2EndpointBuilderFactory {
             return this;
         }
         /**
-         * If using a profile credentials provider this parameter will set the
+         * Amazon AWS Access Key.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: security
+         * 
+         * @param accessKey the value to set
+         * @return the dsl builder
+         */
+        default AWS2EC2EndpointBuilder accessKey(String accessKey) {
+            doSetProperty("accessKey", accessKey);
+            return this;
+        }
+        /**
+         * If using a profile credentials provider, this parameter will set the
          * profile name.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -326,6 +312,35 @@ public interface AWS2EC2EndpointBuilderFactory {
         default AWS2EC2EndpointBuilder profileCredentialsName(
                 String profileCredentialsName) {
             doSetProperty("profileCredentialsName", profileCredentialsName);
+            return this;
+        }
+        /**
+         * Amazon AWS Secret Key.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: security
+         * 
+         * @param secretKey the value to set
+         * @return the dsl builder
+         */
+        default AWS2EC2EndpointBuilder secretKey(String secretKey) {
+            doSetProperty("secretKey", secretKey);
+            return this;
+        }
+        /**
+         * Amazon AWS Session Token used when the user needs to assume an IAM
+         * role.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: security
+         * 
+         * @param sessionToken the value to set
+         * @return the dsl builder
+         */
+        default AWS2EC2EndpointBuilder sessionToken(String sessionToken) {
+            doSetProperty("sessionToken", sessionToken);
             return this;
         }
         /**
@@ -433,6 +448,43 @@ public interface AWS2EC2EndpointBuilderFactory {
         default AWS2EC2EndpointBuilder useProfileCredentialsProvider(
                 String useProfileCredentialsProvider) {
             doSetProperty("useProfileCredentialsProvider", useProfileCredentialsProvider);
+            return this;
+        }
+        /**
+         * Set whether the EC2 client should expect to use Session Credentials.
+         * This is useful in a situation in which the user needs to assume an
+         * IAM role for doing operations in EC2.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default AWS2EC2EndpointBuilder useSessionCredentials(
+                boolean useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
+            return this;
+        }
+        /**
+         * Set whether the EC2 client should expect to use Session Credentials.
+         * This is useful in a situation in which the user needs to assume an
+         * IAM role for doing operations in EC2.
+         * 
+         * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
+         * type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default AWS2EC2EndpointBuilder useSessionCredentials(
+                String useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
             return this;
         }
     }
@@ -575,7 +627,7 @@ public interface AWS2EC2EndpointBuilderFactory {
          * @return the name of the header {@code AwsEC2ImageId}.
          */
         public String awsEC2ImageId() {
-            return "AwsEC2ImageId";
+            return "CamelAwsEC2ImageId";
         }
 
         /**
@@ -589,7 +641,7 @@ public interface AWS2EC2EndpointBuilderFactory {
          * @return the name of the header {@code AwsEC2InstanceType}.
          */
         public String awsEC2InstanceType() {
-            return "AwsEC2InstanceType";
+            return "CamelAwsEC2InstanceType";
         }
 
         /**
@@ -602,7 +654,7 @@ public interface AWS2EC2EndpointBuilderFactory {
          * @return the name of the header {@code AwsEC2Operation}.
          */
         public String awsEC2Operation() {
-            return "AwsEC2Operation";
+            return "CamelAwsEC2Operation";
         }
 
         /**
@@ -615,7 +667,7 @@ public interface AWS2EC2EndpointBuilderFactory {
          * @return the name of the header {@code AwsEC2InstanceMinCount}.
          */
         public String awsEC2InstanceMinCount() {
-            return "AwsEC2InstanceMinCount";
+            return "CamelAwsEC2InstanceMinCount";
         }
 
         /**
@@ -628,7 +680,7 @@ public interface AWS2EC2EndpointBuilderFactory {
          * @return the name of the header {@code AwsEC2InstanceMaxCount}.
          */
         public String awsEC2InstanceMaxCount() {
-            return "AwsEC2InstanceMaxCount";
+            return "CamelAwsEC2InstanceMaxCount";
         }
 
         /**
@@ -641,7 +693,7 @@ public interface AWS2EC2EndpointBuilderFactory {
          * @return the name of the header {@code AwsEC2InstanceMonitoring}.
          */
         public String awsEC2InstanceMonitoring() {
-            return "AwsEC2InstanceMonitoring";
+            return "CamelAwsEC2InstanceMonitoring";
         }
 
         /**
@@ -654,7 +706,7 @@ public interface AWS2EC2EndpointBuilderFactory {
          * @return the name of the header {@code AwsEC2InstanceKernelId}.
          */
         public String awsEC2InstanceKernelId() {
-            return "AwsEC2InstanceKernelId";
+            return "CamelAwsEC2InstanceKernelId";
         }
 
         /**
@@ -667,7 +719,7 @@ public interface AWS2EC2EndpointBuilderFactory {
          * @return the name of the header {@code AwsEC2InstanceEbsOptimized}.
          */
         public String awsEC2InstanceEbsOptimized() {
-            return "AwsEC2InstanceEbsOptimized";
+            return "CamelAwsEC2InstanceEbsOptimized";
         }
 
         /**
@@ -680,7 +732,7 @@ public interface AWS2EC2EndpointBuilderFactory {
          * @return the name of the header {@code AwsEC2InstanceSecurityGroups}.
          */
         public String awsEC2InstanceSecurityGroups() {
-            return "AwsEC2InstanceSecurityGroups";
+            return "CamelAwsEC2InstanceSecurityGroups";
         }
 
         /**
@@ -694,7 +746,7 @@ public interface AWS2EC2EndpointBuilderFactory {
          * @return the name of the header {@code AwsEC2InstancesIds}.
          */
         public String awsEC2InstancesIds() {
-            return "AwsEC2InstancesIds";
+            return "CamelAwsEC2InstancesIds";
         }
 
         /**
@@ -707,7 +759,7 @@ public interface AWS2EC2EndpointBuilderFactory {
          * @return the name of the header {@code AwsEC2InstancesKeyPair}.
          */
         public String awsEC2InstancesKeyPair() {
-            return "AwsEC2InstancesKeyPair";
+            return "CamelAwsEC2InstancesKeyPair";
         }
 
         /**
@@ -721,7 +773,7 @@ public interface AWS2EC2EndpointBuilderFactory {
          * @return the name of the header {@code AwsEC2InstancesClientToken}.
          */
         public String awsEC2InstancesClientToken() {
-            return "AwsEC2InstancesClientToken";
+            return "CamelAwsEC2InstancesClientToken";
         }
 
         /**
@@ -735,7 +787,7 @@ public interface AWS2EC2EndpointBuilderFactory {
          * @return the name of the header {@code AwsEC2InstancesPlacement}.
          */
         public String awsEC2InstancesPlacement() {
-            return "AwsEC2InstancesPlacement";
+            return "CamelAwsEC2InstancesPlacement";
         }
 
         /**
@@ -748,7 +800,7 @@ public interface AWS2EC2EndpointBuilderFactory {
          * @return the name of the header {@code AwsEC2InstancesTags}.
          */
         public String awsEC2InstancesTags() {
-            return "AwsEC2InstancesTags";
+            return "CamelAwsEC2InstancesTags";
         }
 
         /**
@@ -761,7 +813,7 @@ public interface AWS2EC2EndpointBuilderFactory {
          * @return the name of the header {@code AwsEC2SubnetId}.
          */
         public String awsEC2SubnetId() {
-            return "AwsEC2SubnetId";
+            return "CamelAwsEC2SubnetId";
         }
     }
     static AWS2EC2EndpointBuilder endpointBuilder(

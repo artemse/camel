@@ -449,12 +449,17 @@ public interface SjmsEndpointBuilderFactory {
         }
         /**
          * Allows for bridging the consumer to the Camel routing Error Handler,
-         * which mean any exceptions occurred while the consumer is trying to
-         * pickup incoming messages, or the likes, will now be processed as a
-         * message and handled by the routing Error Handler. By default the
-         * consumer will use the org.apache.camel.spi.ExceptionHandler to deal
-         * with exceptions, that will be logged at WARN or ERROR level and
-         * ignored.
+         * which mean any exceptions (if possible) occurred while the Camel
+         * consumer is trying to pickup incoming messages, or the likes, will
+         * now be processed as a message and handled by the routing Error
+         * Handler. Important: This is only possible if the 3rd party component
+         * allows Camel to be alerted if an exception was thrown. Some
+         * components handle this internally only, and therefore
+         * bridgeErrorHandler is not possible. In other situations we may
+         * improve the Camel component to hook into the 3rd party component and
+         * make this possible for future releases. By default the consumer will
+         * use the org.apache.camel.spi.ExceptionHandler to deal with
+         * exceptions, that will be logged at WARN or ERROR level and ignored.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -471,12 +476,17 @@ public interface SjmsEndpointBuilderFactory {
         }
         /**
          * Allows for bridging the consumer to the Camel routing Error Handler,
-         * which mean any exceptions occurred while the consumer is trying to
-         * pickup incoming messages, or the likes, will now be processed as a
-         * message and handled by the routing Error Handler. By default the
-         * consumer will use the org.apache.camel.spi.ExceptionHandler to deal
-         * with exceptions, that will be logged at WARN or ERROR level and
-         * ignored.
+         * which mean any exceptions (if possible) occurred while the Camel
+         * consumer is trying to pickup incoming messages, or the likes, will
+         * now be processed as a message and handled by the routing Error
+         * Handler. Important: This is only possible if the 3rd party component
+         * allows Camel to be alerted if an exception was thrown. Some
+         * components handle this internally only, and therefore
+         * bridgeErrorHandler is not possible. In other situations we may
+         * improve the Camel component to hook into the 3rd party component and
+         * make this possible for future releases. By default the consumer will
+         * use the org.apache.camel.spi.ExceptionHandler to deal with
+         * exceptions, that will be logged at WARN or ERROR level and ignored.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -682,7 +692,7 @@ public interface SjmsEndpointBuilderFactory {
          * Whether to startup the consumer message listener asynchronously, when
          * starting a route. For example if a JmsConsumer cannot get a
          * connection to a remote JMS broker, then it may block while retrying
-         * and/or failover. This will cause Camel to block while starting
+         * and/or fail over. This will cause Camel to block while starting
          * routes. By setting this option to true, you will let routes startup,
          * while the JmsConsumer connects to the JMS broker using a dedicated
          * thread in asynchronous mode. If this option is used, then beware that
@@ -707,7 +717,7 @@ public interface SjmsEndpointBuilderFactory {
          * Whether to startup the consumer message listener asynchronously, when
          * starting a route. For example if a JmsConsumer cannot get a
          * connection to a remote JMS broker, then it may block while retrying
-         * and/or failover. This will cause Camel to block while starting
+         * and/or fail over. This will cause Camel to block while starting
          * routes. By setting this option to true, you will let routes startup,
          * while the JmsConsumer connects to the JMS broker using a dedicated
          * thread in asynchronous mode. If this option is used, then beware that
@@ -1875,7 +1885,7 @@ public interface SjmsEndpointBuilderFactory {
          * Whether to startup the consumer message listener asynchronously, when
          * starting a route. For example if a JmsConsumer cannot get a
          * connection to a remote JMS broker, then it may block while retrying
-         * and/or failover. This will cause Camel to block while starting
+         * and/or fail over. This will cause Camel to block while starting
          * routes. By setting this option to true, you will let routes startup,
          * while the JmsConsumer connects to the JMS broker using a dedicated
          * thread in asynchronous mode. If this option is used, then beware that
@@ -1900,7 +1910,7 @@ public interface SjmsEndpointBuilderFactory {
          * Whether to startup the consumer message listener asynchronously, when
          * starting a route. For example if a JmsConsumer cannot get a
          * connection to a remote JMS broker, then it may block while retrying
-         * and/or failover. This will cause Camel to block while starting
+         * and/or fail over. This will cause Camel to block while starting
          * routes. By setting this option to true, you will let routes startup,
          * while the JmsConsumer connects to the JMS broker using a dedicated
          * thread in asynchronous mode. If this option is used, then beware that
@@ -2576,7 +2586,7 @@ public interface SjmsEndpointBuilderFactory {
          * Whether to startup the consumer message listener asynchronously, when
          * starting a route. For example if a JmsConsumer cannot get a
          * connection to a remote JMS broker, then it may block while retrying
-         * and/or failover. This will cause Camel to block while starting
+         * and/or fail over. This will cause Camel to block while starting
          * routes. By setting this option to true, you will let routes startup,
          * while the JmsConsumer connects to the JMS broker using a dedicated
          * thread in asynchronous mode. If this option is used, then beware that
@@ -2601,7 +2611,7 @@ public interface SjmsEndpointBuilderFactory {
          * Whether to startup the consumer message listener asynchronously, when
          * starting a route. For example if a JmsConsumer cannot get a
          * connection to a remote JMS broker, then it may block while retrying
-         * and/or failover. This will cause Camel to block while starting
+         * and/or fail over. This will cause Camel to block while starting
          * routes. By setting this option to true, you will let routes startup,
          * while the JmsConsumer connects to the JMS broker using a dedicated
          * thread in asynchronous mode. If this option is used, then beware that
@@ -3138,7 +3148,7 @@ public interface SjmsEndpointBuilderFactory {
          * @return the name of the header {@code JMSDestinationName}.
          */
         public String jMSDestinationName() {
-            return "JMSDestinationName";
+            return "CamelJMSDestinationName";
         }
 
         /**
@@ -3152,7 +3162,7 @@ public interface SjmsEndpointBuilderFactory {
          * @return the name of the header {@code JmsRequestTimeout}.
          */
         public String jmsRequestTimeout() {
-            return "JmsRequestTimeout";
+            return "CamelJmsRequestTimeout";
         }
 
         /**

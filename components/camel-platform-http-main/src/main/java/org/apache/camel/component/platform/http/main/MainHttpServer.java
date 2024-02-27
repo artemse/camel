@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -41,11 +42,14 @@ import io.vertx.ext.web.impl.BlockingHandlerDecorator;
 import org.apache.camel.CamelContext;
 import org.apache.camel.CamelContextAware;
 import org.apache.camel.Exchange;
-import org.apache.camel.NonManagedService;
 import org.apache.camel.StartupListener;
 import org.apache.camel.StaticService;
+import org.apache.camel.api.management.ManagedAttribute;
+import org.apache.camel.api.management.ManagedResource;
 import org.apache.camel.component.platform.http.HttpEndpointModel;
 import org.apache.camel.component.platform.http.PlatformHttpComponent;
+import org.apache.camel.component.platform.http.plugin.JolokiaPlatformHttpPlugin;
+import org.apache.camel.component.platform.http.spi.PlatformHttpPluginRegistry;
 import org.apache.camel.component.platform.http.vertx.VertxPlatformHttpRouter;
 import org.apache.camel.component.platform.http.vertx.VertxPlatformHttpServer;
 import org.apache.camel.component.platform.http.vertx.VertxPlatformHttpServerConfiguration;
@@ -55,6 +59,7 @@ import org.apache.camel.health.HealthCheck;
 import org.apache.camel.health.HealthCheckHelper;
 import org.apache.camel.health.HealthCheckRegistry;
 import org.apache.camel.spi.CamelEvent;
+import org.apache.camel.support.ResolverHelper;
 import org.apache.camel.support.SimpleEventNotifierSupport;
 import org.apache.camel.support.jsse.SSLContextParameters;
 import org.apache.camel.support.service.ServiceHelper;
@@ -68,7 +73,8 @@ import org.apache.camel.util.json.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MainHttpServer extends ServiceSupport implements CamelContextAware, StaticService, NonManagedService {
+@ManagedResource(description = "Camel Main Embedded HTTP server")
+public class MainHttpServer extends ServiceSupport implements CamelContextAware, StaticService {
 
     private static final Logger LOG = LoggerFactory.getLogger(MainHttpServer.class);
 
@@ -77,10 +83,14 @@ public class MainHttpServer extends ServiceSupport implements CamelContextAware,
 
     private CamelContext camelContext;
     private PlatformHttpComponent platformHttpComponent;
+    private PlatformHttpPluginRegistry pluginRegistry;
+    private JolokiaPlatformHttpPlugin jolokiaPlugin;
 
     private VertxPlatformHttpServerConfiguration configuration = new VertxPlatformHttpServerConfiguration();
     private boolean devConsoleEnabled;
     private boolean healthCheckEnabled;
+    private boolean jolokiaEnabled;
+    private boolean metricsEnabled;
     private boolean uploadEnabled;
     private String uploadSourceDir;
 
@@ -102,6 +112,7 @@ public class MainHttpServer extends ServiceSupport implements CamelContextAware,
         this.configuration = configuration;
     }
 
+    @ManagedAttribute(description = "Whether dev console is enabled (/q/dev)")
     public boolean isDevConsoleEnabled() {
         return devConsoleEnabled;
     }
@@ -113,8 +124,14 @@ public class MainHttpServer extends ServiceSupport implements CamelContextAware,
         this.devConsoleEnabled = devConsoleEnabled;
     }
 
+    @ManagedAttribute(description = "Whether health check is enabled (q/health)")
     public boolean isHealthCheckEnabled() {
         return healthCheckEnabled;
+    }
+
+    @ManagedAttribute(description = "Whether Jolokia is enabled (q/jolokia)")
+    public boolean isJolokiaEnabled() {
+        return jolokiaEnabled;
     }
 
     /**
@@ -124,6 +141,26 @@ public class MainHttpServer extends ServiceSupport implements CamelContextAware,
         this.healthCheckEnabled = healthCheckEnabled;
     }
 
+    /**
+     * Whether jolokia is enabled (q/jolokia)
+     */
+    public void setJolokiaEnabled(boolean jolokiaEnabledEnabled) {
+        this.jolokiaEnabled = jolokiaEnabledEnabled;
+    }
+
+    @ManagedAttribute(description = "Whether metrics is enabled (q/metric)")
+    public boolean isMetricsEnabled() {
+        return metricsEnabled;
+    }
+
+    /**
+     * Whether metrics is enabled (q/metrics)
+     */
+    public void setMetricsEnabled(boolean metricsEnabled) {
+        this.metricsEnabled = metricsEnabled;
+    }
+
+    @ManagedAttribute(description = "Whether file upload is enabled (only for development) (q/upload)")
     public boolean isUploadEnabled() {
         return uploadEnabled;
     }
@@ -135,6 +172,7 @@ public class MainHttpServer extends ServiceSupport implements CamelContextAware,
         this.uploadEnabled = uploadEnabled;
     }
 
+    @ManagedAttribute(description = "Directory for upload.")
     public String getUploadSourceDir() {
         return uploadSourceDir;
     }
@@ -146,6 +184,7 @@ public class MainHttpServer extends ServiceSupport implements CamelContextAware,
         this.uploadSourceDir = uploadSourceDir;
     }
 
+    @ManagedAttribute(description = "HTTP server port number")
     public int getPort() {
         return configuration.getBindPort();
     }
@@ -154,6 +193,7 @@ public class MainHttpServer extends ServiceSupport implements CamelContextAware,
         configuration.setBindPort(port);
     }
 
+    @ManagedAttribute(description = "HTTP server hostname")
     public String getHost() {
         return configuration.getBindHost();
     }
@@ -162,6 +202,7 @@ public class MainHttpServer extends ServiceSupport implements CamelContextAware,
         configuration.setBindHost(host);
     }
 
+    @ManagedAttribute(description = "HTTP server base path")
     public String getPath() {
         return configuration.getPath();
     }
@@ -170,6 +211,7 @@ public class MainHttpServer extends ServiceSupport implements CamelContextAware,
         configuration.setPath(path);
     }
 
+    @ManagedAttribute(description = "HTTP server maximum body size")
     public Long getMaxBodySize() {
         return configuration.getMaxBodySize();
     }
@@ -186,6 +228,7 @@ public class MainHttpServer extends ServiceSupport implements CamelContextAware,
         configuration.setSslContextParameters(sslContextParameters);
     }
 
+    @ManagedAttribute(description = "HTTP server using global SSL context parameters")
     public boolean isUseGlobalSslContextParameters() {
         return configuration.isUseGlobalSslContextParameters();
     }
@@ -215,17 +258,40 @@ public class MainHttpServer extends ServiceSupport implements CamelContextAware,
     }
 
     @Override
-    protected void doStart() throws Exception {
+    protected void doInit() throws Exception {
         ObjectHelper.notNull(camelContext, "CamelContext");
 
         server = new VertxPlatformHttpServer(configuration);
         camelContext.addService(server);
-        ServiceHelper.startService(server);
+
+        pluginRegistry = getCamelContext().getCamelContextExtension().getContextPlugin(PlatformHttpPluginRegistry.class);
+        if (pluginRegistry == null && pluginsEnabled()) {
+            pluginRegistry = resolvePlatformHttpPluginRegistry();
+            pluginRegistry.setCamelContext(getCamelContext());
+            getCamelContext().getCamelContextExtension().addContextPlugin(PlatformHttpPluginRegistry.class, pluginRegistry);
+        }
+        ServiceHelper.initService(pluginRegistry);
+    }
+
+    @Override
+    protected void doStart() throws Exception {
+        ObjectHelper.notNull(camelContext, "CamelContext");
+
+        ServiceHelper.startService(server, pluginRegistry);
         router = VertxPlatformHttpRouter.lookup(camelContext);
         platformHttpComponent = camelContext.getComponent("platform-http", PlatformHttpComponent.class);
 
         setupConsoles();
         setupStartupSummary();
+    }
+
+    @Override
+    protected void doShutdown() throws Exception {
+        ServiceHelper.stopAndShutdownService(pluginRegistry);
+    }
+
+    private boolean pluginsEnabled() {
+        return jolokiaEnabled;
     }
 
     protected void setupConsoles() {
@@ -235,12 +301,16 @@ public class MainHttpServer extends ServiceSupport implements CamelContextAware,
         if (healthCheckEnabled) {
             setupHealthCheckConsole();
         }
+        if (jolokiaEnabled) {
+            setupJolokia();
+        }
         if (uploadEnabled) {
             if (uploadSourceDir == null) {
                 throw new IllegalArgumentException("UploadSourceDir must be configured when uploadEnabled=true");
             }
             setupUploadConsole(uploadSourceDir);
         }
+        // metrics will be setup in camel-micrometer-prometheus
     }
 
     protected void setupStartupSummary() throws Exception {
@@ -248,8 +318,46 @@ public class MainHttpServer extends ServiceSupport implements CamelContextAware,
 
             private volatile Set<HttpEndpointModel> last;
 
+            private void logSummary() {
+                Set<HttpEndpointModel> endpoints = platformHttpComponent.getHttpEndpoints();
+                if (endpoints.isEmpty()) {
+                    return;
+                }
+
+                // log only if changed
+                if (last == null || last.size() != endpoints.size() || !last.containsAll(endpoints)) {
+                    LOG.info("HTTP endpoints summary");
+                    for (HttpEndpointModel u : endpoints) {
+                        String line = "http://0.0.0.0:" + (server != null ? server.getPort() : getPort()) + u.getUri();
+                        if (u.getVerbs() != null) {
+                            line += "    (" + u.getVerbs() + ")";
+                        }
+                        if (u.getConsumes() != null || u.getProduces() != null) {
+                            line += "    (";
+                            if (u.getConsumes() != null) {
+                                line += "accept:" + u.getConsumes();
+                                if (u.getProduces() != null) {
+                                    line += " ";
+                                }
+                            }
+                            if (u.getProduces() != null) {
+                                line += "produce:" + u.getProduces();
+                            }
+                            line += ")";
+                        }
+                        LOG.info("    {}", line);
+                    }
+                }
+
+                // use a defensive copy of last known endpoints
+                last = new HashSet<>(endpoints);
+            }
+
             @Override
-            public void onCamelContextStarted(CamelContext context, boolean alreadyStarted) throws Exception {
+            public void onCamelContextStarted(CamelContext context, boolean alreadyStarted) {
+                if (alreadyStarted) {
+                    logSummary();
+                }
                 camelContext.getManagementStrategy().addEventNotifier(new SimpleEventNotifierSupport() {
 
                     @Override
@@ -259,7 +367,7 @@ public class MainHttpServer extends ServiceSupport implements CamelContextAware,
                     }
 
                     @Override
-                    public void notify(CamelEvent event) throws Exception {
+                    public void notify(CamelEvent event) {
                         // when reloading then there may be more routes in the same batch, so we only want
                         // to log the summary at the end
                         if (event instanceof CamelEvent.RouteReloadedEvent) {
@@ -269,25 +377,7 @@ public class MainHttpServer extends ServiceSupport implements CamelContextAware,
                             }
                         }
 
-                        Set<HttpEndpointModel> endpoints = platformHttpComponent.getHttpEndpoints();
-                        if (endpoints.isEmpty()) {
-                            return;
-                        }
-
-                        // log only if changed
-                        if (last == null || last.size() != endpoints.size() || !last.containsAll(endpoints)) {
-                            LOG.info("HTTP endpoints summary");
-                            for (HttpEndpointModel u : endpoints) {
-                                String line = "http://0.0.0.0:" + (server != null ? server.getPort() : getPort()) + u.getUri();
-                                if (u.getVerbs() != null) {
-                                    line += " (" + u.getVerbs() + ")";
-                                }
-                                LOG.info("    {}", line);
-                            }
-                        }
-
-                        // use a defensive copy of last known endpoints
-                        last = new HashSet<>(endpoints);
+                        logSummary();
                     }
                 });
             }
@@ -310,27 +400,29 @@ public class MainHttpServer extends ServiceSupport implements CamelContextAware,
             public void handle(RoutingContext ctx) {
                 ctx.response().putHeader("content-type", "application/json");
 
+                HealthCheckRegistry registry = HealthCheckRegistry.get(camelContext);
+                String level = ctx.request().getParam("exposureLevel");
+                if (level == null) {
+                    level = registry.getExposureLevel();
+                }
+                String includeStackTrace = ctx.request().getParam("stackTrace");
+                String includeData = ctx.request().getParam("data");
+
                 boolean all = ctx.currentRoute() == health;
                 boolean liv = ctx.currentRoute() == live;
                 boolean rdy = ctx.currentRoute() == ready;
 
                 Collection<HealthCheck.Result> res;
                 if (all) {
-                    res = HealthCheckHelper.invoke(camelContext);
+                    res = HealthCheckHelper.invoke(camelContext, level);
                 } else if (liv) {
-                    res = HealthCheckHelper.invokeLiveness(camelContext);
+                    res = HealthCheckHelper.invokeLiveness(camelContext, level);
                 } else {
-                    res = HealthCheckHelper.invokeReadiness(camelContext);
+                    res = HealthCheckHelper.invokeReadiness(camelContext, level);
                 }
 
                 StringBuilder sb = new StringBuilder();
                 sb.append("{\n");
-
-                HealthCheckRegistry registry = HealthCheckRegistry.get(camelContext);
-                String level = ctx.request().getParam("exposureLevel");
-                if (level == null) {
-                    level = registry.getExposureLevel();
-                }
 
                 // are we UP
                 boolean up = HealthCheckHelper.isResultsUp(res, rdy);
@@ -341,12 +433,12 @@ public class MainHttpServer extends ServiceSupport implements CamelContextAware,
                 } else if ("full".equals(level)) {
                     // include all details
                     List<HealthCheck.Result> list = new ArrayList<>(res);
-                    healthCheckDetails(sb, list, up);
+                    healthCheckDetails(sb, list, up, level, includeStackTrace, includeData);
                 } else {
                     // include only DOWN details
                     List<HealthCheck.Result> downs = res.stream().filter(r -> r.getState().equals(HealthCheck.State.DOWN))
                             .collect(Collectors.toList());
-                    healthCheckDetails(sb, downs, up);
+                    healthCheckDetails(sb, downs, up, level, includeStackTrace, includeData);
                 }
                 sb.append("}\n");
 
@@ -362,7 +454,34 @@ public class MainHttpServer extends ServiceSupport implements CamelContextAware,
         live.handler(new BlockingHandlerDecorator(handler, true));
         ready.handler(new BlockingHandlerDecorator(handler, true));
 
-        platformHttpComponent.addHttpEndpoint("/q/health", null, null);
+        platformHttpComponent.addHttpEndpoint("/q/health", null, null,
+                "application/json", null);
+    }
+
+    protected void setupJolokia() {
+        // load plugin
+        jolokiaPlugin = pluginRegistry.resolvePluginById(JolokiaPlatformHttpPlugin.NAME, JolokiaPlatformHttpPlugin.class)
+                .orElseThrow(() -> new RuntimeException(
+                        "JolokiaPlatformHttpPlugin not found. Please add camel-platform-http-jolokia dependency."));
+
+        Route jolokia = router.route("/q/jolokia/*");
+        jolokia.method(HttpMethod.GET);
+        jolokia.method(HttpMethod.POST);
+
+        Handler<RoutingContext> handler = (Handler<RoutingContext>) jolokiaPlugin.getHandler();
+        jolokia.handler(new BlockingHandlerDecorator(handler, true));
+
+        platformHttpComponent.addHttpEndpoint("/q/jolokia", null, null,
+                "text/plain,application/json", null);
+    }
+
+    protected PlatformHttpPluginRegistry resolvePlatformHttpPluginRegistry() {
+        Optional<PlatformHttpPluginRegistry> result = ResolverHelper.resolveService(
+                getCamelContext(),
+                PlatformHttpPluginRegistry.FACTORY,
+                PlatformHttpPluginRegistry.class);
+        return result.orElseThrow(() -> new IllegalArgumentException(
+                "Cannot create PlatformHttpPluginRegistry. Make sure camel-platform-http JAR is on classpath."));
     }
 
     @Override
@@ -378,7 +497,9 @@ public class MainHttpServer extends ServiceSupport implements CamelContextAware,
         }
     }
 
-    private static void healthCheckDetails(StringBuilder sb, List<HealthCheck.Result> checks, boolean up) {
+    private static void healthCheckDetails(
+            StringBuilder sb, List<HealthCheck.Result> checks, boolean up, String level, String includeStackTrace,
+            String includeData) {
         healthCheckStatus(sb, up);
 
         if (!checks.isEmpty()) {
@@ -387,7 +508,7 @@ public class MainHttpServer extends ServiceSupport implements CamelContextAware,
             for (int i = 0; i < checks.size(); i++) {
                 HealthCheck.Result d = checks.get(i);
                 sb.append("        {\n");
-                reportHealthCheck(sb, d);
+                reportHealthCheck(sb, d, level, includeStackTrace, includeData);
                 if (i < checks.size() - 1) {
                     sb.append("        },\n");
                 } else {
@@ -398,20 +519,29 @@ public class MainHttpServer extends ServiceSupport implements CamelContextAware,
         }
     }
 
-    private static void reportHealthCheck(StringBuilder sb, HealthCheck.Result d) {
+    private static void reportHealthCheck(
+            StringBuilder sb, HealthCheck.Result d, String level, String includeStackTrace, String includeData) {
         sb.append("            \"name\": \"").append(d.getCheck().getId()).append("\",\n");
-        sb.append("            \"status\": \"").append(d.getState()).append("\",\n");
-        if (d.getError().isPresent()) {
+        sb.append("            \"status\": \"").append(d.getState()).append("\"");
+        if (("full".equals(level) || "true".equals(includeStackTrace)) && d.getError().isPresent()) {
+            // include error message in full exposure
+            sb.append(",\n");
             String msg = allCausedByErrorMessages(d.getError().get());
             sb.append("            \"error-message\": \"").append(msg)
-                    .append("\",\n");
-            sb.append("            \"error-stacktrace\": \"").append(errorStackTrace(d.getError().get()))
-                    .append("\",\n");
+                    .append("\"");
+            if ("true".equals(includeStackTrace)) {
+                sb.append(",\n");
+                sb.append("            \"error-stacktrace\": \"").append(errorStackTrace(d.getError().get()))
+                        .append("\"");
+            }
         }
         if (d.getMessage().isPresent()) {
-            sb.append("            \"message\": \"").append(d.getMessage().get()).append("\",\n");
+            sb.append(",\n");
+            sb.append("            \"message\": \"").append(d.getMessage().get()).append("\"");
         }
-        if (d.getDetails() != null && !d.getDetails().isEmpty()) {
+        // only include data if was enabled
+        if (("true".equals(includeData)) && d.getDetails() != null && !d.getDetails().isEmpty()) {
+            sb.append(",\n");
             // lets use sorted keys
             Iterator<String> it = new TreeSet<>(d.getDetails().keySet()).iterator();
             sb.append("            \"data\": {\n");
@@ -532,7 +662,7 @@ public class MainHttpServer extends ServiceSupport implements CamelContextAware,
                             }
                         }
                     });
-                    if (sb.length() > 0) {
+                    if (!sb.isEmpty()) {
                         String out = sb.toString();
                         if (html) {
                             ctx.response().putHeader("content-type", "text/html");
@@ -571,7 +701,7 @@ public class MainHttpServer extends ServiceSupport implements CamelContextAware,
                             }
                         }
                     });
-                    if (sb.length() > 0) {
+                    if (!sb.isEmpty()) {
                         String out = sb.toString();
                         ctx.end(out);
                     } else if (!root.isEmpty()) {
@@ -588,7 +718,8 @@ public class MainHttpServer extends ServiceSupport implements CamelContextAware,
         dev.handler(new BlockingHandlerDecorator(handler, true));
         devSub.handler(new BlockingHandlerDecorator(handler, true));
 
-        platformHttpComponent.addHttpEndpoint("/q/dev", null, null);
+        platformHttpComponent.addHttpEndpoint("/q/dev", null, null,
+                "text/plain,application/json", null);
     }
 
     protected void setupUploadConsole(final String dir) {
@@ -669,7 +800,8 @@ public class MainHttpServer extends ServiceSupport implements CamelContextAware,
         upload.handler(new BlockingHandlerDecorator(handler, true));
         uploadDelete.handler(new BlockingHandlerDecorator(handler, true));
 
-        platformHttpComponent.addHttpEndpoint("/q/upload", "PUT,DELETE", null);
+        platformHttpComponent.addHttpEndpoint("/q/upload", "PUT,DELETE",
+                "multipart/form-data", null, null);
     }
 
 }

@@ -66,10 +66,10 @@ public interface ConsulComponentBuilderFactory {
             return this;
         }
         /**
-         * Reference to a com.orbitz.consul.Consul in the registry.
+         * Reference to a org.kiwiproject.consul.Consul in the registry.
          * 
-         * The option is a: &lt;code&gt;com.orbitz.consul.Consul&lt;/code&gt;
-         * type.
+         * The option is a:
+         * &lt;code&gt;org.kiwiproject.consul.Consul&lt;/code&gt; type.
          * 
          * Group: common
          * 
@@ -77,7 +77,7 @@ public interface ConsulComponentBuilderFactory {
          * @return the dsl builder
          */
         default ConsulComponentBuilder consulClient(
-                com.orbitz.consul.Consul consulClient) {
+                org.kiwiproject.consul.Consul consulClient) {
             doSetProperty("consulClient", consulClient);
             return this;
         }
@@ -171,12 +171,17 @@ public interface ConsulComponentBuilderFactory {
         }
         /**
          * Allows for bridging the consumer to the Camel routing Error Handler,
-         * which mean any exceptions occurred while the consumer is trying to
-         * pickup incoming messages, or the likes, will now be processed as a
-         * message and handled by the routing Error Handler. By default the
-         * consumer will use the org.apache.camel.spi.ExceptionHandler to deal
-         * with exceptions, that will be logged at WARN or ERROR level and
-         * ignored.
+         * which mean any exceptions (if possible) occurred while the Camel
+         * consumer is trying to pickup incoming messages, or the likes, will
+         * now be processed as a message and handled by the routing Error
+         * Handler. Important: This is only possible if the 3rd party component
+         * allows Camel to be alerted if an exception was thrown. Some
+         * components handle this internally only, and therefore
+         * bridgeErrorHandler is not possible. In other situations we may
+         * improve the Camel component to hook into the 3rd party component and
+         * make this possible for future releases. By default the consumer will
+         * use the org.apache.camel.spi.ExceptionHandler to deal with
+         * exceptions, that will be logged at WARN or ERROR level and ignored.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -286,8 +291,7 @@ public interface ConsulComponentBuilderFactory {
          * ConsistencyMode.DEFAULT.
          * 
          * The option is a:
-         * &lt;code&gt;com.orbitz.consul.option.ConsistencyMode&lt;/code&gt;
-         * type.
+         * &lt;code&gt;org.kiwiproject.consul.option.ConsistencyMode&lt;/code&gt; type.
          * 
          * Default: DEFAULT
          * Group: advanced
@@ -296,7 +300,7 @@ public interface ConsulComponentBuilderFactory {
          * @return the dsl builder
          */
         default ConsulComponentBuilder consistencyMode(
-                com.orbitz.consul.option.ConsistencyMode consistencyMode) {
+                org.kiwiproject.consul.option.ConsistencyMode consistencyMode) {
             doSetProperty("consistencyMode", consistencyMode);
             return this;
         }
@@ -491,7 +495,7 @@ public interface ConsulComponentBuilderFactory {
                 Object value) {
             switch (name) {
             case "connectTimeout": getOrCreateConfiguration((ConsulComponent) component).setConnectTimeout((java.time.Duration) value); return true;
-            case "consulClient": getOrCreateConfiguration((ConsulComponent) component).setConsulClient((com.orbitz.consul.Consul) value); return true;
+            case "consulClient": getOrCreateConfiguration((ConsulComponent) component).setConsulClient((org.kiwiproject.consul.Consul) value); return true;
             case "key": getOrCreateConfiguration((ConsulComponent) component).setKey((java.lang.String) value); return true;
             case "pingInstance": getOrCreateConfiguration((ConsulComponent) component).setPingInstance((boolean) value); return true;
             case "readTimeout": getOrCreateConfiguration((ConsulComponent) component).setReadTimeout((java.time.Duration) value); return true;
@@ -504,7 +508,7 @@ public interface ConsulComponentBuilderFactory {
             case "valueAsString": getOrCreateConfiguration((ConsulComponent) component).setValueAsString((boolean) value); return true;
             case "autowiredEnabled": ((ConsulComponent) component).setAutowiredEnabled((boolean) value); return true;
             case "configuration": ((ConsulComponent) component).setConfiguration((org.apache.camel.component.consul.ConsulConfiguration) value); return true;
-            case "consistencyMode": getOrCreateConfiguration((ConsulComponent) component).setConsistencyMode((com.orbitz.consul.option.ConsistencyMode) value); return true;
+            case "consistencyMode": getOrCreateConfiguration((ConsulComponent) component).setConsistencyMode((org.kiwiproject.consul.option.ConsistencyMode) value); return true;
             case "datacenter": getOrCreateConfiguration((ConsulComponent) component).setDatacenter((java.lang.String) value); return true;
             case "nearNode": getOrCreateConfiguration((ConsulComponent) component).setNearNode((java.lang.String) value); return true;
             case "nodeMeta": getOrCreateConfiguration((ConsulComponent) component).setNodeMeta((java.util.List) value); return true;

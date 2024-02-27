@@ -390,7 +390,7 @@ public final class StringHelper {
         final int size = count;
         final String text = value;
 
-        return new Iterator<String>() {
+        return new Iterator<>() {
             int i;
             int pos;
 
@@ -532,6 +532,17 @@ public final class StringHelper {
      * @return      the string camel cased
      */
     public static String dashToCamelCase(final String text) {
+        return dashToCamelCase(text, false);
+    }
+
+    /**
+     * Converts the string from dash format into camel case (hello-great-world -> helloGreatWorld)
+     *
+     * @param  text              the string
+     * @param  skipQuotedOrKeyed flag to skip converting within quoted or keyed text
+     * @return                   the string camel cased
+     */
+    public static String dashToCamelCase(final String text, boolean skipQuotedOrKeyed) {
         if (text == null) {
             return null;
         }
@@ -546,8 +557,35 @@ public final class StringHelper {
         // there is at least 1 dash so the capacity can be shorter
         StringBuilder sb = new StringBuilder(length - 1);
         boolean upper = false;
+        int singleQuotes = 0;
+        int doubleQuotes = 0;
+        boolean skip = false;
         for (int i = 0; i < length; i++) {
             char c = text.charAt(i);
+
+            // special for skip mode where we should keep text inside quotes or keys as-is
+            if (skipQuotedOrKeyed) {
+                if (c == ']') {
+                    skip = false;
+                } else if (c == '[') {
+                    skip = true;
+                } else if (c == '\'') {
+                    singleQuotes++;
+                } else if (c == '"') {
+                    doubleQuotes++;
+                }
+                if (singleQuotes > 0) {
+                    skip = singleQuotes % 2 == 1;
+                }
+                if (doubleQuotes > 0) {
+                    skip = doubleQuotes % 2 == 1;
+                }
+                if (skip) {
+                    sb.append(c);
+                    continue;
+                }
+            }
+
             if (c == '-') {
                 upper = true;
             } else {
@@ -569,6 +607,9 @@ public final class StringHelper {
      * @return       the text after the token, or <tt>null</tt> if text does not contain the token
      */
     public static String after(String text, String after) {
+        if (text == null) {
+            return null;
+        }
         int pos = text.indexOf(after);
         if (pos == -1) {
             return null;
@@ -614,6 +655,9 @@ public final class StringHelper {
      * @return       the text after the token, or <tt>null</tt> if text does not contain the token
      */
     public static String afterLast(String text, String after) {
+        if (text == null) {
+            return null;
+        }
         int pos = text.lastIndexOf(after);
         if (pos == -1) {
             return null;
@@ -642,6 +686,9 @@ public final class StringHelper {
      * @return        the text before the token, or <tt>null</tt> if text does not contain the token
      */
     public static String before(String text, String before) {
+        if (text == null) {
+            return null;
+        }
         int pos = text.indexOf(before);
         return pos == -1 ? null : text.substring(0, pos);
     }
@@ -655,6 +702,9 @@ public final class StringHelper {
      * @return              the text before the token, or the supplied defaultValue if text does not contain the token
      */
     public static String before(String text, String before, String defaultValue) {
+        if (text == null) {
+            return defaultValue;
+        }
         int pos = text.indexOf(before);
         return pos == -1 ? defaultValue : text.substring(0, pos);
     }
@@ -668,6 +718,9 @@ public final class StringHelper {
      * @return              the text before the token, or the supplied defaultValue if text does not contain the token
      */
     public static String before(String text, char before, String defaultValue) {
+        if (text == null) {
+            return defaultValue;
+        }
         int pos = text.indexOf(before);
         return pos == -1 ? defaultValue : text.substring(0, pos);
     }
@@ -697,6 +750,9 @@ public final class StringHelper {
      * @return        the text before the token, or <tt>null</tt> if text does not contain the token
      */
     public static String beforeLast(String text, String before) {
+        if (text == null) {
+            return null;
+        }
         int pos = text.lastIndexOf(before);
         return pos == -1 ? null : text.substring(0, pos);
     }
@@ -1212,6 +1268,18 @@ public final class StringHelper {
             }
         }
         return true;
+    }
+
+    public static String bytesToHex(byte[] hash) {
+        StringBuilder sb = new StringBuilder(2 * hash.length);
+        for (byte b : hash) {
+            String hex = Integer.toHexString(0xff & b);
+            if (hex.length() == 1) {
+                sb.append('0');
+            }
+            sb.append(hex);
+        }
+        return sb.toString();
     }
 
 }

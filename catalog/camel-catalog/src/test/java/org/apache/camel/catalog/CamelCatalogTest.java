@@ -84,7 +84,7 @@ public class CamelCatalogTest {
         assertTrue(names.contains("log"));
         assertTrue(names.contains("docker"));
         assertTrue(names.contains("jms"));
-        // TODO: camel4 assertTrue(names.contains("activemq"));
+        assertTrue(names.contains("activemq"));
         assertTrue(names.contains("zookeeper-master"));
     }
 
@@ -125,6 +125,17 @@ public class CamelCatalogTest {
         assertTrue(names.contains("file"));
         assertTrue(names.contains("xtokenize"));
         assertTrue(names.contains("hl7terser"));
+    }
+
+    @Test
+    public void testFindTransformerNames() {
+        List<String> names = catalog.findTransformerNames();
+
+        assertTrue(names.contains("application-cloudevents-json"));
+        assertTrue(names.contains("application-x-java-object"));
+        assertTrue(names.contains("aws-cloudtrail-application-cloudevents"));
+        assertTrue(names.contains("azure-storage-queue-application-cloudevents"));
+        assertTrue(names.contains("http-application-cloudevents"));
     }
 
     @Test
@@ -869,6 +880,17 @@ public class CamelCatalogTest {
     }
 
     @Test
+    public void testListTransformersAsJson() throws Exception {
+        String json = catalog.listTransformersAsJson();
+        assertNotNull(json);
+
+        // validate we can parse the json
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode tree = mapper.readTree(json);
+        assertNotNull(tree);
+    }
+
+    @Test
     public void testListModelsAsJson() throws Exception {
         String json = catalog.listModelsAsJson();
         assertNotNull(json);
@@ -1089,6 +1111,11 @@ public class CamelCatalogTest {
         assertFalse(result.isSuccess());
         assertEquals("$.store.book[?(@.price ^^^ 10)]", result.getText());
         assertEquals("Expected character: )", result.getError());
+
+        // just to call via a configuration option
+        result = catalog.validateLanguageExpression(null, "jsonpath?unpackArray=true", "$.store.book[?(@.price < 10)]");
+        assertTrue(result.isSuccess());
+        assertEquals("$.store.book[?(@.price < 10)]", result.getText());
     }
 
     @Test

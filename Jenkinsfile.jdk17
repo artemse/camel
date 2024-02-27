@@ -58,7 +58,7 @@ pipeline {
 
         stage('Build & Install') {
             steps {
-                sh "./mvnw -U $MAVEN_PARAMS -Darchetype.test.skip -Dmaven.test.skip.exec=true clean install"
+                sh "./mvnw -U $MAVEN_PARAMS -Dskip.camel.maven.plugin.tests -Darchetype.test.skip -Dmaven.test.skip.exec=true clean install"
             }
         }
 
@@ -91,7 +91,7 @@ pipeline {
             emailext(
                 subject: '${DEFAULT_SUBJECT}',
                 body: '${DEFAULT_CONTENT}',
-                recipientProviders: [[$class: 'CulpritsRecipientProvider']]
+                recipientProviders: [[$class: 'DevelopersRecipientProvider']]
             )
         }
     }

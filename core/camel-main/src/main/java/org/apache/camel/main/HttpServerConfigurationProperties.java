@@ -41,6 +41,8 @@ public class HttpServerConfigurationProperties implements BootstrapCloseable {
 
     private boolean devConsoleEnabled;
     private boolean healthCheckEnabled;
+    private boolean jolokiaEnabled;
+    private boolean metricsEnabled;
     private boolean uploadEnabled;
     private String uploadSourceDir;
 
@@ -149,6 +151,28 @@ public class HttpServerConfigurationProperties implements BootstrapCloseable {
         this.healthCheckEnabled = healthCheckEnabled;
     }
 
+    public boolean isJolokiaEnabled() {
+        return jolokiaEnabled;
+    }
+
+    /**
+     * Whether to enable jolokia. If enabled then you can access jolokia api on context-path: /q/jolokia
+     */
+    public void setJolokiaEnabled(boolean jolokiaEnabled) {
+        this.jolokiaEnabled = jolokiaEnabled;
+    }
+
+    public boolean isMetricsEnabled() {
+        return metricsEnabled;
+    }
+
+    /**
+     * Whether to enable metrics. If enabled then you can access metrics on context-path: /q/metrics
+     */
+    public void setMetricsEnabled(boolean metricsEnabled) {
+        this.metricsEnabled = metricsEnabled;
+    }
+
     public boolean isUploadEnabled() {
         return uploadEnabled;
     }
@@ -239,6 +263,22 @@ public class HttpServerConfigurationProperties implements BootstrapCloseable {
      */
     public HttpServerConfigurationProperties withHealthCheckEnabled(boolean healthCheckEnabled) {
         this.healthCheckEnabled = healthCheckEnabled;
+        return this;
+    }
+
+    /**
+     * Whether to enable jolokia. If enabled then you can access jolokia api on context-path: /q/jolokia
+     */
+    public HttpServerConfigurationProperties withJolokiaEnabled(boolean jolokiaEnabled) {
+        this.jolokiaEnabled = jolokiaEnabled;
+        return this;
+    }
+
+    /**
+     * Whether to enable metrics. If enabled then you can access metrics on context-path: /q/metrics
+     */
+    public HttpServerConfigurationProperties withMetricsEnabled(boolean metricsEnabled) {
+        this.metricsEnabled = metricsEnabled;
         return this;
     }
 

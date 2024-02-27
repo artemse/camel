@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.apache.camel</groupId>
         <artifactId>camel-parent</artifactId>
-        <version>4.1.0-SNAPSHOT</version>
+        <version>4.5.0-SNAPSHOT</version>
         <relativePath>../parent</relativePath>
     </parent>
 
@@ -89,6 +89,7 @@
         <module>camel-barcode</module>
         <module>camel-base64</module>
         <module>camel-bean-validator</module>
+        <module>camel-beanio</module>
         <module>camel-bindy</module>
         <module>camel-bonita</module>
         <module>camel-box</module>
@@ -122,10 +123,10 @@
         <module>camel-dynamic-router</module>
         <module>camel-ehcache</module>
         <module>camel-elasticsearch</module>
+        <module>camel-elasticsearch-rest-client</module>
         <module>camel-elytron</module>
         <module>camel-etcd3</module>
         <module>camel-exec</module>
-        <module>camel-facebook</module>
         <module>camel-fastjson</module>
         <module>camel-fhir</module>
         <module>camel-file-watch</module>
@@ -146,7 +147,6 @@
         <module>camel-guava-eventbus</module>
         <module>camel-hashicorp-vault</module>
         <module>camel-hazelcast</module>
-        <module>camel-hdfs</module>
         <module>camel-headersmap</module>
         <module>camel-hl7</module>
         <module>camel-huawei</module>
@@ -188,6 +188,7 @@
         <module>camel-json-patch</module>
         <module>camel-jt400</module>
         <module>camel-jta</module>
+        <module>camel-jte</module>
         <module>camel-kafka</module>
         <module>camel-kamelet</module>
         <module>camel-knative</module>
@@ -205,6 +206,7 @@
         <module>camel-mapstruct</module>
         <module>camel-metrics</module>
         <module>camel-micrometer</module>
+        <module>camel-micrometer-prometheus</module>
         <module>camel-microprofile</module>
         <module>camel-mina</module>
         <module>camel-minio</module>
@@ -232,14 +234,16 @@
         <module>camel-pg-replication-slot</module>
         <module>camel-pgevent</module>
         <module>camel-platform-http</module>
-        <module>camel-platform-http-vertx</module>
+        <module>camel-platform-http-jolokia</module>
         <module>camel-platform-http-main</module>
+        <module>camel-platform-http-vertx</module>
         <module>camel-plc4x</module>
         <module>camel-printer</module>
         <module>camel-protobuf</module>
         <module>camel-pubnub</module>
         <module>camel-pulsar</module>
         <module>camel-python</module>
+        <module>camel-qdrant</module>
         <module>camel-quartz</module>
         <module>camel-quickfix</module>
         <module>camel-reactive-executor-tomcat</module>
@@ -265,6 +269,7 @@
         <module>camel-sjms2</module>
         <module>camel-sjms</module>
         <module>camel-slack</module>
+        <module>camel-smb</module>
         <module>camel-smpp</module>
         <module>camel-snakeyaml</module>
         <module>camel-snmp</module>
@@ -294,6 +299,7 @@
         <module>camel-telegram</module>
         <module>camel-threadpoolfactory-vertx</module>
         <module>camel-thrift</module>
+        <module>camel-thymeleaf</module>
         <module>camel-tika</module>
         <module>camel-twilio</module>
         <module>camel-twitter</module>
@@ -302,6 +308,7 @@
         <module>camel-velocity</module>
         <module>camel-vertx</module>
         <module>camel-wal</module>
+        <module>camel-wasm</module>
         <module>camel-weather</module>
         <module>camel-web3j</module>
         <module>camel-webhook</module>

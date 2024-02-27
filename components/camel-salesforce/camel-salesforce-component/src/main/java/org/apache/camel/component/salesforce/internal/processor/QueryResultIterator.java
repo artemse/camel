@@ -65,7 +65,6 @@ public class QueryResultIterator<T extends AbstractSObjectBase> implements Itera
             List<T> valueHolder = new ArrayList<>();
 
             restClient.queryMore(queryRecords.getNextRecordsUrl(), requestHeaders, (response, headers, exception) -> {
-                final AbstractQueryRecordsBase<T> qrb;
                 try {
                     queryRecords = objectMapper.readValue(response, responseClass);
                     iterator = queryRecords.getRecords().iterator();
@@ -86,6 +85,7 @@ public class QueryResultIterator<T extends AbstractSObjectBase> implements Itera
                 latch.await();
                 return valueHolder.get(0);
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 throw new RuntimeCamelException(e);
             }
         } else {

@@ -32,7 +32,7 @@ import org.apache.camel.util.ObjectHelper;
 @Component("azure-storage-datalake")
 public class DataLakeComponent extends HealthCheckComponent {
 
-    @Metadata(description = "configuration object for datalake")
+    @Metadata(description = "configuration object for data lake")
     private DataLakeConfiguration configuration = new DataLakeConfiguration();
 
     public DataLakeComponent() {
@@ -45,7 +45,7 @@ public class DataLakeComponent extends HealthCheckComponent {
     @Override
     protected Endpoint createEndpoint(String uri, String remaining, Map<String, Object> parameters) throws Exception {
 
-        if (remaining == null || remaining.trim().isEmpty()) {
+        if (remaining == null || remaining.isBlank()) {
             throw new IllegalArgumentException("At least the account name must be specified");
         }
 

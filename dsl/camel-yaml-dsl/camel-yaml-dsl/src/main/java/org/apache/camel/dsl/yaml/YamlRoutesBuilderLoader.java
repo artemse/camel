@@ -19,12 +19,15 @@ package org.apache.camel.dsl.yaml;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.CamelContextAware;
@@ -95,16 +98,26 @@ import static org.apache.camel.dsl.yaml.common.YamlDeserializerSupport.setDeseri
 public class YamlRoutesBuilderLoader extends YamlRoutesBuilderLoaderSupport {
 
     public static final String EXTENSION = "yaml";
+    public static final String[] SUPPORTED_EXTENSION = { EXTENSION, "camel.yaml", "pipe.yaml" };
+    private static final String DEPRECATED_EXTENSION = "camelk.yaml";
 
     private static final Logger LOG = LoggerFactory.getLogger(YamlRoutesBuilderLoader.class);
+
+    private final AtomicBoolean deprecatedWarnLogged = new AtomicBoolean();
+    private final AtomicBoolean deprecatedBindingWarnLogged = new AtomicBoolean();
 
     // API versions for Camel-K Integration and Pipe
     // we are lenient so lets just assume we can work with any of the v1 even if they evolve
     private static final String INTEGRATION_VERSION = "camel.apache.org/v1";
+    @Deprecated
     private static final String BINDING_VERSION = "camel.apache.org/v1alpha1";
     private static final String PIPE_VERSION = "camel.apache.org/v1";
     private static final String STRIMZI_VERSION = "kafka.strimzi.io/v1";
-    private static final String KNATIVE_VERSION = "messaging.knative.dev/v1";
+    private static final String KNATIVE_MESSAGING_VERSION = "messaging.knative.dev/v1";
+    private static final String KNATIVE_EVENTING_VERSION = "eventing.knative.dev/v1";
+    private static final String KNATIVE_EVENT_TYPE = "org.apache.camel.event";
+
+    private final Map<String, Boolean> preparseDone = new ConcurrentHashMap<>();
 
     public YamlRoutesBuilderLoader() {
         super(EXTENSION);
@@ -112,6 +125,18 @@ public class YamlRoutesBuilderLoader extends YamlRoutesBuilderLoaderSupport {
 
     YamlRoutesBuilderLoader(String extension) {
         super(extension);
+    }
+
+    @Override
+    public boolean isSupportedExtension(String extension) {
+        // this builder can support multiple extensions
+        if (DEPRECATED_EXTENSION.equals(extension)) {
+            if (deprecatedWarnLogged.compareAndSet(false, true)) {
+                LOG.warn("File extension camelk.yaml is deprecated. Use camel.yaml instead.");
+            }
+            return true;
+        }
+        return Arrays.asList(SUPPORTED_EXTENSION).contains(extension);
     }
 
     protected RouteBuilder builder(final YamlDeserializationContext ctx, final Node root) {
@@ -153,6 +178,14 @@ public class YamlRoutesBuilderLoader extends YamlRoutesBuilderLoaderSupport {
                         doConfigure(target);
                     }
                 }
+
+                // knowing this is the last time an YAML may have been parsed, we can clear the cache
+                // (route may get reloaded later)
+                Resource resource = ctx.getResource();
+                if (resource != null) {
+                    preparseDone.remove(resource.getLocation());
+                }
+                beansDeserializer.clearCache();
             }
 
             private boolean doConfigure(Object item) throws Exception {
@@ -264,10 +297,19 @@ public class YamlRoutesBuilderLoader extends YamlRoutesBuilderLoaderSupport {
                                 idx = node.getStartMark().get().getIndex();
                             }
                             if (idx == -1 || !indexes.contains(idx)) {
-                                Object item = ctx.mandatoryResolve(node).construct(node);
-                                boolean accepted = doConfiguration(item);
-                                if (accepted && idx != -1) {
-                                    indexes.add(idx);
+                                if (node.getNodeType() == NodeType.MAPPING) {
+                                    MappingNode mn = asMappingNode(node);
+                                    for (NodeTuple nt : mn.getValue()) {
+                                        String key = asText(nt.getKeyNode());
+                                        // only accept route-configuration
+                                        if ("route-configuration".equals(key) || "routeConfiguration".equals(key)) {
+                                            Object item = ctx.mandatoryResolve(node).construct(node);
+                                            boolean accepted = doConfiguration(item);
+                                            if (accepted && idx != -1) {
+                                                indexes.add(idx);
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -298,7 +340,7 @@ public class YamlRoutesBuilderLoader extends YamlRoutesBuilderLoaderSupport {
             // camel-k: integration
             boolean integration = anyTupleMatches(mn.getValue(), "apiVersion", v -> v.startsWith(INTEGRATION_VERSION)) &&
                     anyTupleMatches(mn.getValue(), "kind", "Integration");
-            // camel-k: kamelet binding
+            // camel-k: kamelet binding (deprecated)
             boolean binding = anyTupleMatches(mn.getValue(), "apiVersion", v -> v.startsWith(BINDING_VERSION)) &&
                     anyTupleMatches(mn.getValue(), "kind", "KameletBinding");
             // camel-k: pipe
@@ -307,10 +349,39 @@ public class YamlRoutesBuilderLoader extends YamlRoutesBuilderLoaderSupport {
             if (integration) {
                 target = preConfigureIntegration(root, ctx, target, preParse);
             } else if (binding || pipe) {
+                if (binding && deprecatedBindingWarnLogged.compareAndSet(false, true)) {
+                    LOG.warn("CamelK kind=KameletBinding is deprecated. Use CamelK kind=Pipe instead.");
+                }
                 target = preConfigurePipe(root, ctx, target, preParse);
             }
         }
 
+        // only detect beans during pre-parsing
+        if (preParse && Objects.equals(root.getNodeType(), NodeType.SEQUENCE)) {
+            final List<Object> list = new ArrayList<>();
+
+            final SequenceNode sn = asSequenceNode(root);
+            for (Node node : sn.getValue()) {
+                if (Objects.equals(node.getNodeType(), NodeType.MAPPING)) {
+                    MappingNode mn = asMappingNode(node);
+                    for (NodeTuple nt : mn.getValue()) {
+                        String key = asText(nt.getKeyNode());
+                        if ("beans".equals(key)) {
+                            // inlined beans
+                            Node beans = nt.getValueNode();
+                            setDeserializationContext(beans, ctx);
+                            Object output = beansDeserializer.construct(beans);
+                            if (output != null) {
+                                list.add(output);
+                            }
+                        }
+                    }
+                }
+            }
+            if (!list.isEmpty()) {
+                target = list;
+            }
+        }
         return target;
     }
 
@@ -676,12 +747,12 @@ public class YamlRoutesBuilderLoader extends YamlRoutesBuilderLoaderSupport {
                 if (dataTypes != null) {
                     MappingNode in = asMappingNode(nodeAt(dataTypes, "/in"));
                     if (in != null) {
-                        route.inputType(extractTupleValue(in.getValue(), "format"));
+                        route.inputType(extractDataType(in));
                     }
 
                     MappingNode out = asMappingNode(nodeAt(dataTypes, "/out"));
                     if (out != null) {
-                        route.transform(new DataType(extractTupleValue(out.getValue(), "format")));
+                        route.transform(new DataType(extractDataType(out)));
                     }
                 }
 
@@ -724,12 +795,12 @@ public class YamlRoutesBuilderLoader extends YamlRoutesBuilderLoaderSupport {
                     if (dataTypes != null) {
                         MappingNode in = asMappingNode(nodeAt(dataTypes, "/in"));
                         if (in != null) {
-                            route.transform(new DataType(extractTupleValue(in.getValue(), "format")));
+                            route.transform(new DataType(extractDataType(in)));
                         }
 
                         MappingNode out = asMappingNode(nodeAt(dataTypes, "/out"));
                         if (out != null) {
-                            route.outputType(extractTupleValue(out.getValue(), "format"));
+                            route.outputType(extractDataType(out));
                         }
                     }
 
@@ -799,6 +870,24 @@ public class YamlRoutesBuilderLoader extends YamlRoutesBuilderLoaderSupport {
         return answer;
     }
 
+    /**
+     * Extracts the data type transformer name information form nodes dataTypes/in or dataTypes/out. When scheme is set
+     * construct the transformer name with a prefix like scheme:format. Otherwise, just use the given format as a data
+     * type transformer name.
+     *
+     * @param  node
+     * @return
+     */
+    private String extractDataType(MappingNode node) {
+        String scheme = extractTupleValue(node.getValue(), "scheme");
+        String format = extractTupleValue(node.getValue(), "format");
+        if (scheme != null) {
+            return scheme + ":" + format;
+        }
+
+        return format;
+    }
+
     private String extractCamelEndpointUri(MappingNode node) {
         MappingNode mn = null;
         Node ref = nodeAt(node, "/ref");
@@ -811,11 +900,17 @@ public class YamlRoutesBuilderLoader extends YamlRoutesBuilderLoaderSupport {
         boolean strimzi
                 = !kamelet && mn != null && anyTupleMatches(mn.getValue(), "apiVersion", v -> v.startsWith(STRIMZI_VERSION))
                         && anyTupleMatches(mn.getValue(), "kind", "KafkaTopic");
-        boolean knative
+        boolean knativeBroker
+                = !kamelet && mn != null
+                        && anyTupleMatches(mn.getValue(), "apiVersion", v -> v.startsWith(KNATIVE_EVENTING_VERSION))
+                        && anyTupleMatches(mn.getValue(), "kind", "Broker");
+        boolean knativeChannel
                 = !kamelet && !strimzi && mn != null
-                        && anyTupleMatches(mn.getValue(), "apiVersion", v -> v.startsWith(KNATIVE_VERSION));
+                        && anyTupleMatches(mn.getValue(), "apiVersion", v -> v.startsWith(KNATIVE_MESSAGING_VERSION));
         String uri;
-        if (kamelet || strimzi || knative) {
+        if (knativeBroker) {
+            uri = KNATIVE_EVENT_TYPE;
+        } else if (kamelet || strimzi || knativeChannel) {
             uri = extractTupleValue(mn.getValue(), "name");
         } else {
             uri = extractTupleValue(node.getValue(), "uri");
@@ -824,6 +919,12 @@ public class YamlRoutesBuilderLoader extends YamlRoutesBuilderLoaderSupport {
         // properties
         MappingNode prop = asMappingNode(nodeAt(node, "/properties"));
         Map<String, Object> params = asMap(prop);
+
+        if (knativeBroker && params != null && params.containsKey("type")) {
+            // Use explicit event type from properties - remove setting from params and set as uri
+            uri = params.remove("type").toString();
+        }
+
         if (params != null && !params.isEmpty()) {
             String query = URISupport.createQueryString(params);
             uri = uri + "?" + query;
@@ -833,7 +934,14 @@ public class YamlRoutesBuilderLoader extends YamlRoutesBuilderLoaderSupport {
             return "kamelet:" + uri;
         } else if (strimzi) {
             return "kafka:" + uri;
-        } else if (knative) {
+        } else if (knativeBroker) {
+            if (uri.contains("?")) {
+                uri += "&kind=Broker&name=" + extractTupleValue(mn.getValue(), "name");
+            } else {
+                uri += "?kind=Broker&name=" + extractTupleValue(mn.getValue(), "name");
+            }
+            return "knative:event/" + uri;
+        } else if (knativeChannel) {
             return "knative:channel/" + uri;
         } else {
             return uri;
@@ -842,6 +950,12 @@ public class YamlRoutesBuilderLoader extends YamlRoutesBuilderLoaderSupport {
 
     @Override
     public void preParseRoute(Resource resource) throws Exception {
+        // preparsing is done at early stage, so we have a chance to load additional beans and populate
+        // Camel registry
+        if (preparseDone.getOrDefault(resource.getLocation(), false)) {
+            return;
+        }
+
         LOG.trace("Pre-parsing: {}", resource.getLocation());
 
         if (!resource.exists()) {
@@ -863,6 +977,8 @@ public class YamlRoutesBuilderLoader extends YamlRoutesBuilderLoaderSupport {
                 ctx.close();
             }
         }
+
+        preparseDone.put(resource.getLocation(), true);
     }
 
     private Object preParseNode(final YamlDeserializationContext ctx, final Node root) {

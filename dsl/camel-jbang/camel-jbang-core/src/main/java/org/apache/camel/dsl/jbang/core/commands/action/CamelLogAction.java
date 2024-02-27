@@ -38,6 +38,7 @@ import java.util.regex.Pattern;
 
 import org.apache.camel.catalog.impl.TimePatternConverter;
 import org.apache.camel.dsl.jbang.core.commands.CamelJBangMain;
+import org.apache.camel.dsl.jbang.core.common.CommandLineHelper;
 import org.apache.camel.dsl.jbang.core.common.ProcessHelper;
 import org.apache.camel.util.StopWatch;
 import org.apache.camel.util.StringHelper;
@@ -157,7 +158,7 @@ public class CamelLogAction extends ActionBaseCommand {
             do {
                 if (rows.isEmpty()) {
                     if (waitMessage) {
-                        System.out.println("Waiting for logs ...");
+                        printer().println("Waiting for logs ...");
                         waitMessage = false;
                     }
                     Thread.sleep(500);
@@ -289,7 +290,7 @@ public class CamelLogAction extends ActionBaseCommand {
         // only sort if there are multiple Camels running
         if (names.size() > 1) {
             // sort lines
-            final Map<String, String> lastTimestamp = new HashMap<>();
+            final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
             lines.sort((l1, l2) -> {
                 l1 = unescapeAnsi(l1);
                 l2 = unescapeAnsi(l2);
@@ -301,12 +302,22 @@ public class CamelLogAction extends ActionBaseCommand {
                 String t2 = StringHelper.after(l2, "| ");
                 t2 = StringHelper.before(t2, "  ");
 
-                if (t1 == null) {
-                    t1 = lastTimestamp.get(n1);
+                // there may be a stacktrace and no timestamps
+                if (t1 != null) {
+                    try {
+                        sdf.parse(t1);
+                    } catch (ParseException e) {
+                        t1 = null;
+                    }
                 }
-                if (t2 == null) {
-                    t2 = lastTimestamp.get(n2);
+                if (t2 != null) {
+                    try {
+                        sdf.parse(t2);
+                    } catch (ParseException e) {
+                        t2 = null;
+                    }
                 }
+
                 if (t1 == null && t2 == null) {
                     return 0;
                 } else if (t1 == null) {
@@ -314,8 +325,6 @@ public class CamelLogAction extends ActionBaseCommand {
                 } else if (t2 == null) {
                     return 1;
                 }
-                lastTimestamp.put(n1, t1);
-                lastTimestamp.put(n2, t2);
                 return t1.compareTo(t2);
             });
         }
@@ -366,8 +375,8 @@ public class CamelLogAction extends ActionBaseCommand {
             line = unescapeAnsi(line);
             if (name != null) {
                 String n = String.format("%-" + nameMaxWidth + "s", name);
-                System.out.print(n);
-                System.out.print("| ");
+                printer().print(n);
+                printer().print("| ");
             }
         }
         if (find != null || grep != null) {
@@ -388,14 +397,13 @@ public class CamelLogAction extends ActionBaseCommand {
         if (loggingColor) {
             AnsiConsole.out().println(line);
         } else {
-            System.out.println(line);
+            printer().println(line);
         }
     }
 
     private static File logFile(String pid) {
-        File dir = new File(System.getProperty("user.home"), ".camel");
         String name = pid + ".log";
-        return new File(dir, name);
+        return new File(CommandLineHelper.getCamelDir(), name);
     }
 
     private void tailLogFiles(Map<Long, Row> rows, int tail, Date limit) throws Exception {

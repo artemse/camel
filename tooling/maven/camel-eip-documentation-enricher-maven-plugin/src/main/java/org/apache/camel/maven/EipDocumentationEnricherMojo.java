@@ -28,6 +28,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
+import java.util.function.Predicate;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -97,19 +98,19 @@ public class EipDocumentationEnricherMojo extends AbstractMojo {
     /**
      * Sub path from camel core directory to model directory with generated json files for components.
      */
-    @Parameter(defaultValue = "org/apache/camel/model")
+    @Parameter(defaultValue = "META-INF/org/apache/camel/model")
     public String pathToModelDir;
 
     /**
      * Sub path from camel core xml directory to model directory with generated json files for components.
      */
-    @Parameter(defaultValue = "org/apache/camel/core/xml")
+    @Parameter(defaultValue = "META-INF/org/apache/camel/core/xml")
     public String pathToCoreXmlModelDir;
 
     /**
      * Sub path from camel spring directory to model directory with generated json files for components.
      */
-    @Parameter(defaultValue = "org/apache/camel/spring")
+    @Parameter(defaultValue = "META-INF/org/apache/camel/spring")
     public String pathToSpringModelDir;
 
     /**
@@ -130,7 +131,7 @@ public class EipDocumentationEnricherMojo extends AbstractMojo {
             throw new MojoExecutionException("pathToModelDir parameter must not be null");
         }
 
-        // skip if input file does not exists
+        // skip if input file does not exist
         if (inputCamelSchemaFile == null || !inputCamelSchemaFile.exists()) {
             getLog().info("Input Camel schema file: " + inputCamelSchemaFile + " does not exist. Skip EIP document enrichment");
             return;
@@ -168,10 +169,12 @@ public class EipDocumentationEnricherMojo extends AbstractMojo {
         Set<File> files = new HashSet<>();
         PackageHelper.findJsonFiles(new File(camelCoreModelDir, pathToModelDir), files);
         PackageHelper.findJsonFiles(new File(camelCoreXmlDir, pathToCoreXmlModelDir), files);
+        // spring/blueprint should not include SpringErrorHandlerDefinition (duplicates a file from camel-core-model)
+        Predicate<File> filter = f -> !f.getName().equals("errorHandler.json");
         if (blueprint) {
-            PackageHelper.findJsonFiles(new File(camelSpringDir, pathToSpringModelDir), files);
+            PackageHelper.findJsonFiles(new File(camelSpringDir, pathToSpringModelDir), files, filter);
         } else {
-            PackageHelper.findJsonFiles(new File(targetDir, pathToSpringModelDir), files);
+            PackageHelper.findJsonFiles(new File(targetDir, pathToSpringModelDir), files, filter);
         }
         Map<String, File> jsonFiles = new HashMap<>();
         files.forEach(f -> jsonFiles.put(PackageHelper.asName(f.toPath()), f));

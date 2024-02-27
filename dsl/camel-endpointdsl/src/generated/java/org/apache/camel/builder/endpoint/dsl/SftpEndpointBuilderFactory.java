@@ -1111,7 +1111,7 @@ public interface SftpEndpointBuilderFactory {
          * readLockTimeout value must be higher than readLockCheckInterval, but
          * a rule of thumb is to have a timeout that is at least 2 or more times
          * higher than the readLockCheckInterval. This is needed to ensure that
-         * amble time is allowed for the read lock process to try to grab the
+         * ample time is allowed for the read lock process to try to grab the
          * lock before the timeout was hit.
          * 
          * The option is a: &lt;code&gt;long&lt;/code&gt; type.
@@ -1137,7 +1137,7 @@ public interface SftpEndpointBuilderFactory {
          * readLockTimeout value must be higher than readLockCheckInterval, but
          * a rule of thumb is to have a timeout that is at least 2 or more times
          * higher than the readLockCheckInterval. This is needed to ensure that
-         * amble time is allowed for the read lock process to try to grab the
+         * ample time is allowed for the read lock process to try to grab the
          * lock before the timeout was hit.
          * 
          * The option will be converted to a &lt;code&gt;long&lt;/code&gt; type.
@@ -1621,7 +1621,7 @@ public interface SftpEndpointBuilderFactory {
          * readLockTimeout value must be higher than readLockCheckInterval, but
          * a rule of thumb is to have a timeout that is at least 2 or more times
          * higher than the readLockCheckInterval. This is needed to ensure that
-         * amble time is allowed for the read lock process to try to grab the
+         * ample time is allowed for the read lock process to try to grab the
          * lock before the timeout was hit.
          * 
          * The option is a: &lt;code&gt;long&lt;/code&gt; type.
@@ -1647,7 +1647,7 @@ public interface SftpEndpointBuilderFactory {
          * readLockTimeout value must be higher than readLockCheckInterval, but
          * a rule of thumb is to have a timeout that is at least 2 or more times
          * higher than the readLockCheckInterval. This is needed to ensure that
-         * amble time is allowed for the read lock process to try to grab the
+         * ample time is allowed for the read lock process to try to grab the
          * lock before the timeout was hit.
          * 
          * The option will be converted to a &lt;code&gt;long&lt;/code&gt; type.
@@ -2138,6 +2138,43 @@ public interface SftpEndpointBuilderFactory {
             return this;
         }
         /**
+         * If knownHostFile does not exist, then attempt to auto-create the path
+         * and file (beware that the file will be created by the current user of
+         * the running Java process, which may not have file permission).
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param autoCreateKnownHostsFile the value to set
+         * @return the dsl builder
+         */
+        default SftpEndpointConsumerBuilder autoCreateKnownHostsFile(
+                boolean autoCreateKnownHostsFile) {
+            doSetProperty("autoCreateKnownHostsFile", autoCreateKnownHostsFile);
+            return this;
+        }
+        /**
+         * If knownHostFile does not exist, then attempt to auto-create the path
+         * and file (beware that the file will be created by the current user of
+         * the running Java process, which may not have file permission).
+         * 
+         * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
+         * type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param autoCreateKnownHostsFile the value to set
+         * @return the dsl builder
+         */
+        default SftpEndpointConsumerBuilder autoCreateKnownHostsFile(
+                String autoCreateKnownHostsFile) {
+            doSetProperty("autoCreateKnownHostsFile", autoCreateKnownHostsFile);
+            return this;
+        }
+        /**
          * Set a comma separated list of ciphers that will be used in order of
          * preference. Possible cipher names are defined by JCraft JSCH. Some
          * examples include:
@@ -2615,12 +2652,17 @@ public interface SftpEndpointBuilderFactory {
         }
         /**
          * Allows for bridging the consumer to the Camel routing Error Handler,
-         * which mean any exceptions occurred while the consumer is trying to
-         * pickup incoming messages, or the likes, will now be processed as a
-         * message and handled by the routing Error Handler. By default the
-         * consumer will use the org.apache.camel.spi.ExceptionHandler to deal
-         * with exceptions, that will be logged at WARN or ERROR level and
-         * ignored.
+         * which mean any exceptions (if possible) occurred while the Camel
+         * consumer is trying to pickup incoming messages, or the likes, will
+         * now be processed as a message and handled by the routing Error
+         * Handler. Important: This is only possible if the 3rd party component
+         * allows Camel to be alerted if an exception was thrown. Some
+         * components handle this internally only, and therefore
+         * bridgeErrorHandler is not possible. In other situations we may
+         * improve the Camel component to hook into the 3rd party component and
+         * make this possible for future releases. By default the consumer will
+         * use the org.apache.camel.spi.ExceptionHandler to deal with
+         * exceptions, that will be logged at WARN or ERROR level and ignored.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -2637,12 +2679,17 @@ public interface SftpEndpointBuilderFactory {
         }
         /**
          * Allows for bridging the consumer to the Camel routing Error Handler,
-         * which mean any exceptions occurred while the consumer is trying to
-         * pickup incoming messages, or the likes, will now be processed as a
-         * message and handled by the routing Error Handler. By default the
-         * consumer will use the org.apache.camel.spi.ExceptionHandler to deal
-         * with exceptions, that will be logged at WARN or ERROR level and
-         * ignored.
+         * which mean any exceptions (if possible) occurred while the Camel
+         * consumer is trying to pickup incoming messages, or the likes, will
+         * now be processed as a message and handled by the routing Error
+         * Handler. Important: This is only possible if the 3rd party component
+         * allows Camel to be alerted if an exception was thrown. Some
+         * components handle this internally only, and therefore
+         * bridgeErrorHandler is not possible. In other situations we may
+         * improve the Camel component to hook into the 3rd party component and
+         * make this possible for future releases. By default the consumer will
+         * use the org.apache.camel.spi.ExceptionHandler to deal with
+         * exceptions, that will be logged at WARN or ERROR level and ignored.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -2770,7 +2817,7 @@ public interface SftpEndpointBuilderFactory {
         /**
          * Whether to ignore when (trying to list files in directories or when
          * downloading a file), which does not exist or due to permission error.
-         * By default when a directory or file does not exists or insufficient
+         * By default when a directory or file does not exist or insufficient
          * permission, then an exception is thrown. Setting this option to true
          * allows to ignore that instead.
          * 
@@ -2790,7 +2837,7 @@ public interface SftpEndpointBuilderFactory {
         /**
          * Whether to ignore when (trying to list files in directories or when
          * downloading a file), which does not exist or due to permission error.
-         * By default when a directory or file does not exists or insufficient
+         * By default when a directory or file does not exist or insufficient
          * permission, then an exception is thrown. Setting this option to true
          * allows to ignore that instead.
          * 
@@ -3411,6 +3458,44 @@ public interface SftpEndpointBuilderFactory {
             return this;
         }
         /**
+         * The logging level used for various human intended log messages from
+         * the FTP server. This can be used during troubleshooting to raise the
+         * logging level and inspect the logs received from the FTP server.
+         * 
+         * The option is a:
+         * &lt;code&gt;org.apache.camel.LoggingLevel&lt;/code&gt; type.
+         * 
+         * Default: DEBUG
+         * Group: advanced
+         * 
+         * @param serverMessageLoggingLevel the value to set
+         * @return the dsl builder
+         */
+        default AdvancedSftpEndpointConsumerBuilder serverMessageLoggingLevel(
+                org.apache.camel.LoggingLevel serverMessageLoggingLevel) {
+            doSetProperty("serverMessageLoggingLevel", serverMessageLoggingLevel);
+            return this;
+        }
+        /**
+         * The logging level used for various human intended log messages from
+         * the FTP server. This can be used during troubleshooting to raise the
+         * logging level and inspect the logs received from the FTP server.
+         * 
+         * The option will be converted to a
+         * &lt;code&gt;org.apache.camel.LoggingLevel&lt;/code&gt; type.
+         * 
+         * Default: DEBUG
+         * Group: advanced
+         * 
+         * @param serverMessageLoggingLevel the value to set
+         * @return the dsl builder
+         */
+        default AdvancedSftpEndpointConsumerBuilder serverMessageLoggingLevel(
+                String serverMessageLoggingLevel) {
+            doSetProperty("serverMessageLoggingLevel", serverMessageLoggingLevel);
+            return this;
+        }
+        /**
          * Sets the so timeout FTP and FTPS Is the SocketOptions.SO_TIMEOUT
          * value in millis. Recommended option is to set this to 300000 so as
          * not have a hanged connection. On SFTP this option is set as timeout
@@ -3819,6 +3904,25 @@ public interface SftpEndpointBuilderFactory {
             return this;
         }
         /**
+         * If provided, then Camel will write a checksum file when the original
+         * file has been written. The checksum file will contain the checksum
+         * created with the provided algorithm for the original file. The
+         * checksum file will always be written in the same folder as the
+         * original file.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: producer
+         * 
+         * @param checksumFileAlgorithm the value to set
+         * @return the dsl builder
+         */
+        default SftpEndpointProducerBuilder checksumFileAlgorithm(
+                String checksumFileAlgorithm) {
+            doSetProperty("checksumFileAlgorithm", checksumFileAlgorithm);
+            return this;
+        }
+        /**
          * What to do if a file already exists with the same name. Override,
          * which is the default, replaces the existing file. - Append - adds
          * content to the existing file. - Fail - throws a
@@ -4020,6 +4124,43 @@ public interface SftpEndpointBuilderFactory {
          */
         default SftpEndpointProducerBuilder tempPrefix(String tempPrefix) {
             doSetProperty("tempPrefix", tempPrefix);
+            return this;
+        }
+        /**
+         * If knownHostFile does not exist, then attempt to auto-create the path
+         * and file (beware that the file will be created by the current user of
+         * the running Java process, which may not have file permission).
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param autoCreateKnownHostsFile the value to set
+         * @return the dsl builder
+         */
+        default SftpEndpointProducerBuilder autoCreateKnownHostsFile(
+                boolean autoCreateKnownHostsFile) {
+            doSetProperty("autoCreateKnownHostsFile", autoCreateKnownHostsFile);
+            return this;
+        }
+        /**
+         * If knownHostFile does not exist, then attempt to auto-create the path
+         * and file (beware that the file will be created by the current user of
+         * the running Java process, which may not have file permission).
+         * 
+         * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
+         * type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param autoCreateKnownHostsFile the value to set
+         * @return the dsl builder
+         */
+        default SftpEndpointProducerBuilder autoCreateKnownHostsFile(
+                String autoCreateKnownHostsFile) {
+            doSetProperty("autoCreateKnownHostsFile", autoCreateKnownHostsFile);
             return this;
         }
         /**
@@ -5141,6 +5282,44 @@ public interface SftpEndpointBuilderFactory {
             return this;
         }
         /**
+         * The logging level used for various human intended log messages from
+         * the FTP server. This can be used during troubleshooting to raise the
+         * logging level and inspect the logs received from the FTP server.
+         * 
+         * The option is a:
+         * &lt;code&gt;org.apache.camel.LoggingLevel&lt;/code&gt; type.
+         * 
+         * Default: DEBUG
+         * Group: advanced
+         * 
+         * @param serverMessageLoggingLevel the value to set
+         * @return the dsl builder
+         */
+        default AdvancedSftpEndpointProducerBuilder serverMessageLoggingLevel(
+                org.apache.camel.LoggingLevel serverMessageLoggingLevel) {
+            doSetProperty("serverMessageLoggingLevel", serverMessageLoggingLevel);
+            return this;
+        }
+        /**
+         * The logging level used for various human intended log messages from
+         * the FTP server. This can be used during troubleshooting to raise the
+         * logging level and inspect the logs received from the FTP server.
+         * 
+         * The option will be converted to a
+         * &lt;code&gt;org.apache.camel.LoggingLevel&lt;/code&gt; type.
+         * 
+         * Default: DEBUG
+         * Group: advanced
+         * 
+         * @param serverMessageLoggingLevel the value to set
+         * @return the dsl builder
+         */
+        default AdvancedSftpEndpointProducerBuilder serverMessageLoggingLevel(
+                String serverMessageLoggingLevel) {
+            doSetProperty("serverMessageLoggingLevel", serverMessageLoggingLevel);
+            return this;
+        }
+        /**
          * Sets the so timeout FTP and FTPS Is the SocketOptions.SO_TIMEOUT
          * value in millis. Recommended option is to set this to 300000 so as
          * not have a hanged connection. On SFTP this option is set as timeout
@@ -5546,6 +5725,43 @@ public interface SftpEndpointBuilderFactory {
          */
         default SftpEndpointBuilder separator(String separator) {
             doSetProperty("separator", separator);
+            return this;
+        }
+        /**
+         * If knownHostFile does not exist, then attempt to auto-create the path
+         * and file (beware that the file will be created by the current user of
+         * the running Java process, which may not have file permission).
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param autoCreateKnownHostsFile the value to set
+         * @return the dsl builder
+         */
+        default SftpEndpointBuilder autoCreateKnownHostsFile(
+                boolean autoCreateKnownHostsFile) {
+            doSetProperty("autoCreateKnownHostsFile", autoCreateKnownHostsFile);
+            return this;
+        }
+        /**
+         * If knownHostFile does not exist, then attempt to auto-create the path
+         * and file (beware that the file will be created by the current user of
+         * the running Java process, which may not have file permission).
+         * 
+         * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
+         * type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param autoCreateKnownHostsFile the value to set
+         * @return the dsl builder
+         */
+        default SftpEndpointBuilder autoCreateKnownHostsFile(
+                String autoCreateKnownHostsFile) {
+            doSetProperty("autoCreateKnownHostsFile", autoCreateKnownHostsFile);
             return this;
         }
         /**
@@ -6320,6 +6536,44 @@ public interface SftpEndpointBuilderFactory {
             return this;
         }
         /**
+         * The logging level used for various human intended log messages from
+         * the FTP server. This can be used during troubleshooting to raise the
+         * logging level and inspect the logs received from the FTP server.
+         * 
+         * The option is a:
+         * &lt;code&gt;org.apache.camel.LoggingLevel&lt;/code&gt; type.
+         * 
+         * Default: DEBUG
+         * Group: advanced
+         * 
+         * @param serverMessageLoggingLevel the value to set
+         * @return the dsl builder
+         */
+        default AdvancedSftpEndpointBuilder serverMessageLoggingLevel(
+                org.apache.camel.LoggingLevel serverMessageLoggingLevel) {
+            doSetProperty("serverMessageLoggingLevel", serverMessageLoggingLevel);
+            return this;
+        }
+        /**
+         * The logging level used for various human intended log messages from
+         * the FTP server. This can be used during troubleshooting to raise the
+         * logging level and inspect the logs received from the FTP server.
+         * 
+         * The option will be converted to a
+         * &lt;code&gt;org.apache.camel.LoggingLevel&lt;/code&gt; type.
+         * 
+         * Default: DEBUG
+         * Group: advanced
+         * 
+         * @param serverMessageLoggingLevel the value to set
+         * @return the dsl builder
+         */
+        default AdvancedSftpEndpointBuilder serverMessageLoggingLevel(
+                String serverMessageLoggingLevel) {
+            doSetProperty("serverMessageLoggingLevel", serverMessageLoggingLevel);
+            return this;
+        }
+        /**
          * Sets the so timeout FTP and FTPS Is the SocketOptions.SO_TIMEOUT
          * value in millis. Recommended option is to set this to 300000 so as
          * not have a hanged connection. On SFTP this option is set as timeout
@@ -6557,7 +6811,7 @@ public interface SftpEndpointBuilderFactory {
          * @return the name of the header {@code FileLength}.
          */
         public String fileLength() {
-            return "FileLength";
+            return "CamelFileLength";
         }
 
         /**
@@ -6570,7 +6824,7 @@ public interface SftpEndpointBuilderFactory {
          * @return the name of the header {@code FileLastModified}.
          */
         public String fileLastModified() {
-            return "FileLastModified";
+            return "CamelFileLastModified";
         }
 
         /**
@@ -6586,7 +6840,7 @@ public interface SftpEndpointBuilderFactory {
          * @return the name of the header {@code FileName}.
          */
         public String fileName() {
-            return "FileName";
+            return "CamelFileName";
         }
 
         /**
@@ -6599,7 +6853,7 @@ public interface SftpEndpointBuilderFactory {
          * @return the name of the header {@code FileNameOnly}.
          */
         public String fileNameOnly() {
-            return "FileNameOnly";
+            return "CamelFileNameOnly";
         }
 
         /**
@@ -6612,7 +6866,7 @@ public interface SftpEndpointBuilderFactory {
          * @return the name of the header {@code FileParent}.
          */
         public String fileParent() {
-            return "FileParent";
+            return "CamelFileParent";
         }
 
         /**
@@ -6625,7 +6879,7 @@ public interface SftpEndpointBuilderFactory {
          * @return the name of the header {@code RemoteFileInputStream}.
          */
         public String remoteFileInputStream() {
-            return "RemoteFileInputStream";
+            return "CamelRemoteFileInputStream";
         }
 
         /**
@@ -6638,7 +6892,7 @@ public interface SftpEndpointBuilderFactory {
          * @return the name of the header {@code FileLocalWorkPath}.
          */
         public String fileLocalWorkPath() {
-            return "FileLocalWorkPath";
+            return "CamelFileLocalWorkPath";
         }
 
         /**
@@ -6651,7 +6905,7 @@ public interface SftpEndpointBuilderFactory {
          * @return the name of the header {@code FtpReplyCode}.
          */
         public String ftpReplyCode() {
-            return "FtpReplyCode";
+            return "CamelFtpReplyCode";
         }
 
         /**
@@ -6664,7 +6918,7 @@ public interface SftpEndpointBuilderFactory {
          * @return the name of the header {@code FtpReplyString}.
          */
         public String ftpReplyString() {
-            return "FtpReplyString";
+            return "CamelFtpReplyString";
         }
 
         /**
@@ -6677,7 +6931,7 @@ public interface SftpEndpointBuilderFactory {
          * @return the name of the header {@code FileHost}.
          */
         public String fileHost() {
-            return "FileHost";
+            return "CamelFileHost";
         }
     }
     static SftpEndpointBuilder endpointBuilder(String componentName, String path) {

@@ -738,7 +738,7 @@ public class StaticEndpointBuilders {
      * Path parameter: eventbusNameOrArn (required)
      * Event bus name or ARN
      * 
-     * @param path //eventbusNameOrArn
+     * @param path eventbusNameOrArn
      * @return the dsl builder
      */
     public static org.apache.camel.builder.endpoint.dsl.EventbridgeEndpointBuilderFactory.EventbridgeEndpointBuilder aws2Eventbridge(
@@ -760,7 +760,7 @@ public class StaticEndpointBuilders {
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
-     * @param path //eventbusNameOrArn
+     * @param path eventbusNameOrArn
      * @return the dsl builder
      */
     public static org.apache.camel.builder.endpoint.dsl.EventbridgeEndpointBuilderFactory.EventbridgeEndpointBuilder aws2Eventbridge(
@@ -1070,6 +1070,49 @@ public class StaticEndpointBuilders {
         return org.apache.camel.builder.endpoint.dsl.MSK2EndpointBuilderFactory.endpointBuilder(componentName, path);
     }
     /**
+     * AWS RedshiftData (camel-aws2-redshift)
+     * Perform operations on AWS Redshift using Redshift Data API.
+     * 
+     * Category: cloud,serverless,database,bigdata
+     * Since: 4.1
+     * Maven coordinates: org.apache.camel:camel-aws2-redshift
+     * 
+     * Syntax: <code>aws2-redshift-data:label</code>
+     * 
+     * Path parameter: label (required)
+     * Logical name
+     * 
+     * @param path label
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.RedshiftData2EndpointBuilderFactory.RedshiftData2EndpointBuilder aws2RedshiftData(
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.RedshiftData2EndpointBuilderFactory.endpointBuilder("aws2-redshift-data", path);
+    }
+    /**
+     * AWS RedshiftData (camel-aws2-redshift)
+     * Perform operations on AWS Redshift using Redshift Data API.
+     * 
+     * Category: cloud,serverless,database,bigdata
+     * Since: 4.1
+     * Maven coordinates: org.apache.camel:camel-aws2-redshift
+     * 
+     * Syntax: <code>aws2-redshift-data:label</code>
+     * 
+     * Path parameter: label (required)
+     * Logical name
+     * 
+     * @param componentName to use a custom component name for the endpoint
+     * instead of the default name
+     * @param path label
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.RedshiftData2EndpointBuilderFactory.RedshiftData2EndpointBuilder aws2RedshiftData(
+            String componentName,
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.RedshiftData2EndpointBuilderFactory.endpointBuilder(componentName, path);
+    }
+    /**
      * AWS S3 Storage Service (camel-aws2-s3)
      * Store and retrieve objects from AWS S3 Storage Service.
      * 
@@ -1082,7 +1125,7 @@ public class StaticEndpointBuilders {
      * Path parameter: bucketNameOrArn (required)
      * Bucket name or ARN
      * 
-     * @param path //bucketNameOrArn
+     * @param path bucketNameOrArn
      * @return the dsl builder
      */
     public static org.apache.camel.builder.endpoint.dsl.AWS2S3EndpointBuilderFactory.AWS2S3EndpointBuilder aws2S3(
@@ -1104,7 +1147,7 @@ public class StaticEndpointBuilders {
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
-     * @param path //bucketNameOrArn
+     * @param path bucketNameOrArn
      * @return the dsl builder
      */
     public static org.apache.camel.builder.endpoint.dsl.AWS2S3EndpointBuilderFactory.AWS2S3EndpointBuilder aws2S3(
@@ -1329,7 +1372,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS Timestream (camel-aws2-timestream)
-     * A Camel Amazon Web Services TimeStream component
+     * Write records and execute queries on AWS time-series database
      * 
      * Category: cloud,database
      * Since: 4.1
@@ -1353,7 +1396,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * AWS Timestream (camel-aws2-timestream)
-     * A Camel Amazon Web Services TimeStream component
+     * Write records and execute queries on AWS time-series database
      * 
      * Category: cloud,database
      * Since: 4.1
@@ -1463,6 +1506,49 @@ public class StaticEndpointBuilders {
             String componentName,
             String path) {
         return org.apache.camel.builder.endpoint.dsl.CloudtrailEndpointBuilderFactory.endpointBuilder(componentName, path);
+    }
+    /**
+     * AWS Config Service (camel-aws-config)
+     * Manage AWS Config service.
+     * 
+     * Category: cloud,management
+     * Since: 4.3
+     * Maven coordinates: org.apache.camel:camel-aws-config
+     * 
+     * Syntax: <code>aws-config:label</code>
+     * 
+     * Path parameter: label (required)
+     * Logical name
+     * 
+     * @param path label
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.AWSConfigEndpointBuilderFactory.AWSConfigEndpointBuilder awsConfig(
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.AWSConfigEndpointBuilderFactory.endpointBuilder("aws-config", path);
+    }
+    /**
+     * AWS Config Service (camel-aws-config)
+     * Manage AWS Config service.
+     * 
+     * Category: cloud,management
+     * Since: 4.3
+     * Maven coordinates: org.apache.camel:camel-aws-config
+     * 
+     * Syntax: <code>aws-config:label</code>
+     * 
+     * Path parameter: label (required)
+     * Logical name
+     * 
+     * @param componentName to use a custom component name for the endpoint
+     * instead of the default name
+     * @param path label
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.AWSConfigEndpointBuilderFactory.AWSConfigEndpointBuilder awsConfig(
+            String componentName,
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.AWSConfigEndpointBuilderFactory.endpointBuilder(componentName, path);
     }
     /**
      * AWS Secrets Manager (camel-aws-secrets-manager)
@@ -1721,7 +1807,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * Azure ServiceBus (camel-azure-servicebus)
-     * Send and receive messages to/from Azure Event Bus.
+     * Send and receive messages to/from Azure Service Bus.
      * 
      * Category: cloud,messaging
      * Since: 3.12
@@ -1744,7 +1830,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * Azure ServiceBus (camel-azure-servicebus)
-     * Send and receive messages to/from Azure Event Bus.
+     * Send and receive messages to/from Azure Service Bus.
      * 
      * Category: cloud,messaging
      * Since: 3.12
@@ -1818,8 +1904,8 @@ public class StaticEndpointBuilders {
         return org.apache.camel.builder.endpoint.dsl.BlobEndpointBuilderFactory.endpointBuilder(componentName, path);
     }
     /**
-     * Azure Storage Datalake Service (camel-azure-storage-datalake)
-     * Sends and receives files to/from Azure DataLake Storage.
+     * Azure Storage Data Lake Service (camel-azure-storage-datalake)
+     * Sends and receives files to/from Azure Data Lake Storage.
      * 
      * Category: cloud,file,bigdata
      * Since: 3.8
@@ -1841,8 +1927,8 @@ public class StaticEndpointBuilders {
         return org.apache.camel.builder.endpoint.dsl.DataLakeEndpointBuilderFactory.endpointBuilder("azure-storage-datalake", path);
     }
     /**
-     * Azure Storage Datalake Service (camel-azure-storage-datalake)
-     * Sends and receives files to/from Azure DataLake Storage.
+     * Azure Storage Data Lake Service (camel-azure-storage-datalake)
+     * Sends and receives files to/from Azure Data Lake Storage.
      * 
      * Category: cloud,file,bigdata
      * Since: 3.8
@@ -2549,6 +2635,66 @@ public class StaticEndpointBuilders {
         return org.apache.camel.builder.endpoint.dsl.CoAPEndpointBuilderFactory.endpointBuilder(componentName, path);
     }
     /**
+     * CoAP (Secure) (camel-coap)
+     * Send and receive messages to/from COAP capable devices.
+     * 
+     * Category: iot
+     * Since: 2.16
+     * Maven coordinates: org.apache.camel:camel-coap
+     * 
+     * Syntax: <code>coaps:uri</code>
+     * 
+     * Path parameter: uri
+     * The URI for the CoAP endpoint
+     * 
+     * @param path uri
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.CoAPEndpointBuilderFactory.CoAPEndpointBuilder coaps(
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.CoAPEndpointBuilderFactory.endpointBuilder("coaps", path);
+    }
+    /**
+     * CoAP (camel-coap)
+     * Send and receive messages to/from COAP capable devices.
+     * 
+     * Category: iot
+     * Since: 2.16
+     * Maven coordinates: org.apache.camel:camel-coap
+     * 
+     * Syntax: <code>coaps+tcp:uri</code>
+     * 
+     * Path parameter: uri
+     * The URI for the CoAP endpoint
+     * 
+     * @param path uri
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.CoAPEndpointBuilderFactory.CoAPEndpointBuilder coapsTcp(
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.CoAPEndpointBuilderFactory.endpointBuilder("coaps+tcp", path);
+    }
+    /**
+     * CoAP (camel-coap)
+     * Send and receive messages to/from COAP capable devices.
+     * 
+     * Category: iot
+     * Since: 2.16
+     * Maven coordinates: org.apache.camel:camel-coap
+     * 
+     * Syntax: <code>coap+tcp:uri</code>
+     * 
+     * Path parameter: uri
+     * The URI for the CoAP endpoint
+     * 
+     * @param path uri
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.CoAPEndpointBuilderFactory.CoAPEndpointBuilder coapTcp(
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.CoAPEndpointBuilderFactory.endpointBuilder("coap+tcp", path);
+    }
+    /**
      * CometD (camel-cometd)
      * Offers publish/subscribe, peer-to-peer (via a server), and RPC style
      * messaging using the CometD/Bayeux protocol.
@@ -2606,6 +2752,34 @@ public class StaticEndpointBuilders {
             String componentName,
             String path) {
         return org.apache.camel.builder.endpoint.dsl.CometdEndpointBuilderFactory.endpointBuilder(componentName, path);
+    }
+    /**
+     * CometD (Secure) (camel-cometd)
+     * Offers publish/subscribe, peer-to-peer (via a server), and RPC style
+     * messaging using the CometD/Bayeux protocol.
+     * 
+     * Category: networking,messaging
+     * Since: 2.0
+     * Maven coordinates: org.apache.camel:camel-cometd
+     * 
+     * Syntax: <code>cometds:host:port/channelName</code>
+     * 
+     * Path parameter: host (required)
+     * Hostname
+     * 
+     * Path parameter: port (required)
+     * Host port number
+     * 
+     * Path parameter: channelName (required)
+     * The channelName represents a topic that can be subscribed to by the Camel
+     * endpoints.
+     * 
+     * @param path host:port/channelName
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.CometdEndpointBuilderFactory.CometdEndpointBuilder cometds(
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.CometdEndpointBuilderFactory.endpointBuilder("cometds", path);
     }
     /**
      * Consul (camel-consul)
@@ -2668,10 +2842,10 @@ public class StaticEndpointBuilders {
      * Allows you to specify the name of a Language to use for evaluating the
      * message body. If there is any result from the evaluation, then the result
      * is put in the message body.
-     * There are 22 enums and the value can be one of: bean, constant, csimple,
-     * datasonnet, exchangeProperty, file, groovy, header, hl7terser, joor, jq,
-     * jsonpath, mvel, ognl, python, ref, simple, spel, tokenize, xpath, xquery,
-     * xtokenize
+     * There are 23 enums and the value can be one of: bean, constant, csimple,
+     * datasonnet, exchangeProperty, file, groovy, header, hl7terser, java,
+     * joor, jq, jsonpath, mvel, ognl, python, ref, simple, spel, tokenize,
+     * xpath, xquery, xtokenize
      * 
      * @param path command:language
      * @return the dsl builder
@@ -2698,10 +2872,10 @@ public class StaticEndpointBuilders {
      * Allows you to specify the name of a Language to use for evaluating the
      * message body. If there is any result from the evaluation, then the result
      * is put in the message body.
-     * There are 22 enums and the value can be one of: bean, constant, csimple,
-     * datasonnet, exchangeProperty, file, groovy, header, hl7terser, joor, jq,
-     * jsonpath, mvel, ognl, python, ref, simple, spel, tokenize, xpath, xquery,
-     * xtokenize
+     * There are 23 enums and the value can be one of: bean, constant, csimple,
+     * datasonnet, exchangeProperty, file, groovy, header, hl7terser, java,
+     * joor, jq, jsonpath, mvel, ognl, python, ref, simple, spel, tokenize,
+     * xpath, xquery, xtokenize
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -4018,15 +4192,12 @@ public class StaticEndpointBuilders {
      * 
      * Syntax: <code>dynamic-router:channel</code>
      * 
-     * Path parameter: channel (required)
-     * Channel of the Dynamic Router
-     * 
-     * Path parameter: controlAction
-     * Control channel action: subscribe or unsubscribe
-     * There are 2 enums and the value can be one of: subscribe, unsubscribe
-     * 
-     * Path parameter: subscribeChannel
-     * The channel to subscribe to
+     * Path parameter: channel
+     * Channel for the Dynamic Router. For example, if the Dynamic Router URI is
+     * dynamic-router://test, then the channel is test. Channels are a way of
+     * keeping routing participants, their rules, and exchanges logically
+     * separate from the participants, rules, and exchanges on other channels.
+     * This can be seen as analogous to VLANs in networking.
      * 
      * @param path channel
      * @return the dsl builder
@@ -4046,15 +4217,12 @@ public class StaticEndpointBuilders {
      * 
      * Syntax: <code>dynamic-router:channel</code>
      * 
-     * Path parameter: channel (required)
-     * Channel of the Dynamic Router
-     * 
-     * Path parameter: controlAction
-     * Control channel action: subscribe or unsubscribe
-     * There are 2 enums and the value can be one of: subscribe, unsubscribe
-     * 
-     * Path parameter: subscribeChannel
-     * The channel to subscribe to
+     * Path parameter: channel
+     * Channel for the Dynamic Router. For example, if the Dynamic Router URI is
+     * dynamic-router://test, then the channel is test. Channels are a way of
+     * keeping routing participants, their rules, and exchanges logically
+     * separate from the participants, rules, and exchanges on other channels.
+     * This can be seen as analogous to VLANs in networking.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -4065,6 +4233,57 @@ public class StaticEndpointBuilders {
             String componentName,
             String path) {
         return org.apache.camel.builder.endpoint.dsl.DynamicRouterEndpointBuilderFactory.endpointBuilder(componentName, path);
+    }
+    /**
+     * Dynamic Router Control (camel-dynamic-router)
+     * The Dynamic Router control endpoint for operations that allow routing
+     * participants to subscribe or unsubscribe to participate in dynamic
+     * message routing.
+     * 
+     * Category: messaging
+     * Since: 4.4
+     * Maven coordinates: org.apache.camel:camel-dynamic-router
+     * 
+     * Syntax: <code>dynamic-router-control:controlAction</code>
+     * 
+     * Path parameter: controlAction (required)
+     * Control action
+     * There are 5 enums and the value can be one of: subscribe, unsubscribe,
+     * update, list, statistics
+     * 
+     * @param path controlAction
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.DynamicRouterControlEndpointBuilderFactory.DynamicRouterControlEndpointBuilder dynamicRouterControl(
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.DynamicRouterControlEndpointBuilderFactory.endpointBuilder("dynamic-router-control", path);
+    }
+    /**
+     * Dynamic Router Control (camel-dynamic-router)
+     * The Dynamic Router control endpoint for operations that allow routing
+     * participants to subscribe or unsubscribe to participate in dynamic
+     * message routing.
+     * 
+     * Category: messaging
+     * Since: 4.4
+     * Maven coordinates: org.apache.camel:camel-dynamic-router
+     * 
+     * Syntax: <code>dynamic-router-control:controlAction</code>
+     * 
+     * Path parameter: controlAction (required)
+     * Control action
+     * There are 5 enums and the value can be one of: subscribe, unsubscribe,
+     * update, list, statistics
+     * 
+     * @param componentName to use a custom component name for the endpoint
+     * instead of the default name
+     * @param path controlAction
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.DynamicRouterControlEndpointBuilderFactory.DynamicRouterControlEndpointBuilder dynamicRouterControl(
+            String componentName,
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.DynamicRouterControlEndpointBuilderFactory.endpointBuilder(componentName, path);
     }
     /**
      * Ehcache (camel-ehcache)
@@ -4153,6 +4372,51 @@ public class StaticEndpointBuilders {
         return org.apache.camel.builder.endpoint.dsl.ElasticsearchEndpointBuilderFactory.endpointBuilder(componentName, path);
     }
     /**
+     * Elasticsearch Low level Rest Client (camel-elasticsearch-rest-client)
+     * Perform queries and other operations on Elasticsearch or OpenSearch (uses
+     * low-level client).
+     * 
+     * Category: search
+     * Since: 4.3
+     * Maven coordinates: org.apache.camel:camel-elasticsearch-rest-client
+     * 
+     * Syntax: <code>elasticsearch-rest-client:clusterName</code>
+     * 
+     * Path parameter: clusterName (required)
+     * Cluster Name
+     * 
+     * @param path clusterName
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.ElasticsearchRestClientEndpointBuilderFactory.ElasticsearchRestClientEndpointBuilder elasticsearchRestClient(
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.ElasticsearchRestClientEndpointBuilderFactory.endpointBuilder("elasticsearch-rest-client", path);
+    }
+    /**
+     * Elasticsearch Low level Rest Client (camel-elasticsearch-rest-client)
+     * Perform queries and other operations on Elasticsearch or OpenSearch (uses
+     * low-level client).
+     * 
+     * Category: search
+     * Since: 4.3
+     * Maven coordinates: org.apache.camel:camel-elasticsearch-rest-client
+     * 
+     * Syntax: <code>elasticsearch-rest-client:clusterName</code>
+     * 
+     * Path parameter: clusterName (required)
+     * Cluster Name
+     * 
+     * @param componentName to use a custom component name for the endpoint
+     * instead of the default name
+     * @param path clusterName
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.ElasticsearchRestClientEndpointBuilderFactory.ElasticsearchRestClientEndpointBuilder elasticsearchRestClient(
+            String componentName,
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.ElasticsearchRestClientEndpointBuilderFactory.endpointBuilder(componentName, path);
+    }
+    /**
      * Etcd v3 (camel-etcd3)
      * Get, set, delete or watch keys in etcd key-value store.
      * 
@@ -4239,49 +4503,6 @@ public class StaticEndpointBuilders {
             String componentName,
             String path) {
         return org.apache.camel.builder.endpoint.dsl.ExecEndpointBuilderFactory.endpointBuilder(componentName, path);
-    }
-    /**
-     * Facebook (camel-facebook)
-     * Send requests to Facebook APIs supported by Facebook4J.
-     * 
-     * Category: social
-     * Since: 2.14
-     * Maven coordinates: org.apache.camel:camel-facebook
-     * 
-     * Syntax: <code>facebook:methodName</code>
-     * 
-     * Path parameter: methodName (required)
-     * What operation to perform
-     * 
-     * @param path methodName
-     * @return the dsl builder
-     */
-    public static org.apache.camel.builder.endpoint.dsl.FacebookEndpointBuilderFactory.FacebookEndpointBuilder facebook(
-            String path) {
-        return org.apache.camel.builder.endpoint.dsl.FacebookEndpointBuilderFactory.endpointBuilder("facebook", path);
-    }
-    /**
-     * Facebook (camel-facebook)
-     * Send requests to Facebook APIs supported by Facebook4J.
-     * 
-     * Category: social
-     * Since: 2.14
-     * Maven coordinates: org.apache.camel:camel-facebook
-     * 
-     * Syntax: <code>facebook:methodName</code>
-     * 
-     * Path parameter: methodName (required)
-     * What operation to perform
-     * 
-     * @param componentName to use a custom component name for the endpoint
-     * instead of the default name
-     * @param path methodName
-     * @return the dsl builder
-     */
-    public static org.apache.camel.builder.endpoint.dsl.FacebookEndpointBuilderFactory.FacebookEndpointBuilder facebook(
-            String componentName,
-            String path) {
-        return org.apache.camel.builder.endpoint.dsl.FacebookEndpointBuilderFactory.endpointBuilder(componentName, path);
     }
     /**
      * FHIR (camel-fhir)
@@ -5569,6 +5790,7 @@ public class StaticEndpointBuilders {
      * @param path defaultCoordinates
      * @return the dsl builder
      */
+    @Deprecated
     public static org.apache.camel.builder.endpoint.dsl.GrapeEndpointBuilderFactory.GrapeEndpointBuilder grape(
             String path) {
         return org.apache.camel.builder.endpoint.dsl.GrapeEndpointBuilderFactory.endpointBuilder("grape", path);
@@ -5592,6 +5814,7 @@ public class StaticEndpointBuilders {
      * @param path defaultCoordinates
      * @return the dsl builder
      */
+    @Deprecated
     public static org.apache.camel.builder.endpoint.dsl.GrapeEndpointBuilderFactory.GrapeEndpointBuilder grape(
             String componentName,
             String path) {
@@ -6263,63 +6486,6 @@ public class StaticEndpointBuilders {
         return org.apache.camel.builder.endpoint.dsl.HazelcastTopicEndpointBuilderFactory.endpointBuilder(componentName, path);
     }
     /**
-     * HDFS (camel-hdfs)
-     * Read and write from/to an HDFS filesystem using Hadoop 2.x.
-     * 
-     * Category: bigdata,file
-     * Since: 2.14
-     * Maven coordinates: org.apache.camel:camel-hdfs
-     * 
-     * Syntax: <code>hdfs:hostName:port/path</code>
-     * 
-     * Path parameter: hostName (required)
-     * HDFS host to use
-     * 
-     * Path parameter: port
-     * HDFS port to use
-     * Default value: 8020
-     * 
-     * Path parameter: path (required)
-     * The directory path to use
-     * 
-     * @param path hostName:port/path
-     * @return the dsl builder
-     */
-    public static org.apache.camel.builder.endpoint.dsl.HdfsEndpointBuilderFactory.HdfsEndpointBuilder hdfs(
-            String path) {
-        return org.apache.camel.builder.endpoint.dsl.HdfsEndpointBuilderFactory.endpointBuilder("hdfs", path);
-    }
-    /**
-     * HDFS (camel-hdfs)
-     * Read and write from/to an HDFS filesystem using Hadoop 2.x.
-     * 
-     * Category: bigdata,file
-     * Since: 2.14
-     * Maven coordinates: org.apache.camel:camel-hdfs
-     * 
-     * Syntax: <code>hdfs:hostName:port/path</code>
-     * 
-     * Path parameter: hostName (required)
-     * HDFS host to use
-     * 
-     * Path parameter: port
-     * HDFS port to use
-     * Default value: 8020
-     * 
-     * Path parameter: path (required)
-     * The directory path to use
-     * 
-     * @param componentName to use a custom component name for the endpoint
-     * instead of the default name
-     * @param path hostName:port/path
-     * @return the dsl builder
-     */
-    public static org.apache.camel.builder.endpoint.dsl.HdfsEndpointBuilderFactory.HdfsEndpointBuilder hdfs(
-            String componentName,
-            String path) {
-        return org.apache.camel.builder.endpoint.dsl.HdfsEndpointBuilderFactory.endpointBuilder(componentName, path);
-    }
-    /**
      * HTTP (camel-http)
      * Send requests to external HTTP servers using Apache HTTP Client 5.x.
      * 
@@ -6332,7 +6498,7 @@ public class StaticEndpointBuilders {
      * Path parameter: httpUri (required)
      * The url of the HTTP endpoint to call.
      * 
-     * @param path //httpUri
+     * @param path httpUri
      * @return the dsl builder
      */
     public static org.apache.camel.builder.endpoint.dsl.HttpEndpointBuilderFactory.HttpEndpointBuilder http(
@@ -6354,13 +6520,33 @@ public class StaticEndpointBuilders {
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
-     * @param path //httpUri
+     * @param path httpUri
      * @return the dsl builder
      */
     public static org.apache.camel.builder.endpoint.dsl.HttpEndpointBuilderFactory.HttpEndpointBuilder http(
             String componentName,
             String path) {
         return org.apache.camel.builder.endpoint.dsl.HttpEndpointBuilderFactory.endpointBuilder(componentName, path);
+    }
+    /**
+     * HTTPS (Secure) (camel-http)
+     * Send requests to external HTTP servers using Apache HTTP Client 5.x.
+     * 
+     * Category: http
+     * Since: 2.3
+     * Maven coordinates: org.apache.camel:camel-http
+     * 
+     * Syntax: <code>https://httpUri</code>
+     * 
+     * Path parameter: httpUri (required)
+     * The url of the HTTP endpoint to call.
+     * 
+     * @param path httpUri
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.HttpEndpointBuilderFactory.HttpEndpointBuilder https(
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.HttpEndpointBuilderFactory.endpointBuilder("https", path);
     }
     /**
      * Huawei Distributed Message Service (DMS) (camel-huaweicloud-dms)
@@ -7120,6 +7306,29 @@ public class StaticEndpointBuilders {
         return org.apache.camel.builder.endpoint.dsl.MailEndpointBuilderFactory.endpointBuilder(componentName, path);
     }
     /**
+     * IMAPS (Secure) (camel-mail)
+     * Send and receive emails using imap, pop3 and smtp protocols.
+     * 
+     * Category: mail
+     * Since: 1.0
+     * Maven coordinates: org.apache.camel:camel-mail
+     * 
+     * Syntax: <code>imaps:host:port</code>
+     * 
+     * Path parameter: host (required)
+     * The mail server host name
+     * 
+     * Path parameter: port
+     * The port number of the mail server
+     * 
+     * @param path host:port
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.MailEndpointBuilderFactory.MailEndpointBuilder imaps(
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.MailEndpointBuilderFactory.endpointBuilder("imaps", path);
+    }
+    /**
      * Infinispan (camel-infinispan)
      * Read and write from/to Infinispan distributed key/value store and data
      * grid.
@@ -7546,7 +7755,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * Jetty (camel-jetty)
-     * Expose HTTP endpoints using Jetty 11.
+     * Expose HTTP endpoints using Jetty 12.
      * 
      * Category: http
      * Since: 1.2
@@ -7560,13 +7769,13 @@ public class StaticEndpointBuilders {
      * @param path httpUri
      * @return the dsl builder
      */
-    public static org.apache.camel.builder.endpoint.dsl.JettyHttp11EndpointBuilderFactory.JettyHttp11EndpointBuilder jetty(
+    public static org.apache.camel.builder.endpoint.dsl.JettyHttp12EndpointBuilderFactory.JettyHttp12EndpointBuilder jetty(
             String path) {
-        return org.apache.camel.builder.endpoint.dsl.JettyHttp11EndpointBuilderFactory.endpointBuilder("jetty", path);
+        return org.apache.camel.builder.endpoint.dsl.JettyHttp12EndpointBuilderFactory.endpointBuilder("jetty", path);
     }
     /**
      * Jetty (camel-jetty)
-     * Expose HTTP endpoints using Jetty 11.
+     * Expose HTTP endpoints using Jetty 12.
      * 
      * Category: http
      * Since: 1.2
@@ -7582,10 +7791,10 @@ public class StaticEndpointBuilders {
      * @param path httpUri
      * @return the dsl builder
      */
-    public static org.apache.camel.builder.endpoint.dsl.JettyHttp11EndpointBuilderFactory.JettyHttp11EndpointBuilder jetty(
+    public static org.apache.camel.builder.endpoint.dsl.JettyHttp12EndpointBuilderFactory.JettyHttp12EndpointBuilder jetty(
             String componentName,
             String path) {
-        return org.apache.camel.builder.endpoint.dsl.JettyHttp11EndpointBuilderFactory.endpointBuilder(componentName, path);
+        return org.apache.camel.builder.endpoint.dsl.JettyHttp12EndpointBuilderFactory.endpointBuilder(componentName, path);
     }
     /**
      * JGroups (camel-jgroups)
@@ -7973,7 +8182,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * JSLT (camel-jslt)
-     * Query or transform JSON payloads using an JSLT.
+     * Query or transform JSON payloads using JSLT.
      * 
      * Category: transformation
      * Since: 3.1
@@ -7999,7 +8208,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * JSLT (camel-jslt)
-     * Query or transform JSON payloads using an JSLT.
+     * Query or transform JSON payloads using JSLT.
      * 
      * Category: transformation
      * Since: 3.1
@@ -8269,6 +8478,61 @@ public class StaticEndpointBuilders {
         return org.apache.camel.builder.endpoint.dsl.Jt400EndpointBuilderFactory.endpointBuilder(componentName, path);
     }
     /**
+     * JTE (camel-jte)
+     * Transform messages using a Java based template engine (JTE).
+     * 
+     * Category: transformation
+     * Since: 4.4
+     * Maven coordinates: org.apache.camel:camel-jte
+     * 
+     * Syntax: <code>jte:resourceUri</code>
+     * 
+     * Path parameter: resourceUri (required)
+     * Path to the resource. You can prefix with: classpath, file, http, ref, or
+     * bean. classpath, file and http loads the resource using these protocols
+     * (classpath is default). ref will lookup the resource in the registry.
+     * bean will call a method on a bean to be used as the resource. For bean
+     * you can specify the method name after dot, eg bean:myBean.myMethod.
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
+     * 
+     * @param path resourceUri
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.JteEndpointBuilderFactory.JteEndpointBuilder jte(
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.JteEndpointBuilderFactory.endpointBuilder("jte", path);
+    }
+    /**
+     * JTE (camel-jte)
+     * Transform messages using a Java based template engine (JTE).
+     * 
+     * Category: transformation
+     * Since: 4.4
+     * Maven coordinates: org.apache.camel:camel-jte
+     * 
+     * Syntax: <code>jte:resourceUri</code>
+     * 
+     * Path parameter: resourceUri (required)
+     * Path to the resource. You can prefix with: classpath, file, http, ref, or
+     * bean. classpath, file and http loads the resource using these protocols
+     * (classpath is default). ref will lookup the resource in the registry.
+     * bean will call a method on a bean to be used as the resource. For bean
+     * you can specify the method name after dot, eg bean:myBean.myMethod.
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
+     * 
+     * @param componentName to use a custom component name for the endpoint
+     * instead of the default name
+     * @param path resourceUri
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.JteEndpointBuilderFactory.JteEndpointBuilder jte(
+            String componentName,
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.JteEndpointBuilderFactory.endpointBuilder(componentName, path);
+    }
+    /**
      * Kafka (camel-kafka)
      * Sent and receive messages to/from an Apache Kafka broker.
      * 
@@ -8427,7 +8691,12 @@ public class StaticEndpointBuilders {
      * Syntax: <code>kubernetes-config-maps:masterUrl</code>
      * 
      * Path parameter: masterUrl (required)
-     * Kubernetes Master url
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
      * 
      * @param path masterUrl
      * @return the dsl builder
@@ -8448,7 +8717,12 @@ public class StaticEndpointBuilders {
      * Syntax: <code>kubernetes-config-maps:masterUrl</code>
      * 
      * Path parameter: masterUrl (required)
-     * Kubernetes Master url
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -8459,6 +8733,59 @@ public class StaticEndpointBuilders {
             String componentName,
             String path) {
         return org.apache.camel.builder.endpoint.dsl.KubernetesConfigMapsEndpointBuilderFactory.endpointBuilder(componentName, path);
+    }
+    /**
+     * Kubernetes Cronjob (camel-kubernetes)
+     * Perform operations on Kubernetes CronJob.
+     * 
+     * Category: container,cloud
+     * Since: 4.3
+     * Maven coordinates: org.apache.camel:camel-kubernetes
+     * 
+     * Syntax: <code>kubernetes-cronjob:masterUrl</code>
+     * 
+     * Path parameter: masterUrl (required)
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
+     * 
+     * @param path masterUrl
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.KubernetesCronJobEndpointBuilderFactory.KubernetesCronJobEndpointBuilder kubernetesCronjob(
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.KubernetesCronJobEndpointBuilderFactory.endpointBuilder("kubernetes-cronjob", path);
+    }
+    /**
+     * Kubernetes Cronjob (camel-kubernetes)
+     * Perform operations on Kubernetes CronJob.
+     * 
+     * Category: container,cloud
+     * Since: 4.3
+     * Maven coordinates: org.apache.camel:camel-kubernetes
+     * 
+     * Syntax: <code>kubernetes-cronjob:masterUrl</code>
+     * 
+     * Path parameter: masterUrl (required)
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
+     * 
+     * @param componentName to use a custom component name for the endpoint
+     * instead of the default name
+     * @param path masterUrl
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.KubernetesCronJobEndpointBuilderFactory.KubernetesCronJobEndpointBuilder kubernetesCronjob(
+            String componentName,
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.KubernetesCronJobEndpointBuilderFactory.endpointBuilder(componentName, path);
     }
     /**
      * Kubernetes Custom Resources (camel-kubernetes)
@@ -8472,7 +8799,12 @@ public class StaticEndpointBuilders {
      * Syntax: <code>kubernetes-custom-resources:masterUrl</code>
      * 
      * Path parameter: masterUrl (required)
-     * Kubernetes Master url
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
      * 
      * @param path masterUrl
      * @return the dsl builder
@@ -8493,7 +8825,12 @@ public class StaticEndpointBuilders {
      * Syntax: <code>kubernetes-custom-resources:masterUrl</code>
      * 
      * Path parameter: masterUrl (required)
-     * Kubernetes Master url
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -8517,7 +8854,12 @@ public class StaticEndpointBuilders {
      * Syntax: <code>kubernetes-deployments:masterUrl</code>
      * 
      * Path parameter: masterUrl (required)
-     * Kubernetes Master url
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
      * 
      * @param path masterUrl
      * @return the dsl builder
@@ -8538,7 +8880,12 @@ public class StaticEndpointBuilders {
      * Syntax: <code>kubernetes-deployments:masterUrl</code>
      * 
      * Path parameter: masterUrl (required)
-     * Kubernetes Master url
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -8562,7 +8909,12 @@ public class StaticEndpointBuilders {
      * Syntax: <code>kubernetes-events:masterUrl</code>
      * 
      * Path parameter: masterUrl (required)
-     * Kubernetes Master url
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
      * 
      * @param path masterUrl
      * @return the dsl builder
@@ -8583,7 +8935,12 @@ public class StaticEndpointBuilders {
      * Syntax: <code>kubernetes-events:masterUrl</code>
      * 
      * Path parameter: masterUrl (required)
-     * Kubernetes Master url
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -8607,7 +8964,12 @@ public class StaticEndpointBuilders {
      * Syntax: <code>kubernetes-hpa:masterUrl</code>
      * 
      * Path parameter: masterUrl (required)
-     * Kubernetes Master url
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
      * 
      * @param path masterUrl
      * @return the dsl builder
@@ -8628,7 +8990,12 @@ public class StaticEndpointBuilders {
      * Syntax: <code>kubernetes-hpa:masterUrl</code>
      * 
      * Path parameter: masterUrl (required)
-     * Kubernetes Master url
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -8651,7 +9018,12 @@ public class StaticEndpointBuilders {
      * Syntax: <code>kubernetes-job:masterUrl</code>
      * 
      * Path parameter: masterUrl (required)
-     * Kubernetes Master url
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
      * 
      * @param path masterUrl
      * @return the dsl builder
@@ -8671,7 +9043,12 @@ public class StaticEndpointBuilders {
      * Syntax: <code>kubernetes-job:masterUrl</code>
      * 
      * Path parameter: masterUrl (required)
-     * Kubernetes Master url
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -8695,7 +9072,12 @@ public class StaticEndpointBuilders {
      * Syntax: <code>kubernetes-namespaces:masterUrl</code>
      * 
      * Path parameter: masterUrl (required)
-     * Kubernetes Master url
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
      * 
      * @param path masterUrl
      * @return the dsl builder
@@ -8716,7 +9098,12 @@ public class StaticEndpointBuilders {
      * Syntax: <code>kubernetes-namespaces:masterUrl</code>
      * 
      * Path parameter: masterUrl (required)
-     * Kubernetes Master url
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -8739,7 +9126,12 @@ public class StaticEndpointBuilders {
      * Syntax: <code>kubernetes-nodes:masterUrl</code>
      * 
      * Path parameter: masterUrl (required)
-     * Kubernetes Master url
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
      * 
      * @param path masterUrl
      * @return the dsl builder
@@ -8759,7 +9151,12 @@ public class StaticEndpointBuilders {
      * Syntax: <code>kubernetes-nodes:masterUrl</code>
      * 
      * Path parameter: masterUrl (required)
-     * Kubernetes Master url
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -8783,7 +9180,12 @@ public class StaticEndpointBuilders {
      * Syntax: <code>kubernetes-persistent-volumes:masterUrl</code>
      * 
      * Path parameter: masterUrl (required)
-     * Kubernetes Master url
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
      * 
      * @param path masterUrl
      * @return the dsl builder
@@ -8804,7 +9206,12 @@ public class StaticEndpointBuilders {
      * Syntax: <code>kubernetes-persistent-volumes:masterUrl</code>
      * 
      * Path parameter: masterUrl (required)
-     * Kubernetes Master url
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -8828,7 +9235,12 @@ public class StaticEndpointBuilders {
      * Syntax: <code>kubernetes-persistent-volumes-claims:masterUrl</code>
      * 
      * Path parameter: masterUrl (required)
-     * Kubernetes Master url
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
      * 
      * @param path masterUrl
      * @return the dsl builder
@@ -8849,7 +9261,12 @@ public class StaticEndpointBuilders {
      * Syntax: <code>kubernetes-persistent-volumes-claims:masterUrl</code>
      * 
      * Path parameter: masterUrl (required)
-     * Kubernetes Master url
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -8872,7 +9289,12 @@ public class StaticEndpointBuilders {
      * Syntax: <code>kubernetes-pods:masterUrl</code>
      * 
      * Path parameter: masterUrl (required)
-     * Kubernetes Master url
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
      * 
      * @param path masterUrl
      * @return the dsl builder
@@ -8892,7 +9314,12 @@ public class StaticEndpointBuilders {
      * Syntax: <code>kubernetes-pods:masterUrl</code>
      * 
      * Path parameter: masterUrl (required)
-     * Kubernetes Master url
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -8916,7 +9343,12 @@ public class StaticEndpointBuilders {
      * Syntax: <code>kubernetes-replication-controllers:masterUrl</code>
      * 
      * Path parameter: masterUrl (required)
-     * Kubernetes Master url
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
      * 
      * @param path masterUrl
      * @return the dsl builder
@@ -8937,7 +9369,12 @@ public class StaticEndpointBuilders {
      * Syntax: <code>kubernetes-replication-controllers:masterUrl</code>
      * 
      * Path parameter: masterUrl (required)
-     * Kubernetes Master url
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -8960,7 +9397,12 @@ public class StaticEndpointBuilders {
      * Syntax: <code>kubernetes-resources-quota:masterUrl</code>
      * 
      * Path parameter: masterUrl (required)
-     * Kubernetes Master url
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
      * 
      * @param path masterUrl
      * @return the dsl builder
@@ -8980,7 +9422,12 @@ public class StaticEndpointBuilders {
      * Syntax: <code>kubernetes-resources-quota:masterUrl</code>
      * 
      * Path parameter: masterUrl (required)
-     * Kubernetes Master url
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -9003,7 +9450,12 @@ public class StaticEndpointBuilders {
      * Syntax: <code>kubernetes-secrets:masterUrl</code>
      * 
      * Path parameter: masterUrl (required)
-     * Kubernetes Master url
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
      * 
      * @param path masterUrl
      * @return the dsl builder
@@ -9023,7 +9475,12 @@ public class StaticEndpointBuilders {
      * Syntax: <code>kubernetes-secrets:masterUrl</code>
      * 
      * Path parameter: masterUrl (required)
-     * Kubernetes Master url
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -9046,7 +9503,12 @@ public class StaticEndpointBuilders {
      * Syntax: <code>kubernetes-service-accounts:masterUrl</code>
      * 
      * Path parameter: masterUrl (required)
-     * Kubernetes Master url
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
      * 
      * @param path masterUrl
      * @return the dsl builder
@@ -9066,7 +9528,12 @@ public class StaticEndpointBuilders {
      * Syntax: <code>kubernetes-service-accounts:masterUrl</code>
      * 
      * Path parameter: masterUrl (required)
-     * Kubernetes Master url
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -9090,7 +9557,12 @@ public class StaticEndpointBuilders {
      * Syntax: <code>kubernetes-services:masterUrl</code>
      * 
      * Path parameter: masterUrl (required)
-     * Kubernetes Master url
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
      * 
      * @param path masterUrl
      * @return the dsl builder
@@ -9111,7 +9583,12 @@ public class StaticEndpointBuilders {
      * Syntax: <code>kubernetes-services:masterUrl</code>
      * 
      * Path parameter: masterUrl (required)
-     * Kubernetes Master url
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -9192,10 +9669,10 @@ public class StaticEndpointBuilders {
      * 
      * Path parameter: languageName (required)
      * Sets the name of the language to use
-     * There are 22 enums and the value can be one of: bean, constant, csimple,
-     * datasonnet, exchangeProperty, file, groovy, header, hl7terser, joor, jq,
-     * jsonpath, mvel, ognl, ref, simple, spel, sql, tokenize, xpath, xquery,
-     * xtokenize
+     * There are 23 enums and the value can be one of: bean, constant, csimple,
+     * datasonnet, exchangeProperty, file, groovy, header, hl7terser, java,
+     * joor, jq, jsonpath, mvel, ognl, ref, simple, spel, sql, tokenize, xpath,
+     * xquery, xtokenize
      * 
      * Path parameter: resourceUri
      * Path to the resource, or a reference to lookup a bean in the Registry to
@@ -9222,10 +9699,10 @@ public class StaticEndpointBuilders {
      * 
      * Path parameter: languageName (required)
      * Sets the name of the language to use
-     * There are 22 enums and the value can be one of: bean, constant, csimple,
-     * datasonnet, exchangeProperty, file, groovy, header, hl7terser, joor, jq,
-     * jsonpath, mvel, ognl, ref, simple, spel, sql, tokenize, xpath, xquery,
-     * xtokenize
+     * There are 23 enums and the value can be one of: bean, constant, csimple,
+     * datasonnet, exchangeProperty, file, groovy, header, hl7terser, java,
+     * joor, jq, jsonpath, mvel, ognl, ref, simple, spel, sql, tokenize, xpath,
+     * xquery, xtokenize
      * 
      * Path parameter: resourceUri
      * Path to the resource, or a reference to lookup a bean in the Registry to
@@ -10662,7 +11139,12 @@ public class StaticEndpointBuilders {
      * Syntax: <code>openshift-build-configs:masterUrl</code>
      * 
      * Path parameter: masterUrl (required)
-     * Kubernetes Master url
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
      * 
      * @param path masterUrl
      * @return the dsl builder
@@ -10682,7 +11164,12 @@ public class StaticEndpointBuilders {
      * Syntax: <code>openshift-build-configs:masterUrl</code>
      * 
      * Path parameter: masterUrl (required)
-     * Kubernetes Master url
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -10705,7 +11192,12 @@ public class StaticEndpointBuilders {
      * Syntax: <code>openshift-builds:masterUrl</code>
      * 
      * Path parameter: masterUrl (required)
-     * Kubernetes Master url
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
      * 
      * @param path masterUrl
      * @return the dsl builder
@@ -10725,7 +11217,12 @@ public class StaticEndpointBuilders {
      * Syntax: <code>openshift-builds:masterUrl</code>
      * 
      * Path parameter: masterUrl (required)
-     * Kubernetes Master url
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -10749,7 +11246,12 @@ public class StaticEndpointBuilders {
      * Syntax: <code>openshift-deploymentconfigs:masterUrl</code>
      * 
      * Path parameter: masterUrl (required)
-     * Kubernetes Master url
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
      * 
      * @param path masterUrl
      * @return the dsl builder
@@ -10770,7 +11272,12 @@ public class StaticEndpointBuilders {
      * Syntax: <code>openshift-deploymentconfigs:masterUrl</code>
      * 
      * Path parameter: masterUrl (required)
-     * Kubernetes Master url
+     * URL to a remote Kubernetes API server. This should only be used when your
+     * Camel application is connecting from outside Kubernetes. If you run your
+     * Camel application inside Kubernetes, then you can use local or client as
+     * the URL to tell Camel to run in local mode. If you connect remotely to
+     * Kubernetes, then you may also need some of the many other configuration
+     * options for secured connection with certificates, etc.
      * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
@@ -11453,6 +11960,52 @@ public class StaticEndpointBuilders {
         return org.apache.camel.builder.endpoint.dsl.Plc4XEndpointBuilderFactory.endpointBuilder(componentName, path);
     }
     /**
+     * POP3 (camel-mail)
+     * Send and receive emails using imap, pop3 and smtp protocols.
+     * 
+     * Category: mail
+     * Since: 1.0
+     * Maven coordinates: org.apache.camel:camel-mail
+     * 
+     * Syntax: <code>pop3:host:port</code>
+     * 
+     * Path parameter: host (required)
+     * The mail server host name
+     * 
+     * Path parameter: port
+     * The port number of the mail server
+     * 
+     * @param path host:port
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.MailEndpointBuilderFactory.MailEndpointBuilder pop3(
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.MailEndpointBuilderFactory.endpointBuilder("pop3", path);
+    }
+    /**
+     * POP3S (camel-mail)
+     * Send and receive emails using imap, pop3 and smtp protocols.
+     * 
+     * Category: mail
+     * Since: 1.0
+     * Maven coordinates: org.apache.camel:camel-mail
+     * 
+     * Syntax: <code>pop3s:host:port</code>
+     * 
+     * Path parameter: host (required)
+     * The mail server host name
+     * 
+     * Path parameter: port
+     * The port number of the mail server
+     * 
+     * @param path host:port
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.MailEndpointBuilderFactory.MailEndpointBuilder pop3s(
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.MailEndpointBuilderFactory.endpointBuilder("pop3s", path);
+    }
+    /**
      * PubNub (camel-pubnub)
      * Send and receive messages to/from PubNub data stream network for
      * connected devices.
@@ -11559,6 +12112,49 @@ public class StaticEndpointBuilders {
             String componentName,
             String path) {
         return org.apache.camel.builder.endpoint.dsl.PulsarEndpointBuilderFactory.endpointBuilder(componentName, path);
+    }
+    /**
+     * Qdrant (camel-qdrant)
+     * Perform operations on the Qdrant Vector Database.
+     * 
+     * Category: database,ai
+     * Since: 4.5
+     * Maven coordinates: org.apache.camel:camel-qdrant
+     * 
+     * Syntax: <code>qdrant:collection</code>
+     * 
+     * Path parameter: collection (required)
+     * The collection Name
+     * 
+     * @param path collection
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.QdrantEndpointBuilderFactory.QdrantEndpointBuilder qdrant(
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.QdrantEndpointBuilderFactory.endpointBuilder("qdrant", path);
+    }
+    /**
+     * Qdrant (camel-qdrant)
+     * Perform operations on the Qdrant Vector Database.
+     * 
+     * Category: database,ai
+     * Since: 4.5
+     * Maven coordinates: org.apache.camel:camel-qdrant
+     * 
+     * Syntax: <code>qdrant:collection</code>
+     * 
+     * Path parameter: collection (required)
+     * The collection Name
+     * 
+     * @param componentName to use a custom component name for the endpoint
+     * instead of the default name
+     * @param path collection
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.QdrantEndpointBuilderFactory.QdrantEndpointBuilder qdrant(
+            String componentName,
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.QdrantEndpointBuilderFactory.endpointBuilder(componentName, path);
     }
     /**
      * Quartz (camel-quartz)
@@ -11825,7 +12421,8 @@ public class StaticEndpointBuilders {
      * patch, head, trace, connect, options
      * 
      * Path parameter: path (required)
-     * The base path
+     * The base path, can use &#42; as path suffix to support wildcard HTTP
+     * route matching.
      * 
      * Path parameter: uriTemplate
      * The uri template
@@ -11853,7 +12450,8 @@ public class StaticEndpointBuilders {
      * patch, head, trace, connect, options
      * 
      * Path parameter: path (required)
-     * The base path
+     * The base path, can use &#42; as path suffix to support wildcard HTTP
+     * route matching.
      * 
      * Path parameter: uriTemplate
      * The uri template
@@ -11949,7 +12547,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * Robot Framework (camel-robotframework)
-     * Pass camel exchanges to acceptence test written in Robot DSL.
+     * Pass camel exchanges to acceptance test written in Robot DSL.
      * 
      * Category: testing
      * Since: 3.0
@@ -11975,7 +12573,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * Robot Framework (camel-robotframework)
-     * Pass camel exchanges to acceptence test written in Robot DSL.
+     * Pass camel exchanges to acceptance test written in Robot DSL.
      * 
      * Category: testing
      * Since: 3.0
@@ -12145,16 +12743,16 @@ public class StaticEndpointBuilders {
      * 
      * Path parameter: operationName (required)
      * The operation to use
-     * There are 68 enums and the value can be one of: getVersions,
+     * There are 69 enums and the value can be one of: getVersions,
      * getResources, getGlobalObjects, getBasicInfo, getDescription, getSObject,
      * createSObject, updateSObject, deleteSObject, getSObjectWithId,
      * upsertSObject, deleteSObjectWithId, getBlobField, query, queryMore,
-     * queryAll, search, apexCall, recent, createJob, getJob, closeJob,
-     * abortJob, createBatch, getBatch, getAllBatches, getRequest, getResults,
-     * createBatchQuery, getQueryResultIds, getQueryResult, getRecentReports,
-     * getReportDescription, executeSyncReport, executeAsyncReport,
-     * getReportInstances, getReportResults, limits, approval, approvals,
-     * composite-tree, composite-batch, composite,
+     * queryAll, search, apexCall, recent, getEventSchema, createJob, getJob,
+     * closeJob, abortJob, createBatch, getBatch, getAllBatches, getRequest,
+     * getResults, createBatchQuery, getQueryResultIds, getQueryResult,
+     * getRecentReports, getReportDescription, executeSyncReport,
+     * executeAsyncReport, getReportInstances, getReportResults, limits,
+     * approval, approvals, composite-tree, composite-batch, composite,
      * compositeRetrieveSObjectCollections, compositeCreateSObjectCollections,
      * compositeUpdateSObjectCollections, compositeUpsertSObjectCollections,
      * compositeDeleteSObjectCollections, bulk2GetAllJobs, bulk2CreateJob,
@@ -12186,16 +12784,16 @@ public class StaticEndpointBuilders {
      * 
      * Path parameter: operationName (required)
      * The operation to use
-     * There are 68 enums and the value can be one of: getVersions,
+     * There are 69 enums and the value can be one of: getVersions,
      * getResources, getGlobalObjects, getBasicInfo, getDescription, getSObject,
      * createSObject, updateSObject, deleteSObject, getSObjectWithId,
      * upsertSObject, deleteSObjectWithId, getBlobField, query, queryMore,
-     * queryAll, search, apexCall, recent, createJob, getJob, closeJob,
-     * abortJob, createBatch, getBatch, getAllBatches, getRequest, getResults,
-     * createBatchQuery, getQueryResultIds, getQueryResult, getRecentReports,
-     * getReportDescription, executeSyncReport, executeAsyncReport,
-     * getReportInstances, getReportResults, limits, approval, approvals,
-     * composite-tree, composite-batch, composite,
+     * queryAll, search, apexCall, recent, getEventSchema, createJob, getJob,
+     * closeJob, abortJob, createBatch, getBatch, getAllBatches, getRequest,
+     * getResults, createBatchQuery, getQueryResultIds, getQueryResult,
+     * getRecentReports, getReportDescription, executeSyncReport,
+     * executeAsyncReport, getReportInstances, getReportResults, limits,
+     * approval, approvals, composite-tree, composite-batch, composite,
      * compositeRetrieveSObjectCollections, compositeCreateSObjectCollections,
      * compositeUpdateSObjectCollections, compositeUpsertSObjectCollections,
      * compositeDeleteSObjectCollections, bulk2GetAllJobs, bulk2CreateJob,
@@ -12801,6 +13399,63 @@ public class StaticEndpointBuilders {
         return org.apache.camel.builder.endpoint.dsl.SlackEndpointBuilderFactory.endpointBuilder(componentName, path);
     }
     /**
+     * SMB (camel-smb)
+     * Receive files from SMB (Server Message Block) shares.
+     * 
+     * Category: file
+     * Since: 4.3
+     * Maven coordinates: org.apache.camel:camel-smb
+     * 
+     * Syntax: <code>smb:hostname:port/shareName</code>
+     * 
+     * Path parameter: hostname (required)
+     * The share hostname or IP address
+     * 
+     * Path parameter: port
+     * The share port number
+     * Default value: 445
+     * 
+     * Path parameter: shareName
+     * The name of the share to connect to.
+     * 
+     * @param path hostname:port/shareName
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.SmbEndpointBuilderFactory.SmbEndpointBuilder smb(
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.SmbEndpointBuilderFactory.endpointBuilder("smb", path);
+    }
+    /**
+     * SMB (camel-smb)
+     * Receive files from SMB (Server Message Block) shares.
+     * 
+     * Category: file
+     * Since: 4.3
+     * Maven coordinates: org.apache.camel:camel-smb
+     * 
+     * Syntax: <code>smb:hostname:port/shareName</code>
+     * 
+     * Path parameter: hostname (required)
+     * The share hostname or IP address
+     * 
+     * Path parameter: port
+     * The share port number
+     * Default value: 445
+     * 
+     * Path parameter: shareName
+     * The name of the share to connect to.
+     * 
+     * @param componentName to use a custom component name for the endpoint
+     * instead of the default name
+     * @param path hostname:port/shareName
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.SmbEndpointBuilderFactory.SmbEndpointBuilder smb(
+            String componentName,
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.SmbEndpointBuilderFactory.endpointBuilder(componentName, path);
+    }
+    /**
      * SMPP (camel-smpp)
      * Send and receive SMS messages using a SMSC (Short Message Service
      * Center).
@@ -12854,6 +13509,78 @@ public class StaticEndpointBuilders {
             String componentName,
             String path) {
         return org.apache.camel.builder.endpoint.dsl.SmppEndpointBuilderFactory.endpointBuilder(componentName, path);
+    }
+    /**
+     * SMPP (Secure) (camel-smpp)
+     * Send and receive SMS messages using a SMSC (Short Message Service
+     * Center).
+     * 
+     * Category: mobile
+     * Since: 2.2
+     * Maven coordinates: org.apache.camel:camel-smpp
+     * 
+     * Syntax: <code>smpps:host:port</code>
+     * 
+     * Path parameter: host
+     * Hostname for the SMSC server to use.
+     * Default value: localhost
+     * 
+     * Path parameter: port
+     * Port number for the SMSC server to use.
+     * Default value: 2775
+     * 
+     * @param path host:port
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.SmppEndpointBuilderFactory.SmppEndpointBuilder smpps(
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.SmppEndpointBuilderFactory.endpointBuilder("smpps", path);
+    }
+    /**
+     * SMTP (camel-mail)
+     * Send and receive emails using imap, pop3 and smtp protocols.
+     * 
+     * Category: mail
+     * Since: 1.0
+     * Maven coordinates: org.apache.camel:camel-mail
+     * 
+     * Syntax: <code>smtp:host:port</code>
+     * 
+     * Path parameter: host (required)
+     * The mail server host name
+     * 
+     * Path parameter: port
+     * The port number of the mail server
+     * 
+     * @param path host:port
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.MailEndpointBuilderFactory.MailEndpointBuilder smtp(
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.MailEndpointBuilderFactory.endpointBuilder("smtp", path);
+    }
+    /**
+     * SMTPS (camel-mail)
+     * Send and receive emails using imap, pop3 and smtp protocols.
+     * 
+     * Category: mail
+     * Since: 1.0
+     * Maven coordinates: org.apache.camel:camel-mail
+     * 
+     * Syntax: <code>smtps:host:port</code>
+     * 
+     * Path parameter: host (required)
+     * The mail server host name
+     * 
+     * Path parameter: port
+     * The port number of the mail server
+     * 
+     * @param path host:port
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.MailEndpointBuilderFactory.MailEndpointBuilder smtps(
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.MailEndpointBuilderFactory.endpointBuilder("smtps", path);
     }
     /**
      * SNMP (camel-snmp)
@@ -12951,23 +13678,19 @@ public class StaticEndpointBuilders {
     }
     /**
      * Splunk HEC (camel-splunk-hec)
-     * The splunk component allows to publish events in Splunk using the HTTP
+     * The splunk component allows publishing events in Splunk using the HTTP
      * Event Collector.
      * 
      * Category: monitoring
      * Since: 3.3
      * Maven coordinates: org.apache.camel:camel-splunk-hec
      * 
-     * Syntax: <code>splunk-hec:splunkURL/token</code>
+     * Syntax: <code>splunk-hec:splunkURL</code>
      * 
      * Path parameter: splunkURL (required)
      * Splunk Host and Port (example: my_splunk_server:8089)
      * 
-     * Path parameter: token (required)
-     * Splunk HEC token (this is the token created for HEC and not the user's
-     * token)
-     * 
-     * @param path splunkURL/token
+     * @param path splunkURL
      * @return the dsl builder
      */
     public static org.apache.camel.builder.endpoint.dsl.SplunkHECEndpointBuilderFactory.SplunkHECEndpointBuilder splunkHec(
@@ -12976,25 +13699,21 @@ public class StaticEndpointBuilders {
     }
     /**
      * Splunk HEC (camel-splunk-hec)
-     * The splunk component allows to publish events in Splunk using the HTTP
+     * The splunk component allows publishing events in Splunk using the HTTP
      * Event Collector.
      * 
      * Category: monitoring
      * Since: 3.3
      * Maven coordinates: org.apache.camel:camel-splunk-hec
      * 
-     * Syntax: <code>splunk-hec:splunkURL/token</code>
+     * Syntax: <code>splunk-hec:splunkURL</code>
      * 
      * Path parameter: splunkURL (required)
      * Splunk Host and Port (example: my_splunk_server:8089)
      * 
-     * Path parameter: token (required)
-     * Splunk HEC token (this is the token created for HEC and not the user's
-     * token)
-     * 
      * @param componentName to use a custom component name for the endpoint
      * instead of the default name
-     * @param path splunkURL/token
+     * @param path splunkURL
      * @return the dsl builder
      */
     public static org.apache.camel.builder.endpoint.dsl.SplunkHECEndpointBuilderFactory.SplunkHECEndpointBuilder splunkHec(
@@ -13182,7 +13901,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * Spring RabbitMQ (camel-spring-rabbitmq)
-     * Send and receive messages from RabbitMQ using Spring RabbitMQ client.
+     * Send and receive messages from RabbitMQ using the Spring RabbitMQ client.
      * 
      * Category: messaging
      * Since: 3.8
@@ -13205,7 +13924,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * Spring RabbitMQ (camel-spring-rabbitmq)
-     * Send and receive messages from RabbitMQ using Spring RabbitMQ client.
+     * Send and receive messages from RabbitMQ using the Spring RabbitMQ client.
      * 
      * Category: messaging
      * Since: 3.8
@@ -13606,7 +14325,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * Stomp (camel-stomp)
-     * Send and rececive messages to/from STOMP (Simple Text Oriented Messaging
+     * Send and receive messages to/from STOMP (Simple Text Oriented Messaging
      * Protocol) compliant message brokers.
      * 
      * Category: messaging
@@ -13627,7 +14346,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * Stomp (camel-stomp)
-     * Send and rececive messages to/from STOMP (Simple Text Oriented Messaging
+     * Send and receive messages to/from STOMP (Simple Text Oriented Messaging
      * Protocol) compliant message brokers.
      * 
      * Category: messaging
@@ -13798,7 +14517,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * Telegram (camel-telegram)
-     * Send and receive messages acting as a Telegram Bot Telegram Bot API.
+     * Send and receive messages using the Telegram Bot API.
      * 
      * Category: cloud,api,chat
      * Since: 2.18
@@ -13819,7 +14538,7 @@ public class StaticEndpointBuilders {
     }
     /**
      * Telegram (camel-telegram)
-     * Send and receive messages acting as a Telegram Bot Telegram Bot API.
+     * Send and receive messages using the Telegram Bot API.
      * 
      * Category: cloud,api,chat
      * Since: 2.18
@@ -13903,6 +14622,61 @@ public class StaticEndpointBuilders {
             String componentName,
             String path) {
         return org.apache.camel.builder.endpoint.dsl.ThriftEndpointBuilderFactory.endpointBuilder(componentName, path);
+    }
+    /**
+     * Thymeleaf (camel-thymeleaf)
+     * Transform messages using a Thymeleaf template.
+     * 
+     * Category: transformation
+     * Since: 4.1
+     * Maven coordinates: org.apache.camel:camel-thymeleaf
+     * 
+     * Syntax: <code>thymeleaf:resourceUri</code>
+     * 
+     * Path parameter: resourceUri (required)
+     * Path to the resource. You can prefix with: classpath, file, http, ref, or
+     * bean. classpath, file and http loads the resource using these protocols
+     * (classpath is default). ref will lookup the resource in the registry.
+     * bean will call a method on a bean to be used as the resource. For bean
+     * you can specify the method name after dot, eg bean:myBean.myMethod.
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
+     * 
+     * @param path resourceUri
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.ThymeleafEndpointBuilderFactory.ThymeleafEndpointBuilder thymeleaf(
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.ThymeleafEndpointBuilderFactory.endpointBuilder("thymeleaf", path);
+    }
+    /**
+     * Thymeleaf (camel-thymeleaf)
+     * Transform messages using a Thymeleaf template.
+     * 
+     * Category: transformation
+     * Since: 4.1
+     * Maven coordinates: org.apache.camel:camel-thymeleaf
+     * 
+     * Syntax: <code>thymeleaf:resourceUri</code>
+     * 
+     * Path parameter: resourceUri (required)
+     * Path to the resource. You can prefix with: classpath, file, http, ref, or
+     * bean. classpath, file and http loads the resource using these protocols
+     * (classpath is default). ref will lookup the resource in the registry.
+     * bean will call a method on a bean to be used as the resource. For bean
+     * you can specify the method name after dot, eg bean:myBean.myMethod.
+     * This option can also be loaded from an existing file, by prefixing with
+     * file: or classpath: followed by the location of the file.
+     * 
+     * @param componentName to use a custom component name for the endpoint
+     * instead of the default name
+     * @param path resourceUri
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.ThymeleafEndpointBuilderFactory.ThymeleafEndpointBuilder thymeleaf(
+            String componentName,
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.ThymeleafEndpointBuilderFactory.endpointBuilder(componentName, path);
     }
     /**
      * Tika (camel-tika)
@@ -14519,6 +15293,49 @@ public class StaticEndpointBuilders {
         return org.apache.camel.builder.endpoint.dsl.VertxWebsocketEndpointBuilderFactory.endpointBuilder(componentName, path);
     }
     /**
+     * Wasm (camel-wasm)
+     * Invoke Wasm functions.
+     * 
+     * Category: core,script
+     * Since: 4.4
+     * Maven coordinates: org.apache.camel:camel-wasm
+     * 
+     * Syntax: <code>wasm:functionName</code>
+     * 
+     * Path parameter: functionName (required)
+     * The Function Name
+     * 
+     * @param path functionName
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.WasmEndpointBuilderFactory.WasmEndpointBuilder wasm(
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.WasmEndpointBuilderFactory.endpointBuilder("wasm", path);
+    }
+    /**
+     * Wasm (camel-wasm)
+     * Invoke Wasm functions.
+     * 
+     * Category: core,script
+     * Since: 4.4
+     * Maven coordinates: org.apache.camel:camel-wasm
+     * 
+     * Syntax: <code>wasm:functionName</code>
+     * 
+     * Path parameter: functionName (required)
+     * The Function Name
+     * 
+     * @param componentName to use a custom component name for the endpoint
+     * instead of the default name
+     * @param path functionName
+     * @return the dsl builder
+     */
+    public static org.apache.camel.builder.endpoint.dsl.WasmEndpointBuilderFactory.WasmEndpointBuilder wasm(
+            String componentName,
+            String path) {
+        return org.apache.camel.builder.endpoint.dsl.WasmEndpointBuilderFactory.endpointBuilder(componentName, path);
+    }
+    /**
      * Weather (camel-weather)
      * Poll the weather information from Open Weather Map.
      * 
@@ -14693,8 +15510,8 @@ public class StaticEndpointBuilders {
         return org.apache.camel.builder.endpoint.dsl.WhatsAppEndpointBuilderFactory.endpointBuilder(componentName, path);
     }
     /**
-     * Wordpress (camel-wordpress)
-     * Manage posts and users using Wordpress API.
+     * WordPress (camel-wordpress)
+     * Manage posts and users using the WordPress API.
      * 
      * Category: cloud,api,cms
      * Since: 2.21
@@ -14719,8 +15536,8 @@ public class StaticEndpointBuilders {
         return org.apache.camel.builder.endpoint.dsl.WordpressEndpointBuilderFactory.endpointBuilder("wordpress", path);
     }
     /**
-     * Wordpress (camel-wordpress)
-     * Manage posts and users using Wordpress API.
+     * WordPress (camel-wordpress)
+     * Manage posts and users using the WordPress API.
      * 
      * Category: cloud,api,cms
      * Since: 2.21
@@ -15192,8 +16009,8 @@ public class StaticEndpointBuilders {
     }
     /**
      * Zeebe (camel-zeebe)
-     * Zeebe component which does integrage with Camunda Zeebe to interact with
-     * the API.
+     * Zeebe component which integrates with Camunda Zeebe to interact with the
+     * API.
      * 
      * Category: workflow,saas
      * Since: 3.21
@@ -15216,8 +16033,8 @@ public class StaticEndpointBuilders {
     }
     /**
      * Zeebe (camel-zeebe)
-     * Zeebe component which does integrage with Camunda Zeebe to interact with
-     * the API.
+     * Zeebe component which integrates with Camunda Zeebe to interact with the
+     * API.
      * 
      * Category: workflow,saas
      * Since: 3.21
@@ -15253,7 +16070,7 @@ public class StaticEndpointBuilders {
      * 
      * Path parameter: methodName (required)
      * What operation to use
-     * There are 371 enums and the value can be one of:
+     * There are 373 enums and the value can be one of:
      * ADD_TAG_TO_ORGANISATIONS, ADD_TAG_TO_TICKET, ADD_TAG_TO_TOPICS,
      * ASSOCIATE_ATTACHMENTS_TO_ARTICLE, CHANGE_USER_PASSWORD, CREATE_ARTICLE,
      * CREATE_ARTICLE_1, CREATE_ARTICLE_TRANSLATION, CREATE_AUTOMATION,
@@ -15308,16 +16125,17 @@ public class StaticEndpointBuilders {
      * GET_CATEGORY, GET_CATEGORY_TRANSLATIONS, GET_CCD_TICKETS_COUNT_FOR_USER,
      * GET_COMPLIANCE_DELETION_STATUSES, GET_CONTENT_TAG, GET_CONTENT_TAGS,
      * GET_CONTENT_TAGS_1, GET_CONTENT_TAGS_2, GET_CURRENT_USER,
-     * GET_CUSTOM_AGENT_ROLES, GET_DELETED_TICKETS, GET_DELETED_TICKETS_1,
-     * GET_DYNAMIC_CONTENT_ITEM, GET_DYNAMIC_CONTENT_ITEM_VARIANT,
-     * GET_DYNAMIC_CONTENT_ITEM_VARIANTS, GET_DYNAMIC_CONTENT_ITEMS, GET_FORUM,
-     * GET_FORUMS, GET_FORUMS_1, GET_GROUP, GET_GROUP_MEMBERSHIP,
-     * GET_GROUP_MEMBERSHIP_1, GET_GROUP_MEMBERSHIP_BY_USER,
-     * GET_GROUP_MEMBERSHIPS, GET_GROUP_MEMBERSHIPS_1, GET_GROUP_ORGANIZATION,
-     * GET_GROUP_USERS, GET_GROUPS, GET_HELP_CENTER_LOCALES,
-     * GET_HOLIDAYS_FOR_SCHEDULE, GET_HOLIDAYS_FOR_SCHEDULE_1,
-     * GET_INCREMENTAL_TICKETS_RESULT, GET_JOB_STATUS, GET_JOB_STATUS_ASYNC,
-     * GET_JOB_STATUSES, GET_JOB_STATUSES_ASYNC, GET_MACRO, GET_MACROS,
+     * GET_CUSTOM_AGENT_ROLES, GET_CUSTOM_TICKET_STATUSES, GET_DELETED_TICKETS,
+     * GET_DELETED_TICKETS_1, GET_DYNAMIC_CONTENT_ITEM,
+     * GET_DYNAMIC_CONTENT_ITEM_VARIANT, GET_DYNAMIC_CONTENT_ITEM_VARIANTS,
+     * GET_DYNAMIC_CONTENT_ITEMS, GET_FORUM, GET_FORUMS, GET_FORUMS_1,
+     * GET_GROUP, GET_GROUP_MEMBERSHIP, GET_GROUP_MEMBERSHIP_1,
+     * GET_GROUP_MEMBERSHIP_BY_USER, GET_GROUP_MEMBERSHIPS,
+     * GET_GROUP_MEMBERSHIPS_1, GET_GROUP_ORGANIZATION, GET_GROUP_USERS,
+     * GET_GROUPS, GET_HELP_CENTER_LOCALES, GET_HOLIDAYS_FOR_SCHEDULE,
+     * GET_HOLIDAYS_FOR_SCHEDULE_1, GET_INCREMENTAL_TICKETS_RESULT,
+     * GET_JOB_STATUS, GET_JOB_STATUS_ASYNC, GET_JOB_STATUSES,
+     * GET_JOB_STATUSES_ASYNC, GET_LOCALES, GET_MACRO, GET_MACROS,
      * GET_OPEN_REQUESTS, GET_ORGANIZATION, GET_ORGANIZATION_FIELDS,
      * GET_ORGANIZATION_MEMBERSHIP, GET_ORGANIZATION_MEMBERSHIP_BY_USER,
      * GET_ORGANIZATION_MEMBERSHIP_FOR_USER, GET_ORGANIZATION_MEMBERSHIPS,
@@ -15405,7 +16223,7 @@ public class StaticEndpointBuilders {
      * 
      * Path parameter: methodName (required)
      * What operation to use
-     * There are 371 enums and the value can be one of:
+     * There are 373 enums and the value can be one of:
      * ADD_TAG_TO_ORGANISATIONS, ADD_TAG_TO_TICKET, ADD_TAG_TO_TOPICS,
      * ASSOCIATE_ATTACHMENTS_TO_ARTICLE, CHANGE_USER_PASSWORD, CREATE_ARTICLE,
      * CREATE_ARTICLE_1, CREATE_ARTICLE_TRANSLATION, CREATE_AUTOMATION,
@@ -15460,16 +16278,17 @@ public class StaticEndpointBuilders {
      * GET_CATEGORY, GET_CATEGORY_TRANSLATIONS, GET_CCD_TICKETS_COUNT_FOR_USER,
      * GET_COMPLIANCE_DELETION_STATUSES, GET_CONTENT_TAG, GET_CONTENT_TAGS,
      * GET_CONTENT_TAGS_1, GET_CONTENT_TAGS_2, GET_CURRENT_USER,
-     * GET_CUSTOM_AGENT_ROLES, GET_DELETED_TICKETS, GET_DELETED_TICKETS_1,
-     * GET_DYNAMIC_CONTENT_ITEM, GET_DYNAMIC_CONTENT_ITEM_VARIANT,
-     * GET_DYNAMIC_CONTENT_ITEM_VARIANTS, GET_DYNAMIC_CONTENT_ITEMS, GET_FORUM,
-     * GET_FORUMS, GET_FORUMS_1, GET_GROUP, GET_GROUP_MEMBERSHIP,
-     * GET_GROUP_MEMBERSHIP_1, GET_GROUP_MEMBERSHIP_BY_USER,
-     * GET_GROUP_MEMBERSHIPS, GET_GROUP_MEMBERSHIPS_1, GET_GROUP_ORGANIZATION,
-     * GET_GROUP_USERS, GET_GROUPS, GET_HELP_CENTER_LOCALES,
-     * GET_HOLIDAYS_FOR_SCHEDULE, GET_HOLIDAYS_FOR_SCHEDULE_1,
-     * GET_INCREMENTAL_TICKETS_RESULT, GET_JOB_STATUS, GET_JOB_STATUS_ASYNC,
-     * GET_JOB_STATUSES, GET_JOB_STATUSES_ASYNC, GET_MACRO, GET_MACROS,
+     * GET_CUSTOM_AGENT_ROLES, GET_CUSTOM_TICKET_STATUSES, GET_DELETED_TICKETS,
+     * GET_DELETED_TICKETS_1, GET_DYNAMIC_CONTENT_ITEM,
+     * GET_DYNAMIC_CONTENT_ITEM_VARIANT, GET_DYNAMIC_CONTENT_ITEM_VARIANTS,
+     * GET_DYNAMIC_CONTENT_ITEMS, GET_FORUM, GET_FORUMS, GET_FORUMS_1,
+     * GET_GROUP, GET_GROUP_MEMBERSHIP, GET_GROUP_MEMBERSHIP_1,
+     * GET_GROUP_MEMBERSHIP_BY_USER, GET_GROUP_MEMBERSHIPS,
+     * GET_GROUP_MEMBERSHIPS_1, GET_GROUP_ORGANIZATION, GET_GROUP_USERS,
+     * GET_GROUPS, GET_HELP_CENTER_LOCALES, GET_HOLIDAYS_FOR_SCHEDULE,
+     * GET_HOLIDAYS_FOR_SCHEDULE_1, GET_INCREMENTAL_TICKETS_RESULT,
+     * GET_JOB_STATUS, GET_JOB_STATUS_ASYNC, GET_JOB_STATUSES,
+     * GET_JOB_STATUSES_ASYNC, GET_LOCALES, GET_MACRO, GET_MACROS,
      * GET_OPEN_REQUESTS, GET_ORGANIZATION, GET_ORGANIZATION_FIELDS,
      * GET_ORGANIZATION_MEMBERSHIP, GET_ORGANIZATION_MEMBERSHIP_BY_USER,
      * GET_ORGANIZATION_MEMBERSHIP_FOR_USER, GET_ORGANIZATION_MEMBERSHIPS,

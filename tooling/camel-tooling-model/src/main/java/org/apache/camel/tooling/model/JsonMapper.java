@@ -17,7 +17,6 @@
 package org.apache.camel.tooling.model;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -45,7 +44,7 @@ public final class JsonMapper {
 
     public static BaseModel<?> generateModel(Path file) {
         try {
-            String json = new String(Files.readAllBytes(file), StandardCharsets.UTF_8);
+            String json = Files.readString(file);
             return generateModel(json);
         } catch (IOException e) {
             throw new RuntimeException("Error reading json file: " + file, e);
@@ -64,6 +63,8 @@ public final class JsonMapper {
             return generateLanguageModel(obj);
         } else if (obj.containsKey("dataformat")) {
             return generateDataFormatModel(obj);
+        } else if (obj.containsKey("transformer")) {
+            return generateTransformerModel(obj);
         } else if (obj.containsKey("other")) {
             return generateOtherModel(obj);
         } else if (obj.containsKey("model")) {
@@ -188,6 +189,7 @@ public final class JsonMapper {
         model.setConsumerOnly(mobj.getBooleanOrDefault("consumerOnly", false));
         model.setProducerOnly(mobj.getBooleanOrDefault("producerOnly", false));
         model.setLenientProperties(mobj.getBooleanOrDefault("lenientProperties", false));
+        model.setRemote(mobj.getBooleanOrDefault("remote", false));
         parseArtifact(mobj, model);
     }
 
@@ -219,6 +221,7 @@ public final class JsonMapper {
         obj.put("consumerOnly", model.isConsumerOnly());
         obj.put("producerOnly", model.isProducerOnly());
         obj.put("lenientProperties", model.isLenientProperties());
+        obj.put("remote", model.isRemote());
         obj.put("verifiers", model.getVerifiers());
         obj.entrySet().removeIf(e -> e.getValue() == null);
         JsonObject wrapper = new JsonObject();
@@ -290,11 +293,22 @@ public final class JsonMapper {
         model.setInput(mobj.getBooleanOrDefault("input", false));
         model.setOutput(mobj.getBooleanOrDefault("output", false));
         JsonObject mprp = (JsonObject) obj.get("properties");
-        for (Map.Entry<String, Object> entry : mprp.entrySet()) {
-            JsonObject mp = (JsonObject) entry.getValue();
-            EipOptionModel option = new EipOptionModel();
-            parseOption(mp, option, entry.getKey());
-            model.addOption(option);
+        if (mprp != null) {
+            for (Map.Entry<String, Object> entry : mprp.entrySet()) {
+                JsonObject mp = (JsonObject) entry.getValue();
+                EipOptionModel option = new EipOptionModel();
+                parseOption(mp, option, entry.getKey());
+                model.addOption(option);
+            }
+        }
+        mprp = (JsonObject) obj.get("exchangeProperties");
+        if (mprp != null) {
+            for (Map.Entry<String, Object> entry : mprp.entrySet()) {
+                JsonObject mp = (JsonObject) entry.getValue();
+                EipOptionModel option = new EipOptionModel();
+                parseOption(mp, option, entry.getKey());
+                model.addExchangeProperty(option);
+            }
         }
         return model;
     }
@@ -314,6 +328,9 @@ public final class JsonMapper {
         JsonObject wrapper = new JsonObject();
         wrapper.put("model", obj);
         wrapper.put("properties", asJsonObject(model.getOptions()));
+        if (!model.getExchangeProperties().isEmpty()) {
+            wrapper.put("exchangeProperties", asJsonObject(model.getExchangeProperties()));
+        }
         return wrapper;
     }
 
@@ -355,6 +372,21 @@ public final class JsonMapper {
         wrapper.put("language", obj);
         wrapper.put("properties", asJsonObject(model.getOptions()));
         return wrapper;
+    }
+
+    public static TransformerModel generateTransformerModel(String json) {
+        JsonObject obj = deserialize(json);
+        return generateTransformerModel(obj);
+    }
+
+    public static TransformerModel generateTransformerModel(JsonObject obj) {
+        JsonObject mobj = (JsonObject) obj.get("transformer");
+        TransformerModel model = new TransformerModel();
+        parseModel(mobj, model);
+        model.setFrom(mobj.getString("from"));
+        model.setTo(mobj.getString("to"));
+        parseArtifact(mobj, model);
+        return model;
     }
 
     public static OtherModel generateOtherModel(String json) {
@@ -458,6 +490,8 @@ public final class JsonMapper {
         option.setGetterMethod(mp.getString("getterMethod"));
         option.setSetterMethod(mp.getString("setterMethod"));
         option.setSupportFileReference(mp.getBooleanOrDefault("supportFileReference", false));
+        option.setLargeInput(mp.getBooleanOrDefault("largeInput", false));
+        option.setInputLanguage(mp.getString("inputLanguage"));
     }
 
     private static void parseGroup(JsonObject mp, MainGroupModel option) {
@@ -537,6 +571,14 @@ public final class JsonMapper {
         if (option.isSupportFileReference()) {
             // only include if supported to not regen all files
             prop.put("supportFileReference", option.isSupportFileReference());
+        }
+        if (option.isLargeInput()) {
+            // only include if supported to not regen all files
+            prop.put("largeInput", option.isLargeInput());
+        }
+        if (!Strings.isNullOrEmpty(option.getInputLanguage())) {
+            // only include if supported to not regen all files
+            prop.put("inputLanguage", option.getInputLanguage());
         }
         prop.put("asPredicate", option.isAsPredicate());
         prop.put("configurationClass", option.getConfigurationClass());

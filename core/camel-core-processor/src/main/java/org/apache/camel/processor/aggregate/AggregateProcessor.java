@@ -74,13 +74,14 @@ import org.slf4j.LoggerFactory;
 
 /**
  * An implementation of the <a href="http://camel.apache.org/aggregator2.html">Aggregator</a> pattern where a batch of
- * messages are processed (up to a maximum amount or until some timeout is reached) and messages for the same
- * correlation key are combined together using some kind of {@link AggregationStrategy} (by default the latest message
- * is used) to compress many message exchanges into a smaller number of exchanges.
+ * messages is processed (up to a maximum amount or until some timeout is reached) and messages for the same correlation
+ * key are combined using some kind of {@link AggregationStrategy} (by default the latest message is used) to compress
+ * many message exchanges into a smaller number of exchanges.
  * <p/>
- * A good example of this is stock market data; you may be receiving 30,000 messages/second and you may want to throttle
- * it right down so that multiple messages for the same stock are combined (or just the latest message is used and older
- * prices are discarded). Another idea is to combine line item messages together into a single invoice message.
+ * A good example of this is stock market data; you may be receiving 30,000 messages/second, and you may want to
+ * throttle it right down so that multiple messages for the same stock are combined (or just the latest message is used
+ * and older prices to be discarded). Another idea is to combine line item messages together into a single invoice
+ * message.
  */
 public class AggregateProcessor extends AsyncProcessorSupport
         implements Navigate<Processor>, Traceable, ShutdownPrepared, ShutdownAware, IdAware, RouteIdAware {
@@ -619,16 +620,19 @@ public class AggregateProcessor extends AsyncProcessorSupport
         if (COMPLETED_BY_CONSUMER.equals(complete)) {
             for (String batchKey : batchConsumerCorrelationKeys) {
                 Exchange batchAnswer;
+                Exchange batchOriginalExchange;
                 if (batchKey.equals(key)) {
                     // skip the current aggregated key as we have already aggregated it and have the answer
                     batchAnswer = answer;
+                    batchOriginalExchange = originalExchange;
                 } else {
                     batchAnswer = aggregationRepository.get(camelContext, batchKey);
+                    batchOriginalExchange = batchAnswer;
                 }
 
                 if (batchAnswer != null) {
                     batchAnswer.setProperty(ExchangePropertyKey.AGGREGATED_COMPLETED_BY, complete);
-                    onCompletion(batchKey, originalExchange, batchAnswer, false, aggregateFailed);
+                    onCompletion(batchKey, batchOriginalExchange, batchAnswer, false, aggregateFailed);
                     list.add(batchAnswer);
                 }
             }
@@ -677,7 +681,7 @@ public class AggregateProcessor extends AsyncProcessorSupport
      *                     pre-completion
      */
     protected String isPreCompleted(String key, Exchange oldExchange, Exchange newExchange) {
-        return aggregationStrategy.preComplete(oldExchange, newExchange) ? "strategy" : null;
+        return aggregationStrategy.preComplete(oldExchange, newExchange) ? COMPLETED_BY_STRATEGY : null;
     }
 
     /**
@@ -1700,6 +1704,7 @@ public class AggregateProcessor extends AsyncProcessorSupport
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 // break out as we got interrupted such as the JVM terminating
                 LOG.warn("Interrupted while waiting for {} inflight exchanges to complete.", getInProgressCompleteExchanges());
                 break;

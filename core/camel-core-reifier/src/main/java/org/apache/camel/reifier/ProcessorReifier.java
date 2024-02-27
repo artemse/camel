@@ -41,6 +41,8 @@ import org.apache.camel.model.ChoiceDefinition;
 import org.apache.camel.model.CircuitBreakerDefinition;
 import org.apache.camel.model.ClaimCheckDefinition;
 import org.apache.camel.model.ConvertBodyDefinition;
+import org.apache.camel.model.ConvertHeaderDefinition;
+import org.apache.camel.model.ConvertVariableDefinition;
 import org.apache.camel.model.DelayDefinition;
 import org.apache.camel.model.DynamicRouterDefinition;
 import org.apache.camel.model.EnrichDefinition;
@@ -75,6 +77,7 @@ import org.apache.camel.model.RemoveHeaderDefinition;
 import org.apache.camel.model.RemoveHeadersDefinition;
 import org.apache.camel.model.RemovePropertiesDefinition;
 import org.apache.camel.model.RemovePropertyDefinition;
+import org.apache.camel.model.RemoveVariableDefinition;
 import org.apache.camel.model.ResequenceDefinition;
 import org.apache.camel.model.ResumableDefinition;
 import org.apache.camel.model.RollbackDefinition;
@@ -87,7 +90,9 @@ import org.apache.camel.model.ScriptDefinition;
 import org.apache.camel.model.SetBodyDefinition;
 import org.apache.camel.model.SetExchangePatternDefinition;
 import org.apache.camel.model.SetHeaderDefinition;
+import org.apache.camel.model.SetHeadersDefinition;
 import org.apache.camel.model.SetPropertyDefinition;
+import org.apache.camel.model.SetVariableDefinition;
 import org.apache.camel.model.SortDefinition;
 import org.apache.camel.model.SplitDefinition;
 import org.apache.camel.model.StepDefinition;
@@ -126,6 +131,14 @@ import org.slf4j.LoggerFactory;
 
 public abstract class ProcessorReifier<T extends ProcessorDefinition<?>> extends AbstractReifier {
 
+    /**
+     * Global option on {@link CamelContext#getGlobalOptions()} that tooling can use to disable all route processors,
+     * which allows to startup Camel without wiring up and initializing all route EIPs that may use custom processors,
+     * beans, and other services that may not be available, or is unwanted to be in use; for example to have fast
+     * startup, and being able to introspect CamelContext and the route models.
+     */
+    public static final String DISABLE_ALL_PROCESSORS = "DisableAllProcessors";
+
     private static final Logger LOG = LoggerFactory.getLogger(ProcessorReifier.class);
 
     // for custom reifiers
@@ -163,7 +176,10 @@ public abstract class ProcessorReifier<T extends ProcessorDefinition<?>> extends
         // special if the EIP is disabled
         if (route != null && route.getCamelContext() != null) {
             Boolean disabled = CamelContextHelper.parseBoolean(route.getCamelContext(), definition.getDisabled());
-            if (disabled != null && disabled) {
+            if (disabled == null) {
+                disabled = "true".equalsIgnoreCase(route.getCamelContext().getGlobalOption(DISABLE_ALL_PROCESSORS));
+            }
+            if (disabled) {
                 return new DisabledReifier<>(route, definition);
             }
         }
@@ -202,6 +218,10 @@ public abstract class ProcessorReifier<T extends ProcessorDefinition<?>> extends
             return new ClaimCheckReifier(route, definition);
         } else if (definition instanceof ConvertBodyDefinition) {
             return new ConvertBodyReifier(route, definition);
+        } else if (definition instanceof ConvertHeaderDefinition) {
+            return new ConvertHeaderReifier(route, definition);
+        } else if (definition instanceof ConvertVariableDefinition) {
+            return new ConvertVariableReifier(route, definition);
         } else if (definition instanceof DelayDefinition) {
             return new DelayReifier(route, definition);
         } else if (definition instanceof DynamicRouterDefinition) {
@@ -258,6 +278,8 @@ public abstract class ProcessorReifier<T extends ProcessorDefinition<?>> extends
             return new RemovePropertyReifier(route, definition);
         } else if (definition instanceof RemovePropertiesDefinition) {
             return new RemovePropertiesReifier(route, definition);
+        } else if (definition instanceof RemoveVariableDefinition) {
+            return new RemoveVariableReifier(route, definition);
         } else if (definition instanceof ResequenceDefinition) {
             return new ResequenceReifier(route, definition);
         } else if (definition instanceof RollbackDefinition) {
@@ -278,8 +300,12 @@ public abstract class ProcessorReifier<T extends ProcessorDefinition<?>> extends
             return new SetExchangePatternReifier(route, definition);
         } else if (definition instanceof SetHeaderDefinition) {
             return new SetHeaderReifier(route, definition);
+        } else if (definition instanceof SetHeadersDefinition) {
+            return new SetHeadersReifier(route, definition);
         } else if (definition instanceof SetPropertyDefinition) {
             return new SetPropertyReifier(route, definition);
+        } else if (definition instanceof SetVariableDefinition) {
+            return new SetVariableReifier(route, definition);
         } else if (definition instanceof SortDefinition) {
             return new SortReifier<>(route, definition);
         } else if (definition instanceof SplitDefinition) {

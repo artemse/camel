@@ -42,8 +42,8 @@ public interface MQ2EndpointBuilderFactory {
             return (AdvancedMQ2EndpointBuilder) this;
         }
         /**
-         * The operation to perform. It can be
-         * listBrokers,createBroker,deleteBroker.
+         * The operation to perform. It can be listBrokers, createBroker,
+         * deleteBroker.
          * 
          * The option is a:
          * &lt;code&gt;org.apache.camel.component.aws2.mq.MQ2Operations&lt;/code&gt; type.
@@ -60,8 +60,8 @@ public interface MQ2EndpointBuilderFactory {
             return this;
         }
         /**
-         * The operation to perform. It can be
-         * listBrokers,createBroker,deleteBroker.
+         * The operation to perform. It can be listBrokers, createBroker,
+         * deleteBroker.
          * 
          * The option will be converted to a
          * &lt;code&gt;org.apache.camel.component.aws2.mq.MQ2Operations&lt;/code&gt; type.
@@ -77,8 +77,8 @@ public interface MQ2EndpointBuilderFactory {
             return this;
         }
         /**
-         * Set the need for overidding the endpoint. This option needs to be
-         * used in combination with uriEndpointOverride option.
+         * Set the need for overriding the endpoint. This option needs to be
+         * used in combination with the uriEndpointOverride option.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -93,8 +93,8 @@ public interface MQ2EndpointBuilderFactory {
             return this;
         }
         /**
-         * Set the need for overidding the endpoint. This option needs to be
-         * used in combination with uriEndpointOverride option.
+         * Set the need for overriding the endpoint. This option needs to be
+         * used in combination with the uriEndpointOverride option.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -143,7 +143,7 @@ public interface MQ2EndpointBuilderFactory {
         /**
          * The region in which MQ client needs to work. When using this
          * parameter, the configuration will expect the lowercase name of the
-         * region (for example ap-east-1) You'll need to use the name
+         * region (for example, ap-east-1) You'll need to use the name
          * Region.EU_WEST_1.id().
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -264,7 +264,7 @@ public interface MQ2EndpointBuilderFactory {
             return this;
         }
         /**
-         * If using a profile credentials provider this parameter will set the
+         * If using a profile credentials provider, this parameter will set the
          * profile name.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -291,6 +291,21 @@ public interface MQ2EndpointBuilderFactory {
          */
         default MQ2EndpointBuilder secretKey(String secretKey) {
             doSetProperty("secretKey", secretKey);
+            return this;
+        }
+        /**
+         * Amazon AWS Session Token used when the user needs to assume an IAM
+         * role.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: security
+         * 
+         * @param sessionToken the value to set
+         * @return the dsl builder
+         */
+        default MQ2EndpointBuilder sessionToken(String sessionToken) {
+            doSetProperty("sessionToken", sessionToken);
             return this;
         }
         /**
@@ -400,6 +415,43 @@ public interface MQ2EndpointBuilderFactory {
             doSetProperty("useProfileCredentialsProvider", useProfileCredentialsProvider);
             return this;
         }
+        /**
+         * Set whether the MQ client should expect to use Session Credentials.
+         * This is useful in a situation in which the user needs to assume an
+         * IAM role for doing operations in MQ.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default MQ2EndpointBuilder useSessionCredentials(
+                boolean useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
+            return this;
+        }
+        /**
+         * Set whether the MQ client should expect to use Session Credentials.
+         * This is useful in a situation in which the user needs to assume an
+         * IAM role for doing operations in MQ.
+         * 
+         * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
+         * type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default MQ2EndpointBuilder useSessionCredentials(
+                String useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
+            return this;
+        }
     }
 
     /**
@@ -461,7 +513,7 @@ public interface MQ2EndpointBuilderFactory {
             return this;
         }
         /**
-         * To use a existing configured AmazonMQClient as client.
+         * To use a existing configured AmazonMQClient client.
          * 
          * The option is a:
          * &lt;code&gt;software.amazon.awssdk.services.mq.MqClient&lt;/code&gt;
@@ -478,7 +530,7 @@ public interface MQ2EndpointBuilderFactory {
             return this;
         }
         /**
-         * To use a existing configured AmazonMQClient as client.
+         * To use a existing configured AmazonMQClient client.
          * 
          * The option will be converted to a
          * &lt;code&gt;software.amazon.awssdk.services.mq.MqClient&lt;/code&gt;
@@ -571,7 +623,7 @@ public interface MQ2EndpointBuilderFactory {
          * @return the name of the header {@code AwsMQOperation}.
          */
         public String awsMQOperation() {
-            return "AwsMQOperation";
+            return "CamelAwsMQOperation";
         }
 
         /**
@@ -585,7 +637,7 @@ public interface MQ2EndpointBuilderFactory {
          * @return the name of the header {@code AwsMQMaxResults}.
          */
         public String awsMQMaxResults() {
-            return "AwsMQMaxResults";
+            return "CamelAwsMQMaxResults";
         }
 
         /**
@@ -598,7 +650,7 @@ public interface MQ2EndpointBuilderFactory {
          * @return the name of the header {@code AwsMQBrokerName}.
          */
         public String awsMQBrokerName() {
-            return "AwsMQBrokerName";
+            return "CamelAwsMQBrokerName";
         }
 
         /**
@@ -611,7 +663,7 @@ public interface MQ2EndpointBuilderFactory {
          * @return the name of the header {@code AwsMQBrokerEngine}.
          */
         public String awsMQBrokerEngine() {
-            return "AwsMQBrokerEngine";
+            return "CamelAwsMQBrokerEngine";
         }
 
         /**
@@ -625,7 +677,7 @@ public interface MQ2EndpointBuilderFactory {
          * @return the name of the header {@code AwsMQBrokerEngineVersion}.
          */
         public String awsMQBrokerEngineVersion() {
-            return "AwsMQBrokerEngineVersion";
+            return "CamelAwsMQBrokerEngineVersion";
         }
 
         /**
@@ -638,7 +690,7 @@ public interface MQ2EndpointBuilderFactory {
          * @return the name of the header {@code AwsMQBrokerID}.
          */
         public String awsMQBrokerID() {
-            return "AwsMQBrokerID";
+            return "CamelAwsMQBrokerID";
         }
 
         /**
@@ -652,7 +704,7 @@ public interface MQ2EndpointBuilderFactory {
          * @return the name of the header {@code AwsMQConfigurationID}.
          */
         public String awsMQConfigurationID() {
-            return "AwsMQConfigurationID";
+            return "CamelAwsMQConfigurationID";
         }
 
         /**
@@ -665,7 +717,7 @@ public interface MQ2EndpointBuilderFactory {
          * @return the name of the header {@code AwsMQBrokerDeploymentMode}.
          */
         public String awsMQBrokerDeploymentMode() {
-            return "AwsMQBrokerDeploymentMode";
+            return "CamelAwsMQBrokerDeploymentMode";
         }
 
         /**
@@ -678,7 +730,7 @@ public interface MQ2EndpointBuilderFactory {
          * @return the name of the header {@code AwsMQBrokerInstanceType}.
          */
         public String awsMQBrokerInstanceType() {
-            return "AwsMQBrokerInstanceType";
+            return "CamelAwsMQBrokerInstanceType";
         }
 
         /**
@@ -691,7 +743,7 @@ public interface MQ2EndpointBuilderFactory {
          * @return the name of the header {@code AwsMQBrokerUsers}.
          */
         public String awsMQBrokerUsers() {
-            return "AwsMQBrokerUsers";
+            return "CamelAwsMQBrokerUsers";
         }
 
         /**
@@ -705,7 +757,7 @@ public interface MQ2EndpointBuilderFactory {
          * @return the name of the header {@code AwsMQBrokerPubliclyAccessible}.
          */
         public String awsMQBrokerPubliclyAccessible() {
-            return "AwsMQBrokerPubliclyAccessible";
+            return "CamelAwsMQBrokerPubliclyAccessible";
         }
     }
     static MQ2EndpointBuilder endpointBuilder(String componentName, String path) {

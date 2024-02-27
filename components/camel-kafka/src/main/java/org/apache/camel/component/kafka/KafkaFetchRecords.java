@@ -29,8 +29,10 @@ import org.apache.camel.component.kafka.consumer.errorhandler.KafkaConsumerListe
 import org.apache.camel.component.kafka.consumer.errorhandler.KafkaErrorStrategies;
 import org.apache.camel.component.kafka.consumer.support.KafkaRecordProcessorFacade;
 import org.apache.camel.component.kafka.consumer.support.ProcessingResult;
+import org.apache.camel.component.kafka.consumer.support.batching.KafkaRecordBatchingProcessorFacade;
 import org.apache.camel.component.kafka.consumer.support.classic.ClassicRebalanceListener;
 import org.apache.camel.component.kafka.consumer.support.resume.ResumeRebalanceListener;
+import org.apache.camel.component.kafka.consumer.support.streaming.KafkaRecordStreamingProcessorFacade;
 import org.apache.camel.support.BridgeExceptionHandlerToErrorHandler;
 import org.apache.camel.support.task.ForegroundTask;
 import org.apache.camel.support.task.Tasks;
@@ -209,9 +211,12 @@ public class KafkaFetchRecords implements Runnable {
             if (consumerListener != null) {
                 consumerListener.setConsumer(consumer);
 
-                SeekPolicy seekPolicy = kafkaConsumer.getEndpoint().getComponent().getConfiguration().getSeekTo();
+                SeekPolicy seekPolicy = kafkaConsumer.getEndpoint().getConfiguration().getSeekTo();
                 if (seekPolicy == null) {
-                    seekPolicy = SeekPolicy.BEGINNING;
+                    seekPolicy = kafkaConsumer.getEndpoint().getComponent().getConfiguration().getSeekTo();
+                    if (seekPolicy == null) {
+                        seekPolicy = SeekPolicy.BEGINNING;
+                    }
                 }
 
                 consumerListener.setSeekPolicy(seekPolicy);
@@ -302,7 +307,6 @@ public class KafkaFetchRecords implements Runnable {
     }
 
     protected void startPolling() {
-        long partitionLastOffset = -1;
 
         try {
             /*
@@ -312,16 +316,14 @@ public class KafkaFetchRecords implements Runnable {
             lock.lock();
 
             long pollTimeoutMs = kafkaConsumer.getEndpoint().getConfiguration().getPollTimeoutMs();
+            Duration pollDuration = Duration.ofMillis(pollTimeoutMs);
 
             if (LOG.isTraceEnabled()) {
                 LOG.trace("Polling {} from {} with timeout: {}", threadId, getPrintableTopic(), pollTimeoutMs);
             }
 
-            KafkaRecordProcessorFacade recordProcessorFacade = new KafkaRecordProcessorFacade(
-                    kafkaConsumer, threadId, commitManager, consumerListener);
+            final KafkaRecordProcessorFacade recordProcessorFacade = createRecordProcessor();
 
-            Duration pollDuration = Duration.ofMillis(pollTimeoutMs);
-            ProcessingResult lastResult = null;
             while (isKafkaConsumerRunnableAndNotStopped() && isConnected() && pollExceptionStrategy.canContinue()) {
                 ConsumerRecords<Object, Object> allRecords = consumer.poll(pollDuration);
                 if (consumerListener != null) {
@@ -330,15 +332,15 @@ public class KafkaFetchRecords implements Runnable {
                     }
                 }
 
-                ProcessingResult result = recordProcessorFacade.processPolledRecords(allRecords, lastResult);
+                ProcessingResult result = recordProcessorFacade.processPolledRecords(allRecords);
                 updateTaskState();
-                if (result.isBreakOnErrorHit() && !this.state.equals(State.PAUSED)) {
+
+                // when breakOnFirstError we want to unsubscribe from Kafka
+                if (result != null && result.isBreakOnErrorHit() && !this.state.equals(State.PAUSED)) {
                     LOG.debug("We hit an error ... setting flags to force reconnect");
                     // force re-connect
                     setReconnect(true);
                     setConnected(false);
-                } else {
-                    lastResult = result;
                 }
 
             }
@@ -350,7 +352,8 @@ public class KafkaFetchRecords implements Runnable {
 
             safeUnsubscribe();
         } catch (InterruptException e) {
-            kafkaConsumer.getExceptionHandler().handleException("Interrupted while consuming " + threadId + " from kafka topic",
+            kafkaConsumer.getExceptionHandler().handleException(
+                    "Thread " + threadId + " interrupted while consuming from kafka topic",
                     e);
             commitManager.commit();
 
@@ -372,6 +375,8 @@ public class KafkaFetchRecords implements Runnable {
                         e.getClass().getName(), threadId, getPrintableTopic(), e.getMessage());
             }
 
+            // why do we set this to -1
+            long partitionLastOffset = -1;
             pollExceptionStrategy.handle(partitionLastOffset, e);
         } finally {
             // only close if not retry
@@ -380,6 +385,17 @@ public class KafkaFetchRecords implements Runnable {
                 safeConsumerClose();
             }
             lock.unlock();
+        }
+    }
+
+    private KafkaRecordProcessorFacade createRecordProcessor() {
+        final KafkaConfiguration configuration = kafkaConsumer.getEndpoint().getConfiguration();
+        if (configuration.isBatching()) {
+            return new KafkaRecordBatchingProcessorFacade(
+                    kafkaConsumer, threadId, commitManager, consumerListener);
+        } else {
+            return new KafkaRecordStreamingProcessorFacade(
+                    kafkaConsumer, threadId, commitManager, consumerListener);
         }
     }
 
@@ -497,8 +513,10 @@ public class KafkaFetchRecords implements Runnable {
             }
 
             // As advised in the KAFKA-1894 ticket, calling this wakeup method breaks the infinite loop
+            LOG.trace("Waking up Kafka consumer");
             consumer.wakeup();
         } catch (InterruptedException e) {
+            LOG.trace("Interrupted while waiting for processing to finish: waking up Kafka consumer");
             consumer.wakeup();
             Thread.currentThread().interrupt();
         } finally {

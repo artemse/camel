@@ -210,8 +210,10 @@ public abstract class ProcessorDefinition<Type extends ProcessorDefinition<Type>
         configureChild(output);
         getOutputs().add(output);
 
-        if (context != null && (context.isSourceLocationEnabled() || context.isDebugging() || context.isTracing())) {
-            // we want to capture source location:line for every output
+        if (context != null && (context.isSourceLocationEnabled()
+                || context.isDebugging() || context.isDebugStandby()
+                || context.isTracing() || context.isTracingStandby())) {
+            // we want to capture source location:line for every output (also when debugging or tracing enabled/standby)
             Resource resource = this instanceof ResourceAware ? ((ResourceAware) this).getResource() : null;
             ProcessorDefinitionHelper.prepareSourceLocation(resource, output);
         }
@@ -253,6 +255,22 @@ public abstract class ProcessorDefinition<Type extends ProcessorDefinition<Type>
     }
 
     /**
+     * Sends the exchange to the given endpoint
+     *
+     * @param  uri             the endpoint to send to
+     * @param  variableSend    to use a variable as the source for the message body to send.
+     * @param  variableReceive to use a variable to store the received message body (only body, not headers).
+     * @return                 the builder
+     */
+    public Type toV(@AsEndpointUri String uri, String variableSend, String variableReceive) {
+        ToDefinition to = new ToDefinition(uri);
+        to.setVariableSend(variableSend);
+        to.setVariableReceive(variableReceive);
+        addOutput(to);
+        return asType();
+    }
+
+    /**
      * Sends the exchange to the given dynamic endpoint
      *
      * @return the builder
@@ -279,12 +297,46 @@ public abstract class ProcessorDefinition<Type extends ProcessorDefinition<Type>
     /**
      * Sends the exchange to the given dynamic endpoint
      *
+     * @param  uri             the dynamic endpoint to send to (resolved using simple language by default)
+     * @param  variableSend    to use a variable as the source for the message body to send.
+     * @param  variableReceive to use a variable to store the received message body (only body, not headers).
+     * @return                 the builder
+     */
+    public Type toD(@AsEndpointUri String uri, String variableSend, String variableReceive) {
+        ToDynamicDefinition answer = new ToDynamicDefinition(uri);
+        answer.setVariableSend(variableSend);
+        answer.setVariableReceive(variableReceive);
+        addOutput(answer);
+        return asType();
+    }
+
+    /**
+     * Sends the exchange to the given dynamic endpoint
+     *
      * @param  endpointProducerBuilder the dynamic endpoint to send to (resolved using simple language by default)
      * @return                         the builder
      */
     public Type toD(@AsEndpointUri EndpointProducerBuilder endpointProducerBuilder) {
         ToDynamicDefinition answer = new ToDynamicDefinition();
         answer.setEndpointProducerBuilder(endpointProducerBuilder);
+        addOutput(answer);
+        return asType();
+    }
+
+    /**
+     * Sends the exchange to the given dynamic endpoint
+     *
+     * @param  endpointProducerBuilder the dynamic endpoint to send to (resolved using simple language by default)
+     * @param  variableSend            to use a variable as the source for the message body to send.
+     * @param  variableReceive         to use a variable to store the received message body (only body, not headers).
+     * @return                         the builder
+     */
+    public Type toD(
+            @AsEndpointUri EndpointProducerBuilder endpointProducerBuilder, String variableSend, String variableReceive) {
+        ToDynamicDefinition answer = new ToDynamicDefinition();
+        answer.setEndpointProducerBuilder(endpointProducerBuilder);
+        answer.setVariableSend(variableSend);
+        answer.setVariableReceive(variableReceive);
         addOutput(answer);
         return asType();
     }
@@ -924,8 +976,7 @@ public abstract class ProcessorDefinition<Type extends ProcessorDefinition<Type>
      * @return the builder
      */
     public ProcessorDefinition<?> end() {
-        // must do this ugly cast to avoid compiler error on AIX/HP-UX
-        ProcessorDefinition<?> defn = (ProcessorDefinition<?>) this;
+        ProcessorDefinition<?> defn = this;
 
         // when using choice .. when .. otherwise - doTry .. doCatch ..
         // doFinally we should always
@@ -1763,14 +1814,14 @@ public abstract class ProcessorDefinition<Type extends ProcessorDefinition<Type>
      * that a specific endpoint does not get overloaded, or that we don't exceed an agreed SLA with some external
      * service.
      * <p/>
-     * Will default use a time period of 1 second, so setting the maximumRequestCount to eg 10 will default ensure at
-     * most 10 messages per second.
+     * Setting the maximumConcurrentRequest will ensure that no more than the specified number of messages will flow to
+     * the endpoint at any given time.
      *
-     * @param  maximumRequestCount the maximum messages
-     * @return                     the builder
+     * @param  maximumConcurrentRequests the maximum number of concurrent messages
+     * @return                           the builder
      */
-    public ThrottleDefinition throttle(long maximumRequestCount) {
-        return throttle(ExpressionBuilder.constantExpression(maximumRequestCount));
+    public ThrottleDefinition throttle(long maximumConcurrentRequests) {
+        return throttle(ExpressionBuilder.constantExpression(maximumConcurrentRequests));
     }
 
     /**
@@ -1778,14 +1829,14 @@ public abstract class ProcessorDefinition<Type extends ProcessorDefinition<Type>
      * that a specific endpoint does not get overloaded, or that we don't exceed an agreed SLA with some external
      * service.
      * <p/>
-     * Will default use a time period of 1 second, so setting the maximumRequestCount to eg 10 will default ensure at
-     * most 10 messages per second.
+     * Setting the maximumConcurrentRequest will ensure that no more than the specified number of messages will flow to
+     * the endpoint at any given time.
      *
-     * @param  maximumRequestCount an expression to calculate the maximum request count
-     * @return                     the builder
+     * @param  maximumConcurrentRequests an expression to calculate the maximum concurrent request count
+     * @return                           the builder
      */
-    public ThrottleDefinition throttle(Expression maximumRequestCount) {
-        ThrottleDefinition answer = new ThrottleDefinition(maximumRequestCount);
+    public ThrottleDefinition throttle(Expression maximumConcurrentRequests) {
+        ThrottleDefinition answer = new ThrottleDefinition(maximumConcurrentRequests);
         addOutput(answer);
         return answer;
     }
@@ -1797,17 +1848,18 @@ public abstract class ProcessorDefinition<Type extends ProcessorDefinition<Type>
      * based on the key expression to group exchanges. This will make key-based throttling instead of overall
      * throttling.
      * <p/>
-     * Will default use a time period of 1 second, so setting the maximumRequestCount to eg 10 will default ensure at
-     * most 10 messages per second.
+     * Setting the maximumConcurrentRequest will ensure that no more than the specified number of messages will flow to
+     * the endpoint at any given time.
      *
-     * @param  maximumRequestCount      an expression to calculate the maximum request count
-     * @param  correlationExpressionKey is a correlation key that can throttle by the given key instead of overall
-     *                                  throttling
-     * @return                          the builder
+     * @param  maximumConcurrentRequests an expression to calculate the maximum concurrent request count
+     * @param  correlationExpressionKey  is a correlation key that can throttle by the given key instead of overall
+     *                                   throttling
+     * @return                           the builder
      */
-    public ThrottleDefinition throttle(Expression maximumRequestCount, long correlationExpressionKey) {
+    public ThrottleDefinition throttle(Expression maximumConcurrentRequests, long correlationExpressionKey) {
         ThrottleDefinition answer
-                = new ThrottleDefinition(maximumRequestCount, ExpressionBuilder.constantExpression(correlationExpressionKey));
+                = new ThrottleDefinition(
+                        maximumConcurrentRequests, ExpressionBuilder.constantExpression(correlationExpressionKey));
         addOutput(answer);
         return answer;
     }
@@ -1819,16 +1871,16 @@ public abstract class ProcessorDefinition<Type extends ProcessorDefinition<Type>
      * based on the key expression to group exchanges. This will make key-based throttling instead of overall
      * throttling.
      * <p/>
-     * Will default use a time period of 1 second, so setting the maximumRequestCount to eg 10 will default ensure at
-     * most 10 messages per second.
+     * Setting the maximumConcurrentRequest will ensure that no more than the specified number of messages will flow to
+     * the endpoint at any given time.
      *
-     * @param  maximumRequestCount      an expression to calculate the maximum request count
-     * @param  correlationExpressionKey is a correlation key as an expression that can throttle by the given key instead
-     *                                  of overall throttling
-     * @return                          the builder
+     * @param  maximumConcurrentRequests an expression to calculate the maximum concurrent request count
+     * @param  correlationExpressionKey  is a correlation key as an expression that can throttle by the given key
+     *                                   instead of overall throttling
+     * @return                           the builder
      */
-    public ThrottleDefinition throttle(Expression maximumRequestCount, Expression correlationExpressionKey) {
-        ThrottleDefinition answer = new ThrottleDefinition(maximumRequestCount, correlationExpressionKey);
+    public ThrottleDefinition throttle(Expression maximumConcurrentRequests, Expression correlationExpressionKey) {
+        ThrottleDefinition answer = new ThrottleDefinition(maximumConcurrentRequests, correlationExpressionKey);
         addOutput(answer);
         return answer;
     }
@@ -2026,12 +2078,46 @@ public abstract class ProcessorDefinition<Type extends ProcessorDefinition<Type>
      * each processor and destination gets a copy of the original message to avoid the processors interfering with each
      * other using {@link ExchangePattern#InOnly}.
      *
+     * @param  endpoint     the endpoint to wiretap to
+     * @param  variableSend to use a variable as the source for the message body to send.
+     * @return              the builder
+     */
+    public WireTapDefinition<Type> wireTap(@AsEndpointUri EndpointProducerBuilder endpoint, String variableSend) {
+        WireTapDefinition answer = new WireTapDefinition();
+        answer.setEndpointProducerBuilder(endpoint);
+        answer.setVariableSend(variableSend);
+        addOutput(answer);
+        return answer;
+    }
+
+    /**
+     * <a href="http://camel.apache.org/wiretap.html">WireTap EIP:</a> Sends messages to all its child outputs; so that
+     * each processor and destination gets a copy of the original message to avoid the processors interfering with each
+     * other using {@link ExchangePattern#InOnly}.
+     *
      * @param  uri the dynamic endpoint to wiretap to (resolved using simple language by default)
      * @return     the builder
      */
     public WireTapDefinition<Type> wireTap(@AsEndpointUri String uri) {
         WireTapDefinition answer = new WireTapDefinition();
         answer.setUri(uri);
+        addOutput(answer);
+        return answer;
+    }
+
+    /**
+     * <a href="http://camel.apache.org/wiretap.html">WireTap EIP:</a> Sends messages to all its child outputs; so that
+     * each processor and destination gets a copy of the original message to avoid the processors interfering with each
+     * other using {@link ExchangePattern#InOnly}.
+     *
+     * @param  uri          the dynamic endpoint to wiretap to (resolved using simple language by default)
+     * @param  variableSend to use a variable as the source for the message body to send.
+     * @return              the builder
+     */
+    public WireTapDefinition<Type> wireTap(@AsEndpointUri String uri, String variableSend) {
+        WireTapDefinition answer = new WireTapDefinition();
+        answer.setUri(uri);
+        answer.setVariableSend(variableSend);
         addOutput(answer);
         return answer;
     }
@@ -2093,10 +2179,43 @@ public abstract class ProcessorDefinition<Type extends ProcessorDefinition<Type>
      * <a href="http://camel.apache.org/exception-clause.html">Exception clause</a> for catching certain exceptions and
      * handling them.
      *
+     * @param  exceptionType1 the first exception to catch
+     * @param  exceptionType2 the second exception to catch
+     * @return                the exception builder to configure
+     */
+    public OnExceptionDefinition onException(
+            Class<? extends Throwable> exceptionType1, Class<? extends Throwable> exceptionType2) {
+        OnExceptionDefinition answer = new OnExceptionDefinition(Arrays.asList(exceptionType1, exceptionType2));
+        addOutput(answer);
+        return answer;
+    }
+
+    /**
+     * <a href="http://camel.apache.org/exception-clause.html">Exception clause</a> for catching certain exceptions and
+     * handling them.
+     *
+     * @param  exceptionType1 the first exception to catch
+     * @param  exceptionType2 the second exception to catch
+     * @param  exceptionType3 the third exception to catch
+     * @return                the exception builder to configure
+     */
+    public OnExceptionDefinition onException(
+            Class<? extends Throwable> exceptionType1, Class<? extends Throwable> exceptionType2,
+            Class<? extends Throwable> exceptionType3) {
+        OnExceptionDefinition answer = new OnExceptionDefinition(Arrays.asList(exceptionType1, exceptionType2, exceptionType3));
+        addOutput(answer);
+        return answer;
+    }
+
+    /**
+     * <a href="http://camel.apache.org/exception-clause.html">Exception clause</a> for catching certain exceptions and
+     * handling them.
+     *
      * @param  exceptions list of exceptions to catch
      * @return            the exception builder to configure
      */
-    public OnExceptionDefinition onException(Class<? extends Throwable>... exceptions) {
+    @SafeVarargs
+    public final OnExceptionDefinition onException(Class<? extends Throwable>... exceptions) {
         OnExceptionDefinition answer = new OnExceptionDefinition(Arrays.asList(exceptions));
         addOutput(answer);
         return answer;
@@ -2522,7 +2641,7 @@ public abstract class ProcessorDefinition<Type extends ProcessorDefinition<Type>
      * Adds a processor which sets the header on the IN message
      *
      * @param  name the header name
-     * @return      a expression builder clause to set the header
+     * @return      an expression builder clause to set the header
      */
     public ExpressionClause<ProcessorDefinition<Type>> setHeader(String name) {
         ExpressionClause<ProcessorDefinition<Type>> clause = new ExpressionClause<>(this);
@@ -2545,6 +2664,18 @@ public abstract class ProcessorDefinition<Type extends ProcessorDefinition<Type>
     }
 
     /**
+     * Adds a processor which sets several headers on the IN message
+     *
+     * @param  headerNamesAndValues a sequence of header names and values or a Map containing names and values
+     * @return                      the builder
+     */
+    public Type setHeaders(Object... headerNamesAndValues) {
+        SetHeadersDefinition answer = new SetHeadersDefinition(headerNamesAndValues);
+        addOutput(answer);
+        return asType();
+    }
+
+    /**
      * Adds a processor which sets the header on the IN message
      *
      * @param  name     the header name
@@ -2558,7 +2689,50 @@ public abstract class ProcessorDefinition<Type extends ProcessorDefinition<Type>
                 return supplier.get();
             }
         });
+        addOutput(answer);
+        return asType();
+    }
 
+    /**
+     * Adds a processor which sets the variable
+     *
+     * @param  name the variable name
+     * @return      an expression builder clause to set the variable
+     */
+    public ExpressionClause<ProcessorDefinition<Type>> setVariable(String name) {
+        ExpressionClause<ProcessorDefinition<Type>> clause = new ExpressionClause<>(this);
+        SetVariableDefinition answer = new SetVariableDefinition(name, clause);
+        addOutput(answer);
+        return clause;
+    }
+
+    /**
+     * Adds a processor which sets the variable
+     *
+     * @param  name       the variable name
+     * @param  expression the expression used to set the variable
+     * @return            the builder
+     */
+    public Type setVariable(String name, Expression expression) {
+        SetVariableDefinition answer = new SetVariableDefinition(name, expression);
+        addOutput(answer);
+        return asType();
+    }
+
+    /**
+     * Adds a processor which sets the variable
+     *
+     * @param  name     the variable name
+     * @param  supplier the supplier used to set the variable
+     * @return          the builder
+     */
+    public Type setVariable(String name, final Supplier<Object> supplier) {
+        SetVariableDefinition answer = new SetVariableDefinition(name, new ExpressionAdapter() {
+            @Override
+            public Object evaluate(Exchange exchange) {
+                return supplier.get();
+            }
+        });
         addOutput(answer);
         return asType();
     }
@@ -2646,6 +2820,18 @@ public abstract class ProcessorDefinition<Type extends ProcessorDefinition<Type>
     }
 
     /**
+     * Adds a processor which removes the variable
+     *
+     * @param  name the variable name
+     * @return      the builder
+     */
+    public Type removeVariable(String name) {
+        RemoveVariableDefinition answer = new RemoveVariableDefinition(name);
+        addOutput(answer);
+        return asType();
+    }
+
+    /**
      * Adds a processor which removes the exchange property
      *
      * @param  name the property name
@@ -2714,6 +2900,108 @@ public abstract class ProcessorDefinition<Type extends ProcessorDefinition<Type>
      */
     public Type convertBodyTo(Class<?> type, String charset) {
         addOutput(new ConvertBodyDefinition(type, charset));
+        return asType();
+    }
+
+    /**
+     * Converts the IN message header to the specified type
+     *
+     * @param  name the header name
+     * @param  type the type to convert to
+     * @return      the builder
+     */
+    public Type convertHeaderTo(String name, Class<?> type) {
+        addOutput(new ConvertHeaderDefinition(name, type));
+        return asType();
+    }
+
+    /**
+     * Converts the IN message header to the specified type
+     *
+     * @param  name   the header name
+     * @param  toName to use another header to store the result
+     * @param  type   the type to convert to
+     * @return        the builder
+     */
+    public Type convertHeaderTo(String name, String toName, Class<?> type) {
+        addOutput(new ConvertHeaderDefinition(name, toName, type));
+        return asType();
+    }
+
+    /**
+     * Converts the IN message header to the specified type
+     *
+     * @param  name      the header name
+     * @param  type      the type to convert to
+     * @param  mandatory whether to use mandatory type conversion or not
+     * @return           the builder
+     */
+    public Type convertHeaderTo(String name, Class<?> type, boolean mandatory) {
+        addOutput(new ConvertHeaderDefinition(name, type, mandatory));
+        return asType();
+    }
+
+    /**
+     * Converts the IN message header to the specified type
+     *
+     * @param  name    the header name
+     * @param  type    the type to convert to
+     * @param  charset the charset to use by type converters (not all converters support specific charset)
+     * @return         the builder
+     */
+    public Type convertHeaderTo(String name, Class<?> type, String charset) {
+        addOutput(new ConvertHeaderDefinition(name, type, charset));
+        return asType();
+    }
+
+    /**
+     * Converts the variable to the specified type
+     *
+     * @param  name the variable name
+     * @param  type the type to convert to
+     * @return      the builder
+     */
+    public Type convertVariableTo(String name, Class<?> type) {
+        addOutput(new ConvertVariableDefinition(name, type));
+        return asType();
+    }
+
+    /**
+     * Converts the variable to the specified type
+     *
+     * @param  name   the variable name
+     * @param  toName to use another variable to store the result
+     * @param  type   the type to convert to
+     * @return        the builder
+     */
+    public Type convertVariableTo(String name, String toName, Class<?> type) {
+        addOutput(new ConvertVariableDefinition(name, toName, type));
+        return asType();
+    }
+
+    /**
+     * Converts the variable to the specified type
+     *
+     * @param  name      the variable name
+     * @param  type      the type to convert to
+     * @param  mandatory whether to use mandatory type conversion or not
+     * @return           the builder
+     */
+    public Type convertVariableTo(String name, Class<?> type, boolean mandatory) {
+        addOutput(new ConvertVariableDefinition(name, type, mandatory));
+        return asType();
+    }
+
+    /**
+     * Converts the variable to the specified type
+     *
+     * @param  name    the variable name
+     * @param  type    the type to convert to
+     * @param  charset the charset to use by type converters (not all converters support specific charset)
+     * @return         the builder
+     */
+    public Type convertVariableTo(String name, Class<?> type, String charset) {
+        addOutput(new ConvertVariableDefinition(name, type, charset));
         return asType();
     }
 

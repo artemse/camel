@@ -31,7 +31,6 @@ import org.apache.camel.Exchange;
 import org.apache.camel.component.jms.ConsumerType;
 import org.apache.camel.component.jms.DefaultJmsMessageListenerContainer;
 import org.apache.camel.component.jms.DefaultSpringErrorHandler;
-import org.apache.camel.component.jms.MessageListenerContainerFactory;
 import org.apache.camel.component.jms.SimpleJmsMessageListenerContainer;
 import org.springframework.jms.listener.AbstractMessageListenerContainer;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
@@ -53,8 +52,9 @@ public class TemporaryQueueReplyManager extends ReplyManagerSupport {
         try {
             destResolver.destinationReady();
         } catch (InterruptedException e) {
-            log.warn("Interrupted while waiting for JMSReplyTo destination refresh due to: {}. This exception is ignored.",
+            log.warn("Interrupted while waiting for JMSReplyTo destination refresh due to: {}.",
                     e.getMessage());
+            Thread.currentThread().interrupt();
         }
         return super.getReplyTo();
     }
@@ -106,12 +106,7 @@ public class TemporaryQueueReplyManager extends ReplyManagerSupport {
         } else if (endpoint.getConfiguration().getReplyToConsumerType() == ConsumerType.Simple) {
             return createSimpleListenerContainer();
         } else {
-            MessageListenerContainerFactory factory = endpoint.getConfiguration().getMessageListenerContainerFactory();
-            if (factory != null) {
-                return factory.createMessageListenerContainer(endpoint);
-            }
-            throw new IllegalArgumentException(
-                    "ReplyToConsumerType.Custom requires that a MessageListenerContainerFactory has been configured");
+            return getAbstractMessageListenerContainer(endpoint);
         }
     }
 

@@ -21,13 +21,15 @@ public class ServiceBusEndpointUriFactory extends org.apache.camel.support.compo
     private static final Set<String> SECRET_PROPERTY_NAMES;
     private static final Set<String> MULTI_VALUE_PREFIXES;
     static {
-        Set<String> props = new HashSet<>(26);
+        Set<String> props = new HashSet<>(29);
         props.add("amqpRetryOptions");
         props.add("amqpTransportType");
+        props.add("binary");
         props.add("bridgeErrorHandler");
         props.add("clientOptions");
         props.add("connectionString");
         props.add("consumerOperation");
+        props.add("credentialType");
         props.add("disableAutoComplete");
         props.add("exceptionHandler");
         props.add("exchangePattern");
@@ -39,6 +41,7 @@ public class ServiceBusEndpointUriFactory extends org.apache.camel.support.compo
         props.add("producerOperation");
         props.add("proxyOptions");
         props.add("receiverAsyncClient");
+        props.add("reconnectDelay");
         props.add("scheduledEnqueueTime");
         props.add("senderAsyncClient");
         props.add("serviceBusReceiveMode");

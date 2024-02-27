@@ -42,7 +42,7 @@ public interface Ses2EndpointBuilderFactory {
             return (AdvancedSes2EndpointBuilder) this;
         }
         /**
-         * List of comma separated destination blind carbon copy (bcc) email
+         * List of comma-separated destination blind carbon copy (bcc) email
          * address. Can be overridden with 'CamelAwsSesBcc' header.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -57,7 +57,7 @@ public interface Ses2EndpointBuilderFactory {
             return this;
         }
         /**
-         * List of comma separated destination carbon copy (cc) email address.
+         * List of comma-separated destination carbon copy (cc) email address.
          * Can be overridden with 'CamelAwsSesCc' header.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -87,8 +87,8 @@ public interface Ses2EndpointBuilderFactory {
             return this;
         }
         /**
-         * Set the need for overidding the endpoint. This option needs to be
-         * used in combination with uriEndpointOverride option.
+         * Set the need for overriding the endpoint. This option needs to be
+         * used in combination with the uriEndpointOverride option.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -103,8 +103,8 @@ public interface Ses2EndpointBuilderFactory {
             return this;
         }
         /**
-         * Set the need for overidding the endpoint. This option needs to be
-         * used in combination with uriEndpointOverride option.
+         * Set the need for overriding the endpoint. This option needs to be
+         * used in combination with the uriEndpointOverride option.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -122,7 +122,7 @@ public interface Ses2EndpointBuilderFactory {
         /**
          * The region in which SES client needs to work. When using this
          * parameter, the configuration will expect the lowercase name of the
-         * region (for example ap-east-1) You'll need to use the name
+         * region (for example, ap-east-1) You'll need to use the name
          * Region.EU_WEST_1.id().
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -303,7 +303,7 @@ public interface Ses2EndpointBuilderFactory {
             return this;
         }
         /**
-         * If using a profile credentials provider this parameter will set the
+         * If using a profile credentials provider, this parameter will set the
          * profile name.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -330,6 +330,21 @@ public interface Ses2EndpointBuilderFactory {
          */
         default Ses2EndpointBuilder secretKey(String secretKey) {
             doSetProperty("secretKey", secretKey);
+            return this;
+        }
+        /**
+         * Amazon AWS Session Token used when the user needs to assume an IAM
+         * role.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: security
+         * 
+         * @param sessionToken the value to set
+         * @return the dsl builder
+         */
+        default Ses2EndpointBuilder sessionToken(String sessionToken) {
+            doSetProperty("sessionToken", sessionToken);
             return this;
         }
         /**
@@ -437,6 +452,43 @@ public interface Ses2EndpointBuilderFactory {
         default Ses2EndpointBuilder useProfileCredentialsProvider(
                 String useProfileCredentialsProvider) {
             doSetProperty("useProfileCredentialsProvider", useProfileCredentialsProvider);
+            return this;
+        }
+        /**
+         * Set whether the SES client should expect to use Session Credentials.
+         * This is useful in a situation in which the user needs to assume an
+         * IAM role for doing operations in SES.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default Ses2EndpointBuilder useSessionCredentials(
+                boolean useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
+            return this;
+        }
+        /**
+         * Set whether the SES client should expect to use Session Credentials.
+         * This is useful in a situation in which the user needs to assume an
+         * IAM role for doing operations in SES.
+         * 
+         * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
+         * type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default Ses2EndpointBuilder useSessionCredentials(
+                String useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
             return this;
         }
     }
@@ -611,7 +663,7 @@ public interface Ses2EndpointBuilderFactory {
          * @return the name of the header {@code AwsSesFrom}.
          */
         public String awsSesFrom() {
-            return "AwsSesFrom";
+            return "CamelAwsSesFrom";
         }
 
         /**
@@ -624,7 +676,7 @@ public interface Ses2EndpointBuilderFactory {
          * @return the name of the header {@code AwsSesMessageId}.
          */
         public String awsSesMessageId() {
-            return "AwsSesMessageId";
+            return "CamelAwsSesMessageId";
         }
 
         /**
@@ -638,7 +690,7 @@ public interface Ses2EndpointBuilderFactory {
          * @return the name of the header {@code AwsSesReplyToAddresses}.
          */
         public String awsSesReplyToAddresses() {
-            return "AwsSesReplyToAddresses";
+            return "CamelAwsSesReplyToAddresses";
         }
 
         /**
@@ -651,7 +703,7 @@ public interface Ses2EndpointBuilderFactory {
          * @return the name of the header {@code AwsSesReturnPath}.
          */
         public String awsSesReturnPath() {
-            return "AwsSesReturnPath";
+            return "CamelAwsSesReturnPath";
         }
 
         /**
@@ -664,7 +716,7 @@ public interface Ses2EndpointBuilderFactory {
          * @return the name of the header {@code AwsSesSubject}.
          */
         public String awsSesSubject() {
-            return "AwsSesSubject";
+            return "CamelAwsSesSubject";
         }
 
         /**
@@ -677,7 +729,7 @@ public interface Ses2EndpointBuilderFactory {
          * @return the name of the header {@code AwsSesTo}.
          */
         public String awsSesTo() {
-            return "AwsSesTo";
+            return "CamelAwsSesTo";
         }
 
         /**
@@ -690,7 +742,7 @@ public interface Ses2EndpointBuilderFactory {
          * @return the name of the header {@code AwsSesCc}.
          */
         public String awsSesCc() {
-            return "AwsSesCc";
+            return "CamelAwsSesCc";
         }
 
         /**
@@ -704,7 +756,7 @@ public interface Ses2EndpointBuilderFactory {
          * @return the name of the header {@code AwsSesBcc}.
          */
         public String awsSesBcc() {
-            return "AwsSesBcc";
+            return "CamelAwsSesBcc";
         }
 
         /**
@@ -717,7 +769,7 @@ public interface Ses2EndpointBuilderFactory {
          * @return the name of the header {@code AwsSesHtmlEmail}.
          */
         public String awsSesHtmlEmail() {
-            return "AwsSesHtmlEmail";
+            return "CamelAwsSesHtmlEmail";
         }
 
         /**
@@ -730,7 +782,7 @@ public interface Ses2EndpointBuilderFactory {
          * @return the name of the header {@code AwsSesConfigurationSet}.
          */
         public String awsSesConfigurationSet() {
-            return "AwsSesConfigurationSet";
+            return "CamelAwsSesConfigurationSet";
         }
     }
     static Ses2EndpointBuilder endpointBuilder(String componentName, String path) {

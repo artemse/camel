@@ -17,7 +17,6 @@
 package org.apache.camel.dsl.jbang.core.commands.action;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -31,10 +30,8 @@ import org.apache.camel.dsl.jbang.core.commands.CamelJBangMain;
 import org.apache.camel.support.PatternHelper;
 import org.apache.camel.util.FileUtil;
 import org.apache.camel.util.IOHelper;
-import org.apache.camel.util.StopWatch;
 import org.apache.camel.util.json.JsonArray;
 import org.apache.camel.util.json.JsonObject;
-import org.apache.camel.util.json.Jsoner;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
@@ -86,8 +83,8 @@ public class CamelThreadDump extends ActionWatchCommand {
         if (pids.isEmpty()) {
             return 0;
         } else if (pids.size() > 1) {
-            System.out.println("Name or pid " + name + " matches " + pids.size()
-                               + " running Camel integrations. Specify a name or PID that matches exactly one.");
+            printer().println("Name or pid " + name + " matches " + pids.size()
+                              + " running Camel integrations. Specify a name or PID that matches exactly one.");
             return 0;
         }
 
@@ -138,7 +135,7 @@ public class CamelThreadDump extends ActionWatchCommand {
                 rows.add(row);
             }
         } else {
-            System.out.println("Response from running Camel with PID " + pid + " not received within 5 seconds");
+            printer().println("Response from running Camel with PID " + pid + " not received within 5 seconds");
             return 1;
         }
 
@@ -151,7 +148,7 @@ public class CamelThreadDump extends ActionWatchCommand {
         if (!rows.isEmpty()) {
             int total = jo.getInteger("threadCount");
             int peak = jo.getInteger("peakThreadCount");
-            System.out.printf("PID: %s\tThreads: %d\tPeak: %d\t\tDisplay: %d/%d\n", pid, total, peak, rows.size(), total);
+            printer().printf("PID: %s\tThreads: %d\tPeak: %d\t\tDisplay: %d/%d\n", pid, total, peak, rows.size(), total);
 
             if (depth == 1) {
                 singleTable(rows);
@@ -167,7 +164,7 @@ public class CamelThreadDump extends ActionWatchCommand {
     }
 
     protected void singleTable(List<Row> rows) {
-        System.out.println(AsciiTable.getTable(AsciiTable.NO_BORDERS, rows, Arrays.asList(
+        printer().println(AsciiTable.getTable(AsciiTable.NO_BORDERS, rows, Arrays.asList(
                 new Column().header("ID").headerAlign(HorizontalAlign.CENTER).with(r -> Long.toString(r.id)),
                 new Column().header("NAME").dataAlign(HorizontalAlign.LEFT).maxWidth(60, OverflowBehaviour.ELLIPSIS_RIGHT)
                         .with(r -> r.name),
@@ -180,7 +177,7 @@ public class CamelThreadDump extends ActionWatchCommand {
 
     protected void tableAndStackTrace(List<Row> rows) {
         for (Row row : rows) {
-            System.out.println(AsciiTable.getTable(AsciiTable.NO_BORDERS, List.of(row), Arrays.asList(
+            printer().println(AsciiTable.getTable(AsciiTable.NO_BORDERS, List.of(row), Arrays.asList(
                     new Column().header("ID").headerAlign(HorizontalAlign.CENTER).with(r -> Long.toString(r.id)),
                     new Column().header("NAME").dataAlign(HorizontalAlign.LEFT).maxWidth(60, OverflowBehaviour.ELLIPSIS_RIGHT)
                             .with(r -> r.name),
@@ -188,7 +185,7 @@ public class CamelThreadDump extends ActionWatchCommand {
                     new Column().header("BLOCK").with(this::getBlocked),
                     new Column().header("WAIT").with(this::getWaited))));
             for (int i = 0; i < depth && i < row.stackTrace.size(); i++) {
-                System.out.println("\t" + row.stackTrace.get(i));
+                printer().println("\t" + row.stackTrace.get(i));
             }
         }
     }
@@ -213,24 +210,7 @@ public class CamelThreadDump extends ActionWatchCommand {
     }
 
     protected JsonObject waitForOutputFile(File outputFile) {
-        StopWatch watch = new StopWatch();
-        while (watch.taken() < 5000) {
-            try {
-                // give time for response to be ready
-                Thread.sleep(100);
-
-                if (outputFile.exists()) {
-                    FileInputStream fis = new FileInputStream(outputFile);
-                    String text = IOHelper.loadText(fis);
-                    IOHelper.close(fis);
-                    return (JsonObject) Jsoner.deserialize(text);
-                }
-
-            } catch (Exception e) {
-                // ignore
-            }
-        }
-        return null;
+        return getJsonObject(outputFile);
     }
 
     private String getBlocked(Row r) {

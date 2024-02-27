@@ -21,7 +21,7 @@
     <parent>
         <artifactId>camel-parent</artifactId>
         <groupId>org.apache.camel</groupId>
-        <version>4.1.0-SNAPSHOT</version>
+        <version>4.5.0-SNAPSHOT</version>
         <relativePath>../parent</relativePath>
     </parent>
 
@@ -49,7 +49,6 @@
         <module>camel-test-infra-messaging-common</module>
         <module>camel-test-infra-artemis</module>
         <module>camel-test-infra-dispatch-router</module>
-        <module>camel-test-infra-hdfs</module>
         <module>camel-test-infra-jdbc</module>
         <module>camel-test-infra-arangodb</module>
         <module>camel-test-infra-consul</module>
@@ -76,5 +75,8 @@
         <module>camel-test-infra-etcd3</module>
         <module>camel-test-infra-core</module>
         <module>camel-test-infra-opensearch</module>
+        <module>camel-test-infra-smb</module>
+        <module>camel-test-infra-cli</module>
+        <module>camel-test-infra-qdrant</module>
     </modules>
 </project>

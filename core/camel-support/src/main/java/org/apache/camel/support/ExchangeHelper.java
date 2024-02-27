@@ -34,6 +34,7 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.CamelExecutionException;
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
+import org.apache.camel.ExchangeExtension;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.ExchangePropertyKey;
 import org.apache.camel.Message;
@@ -46,9 +47,12 @@ import org.apache.camel.NoTypeConversionAvailableException;
 import org.apache.camel.Route;
 import org.apache.camel.RuntimeCamelException;
 import org.apache.camel.TypeConversionException;
+import org.apache.camel.VariableAware;
 import org.apache.camel.WrappedFile;
 import org.apache.camel.spi.NormalizedEndpointUri;
 import org.apache.camel.spi.UnitOfWork;
+import org.apache.camel.spi.VariableRepository;
+import org.apache.camel.spi.VariableRepositoryFactory;
 import org.apache.camel.util.IOHelper;
 import org.apache.camel.util.ObjectHelper;
 import org.apache.camel.util.Scanner;
@@ -343,56 +347,73 @@ public final class ExchangeHelper {
 
     private static void doCopyResults(Exchange result, Exchange source, boolean preserverPattern) {
         if (result == source) {
-            // we just need to ensure MEP is as expected (eg copy result to OUT if out capable)
-            // and the result is not failed
-            if (result.getPattern().isOutCapable() && !result.hasOut() && !result.isFailed()) {
-                // copy IN to OUT as we expect a OUT response
-                result.getOut().copyFrom(source.getIn());
-            }
+            copyFromOutMessageConditionally(result, source);
             return;
         }
 
         if (source.hasOut()) {
-            if (preserverPattern) {
-                // exchange pattern sensitive
-                Message resultMessage = getResultMessage(result);
-                resultMessage.copyFrom(source.getOut());
-            } else {
-                result.getOut().copyFrom(source.getOut());
-            }
+            copyFromOutMessage(result, source, preserverPattern);
         } else {
-            // no results so lets copy the last input
-            // as the final processor on a pipeline might not
-            // have created any OUT; such as a mock:endpoint
-            // so lets assume the last IN is the OUT
-            if (!preserverPattern && result.getPattern().isOutCapable()) {
-                // only set OUT if its OUT capable
-                result.getOut().copyFrom(source.getIn());
-            } else {
-                // if not replace IN instead to keep the MEP
-                result.getIn().copyFrom(source.getIn());
-                // clear any existing OUT as the result is on the IN
-                if (result.hasOut()) {
-                    result.setOut(null);
-                }
-            }
+            copyFromInMessage(result, source, preserverPattern);
         }
 
         if (source.hasProperties()) {
             result.getProperties().putAll(source.getProperties());
         }
-        source.getExchangeExtension().copyInternalProperties(result);
-        source.getExchangeExtension().copySafeCopyPropertiesTo(result.getExchangeExtension());
+
+        final ExchangeExtension sourceExtension = source.getExchangeExtension();
+        sourceExtension.copyInternalProperties(result);
+
+        final ExchangeExtension resultExtension = result.getExchangeExtension();
+        sourceExtension.copySafeCopyPropertiesTo(resultExtension);
 
         // copy over state
         result.setRouteStop(source.isRouteStop());
         result.setRollbackOnly(source.isRollbackOnly());
         result.setRollbackOnlyLast(source.isRollbackOnlyLast());
-        result.getExchangeExtension().setNotifyEvent(source.getExchangeExtension().isNotifyEvent());
-        result.getExchangeExtension().setRedeliveryExhausted(source.getExchangeExtension().isRedeliveryExhausted());
-        result.getExchangeExtension().setErrorHandlerHandled(source.getExchangeExtension().getErrorHandlerHandled());
+        resultExtension.setNotifyEvent(sourceExtension.isNotifyEvent());
+        resultExtension.setRedeliveryExhausted(sourceExtension.isRedeliveryExhausted());
+        resultExtension.setErrorHandlerHandled(sourceExtension.getErrorHandlerHandled());
+        resultExtension.setFailureHandled(sourceExtension.isFailureHandled());
 
         result.setException(source.getException());
+    }
+
+    private static void copyFromOutMessageConditionally(Exchange result, Exchange source) {
+        // we just need to ensure MEP is as expected (eg copy result to OUT if out capable)
+        // and the result is not failed
+        if (result.getPattern().isOutCapable() && !result.hasOut() && !result.isFailed()) {
+            // copy IN to OUT as we expect a OUT response
+            result.getOut().copyFrom(source.getIn());
+        }
+    }
+
+    private static void copyFromInMessage(Exchange result, Exchange source, boolean preserverPattern) {
+        // no results so lets copy the last input
+        // as the final processor on a pipeline might not
+        // have created any OUT; such as a mock:endpoint
+        // so lets assume the last IN is the OUT
+        if (!preserverPattern && result.getPattern().isOutCapable()) {
+            // only set OUT if its OUT capable
+            result.getOut().copyFrom(source.getIn());
+        } else {
+            // if not replace IN instead to keep the MEP
+            result.getIn().copyFrom(source.getIn());
+            // clear any existing OUT as the result is on the IN
+            if (result.hasOut()) {
+                result.setOut(null);
+            }
+        }
+    }
+
+    private static void copyFromOutMessage(Exchange result, Exchange source, boolean preserverPattern) {
+        if (preserverPattern) {
+            // exchange pattern sensitive
+            Message resultMessage = getResultMessage(result);
+            resultMessage.copyFrom(source.getOut());
+        } else {
+            result.getOut().copyFrom(source.getOut());
+        }
     }
 
     /**
@@ -457,10 +478,12 @@ public final class ExchangeHelper {
         Message in = exchange.getIn();
         map.put("headers", in.getHeaders());
         map.put("body", in.getBody());
+        map.put("variables", exchange.getVariables());
         if (allowContextMapAll) {
             map.put("in", in);
             map.put("request", in);
             map.put("exchange", exchange);
+            map.put("exchangeProperties", exchange.getAllProperties());
             if (isOutCapable(exchange)) {
                 // if we are out capable then set out and response as well
                 // however only grab OUT if it exists, otherwise reuse IN
@@ -691,6 +714,7 @@ public final class ExchangeHelper {
         try {
             return doExtractFutureBody(context, future.get(), type);
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             throw RuntimeCamelException.wrapRuntimeCamelException(e);
         } catch (ExecutionException e) {
             // execution failed due to an exception so rethrow the cause
@@ -727,6 +751,7 @@ public final class ExchangeHelper {
             }
         } catch (InterruptedException e) {
             // execution failed due interruption so rethrow the cause
+            Thread.currentThread().interrupt();
             throw CamelExecutionException.wrapCamelExecutionException(null, e);
         } catch (ExecutionException e) {
             // execution failed due to an exception so rethrow the cause
@@ -1010,6 +1035,14 @@ public final class ExchangeHelper {
         return answer;
     }
 
+    public static String getRouteGroup(Exchange exchange) {
+        Route rc = getRoute(exchange);
+        if (rc != null) {
+            return rc.getGroup();
+        }
+        return null;
+    }
+
     public static Route getRoute(Exchange exchange) {
         UnitOfWork uow = exchange.getUnitOfWork();
         return uow != null ? uow.getRoute() : null;
@@ -1044,4 +1077,135 @@ public final class ExchangeHelper {
             exchange.getOut().setBody(body);
         }
     }
+
+    /**
+     * Sets the variable
+     *
+     * @param exchange the exchange
+     * @param name     the variable name. Can be prefixed with repo-id:name to use a specific repository. If no repo-id
+     *                 is provided, then the variable is set on the exchange
+     * @param value    the value of the variable
+     */
+    public static void setVariable(Exchange exchange, String name, Object value) {
+        VariableRepository repo = null;
+        String id = StringHelper.before(name, ":");
+        // header and exchange is reserved
+        if ("header".equals(id) || "exchange".equals(id)) {
+            id = null;
+        }
+        if (id != null) {
+            VariableRepositoryFactory factory
+                    = exchange.getContext().getCamelContextExtension().getContextPlugin(VariableRepositoryFactory.class);
+            repo = factory.getVariableRepository(id);
+            if (repo == null) {
+                throw new IllegalArgumentException("VariableRepository with id: " + id + " does not exist");
+            }
+            name = StringHelper.after(name, ":");
+            // special for route, where we need to enrich the name with current route id if none given
+            if ("route".equals(id) && !name.contains(":")) {
+                String prefix = getAtRouteId(exchange);
+                if (prefix != null) {
+                    name = prefix + ":" + name;
+                }
+            }
+        }
+        VariableAware va = repo != null ? repo : exchange;
+        va.setVariable(name, value);
+    }
+
+    /**
+     * Sets the variable from the given message body and headers
+     *
+     * @param exchange the exchange
+     * @param name     the variable name. Can be prefixed with repo-id:name to use a specific repository. If no repo-id
+     *                 is provided, then the variable is set on the exchange
+     * @param message  the message with the body and headers as source values
+     */
+    public static void setVariableFromMessageBodyAndHeaders(Exchange exchange, String name, Message message) {
+        VariableRepository repo = null;
+        String id = StringHelper.before(name, ":");
+        // header and exchange is reserved
+        if ("header".equals(id) || "exchange".equals(id)) {
+            id = null;
+        }
+        if (id != null) {
+            VariableRepositoryFactory factory
+                    = exchange.getContext().getCamelContextExtension().getContextPlugin(VariableRepositoryFactory.class);
+            repo = factory.getVariableRepository(id);
+            if (repo == null) {
+                throw new IllegalArgumentException("VariableRepository with id: " + id + " does not exist");
+            }
+            name = StringHelper.after(name, ":");
+            // special for route, where we need to enrich the name with current route id if none given
+            if ("route".equals(id) && !name.contains(":")) {
+                String prefix = getAtRouteId(exchange);
+                if (prefix != null) {
+                    name = prefix + ":" + name;
+                }
+            }
+        }
+        VariableAware va = repo != null ? repo : exchange;
+
+        // set body and headers as variables
+        Object body = message.getBody();
+        va.setVariable(name, body);
+        for (Map.Entry<String, Object> header : message.getHeaders().entrySet()) {
+            String key = "header:" + name + "." + header.getKey();
+            Object value = header.getValue();
+            va.setVariable(key, value);
+        }
+    }
+
+    /**
+     * Gets the variable
+     *
+     * @param  exchange the exchange
+     * @param  name     the variable name. Can be prefixed with repo-id:name to lookup the variable from a specific
+     *                  repository. If no repo-id is provided, then the variable is set on the exchange
+     * @return          the variable
+     */
+    public static Object getVariable(Exchange exchange, String name) {
+        VariableRepository repo = null;
+        String id = StringHelper.before(name, ":");
+        // header and exchange is reserved
+        if ("header".equals(id) || "exchange".equals(id)) {
+            id = null;
+        }
+        if (id != null) {
+            VariableRepositoryFactory factory
+                    = exchange.getContext().getCamelContextExtension().getContextPlugin(VariableRepositoryFactory.class);
+            repo = factory.getVariableRepository(id);
+            if (repo == null) {
+                throw new IllegalArgumentException("VariableRepository with id: " + id + " does not exist");
+            }
+            name = StringHelper.after(name, ":");
+            // special for route, where we need to enrich the name with current route id if none given
+            if ("route".equals(id) && !name.contains(":")) {
+                String prefix = getAtRouteId(exchange);
+                if (prefix != null) {
+                    name = prefix + ":" + name;
+                }
+            }
+        }
+        VariableAware va = repo != null ? repo : exchange;
+        return va.getVariable(name);
+    }
+
+    /**
+     * Gets the variable, converted to the given type
+     *
+     * @param  exchange the exchange
+     * @param  name     the variable name. Can be prefixed with repo-id:name to lookup the variable from a specific
+     *                  repository. If no repo-id is provided, then the variable is set on the exchange
+     * @param  type     the type to convert to
+     * @return          the variable
+     */
+    public static <T> T getVariable(Exchange exchange, String name, Class<T> type) {
+        Object answer = getVariable(exchange, name);
+        if (answer != null) {
+            return exchange.getContext().getTypeConverter().convertTo(type, exchange, answer);
+        }
+        return null;
+    }
+
 }

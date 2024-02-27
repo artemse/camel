@@ -52,12 +52,17 @@ public interface Aws2DdbstreamComponentBuilderFactory {
                 ComponentBuilder<Ddb2StreamComponent> {
         /**
          * Allows for bridging the consumer to the Camel routing Error Handler,
-         * which mean any exceptions occurred while the consumer is trying to
-         * pickup incoming messages, or the likes, will now be processed as a
-         * message and handled by the routing Error Handler. By default the
-         * consumer will use the org.apache.camel.spi.ExceptionHandler to deal
-         * with exceptions, that will be logged at WARN or ERROR level and
-         * ignored.
+         * which mean any exceptions (if possible) occurred while the Camel
+         * consumer is trying to pickup incoming messages, or the likes, will
+         * now be processed as a message and handled by the routing Error
+         * Handler. Important: This is only possible if the 3rd party component
+         * allows Camel to be alerted if an exception was thrown. Some
+         * components handle this internally only, and therefore
+         * bridgeErrorHandler is not possible. In other situations we may
+         * improve the Camel component to hook into the 3rd party component and
+         * make this possible for future releases. By default the consumer will
+         * use the org.apache.camel.spi.ExceptionHandler to deal with
+         * exceptions, that will be logged at WARN or ERROR level and ignored.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -336,6 +341,22 @@ public interface Aws2DdbstreamComponentBuilderFactory {
             return this;
         }
         /**
+         * Amazon AWS Session Token used when the user needs to assume a IAM
+         * role.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: security
+         * 
+         * @param sessionToken the value to set
+         * @return the dsl builder
+         */
+        default Aws2DdbstreamComponentBuilder sessionToken(
+                java.lang.String sessionToken) {
+            doSetProperty("sessionToken", sessionToken);
+            return this;
+        }
+        /**
          * If we want to trust all certificates in case of overriding the
          * endpoint.
          * 
@@ -387,6 +408,24 @@ public interface Aws2DdbstreamComponentBuilderFactory {
             doSetProperty("useProfileCredentialsProvider", useProfileCredentialsProvider);
             return this;
         }
+        /**
+         * Set whether the DDB Streams client should expect to use Session
+         * Credentials. This is useful in situation in which the user needs to
+         * assume a IAM role for doing operations in DDB.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default Aws2DdbstreamComponentBuilder useSessionCredentials(
+                boolean useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
+            return this;
+        }
     }
 
     class Aws2DdbstreamComponentBuilderImpl
@@ -428,9 +467,11 @@ public interface Aws2DdbstreamComponentBuilderFactory {
             case "accessKey": getOrCreateConfiguration((Ddb2StreamComponent) component).setAccessKey((java.lang.String) value); return true;
             case "profileCredentialsName": getOrCreateConfiguration((Ddb2StreamComponent) component).setProfileCredentialsName((java.lang.String) value); return true;
             case "secretKey": getOrCreateConfiguration((Ddb2StreamComponent) component).setSecretKey((java.lang.String) value); return true;
+            case "sessionToken": getOrCreateConfiguration((Ddb2StreamComponent) component).setSessionToken((java.lang.String) value); return true;
             case "trustAllCertificates": getOrCreateConfiguration((Ddb2StreamComponent) component).setTrustAllCertificates((boolean) value); return true;
             case "useDefaultCredentialsProvider": getOrCreateConfiguration((Ddb2StreamComponent) component).setUseDefaultCredentialsProvider((boolean) value); return true;
             case "useProfileCredentialsProvider": getOrCreateConfiguration((Ddb2StreamComponent) component).setUseProfileCredentialsProvider((boolean) value); return true;
+            case "useSessionCredentials": getOrCreateConfiguration((Ddb2StreamComponent) component).setUseSessionCredentials((boolean) value); return true;
             default: return false;
             }
         }

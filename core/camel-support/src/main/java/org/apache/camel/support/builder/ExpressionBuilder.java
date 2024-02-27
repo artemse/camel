@@ -34,7 +34,10 @@ import org.apache.camel.ExchangePropertyKey;
 import org.apache.camel.Expression;
 import org.apache.camel.InvalidPayloadException;
 import org.apache.camel.Message;
+import org.apache.camel.NoSuchHeaderException;
 import org.apache.camel.NoSuchLanguageException;
+import org.apache.camel.NoSuchPropertyException;
+import org.apache.camel.NoSuchVariableException;
 import org.apache.camel.Predicate;
 import org.apache.camel.RuntimeCamelException;
 import org.apache.camel.RuntimeExchangeException;
@@ -51,6 +54,7 @@ import org.apache.camel.support.GroupIterator;
 import org.apache.camel.support.GroupTokenIterator;
 import org.apache.camel.support.LanguageHelper;
 import org.apache.camel.support.LanguageSupport;
+import org.apache.camel.support.SingleInputTypedLanguageSupport;
 import org.apache.camel.util.InetAddressUtil;
 import org.apache.camel.util.ObjectHelper;
 import org.apache.camel.util.StringHelper;
@@ -80,23 +84,53 @@ public class ExpressionBuilder {
      * Will fallback and look in properties if not found in headers.
      *
      * @param  headerName the name of the header the expression will return
+     * @param  mandatory  whether the header is mandatory and if not present an exception is thrown
+     * @return            an expression object which will return the header value
+     */
+    public static Expression headerExpression(final String headerName, boolean mandatory) {
+        return headerExpression(simpleExpression(headerName), mandatory);
+    }
+
+    /**
+     * Returns an expression for the header value with the given name
+     * <p/>
+     * Will fallback and look in properties if not found in headers.
+     *
+     * @param  headerName the name of the header the expression will return
      * @return            an expression object which will return the header value
      */
     public static Expression headerExpression(final Expression headerName) {
+        return headerExpression(headerName, false);
+    }
+
+    /**
+     * Returns an expression for the header value with the given name
+     * <p/>
+     * Will fallback and look in properties if not found in headers.
+     *
+     * @param  headerName the name of the header the expression will return
+     * @param  mandatory  whether the header is mandatory and if not present an exception is thrown
+     * @return            an expression object which will return the header value
+     */
+    public static Expression headerExpression(final Expression headerName, final boolean mandatory) {
         return new ExpressionAdapter() {
             @Override
             public Object evaluate(Exchange exchange) {
-                String name = headerName.evaluate(exchange, String.class);
-                Object header = exchange.getIn().getHeader(name);
-                if (header == null) {
+                String key = headerName.evaluate(exchange, String.class);
+                Object answer = exchange.getIn().getHeader(key);
+                if (answer == null) {
                     // fall back on a property
-                    header = exchange.getProperty(name);
+                    answer = exchange.getProperty(key);
                 }
-                return header;
+                if (mandatory && answer == null) {
+                    throw RuntimeCamelException.wrapRuntimeCamelException(new NoSuchHeaderException(exchange, key, null));
+                }
+                return answer;
             }
 
             @Override
             public void init(CamelContext context) {
+                super.init(context);
                 headerName.init(context);
             }
 
@@ -166,6 +200,7 @@ public class ExpressionBuilder {
 
             @Override
             public void init(CamelContext context) {
+                super.init(context);
                 headerName.init(context);
                 typeName.init(context);
                 classResolver = context.getClassResolver();
@@ -174,6 +209,136 @@ public class ExpressionBuilder {
             @Override
             public String toString() {
                 return "headerAs(" + headerName + ", " + typeName + ")";
+            }
+        };
+    }
+
+    /**
+     * Returns an expression for the variable with the given name
+     *
+     * @param  variableName the name of the variable the expression will return
+     * @return              an expression object which will return the variable value
+     */
+    public static Expression variableExpression(final String variableName) {
+        return variableExpression(simpleExpression(variableName));
+    }
+
+    /**
+     * Returns an expression for the variable with the given name
+     *
+     * @param  variableName the name of the variable the expression will return
+     * @param  mandatory    whether the variable is mandatory and if not present an exception is thrown
+     * @return              an expression object which will return the variable value
+     */
+    public static Expression variableExpression(final String variableName, boolean mandatory) {
+        return variableExpression(simpleExpression(variableName), mandatory);
+    }
+
+    /**
+     * Returns an expression for the variable with the given name
+     *
+     * @param  variableName the name of the variable the expression will return
+     * @return              an expression object which will return the variable value
+     */
+    public static Expression variableExpression(final Expression variableName) {
+        return variableExpression(variableName, false);
+    }
+
+    /**
+     * Returns an expression for the variable with the given name
+     *
+     * @param  variableName the name of the variable the expression will return
+     * @param  mandatory    whether the variable is mandatory and if not present an exception is thrown
+     * @return              an expression object which will return the variable value
+     */
+    public static Expression variableExpression(final Expression variableName, final boolean mandatory) {
+        return new ExpressionAdapter() {
+            @Override
+            public Object evaluate(Exchange exchange) {
+                String key = variableName.evaluate(exchange, String.class);
+                Object answer = ExchangeHelper.getVariable(exchange, key);
+                if (mandatory && answer == null) {
+                    throw RuntimeCamelException.wrapRuntimeCamelException(new NoSuchVariableException(exchange, key));
+                }
+                return answer;
+            }
+
+            @Override
+            public void init(CamelContext context) {
+                super.init(context);
+                variableName.init(context);
+            }
+
+            @Override
+            public String toString() {
+                return "variable(" + variableName + ")";
+            }
+        };
+    }
+
+    /**
+     * Returns an expression for the variable with the given name converted to the given type
+     *
+     * @param  variableName the name of the variable the expression will return
+     * @param  type         the type to convert to
+     * @return              an expression object which will return the variable value
+     */
+    public static <T> Expression variableExpression(final String variableName, final Class<T> type) {
+        return variableExpression(simpleExpression(variableName), constantExpression(type.getName()));
+    }
+
+    /**
+     * Returns an expression for the variable with the given name converted to the given type
+     *
+     * @param  variableName the name of the variable the expression will return
+     * @param  typeName     the type to convert to as a FQN class name
+     * @return              an expression object which will return the header value
+     */
+    public static Expression variableExpression(final String variableName, final String typeName) {
+        return variableExpression(simpleExpression(variableName), simpleExpression(typeName));
+    }
+
+    /**
+     * Returns an expression for the variable with the given name converted to the given type
+     *
+     * @param  variableName the name of the variable the expression will return
+     * @param  typeName     the type to convert to as a FQN class name
+     * @return              an expression object which will return the header value
+     */
+    public static Expression variableExpression(final Expression variableName, final Expression typeName) {
+        return new ExpressionAdapter() {
+            private ClassResolver classResolver;
+            private TypeConverter converter;
+
+            @Override
+            public Object evaluate(Exchange exchange) {
+                Class<?> type;
+                try {
+                    String text = typeName.evaluate(exchange, String.class);
+                    type = classResolver.resolveMandatoryClass(text);
+                } catch (ClassNotFoundException e) {
+                    throw CamelExecutionException.wrapCamelExecutionException(exchange, e);
+                }
+                String key = variableName.evaluate(exchange, String.class);
+                Object value = ExchangeHelper.getVariable(exchange, key);
+                if (value != null) {
+                    value = converter.convertTo(type, value);
+                }
+                return value;
+            }
+
+            @Override
+            public void init(CamelContext context) {
+                super.init(context);
+                variableName.init(context);
+                typeName.init(context);
+                classResolver = context.getClassResolver();
+                converter = context.getTypeConverter();
+            }
+
+            @Override
+            public String toString() {
+                return "variableAs(" + variableName + ", " + typeName + ")";
             }
         };
     }
@@ -193,6 +358,25 @@ public class ExpressionBuilder {
             @Override
             public String toString() {
                 return "headers";
+            }
+        };
+    }
+
+    /**
+     * Returns an expression for the {@link Exchange} variables
+     *
+     * @return an expression object which will return the variables
+     */
+    public static Expression variablesExpression() {
+        return new ExpressionAdapter() {
+            @Override
+            public Object evaluate(Exchange exchange) {
+                return exchange.getVariables();
+            }
+
+            @Override
+            public String toString() {
+                return "variables";
             }
         };
     }
@@ -285,6 +469,7 @@ public class ExpressionBuilder {
 
             @Override
             public void init(CamelContext context) {
+                super.init(context);
                 typeConverter = context.getTypeConverter();
             }
 
@@ -311,6 +496,7 @@ public class ExpressionBuilder {
 
             @Override
             public void init(CamelContext context) {
+                super.init(context);
                 registry = context.getRegistry();
             }
 
@@ -355,6 +541,7 @@ public class ExpressionBuilder {
 
             @Override
             public void init(CamelContext context) {
+                super.init(context);
                 ref.init(context);
                 registry = context.getRegistry();
             }
@@ -382,6 +569,7 @@ public class ExpressionBuilder {
 
             @Override
             public void init(CamelContext context) {
+                super.init(context);
                 this.context = context;
             }
 
@@ -408,6 +596,7 @@ public class ExpressionBuilder {
 
             @Override
             public void init(CamelContext context) {
+                super.init(context);
                 name = context.getName();
                 setValue(name);
             }
@@ -475,18 +664,45 @@ public class ExpressionBuilder {
      * Returns an expression for the property value of exchange with the given name
      *
      * @param  propertyName the name of the property the expression will return
+     * @param  mandatory    whether the property is mandatory and if not present an exception is thrown
+     * @return              an expression object which will return the property value
+     */
+    public static Expression exchangePropertyExpression(final String propertyName, boolean mandatory) {
+        return exchangePropertyExpression(simpleExpression(propertyName), mandatory);
+    }
+
+    /**
+     * Returns an expression for the property value of exchange with the given name
+     *
+     * @param  propertyName the name of the property the expression will return
      * @return              an expression object which will return the property value
      */
     public static Expression exchangePropertyExpression(final Expression propertyName) {
+        return exchangePropertyExpression(propertyName, false);
+    }
+
+    /**
+     * Returns an expression for the property value of exchange with the given name
+     *
+     * @param  propertyName the name of the property the expression will return
+     * @param  mandatory    whether the property is mandatory and if not present an exception is thrown
+     * @return              an expression object which will return the property value
+     */
+    public static Expression exchangePropertyExpression(final Expression propertyName, final boolean mandatory) {
         return new ExpressionAdapter() {
             @Override
             public Object evaluate(Exchange exchange) {
-                String text = propertyName.evaluate(exchange, String.class);
-                return exchange.getProperty(text);
+                String key = propertyName.evaluate(exchange, String.class);
+                Object answer = exchange.getProperty(key);
+                if (mandatory && answer == null) {
+                    throw RuntimeCamelException.wrapRuntimeCamelException(new NoSuchPropertyException(exchange, key));
+                }
+                return answer;
             }
 
             @Override
             public void init(CamelContext context) {
+                super.init(context);
                 propertyName.init(context);
             }
 
@@ -532,6 +748,7 @@ public class ExpressionBuilder {
 
             @Override
             public void init(CamelContext context) {
+                super.init(context);
                 globalOptions = context.getGlobalOptions();
             }
 
@@ -568,6 +785,7 @@ public class ExpressionBuilder {
 
             @Override
             public void init(CamelContext context) {
+                super.init(context);
                 propertyName.init(context);
             }
 
@@ -623,6 +841,7 @@ public class ExpressionBuilder {
 
             @Override
             public void init(CamelContext context) {
+                super.init(context);
                 exprName.init(context);
                 defaultValue.init(context);
             }
@@ -683,6 +902,7 @@ public class ExpressionBuilder {
 
             @Override
             public void init(CamelContext context) {
+                super.init(context);
                 propertyName.init(context);
                 defaultValue.init(context);
             }
@@ -709,6 +929,7 @@ public class ExpressionBuilder {
 
             @Override
             public void init(CamelContext context) {
+                super.init(context);
                 setValue(value);
             }
 
@@ -733,6 +954,7 @@ public class ExpressionBuilder {
 
             @Override
             public void init(CamelContext context) {
+                super.init(context);
                 exp = language.createExpression(expression);
                 exp.init(context);
             }
@@ -772,12 +994,67 @@ public class ExpressionBuilder {
 
             @Override
             public void init(CamelContext context) {
+                super.init(context);
                 Language lan = context.resolveLanguage(language);
                 if (lan != null) {
                     pred = lan.createPredicate(expression);
                     pred.init(context);
                     expr = lan.createExpression(expression);
                     expr.init(context);
+                } else {
+                    throw new NoSuchLanguageException(language);
+                }
+            }
+
+            @Override
+            public String toString() {
+                return "language[" + language + ":" + expression + "]";
+            }
+        };
+    }
+
+    /**
+     * Returns an expression for evaluating the expression/predicate using the given language
+     *
+     * @param  expression the expression or predicate
+     * @param  source     Source to use, instead of message body. You can prefix with variable:, header:, or property:
+     *                    to specify kind of source. Otherwise, the source is assumed to be a variable. Use empty or
+     *                    null to use default source, which is the message body.
+     * @return            an expression object which will evaluate the expression/predicate using the given language
+     */
+    public static Expression singleInputLanguageExpression(
+            final String language, final String expression, final String source) {
+        return new ExpressionAdapter() {
+            private Expression expr;
+            private Predicate pred;
+
+            @Override
+            public Object evaluate(Exchange exchange) {
+                return expr.evaluate(exchange, Object.class);
+            }
+
+            @Override
+            public boolean matches(Exchange exchange) {
+                return pred.matches(exchange);
+            }
+
+            @Override
+            public void init(CamelContext context) {
+                super.init(context);
+                Language lan = context.resolveLanguage(language);
+                if (lan != null) {
+                    if (source != null && lan instanceof SingleInputTypedLanguageSupport sil) {
+                        Expression input = ExpressionBuilder.singleInputExpression(source);
+                        expr = sil.createExpression(input, expression, null);
+                        expr.init(context);
+                        pred = PredicateBuilder.toPredicate(expr);
+                        pred.init(context);
+                    } else {
+                        pred = lan.createPredicate(expression);
+                        pred.init(context);
+                        expr = lan.createExpression(expression);
+                        expr.init(context);
+                    }
                 } else {
                     throw new NoSuchLanguageException(language);
                 }
@@ -962,6 +1239,7 @@ public class ExpressionBuilder {
 
             @Override
             public void init(CamelContext context) {
+                super.init(context);
                 name.init(context);
                 classResolver = context.getClassResolver();
             }
@@ -974,20 +1252,28 @@ public class ExpressionBuilder {
     }
 
     /**
-     * @param  headerName   the name of the header from which the input data must be extracted if not empty.
-     * @param  propertyName the name of the property from which the input data must be extracted if not empty and
-     *                      {@code headerName} is empty.
-     * @return              a header expression if {@code headerName} is not empty, otherwise a property expression if
-     *                      {@code propertyName} is not empty or finally a body expression.
+     * Creates a source {@link Expression} for languages that can accept input from other sources than the message body.
+     *
+     * @param  source Source to use, instead of message body. You can prefix with variable:, header:, or property: to
+     *                specify kind of source. Otherwise, the source is assumed to be a variable. Use empty or null to
+     *                use default source, which is the message body.
+     * @return        a variable expression if {@code variableName} is not empty, a header expression if
+     *                {@code headerName} is not empty, otherwise a property expression if {@code propertyName} is not
+     *                empty or finally a body expression.
      */
-    public static Expression singleInputExpression(String headerName, String propertyName) {
+    public static Expression singleInputExpression(String source) {
         final Expression exp;
-        if (ObjectHelper.isNotEmpty(headerName)) {
-            exp = headerExpression(headerName);
-        } else if (ObjectHelper.isNotEmpty(propertyName)) {
-            exp = exchangePropertyExpression(propertyName);
-        } else {
+        if (source == null || source.isEmpty()) {
             exp = bodyExpression();
+        } else if (source.startsWith("header:")) {
+            exp = headerExpression(source.substring(7), true);
+        } else if (source.startsWith("property:")) {
+            exp = exchangePropertyExpression(source.substring(9), true);
+        } else {
+            if (source.startsWith("variable:")) {
+                source = source.substring(9);
+            }
+            exp = variableExpression(source);
         }
         return exp;
     }
@@ -995,7 +1281,6 @@ public class ExpressionBuilder {
     /**
      * Returns the expression for the current thread id
      */
-
     public static Expression threadIdExpression() {
         return new ExpressionAdapter() {
             @Override
@@ -1041,6 +1326,7 @@ public class ExpressionBuilder {
 
             @Override
             public void init(CamelContext context) {
+                super.init(context);
                 hostname = InetAddressUtil.getLocalHostNameSafe();
                 setValue(hostname);
             }
@@ -1169,6 +1455,46 @@ public class ExpressionBuilder {
     }
 
     /**
+     * Returns the expression for the message converted to the given type
+     */
+    public static Expression messageExpression(final String name) {
+        return messageExpression(simpleExpression(name));
+    }
+
+    /**
+     * Returns the expression for the message converted to the given type
+     */
+    public static Expression messageExpression(final Expression name) {
+        return new ExpressionAdapter() {
+            private ClassResolver classResolver;
+
+            @Override
+            public Object evaluate(Exchange exchange) {
+                Class<?> type;
+                try {
+                    String text = name.evaluate(exchange, String.class);
+                    type = classResolver.resolveMandatoryClass(text);
+                } catch (ClassNotFoundException e) {
+                    throw CamelExecutionException.wrapCamelExecutionException(exchange, e);
+                }
+                return exchange.getMessage(type);
+            }
+
+            @Override
+            public void init(CamelContext context) {
+                super.init(context);
+                name.init(context);
+                classResolver = context.getClassResolver();
+            }
+
+            @Override
+            public String toString() {
+                return "messageAs[" + name + "]";
+            }
+        };
+    }
+
+    /**
      * Returns a functional expression for the IN message
      */
     public static Expression messageExpression(final Function<Message, Object> function) {
@@ -1225,6 +1551,7 @@ public class ExpressionBuilder {
 
             @Override
             public void init(CamelContext context) {
+                super.init(context);
                 expression.init(context);
             }
 
@@ -1252,6 +1579,7 @@ public class ExpressionBuilder {
 
             @Override
             public void init(CamelContext context) {
+                super.init(context);
                 expression.init(context);
                 type.init(context);
             }
@@ -1288,6 +1616,7 @@ public class ExpressionBuilder {
 
             @Override
             public void init(CamelContext context) {
+                super.init(context);
                 expression.init(context);
                 token.init(context);
             }
@@ -1321,6 +1650,7 @@ public class ExpressionBuilder {
 
             @Override
             public void init(CamelContext context) {
+                super.init(context);
                 expression.init(context);
                 typeConverter = context.getTypeConverter();
             }
@@ -1347,6 +1677,7 @@ public class ExpressionBuilder {
 
             @Override
             public void init(CamelContext context) {
+                super.init(context);
                 expression.init(context);
             }
 
@@ -1382,6 +1713,7 @@ public class ExpressionBuilder {
 
             @Override
             public void init(CamelContext context) {
+                super.init(context);
                 expression.init(context);
                 groupExp = context.resolveLanguage("simple").createExpression(group);
                 groupExp.init(context);
@@ -1423,6 +1755,7 @@ public class ExpressionBuilder {
 
             @Override
             public void init(CamelContext context) {
+                super.init(context);
                 expression.init(context);
                 groupExp = context.resolveLanguage("simple").createExpression(group);
                 groupExp.init(context);
@@ -1452,7 +1785,7 @@ public class ExpressionBuilder {
                     if (o != null) {
                         String s = converter.tryConvertTo(String.class, exchange, o);
                         if (s != null) {
-                            if (sb.length() > 0) {
+                            if (!sb.isEmpty()) {
                                 sb.append(separator);
                             }
                             if (prefix != null) {
@@ -1468,6 +1801,7 @@ public class ExpressionBuilder {
 
             @Override
             public void init(CamelContext context) {
+                super.init(context);
                 expression.init(context);
                 converter = context.getTypeConverter();
             }
@@ -1500,6 +1834,7 @@ public class ExpressionBuilder {
 
             @Override
             public void init(CamelContext context) {
+                super.init(context);
                 expression.init(context);
             }
 
@@ -1530,6 +1865,7 @@ public class ExpressionBuilder {
 
             @Override
             public void init(CamelContext context) {
+                super.init(context);
                 expression.init(context);
             }
 
@@ -1562,6 +1898,7 @@ public class ExpressionBuilder {
 
             @Override
             public void init(CamelContext context) {
+                super.init(context);
                 expression.init(context);
                 replacementExpression.init(context);
             }
@@ -1585,6 +1922,7 @@ public class ExpressionBuilder {
 
             @Override
             public void init(CamelContext context) {
+                super.init(context);
                 left.init(context);
                 right.init(context);
             }
@@ -1608,6 +1946,7 @@ public class ExpressionBuilder {
 
             @Override
             public void init(CamelContext context) {
+                super.init(context);
                 left.init(context);
                 right.init(context);
             }
@@ -1669,6 +2008,7 @@ public class ExpressionBuilder {
 
             @Override
             public void init(CamelContext context) {
+                super.init(context);
                 for (Expression expression : expressions) {
                     expression.init(context);
                 }
@@ -1719,6 +2059,7 @@ public class ExpressionBuilder {
 
             @Override
             public void init(CamelContext context) {
+                super.init(context);
                 if (optimized == null) {
                     Collection<Object> preprocessedExpression = new ArrayList<>(expressions.size());
                     boolean constantsOnly = true;
@@ -1827,6 +2168,23 @@ public class ExpressionBuilder {
         };
     }
 
+    /**
+     * Returns an Expression for the route group
+     */
+    public static Expression routeGroupExpression() {
+        return new ExpressionAdapter() {
+            @Override
+            public Object evaluate(Exchange exchange) {
+                return ExchangeHelper.getRouteGroup(exchange);
+            }
+
+            @Override
+            public String toString() {
+                return "routeGroup";
+            }
+        };
+    }
+
     public static Expression simpleExpression(final String expression) {
         if (LanguageSupport.hasSimpleFunction(expression)) {
             return new ExpressionAdapter() {
@@ -1839,6 +2197,7 @@ public class ExpressionBuilder {
 
                 @Override
                 public void init(CamelContext context) {
+                    super.init(context);
                     final Language language = context.resolveLanguage("simple");
                     this.exp = language.createExpression(expression);
                     this.exp.init(context);
@@ -1867,6 +2226,7 @@ public class ExpressionBuilder {
 
             @Override
             public void init(CamelContext context) {
+                super.init(context);
                 final Language language = context.resolveLanguage("bean");
                 this.exp = language.createExpression(expression);
                 this.exp.init(context);
@@ -1890,8 +2250,9 @@ public class ExpressionBuilder {
 
             @Override
             public void init(CamelContext context) {
+                super.init(context);
                 final Language language = context.resolveLanguage("bean");
-                this.exp = language.createExpression(null, new Object[] { bean, method });
+                this.exp = language.createExpression(null, new Object[] { null, bean, method });
                 this.exp.init(context);
             }
 
@@ -1908,13 +2269,14 @@ public class ExpressionBuilder {
             @Override
             public Object evaluate(Exchange exchange) {
                 Object bean = expression.evaluate(exchange, Object.class);
-                Expression exp = language.createExpression(null, new Object[] { bean, method });
+                Expression exp = language.createExpression(null, new Object[] { null, bean, method });
                 exp.init(exchange.getContext());
                 return exp.evaluate(exchange, Object.class);
             }
 
             @Override
             public void init(CamelContext context) {
+                super.init(context);
                 this.language = context.resolveLanguage("bean");
             }
 
@@ -1946,6 +2308,7 @@ public class ExpressionBuilder {
 
             @Override
             public void init(CamelContext context) {
+                super.init(context);
                 exp = simpleExpression(key);
                 exp.init(context);
                 pc = context.getPropertiesComponent();
@@ -1974,6 +2337,7 @@ public class ExpressionBuilder {
 
             @Override
             public void init(CamelContext context) {
+                super.init(context);
                 pc = context.getPropertiesComponent();
             }
 
@@ -1992,27 +2356,33 @@ public class ExpressionBuilder {
     }
 
     /**
+     * Returns an {@link TokenPairExpressionIterator} expression
+     */
+    public static Expression tokenizePairExpression(
+            Expression source, String startToken, String endToken, boolean includeTokens) {
+        return new TokenPairExpressionIterator(startToken, endToken, includeTokens);
+    }
+
+    /**
      * Returns an {@link TokenXMLExpressionIterator} expression
      */
     public static Expression tokenizeXMLExpression(String tagName, String inheritNamespaceTagName) {
-        StringHelper.notEmpty(tagName, "tagName");
         return new TokenXMLExpressionIterator(tagName, inheritNamespaceTagName);
     }
 
+    public static Expression tokenizeXMLExpression(Expression source, String tagName, String inheritNamespaceTagName) {
+        return new TokenXMLExpressionIterator(source, tagName, inheritNamespaceTagName);
+    }
+
     public static Expression tokenizeXMLAwareExpression(String path, char mode) {
-        return tokenizeXMLAwareExpression(null, path, mode, 1, null);
+        return tokenizeXMLAwareExpression(path, mode, 1, null);
     }
 
     public static Expression tokenizeXMLAwareExpression(String path, char mode, int group) {
-        return tokenizeXMLAwareExpression(null, path, mode, group, null);
+        return tokenizeXMLAwareExpression(path, mode, group, null);
     }
 
     public static Expression tokenizeXMLAwareExpression(String path, char mode, int group, Namespaces namespaces) {
-        return tokenizeXMLAwareExpression(null, path, mode, group, namespaces);
-    }
-
-    public static Expression tokenizeXMLAwareExpression(
-            String headerName, String path, char mode, int group, Namespaces namespaces) {
         StringHelper.notEmpty(path, "path");
         return new ExpressionAdapter() {
             private Expression exp;
@@ -2024,8 +2394,10 @@ public class ExpressionBuilder {
 
             @Override
             public void init(CamelContext context) {
+                super.init(context);
                 final Language language = context.resolveLanguage("xtokenize");
-                this.exp = language.createExpression(path, new Object[] { headerName, mode, group, namespaces });
+                this.exp = language.createExpression(path,
+                        new Object[] { null, null, mode, group, namespaces });
                 this.exp.init(context);
             }
 
@@ -2054,6 +2426,32 @@ public class ExpressionBuilder {
             @Override
             public String toString() {
                 return "bodyOneLine()";
+            }
+        };
+    }
+
+    /**
+     * Returns the expression as pretty formatted string
+     */
+    public static Expression prettyExpression(final Expression expression) {
+        return new ExpressionAdapter() {
+            @Override
+            public Object evaluate(Exchange exchange) {
+                String body = expression.evaluate(exchange, String.class);
+                if (body == null) {
+                    return null;
+                } else if (body.startsWith("{") && body.endsWith("}") || body.startsWith("[") && body.endsWith("]")) {
+                    return Jsoner.prettyPrint(body); //json
+                } else if (body.startsWith("<") && body.endsWith(">")) {
+                    return ExpressionBuilder.prettyXml(body); //xml
+                }
+
+                return body;
+            }
+
+            @Override
+            public String toString() {
+                return "pretty(" + expression + ")";
             }
         };
     }

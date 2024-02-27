@@ -56,8 +56,8 @@ public interface Cw2EndpointBuilderFactory {
             return this;
         }
         /**
-         * Set the need for overidding the endpoint. This option needs to be
-         * used in combination with uriEndpointOverride option.
+         * Set the need for overriding the endpoint. This option needs to be
+         * used in combination with the uriEndpointOverride option.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -72,8 +72,8 @@ public interface Cw2EndpointBuilderFactory {
             return this;
         }
         /**
-         * Set the need for overidding the endpoint. This option needs to be
-         * used in combination with uriEndpointOverride option.
+         * Set the need for overriding the endpoint. This option needs to be
+         * used in combination with the uriEndpointOverride option.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -91,7 +91,7 @@ public interface Cw2EndpointBuilderFactory {
         /**
          * The region in which CW client needs to work. When using this
          * parameter, the configuration will expect the lowercase name of the
-         * region (for example ap-east-1) You'll need to use the name
+         * region (for example, ap-east-1) You'll need to use the name
          * Region.EU_WEST_1.id().
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -284,7 +284,7 @@ public interface Cw2EndpointBuilderFactory {
             return this;
         }
         /**
-         * If using a profile credentials provider this parameter will set the
+         * If using a profile credentials provider, this parameter will set the
          * profile name.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -311,6 +311,21 @@ public interface Cw2EndpointBuilderFactory {
          */
         default Cw2EndpointBuilder secretKey(String secretKey) {
             doSetProperty("secretKey", secretKey);
+            return this;
+        }
+        /**
+         * Amazon AWS Session Token used when the user needs to assume an IAM
+         * role.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: security
+         * 
+         * @param sessionToken the value to set
+         * @return the dsl builder
+         */
+        default Cw2EndpointBuilder sessionToken(String sessionToken) {
+            doSetProperty("sessionToken", sessionToken);
             return this;
         }
         /**
@@ -418,6 +433,43 @@ public interface Cw2EndpointBuilderFactory {
         default Cw2EndpointBuilder useProfileCredentialsProvider(
                 String useProfileCredentialsProvider) {
             doSetProperty("useProfileCredentialsProvider", useProfileCredentialsProvider);
+            return this;
+        }
+        /**
+         * Set whether the CloudWatch client should expect to use Session
+         * Credentials. This is useful in a situation in which the user needs to
+         * assume an IAM role for doing operations in CloudWatch.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default Cw2EndpointBuilder useSessionCredentials(
+                boolean useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
+            return this;
+        }
+        /**
+         * Set whether the CloudWatch client should expect to use Session
+         * Credentials. This is useful in a situation in which the user needs to
+         * assume an IAM role for doing operations in CloudWatch.
+         * 
+         * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
+         * type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default Cw2EndpointBuilder useSessionCredentials(
+                String useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
             return this;
         }
     }
@@ -589,7 +641,7 @@ public interface Cw2EndpointBuilderFactory {
          * @return the name of the header {@code AwsCwMetricNamespace}.
          */
         public String awsCwMetricNamespace() {
-            return "AwsCwMetricNamespace";
+            return "CamelAwsCwMetricNamespace";
         }
 
         /**
@@ -602,7 +654,7 @@ public interface Cw2EndpointBuilderFactory {
          * @return the name of the header {@code AwsCwMetricName}.
          */
         public String awsCwMetricName() {
-            return "AwsCwMetricName";
+            return "CamelAwsCwMetricName";
         }
 
         /**
@@ -615,7 +667,7 @@ public interface Cw2EndpointBuilderFactory {
          * @return the name of the header {@code AwsCwMetricValue}.
          */
         public String awsCwMetricValue() {
-            return "AwsCwMetricValue";
+            return "CamelAwsCwMetricValue";
         }
 
         /**
@@ -628,7 +680,7 @@ public interface Cw2EndpointBuilderFactory {
          * @return the name of the header {@code AwsCwMetricUnit}.
          */
         public String awsCwMetricUnit() {
-            return "AwsCwMetricUnit";
+            return "CamelAwsCwMetricUnit";
         }
 
         /**
@@ -641,7 +693,7 @@ public interface Cw2EndpointBuilderFactory {
          * @return the name of the header {@code AwsCwMetricTimestamp}.
          */
         public String awsCwMetricTimestamp() {
-            return "AwsCwMetricTimestamp";
+            return "CamelAwsCwMetricTimestamp";
         }
 
         /**
@@ -654,7 +706,7 @@ public interface Cw2EndpointBuilderFactory {
          * @return the name of the header {@code AwsCwMetricDimensions}.
          */
         public String awsCwMetricDimensions() {
-            return "AwsCwMetricDimensions";
+            return "CamelAwsCwMetricDimensions";
         }
 
         /**
@@ -667,7 +719,7 @@ public interface Cw2EndpointBuilderFactory {
          * @return the name of the header {@code AwsCwMetricDimensionName}.
          */
         public String awsCwMetricDimensionName() {
-            return "AwsCwMetricDimensionName";
+            return "CamelAwsCwMetricDimensionName";
         }
 
         /**
@@ -680,7 +732,7 @@ public interface Cw2EndpointBuilderFactory {
          * @return the name of the header {@code AwsCwMetricDimensionValue}.
          */
         public String awsCwMetricDimensionValue() {
-            return "AwsCwMetricDimensionValue";
+            return "CamelAwsCwMetricDimensionValue";
         }
     }
     static Cw2EndpointBuilder endpointBuilder(String componentName, String path) {

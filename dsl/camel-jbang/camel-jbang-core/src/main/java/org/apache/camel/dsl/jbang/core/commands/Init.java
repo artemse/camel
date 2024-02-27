@@ -25,6 +25,7 @@ import java.util.StringJoiner;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.dsl.jbang.core.commands.catalog.KameletCatalogHelper;
+import org.apache.camel.dsl.jbang.core.common.CommandLineHelper;
 import org.apache.camel.dsl.jbang.core.common.ResourceDoesNotExist;
 import org.apache.camel.dsl.jbang.core.common.VersionHelper;
 import org.apache.camel.github.GistResourceResolver;
@@ -74,6 +75,16 @@ public class Init extends CamelCommand {
 
     @Override
     public Integer doCall() throws Exception {
+        int code = execute();
+        if (code == 0) {
+            // In case of successful execution, we create the working directory if it does not exist to help the tooling
+            // know that it is a Camel JBang project
+            createWorkingDirectoryIfAbsent();
+        }
+        return code;
+    }
+
+    private int execute() throws Exception {
         // is the file referring to an existing file on github/gist
         // then we should download the file to local for use
         if (file.startsWith("https://github.com/")) {
@@ -88,7 +99,7 @@ public class Init extends CamelCommand {
         }
 
         if (fromKamelet != null && !"kamelet.yaml".equals(ext)) {
-            System.out.println("When extending from an existing Kamelet then file must have extension .kamelet.yaml");
+            printer().println("When extending from an existing Kamelet then file must have extension .kamelet.yaml");
             return 1;
         }
 
@@ -118,9 +129,9 @@ public class Init extends CamelCommand {
         }
         if (is == null) {
             if (fromKamelet != null) {
-                System.out.println("Error: Existing Kamelet does not exist: " + fromKamelet);
+                printer().println("Error: Existing Kamelet does not exist: " + fromKamelet);
             } else {
-                System.out.println("Error: Unsupported file type: " + ext);
+                printer().println("Error: Unsupported file type: " + ext);
             }
             return 1;
         }
@@ -156,6 +167,13 @@ public class Init extends CamelCommand {
         }
         IOHelper.writeText(content, new FileOutputStream(target, false));
         return 0;
+    }
+
+    private void createWorkingDirectoryIfAbsent() {
+        File work = CommandLineHelper.getWorkDir();
+        if (!work.exists()) {
+            work.mkdirs();
+        }
     }
 
     private int downloadFromGithub() throws Exception {

@@ -53,7 +53,11 @@ public class DebeziumMySqlComponentConfigurer extends PropertyConfigurerSupport 
         case "connectKeepAliveIntervalMs": getOrCreateConfiguration(target).setConnectKeepAliveIntervalMs(property(camelContext, java.time.Duration.class, value).toMillis()); return true;
         case "connecttimeoutms":
         case "connectTimeoutMs": getOrCreateConfiguration(target).setConnectTimeoutMs(property(camelContext, int.class, value)); return true;
+        case "connectoradapter":
+        case "connectorAdapter": getOrCreateConfiguration(target).setConnectorAdapter(property(camelContext, java.lang.String.class, value)); return true;
         case "converters": getOrCreateConfiguration(target).setConverters(property(camelContext, java.lang.String.class, value)); return true;
+        case "custommetrictags":
+        case "customMetricTags": getOrCreateConfiguration(target).setCustomMetricTags(property(camelContext, java.lang.String.class, value)); return true;
         case "databaseexcludelist":
         case "databaseExcludeList": getOrCreateConfiguration(target).setDatabaseExcludeList(property(camelContext, java.lang.String.class, value)); return true;
         case "databasehostname":
@@ -120,6 +124,8 @@ public class DebeziumMySqlComponentConfigurer extends PropertyConfigurerSupport 
         case "incrementalSnapshotAllowSchemaChanges": getOrCreateConfiguration(target).setIncrementalSnapshotAllowSchemaChanges(property(camelContext, boolean.class, value)); return true;
         case "incrementalsnapshotchunksize":
         case "incrementalSnapshotChunkSize": getOrCreateConfiguration(target).setIncrementalSnapshotChunkSize(property(camelContext, int.class, value)); return true;
+        case "incrementalsnapshotwatermarkingstrategy":
+        case "incrementalSnapshotWatermarkingStrategy": getOrCreateConfiguration(target).setIncrementalSnapshotWatermarkingStrategy(property(camelContext, java.lang.String.class, value)); return true;
         case "internalkeyconverter":
         case "internalKeyConverter": getOrCreateConfiguration(target).setInternalKeyConverter(property(camelContext, java.lang.String.class, value)); return true;
         case "internalvalueconverter":
@@ -156,6 +162,8 @@ public class DebeziumMySqlComponentConfigurer extends PropertyConfigurerSupport 
         case "offsetStorageTopic": getOrCreateConfiguration(target).setOffsetStorageTopic(property(camelContext, java.lang.String.class, value)); return true;
         case "pollintervalms":
         case "pollIntervalMs": getOrCreateConfiguration(target).setPollIntervalMs(property(camelContext, java.time.Duration.class, value).toMillis()); return true;
+        case "postprocessors":
+        case "postProcessors": getOrCreateConfiguration(target).setPostProcessors(property(camelContext, java.lang.String.class, value)); return true;
         case "providetransactionmetadata":
         case "provideTransactionMetadata": getOrCreateConfiguration(target).setProvideTransactionMetadata(property(camelContext, boolean.class, value)); return true;
         case "queryfetchsize":
@@ -250,7 +258,11 @@ public class DebeziumMySqlComponentConfigurer extends PropertyConfigurerSupport 
         case "connectKeepAliveIntervalMs": return long.class;
         case "connecttimeoutms":
         case "connectTimeoutMs": return int.class;
+        case "connectoradapter":
+        case "connectorAdapter": return java.lang.String.class;
         case "converters": return java.lang.String.class;
+        case "custommetrictags":
+        case "customMetricTags": return java.lang.String.class;
         case "databaseexcludelist":
         case "databaseExcludeList": return java.lang.String.class;
         case "databasehostname":
@@ -317,6 +329,8 @@ public class DebeziumMySqlComponentConfigurer extends PropertyConfigurerSupport 
         case "incrementalSnapshotAllowSchemaChanges": return boolean.class;
         case "incrementalsnapshotchunksize":
         case "incrementalSnapshotChunkSize": return int.class;
+        case "incrementalsnapshotwatermarkingstrategy":
+        case "incrementalSnapshotWatermarkingStrategy": return java.lang.String.class;
         case "internalkeyconverter":
         case "internalKeyConverter": return java.lang.String.class;
         case "internalvalueconverter":
@@ -353,6 +367,8 @@ public class DebeziumMySqlComponentConfigurer extends PropertyConfigurerSupport 
         case "offsetStorageTopic": return java.lang.String.class;
         case "pollintervalms":
         case "pollIntervalMs": return long.class;
+        case "postprocessors":
+        case "postProcessors": return java.lang.String.class;
         case "providetransactionmetadata":
         case "provideTransactionMetadata": return boolean.class;
         case "queryfetchsize":
@@ -448,7 +464,11 @@ public class DebeziumMySqlComponentConfigurer extends PropertyConfigurerSupport 
         case "connectKeepAliveIntervalMs": return getOrCreateConfiguration(target).getConnectKeepAliveIntervalMs();
         case "connecttimeoutms":
         case "connectTimeoutMs": return getOrCreateConfiguration(target).getConnectTimeoutMs();
+        case "connectoradapter":
+        case "connectorAdapter": return getOrCreateConfiguration(target).getConnectorAdapter();
         case "converters": return getOrCreateConfiguration(target).getConverters();
+        case "custommetrictags":
+        case "customMetricTags": return getOrCreateConfiguration(target).getCustomMetricTags();
         case "databaseexcludelist":
         case "databaseExcludeList": return getOrCreateConfiguration(target).getDatabaseExcludeList();
         case "databasehostname":
@@ -515,6 +535,8 @@ public class DebeziumMySqlComponentConfigurer extends PropertyConfigurerSupport 
         case "incrementalSnapshotAllowSchemaChanges": return getOrCreateConfiguration(target).isIncrementalSnapshotAllowSchemaChanges();
         case "incrementalsnapshotchunksize":
         case "incrementalSnapshotChunkSize": return getOrCreateConfiguration(target).getIncrementalSnapshotChunkSize();
+        case "incrementalsnapshotwatermarkingstrategy":
+        case "incrementalSnapshotWatermarkingStrategy": return getOrCreateConfiguration(target).getIncrementalSnapshotWatermarkingStrategy();
         case "internalkeyconverter":
         case "internalKeyConverter": return getOrCreateConfiguration(target).getInternalKeyConverter();
         case "internalvalueconverter":
@@ -551,6 +573,8 @@ public class DebeziumMySqlComponentConfigurer extends PropertyConfigurerSupport 
         case "offsetStorageTopic": return getOrCreateConfiguration(target).getOffsetStorageTopic();
         case "pollintervalms":
         case "pollIntervalMs": return getOrCreateConfiguration(target).getPollIntervalMs();
+        case "postprocessors":
+        case "postProcessors": return getOrCreateConfiguration(target).getPostProcessors();
         case "providetransactionmetadata":
         case "provideTransactionMetadata": return getOrCreateConfiguration(target).isProvideTransactionMetadata();
         case "queryfetchsize":

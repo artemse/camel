@@ -44,6 +44,8 @@ public class DebeziumMongodbComponentConfigurer extends PropertyConfigurerSuppor
         case "converters": getOrCreateConfiguration(target).setConverters(property(camelContext, java.lang.String.class, value)); return true;
         case "cursormaxawaittimems":
         case "cursorMaxAwaitTimeMs": getOrCreateConfiguration(target).setCursorMaxAwaitTimeMs(property(camelContext, int.class, value)); return true;
+        case "custommetrictags":
+        case "customMetricTags": getOrCreateConfiguration(target).setCustomMetricTags(property(camelContext, java.lang.String.class, value)); return true;
         case "databaseexcludelist":
         case "databaseExcludeList": getOrCreateConfiguration(target).setDatabaseExcludeList(property(camelContext, java.lang.String.class, value)); return true;
         case "databaseincludelist":
@@ -60,6 +62,8 @@ public class DebeziumMongodbComponentConfigurer extends PropertyConfigurerSuppor
         case "heartbeatIntervalMs": getOrCreateConfiguration(target).setHeartbeatIntervalMs(property(camelContext, int.class, value)); return true;
         case "heartbeattopicsprefix":
         case "heartbeatTopicsPrefix": getOrCreateConfiguration(target).setHeartbeatTopicsPrefix(property(camelContext, java.lang.String.class, value)); return true;
+        case "incrementalsnapshotwatermarkingstrategy":
+        case "incrementalSnapshotWatermarkingStrategy": getOrCreateConfiguration(target).setIncrementalSnapshotWatermarkingStrategy(property(camelContext, java.lang.String.class, value)); return true;
         case "internalkeyconverter":
         case "internalKeyConverter": getOrCreateConfiguration(target).setInternalKeyConverter(property(camelContext, java.lang.String.class, value)); return true;
         case "internalvalueconverter":
@@ -116,6 +120,8 @@ public class DebeziumMongodbComponentConfigurer extends PropertyConfigurerSuppor
         case "offsetStorageTopic": getOrCreateConfiguration(target).setOffsetStorageTopic(property(camelContext, java.lang.String.class, value)); return true;
         case "pollintervalms":
         case "pollIntervalMs": getOrCreateConfiguration(target).setPollIntervalMs(property(camelContext, java.time.Duration.class, value).toMillis()); return true;
+        case "postprocessors":
+        case "postProcessors": getOrCreateConfiguration(target).setPostProcessors(property(camelContext, java.lang.String.class, value)); return true;
         case "providetransactionmetadata":
         case "provideTransactionMetadata": getOrCreateConfiguration(target).setProvideTransactionMetadata(property(camelContext, boolean.class, value)); return true;
         case "queryfetchsize":
@@ -177,6 +183,8 @@ public class DebeziumMongodbComponentConfigurer extends PropertyConfigurerSuppor
         case "converters": return java.lang.String.class;
         case "cursormaxawaittimems":
         case "cursorMaxAwaitTimeMs": return int.class;
+        case "custommetrictags":
+        case "customMetricTags": return java.lang.String.class;
         case "databaseexcludelist":
         case "databaseExcludeList": return java.lang.String.class;
         case "databaseincludelist":
@@ -193,6 +201,8 @@ public class DebeziumMongodbComponentConfigurer extends PropertyConfigurerSuppor
         case "heartbeatIntervalMs": return int.class;
         case "heartbeattopicsprefix":
         case "heartbeatTopicsPrefix": return java.lang.String.class;
+        case "incrementalsnapshotwatermarkingstrategy":
+        case "incrementalSnapshotWatermarkingStrategy": return java.lang.String.class;
         case "internalkeyconverter":
         case "internalKeyConverter": return java.lang.String.class;
         case "internalvalueconverter":
@@ -249,6 +259,8 @@ public class DebeziumMongodbComponentConfigurer extends PropertyConfigurerSuppor
         case "offsetStorageTopic": return java.lang.String.class;
         case "pollintervalms":
         case "pollIntervalMs": return long.class;
+        case "postprocessors":
+        case "postProcessors": return java.lang.String.class;
         case "providetransactionmetadata":
         case "provideTransactionMetadata": return boolean.class;
         case "queryfetchsize":
@@ -311,6 +323,8 @@ public class DebeziumMongodbComponentConfigurer extends PropertyConfigurerSuppor
         case "converters": return getOrCreateConfiguration(target).getConverters();
         case "cursormaxawaittimems":
         case "cursorMaxAwaitTimeMs": return getOrCreateConfiguration(target).getCursorMaxAwaitTimeMs();
+        case "custommetrictags":
+        case "customMetricTags": return getOrCreateConfiguration(target).getCustomMetricTags();
         case "databaseexcludelist":
         case "databaseExcludeList": return getOrCreateConfiguration(target).getDatabaseExcludeList();
         case "databaseincludelist":
@@ -327,6 +341,8 @@ public class DebeziumMongodbComponentConfigurer extends PropertyConfigurerSuppor
         case "heartbeatIntervalMs": return getOrCreateConfiguration(target).getHeartbeatIntervalMs();
         case "heartbeattopicsprefix":
         case "heartbeatTopicsPrefix": return getOrCreateConfiguration(target).getHeartbeatTopicsPrefix();
+        case "incrementalsnapshotwatermarkingstrategy":
+        case "incrementalSnapshotWatermarkingStrategy": return getOrCreateConfiguration(target).getIncrementalSnapshotWatermarkingStrategy();
         case "internalkeyconverter":
         case "internalKeyConverter": return getOrCreateConfiguration(target).getInternalKeyConverter();
         case "internalvalueconverter":
@@ -383,6 +399,8 @@ public class DebeziumMongodbComponentConfigurer extends PropertyConfigurerSuppor
         case "offsetStorageTopic": return getOrCreateConfiguration(target).getOffsetStorageTopic();
         case "pollintervalms":
         case "pollIntervalMs": return getOrCreateConfiguration(target).getPollIntervalMs();
+        case "postprocessors":
+        case "postProcessors": return getOrCreateConfiguration(target).getPostProcessors();
         case "providetransactionmetadata":
         case "provideTransactionMetadata": return getOrCreateConfiguration(target).isProvideTransactionMetadata();
         case "queryfetchsize":

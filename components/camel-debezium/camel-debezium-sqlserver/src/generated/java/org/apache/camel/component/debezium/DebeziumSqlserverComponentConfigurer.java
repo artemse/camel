@@ -44,6 +44,8 @@ public class DebeziumSqlserverComponentConfigurer extends PropertyConfigurerSupp
         case "columnPropagateSourceType": getOrCreateConfiguration(target).setColumnPropagateSourceType(property(camelContext, java.lang.String.class, value)); return true;
         case "configuration": target.setConfiguration(property(camelContext, org.apache.camel.component.debezium.configuration.SqlServerConnectorEmbeddedDebeziumConfiguration.class, value)); return true;
         case "converters": getOrCreateConfiguration(target).setConverters(property(camelContext, java.lang.String.class, value)); return true;
+        case "custommetrictags":
+        case "customMetricTags": getOrCreateConfiguration(target).setCustomMetricTags(property(camelContext, java.lang.String.class, value)); return true;
         case "databasehostname":
         case "databaseHostname": getOrCreateConfiguration(target).setDatabaseHostname(property(camelContext, java.lang.String.class, value)); return true;
         case "databaseinstance":
@@ -80,6 +82,8 @@ public class DebeziumSqlserverComponentConfigurer extends PropertyConfigurerSupp
         case "incrementalSnapshotChunkSize": getOrCreateConfiguration(target).setIncrementalSnapshotChunkSize(property(camelContext, int.class, value)); return true;
         case "incrementalsnapshotoptionrecompile":
         case "incrementalSnapshotOptionRecompile": getOrCreateConfiguration(target).setIncrementalSnapshotOptionRecompile(property(camelContext, boolean.class, value)); return true;
+        case "incrementalsnapshotwatermarkingstrategy":
+        case "incrementalSnapshotWatermarkingStrategy": getOrCreateConfiguration(target).setIncrementalSnapshotWatermarkingStrategy(property(camelContext, java.lang.String.class, value)); return true;
         case "internalkeyconverter":
         case "internalKeyConverter": getOrCreateConfiguration(target).setInternalKeyConverter(property(camelContext, java.lang.String.class, value)); return true;
         case "internalvalueconverter":
@@ -116,10 +120,10 @@ public class DebeziumSqlserverComponentConfigurer extends PropertyConfigurerSupp
         case "offsetStorageTopic": getOrCreateConfiguration(target).setOffsetStorageTopic(property(camelContext, java.lang.String.class, value)); return true;
         case "pollintervalms":
         case "pollIntervalMs": getOrCreateConfiguration(target).setPollIntervalMs(property(camelContext, java.time.Duration.class, value).toMillis()); return true;
+        case "postprocessors":
+        case "postProcessors": getOrCreateConfiguration(target).setPostProcessors(property(camelContext, java.lang.String.class, value)); return true;
         case "providetransactionmetadata":
         case "provideTransactionMetadata": getOrCreateConfiguration(target).setProvideTransactionMetadata(property(camelContext, boolean.class, value)); return true;
-        case "queryfetchsize":
-        case "queryFetchSize": getOrCreateConfiguration(target).setQueryFetchSize(property(camelContext, int.class, value)); return true;
         case "retriablerestartconnectorwaitms":
         case "retriableRestartConnectorWaitMs": getOrCreateConfiguration(target).setRetriableRestartConnectorWaitMs(property(camelContext, java.time.Duration.class, value).toMillis()); return true;
         case "schemahistoryinternal":
@@ -199,6 +203,8 @@ public class DebeziumSqlserverComponentConfigurer extends PropertyConfigurerSupp
         case "columnPropagateSourceType": return java.lang.String.class;
         case "configuration": return org.apache.camel.component.debezium.configuration.SqlServerConnectorEmbeddedDebeziumConfiguration.class;
         case "converters": return java.lang.String.class;
+        case "custommetrictags":
+        case "customMetricTags": return java.lang.String.class;
         case "databasehostname":
         case "databaseHostname": return java.lang.String.class;
         case "databaseinstance":
@@ -235,6 +241,8 @@ public class DebeziumSqlserverComponentConfigurer extends PropertyConfigurerSupp
         case "incrementalSnapshotChunkSize": return int.class;
         case "incrementalsnapshotoptionrecompile":
         case "incrementalSnapshotOptionRecompile": return boolean.class;
+        case "incrementalsnapshotwatermarkingstrategy":
+        case "incrementalSnapshotWatermarkingStrategy": return java.lang.String.class;
         case "internalkeyconverter":
         case "internalKeyConverter": return java.lang.String.class;
         case "internalvalueconverter":
@@ -271,10 +279,10 @@ public class DebeziumSqlserverComponentConfigurer extends PropertyConfigurerSupp
         case "offsetStorageTopic": return java.lang.String.class;
         case "pollintervalms":
         case "pollIntervalMs": return long.class;
+        case "postprocessors":
+        case "postProcessors": return java.lang.String.class;
         case "providetransactionmetadata":
         case "provideTransactionMetadata": return boolean.class;
-        case "queryfetchsize":
-        case "queryFetchSize": return int.class;
         case "retriablerestartconnectorwaitms":
         case "retriableRestartConnectorWaitMs": return long.class;
         case "schemahistoryinternal":
@@ -355,6 +363,8 @@ public class DebeziumSqlserverComponentConfigurer extends PropertyConfigurerSupp
         case "columnPropagateSourceType": return getOrCreateConfiguration(target).getColumnPropagateSourceType();
         case "configuration": return target.getConfiguration();
         case "converters": return getOrCreateConfiguration(target).getConverters();
+        case "custommetrictags":
+        case "customMetricTags": return getOrCreateConfiguration(target).getCustomMetricTags();
         case "databasehostname":
         case "databaseHostname": return getOrCreateConfiguration(target).getDatabaseHostname();
         case "databaseinstance":
@@ -391,6 +401,8 @@ public class DebeziumSqlserverComponentConfigurer extends PropertyConfigurerSupp
         case "incrementalSnapshotChunkSize": return getOrCreateConfiguration(target).getIncrementalSnapshotChunkSize();
         case "incrementalsnapshotoptionrecompile":
         case "incrementalSnapshotOptionRecompile": return getOrCreateConfiguration(target).isIncrementalSnapshotOptionRecompile();
+        case "incrementalsnapshotwatermarkingstrategy":
+        case "incrementalSnapshotWatermarkingStrategy": return getOrCreateConfiguration(target).getIncrementalSnapshotWatermarkingStrategy();
         case "internalkeyconverter":
         case "internalKeyConverter": return getOrCreateConfiguration(target).getInternalKeyConverter();
         case "internalvalueconverter":
@@ -427,10 +439,10 @@ public class DebeziumSqlserverComponentConfigurer extends PropertyConfigurerSupp
         case "offsetStorageTopic": return getOrCreateConfiguration(target).getOffsetStorageTopic();
         case "pollintervalms":
         case "pollIntervalMs": return getOrCreateConfiguration(target).getPollIntervalMs();
+        case "postprocessors":
+        case "postProcessors": return getOrCreateConfiguration(target).getPostProcessors();
         case "providetransactionmetadata":
         case "provideTransactionMetadata": return getOrCreateConfiguration(target).isProvideTransactionMetadata();
-        case "queryfetchsize":
-        case "queryFetchSize": return getOrCreateConfiguration(target).getQueryFetchSize();
         case "retriablerestartconnectorwaitms":
         case "retriableRestartConnectorWaitMs": return getOrCreateConfiguration(target).getRetriableRestartConnectorWaitMs();
         case "schemahistoryinternal":

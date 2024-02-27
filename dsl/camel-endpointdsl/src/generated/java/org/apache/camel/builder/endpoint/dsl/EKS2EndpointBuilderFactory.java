@@ -76,8 +76,8 @@ public interface EKS2EndpointBuilderFactory {
             return this;
         }
         /**
-         * Set the need for overidding the endpoint. This option needs to be
-         * used in combination with uriEndpointOverride option.
+         * Set the need for overriding the endpoint. This option needs to be
+         * used in combination with the uriEndpointOverride option.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -92,8 +92,8 @@ public interface EKS2EndpointBuilderFactory {
             return this;
         }
         /**
-         * Set the need for overidding the endpoint. This option needs to be
-         * used in combination with uriEndpointOverride option.
+         * Set the need for overriding the endpoint. This option needs to be
+         * used in combination with the uriEndpointOverride option.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -140,7 +140,7 @@ public interface EKS2EndpointBuilderFactory {
             return this;
         }
         /**
-         * If using a profile credentials provider this parameter will set the
+         * If using a profile credentials provider, this parameter will set the
          * profile name.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -159,7 +159,7 @@ public interface EKS2EndpointBuilderFactory {
         /**
          * The region in which EKS client needs to work. When using this
          * parameter, the configuration will expect the lowercase name of the
-         * region (for example ap-east-1) You'll need to use the name
+         * region (for example, ap-east-1) You'll need to use the name
          * Region.EU_WEST_1.id().
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -366,6 +366,21 @@ public interface EKS2EndpointBuilderFactory {
             return this;
         }
         /**
+         * Amazon AWS Session Token used when the user needs to assume an IAM
+         * role.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: security
+         * 
+         * @param sessionToken the value to set
+         * @return the dsl builder
+         */
+        default EKS2EndpointBuilder sessionToken(String sessionToken) {
+            doSetProperty("sessionToken", sessionToken);
+            return this;
+        }
+        /**
          * If we want to trust all certificates in case of overriding the
          * endpoint.
          * 
@@ -398,6 +413,43 @@ public interface EKS2EndpointBuilderFactory {
         default EKS2EndpointBuilder trustAllCertificates(
                 String trustAllCertificates) {
             doSetProperty("trustAllCertificates", trustAllCertificates);
+            return this;
+        }
+        /**
+         * Set whether the EKS client should expect to use Session Credentials.
+         * This is useful in a situation in which the user needs to assume an
+         * IAM role for doing operations in EKS.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default EKS2EndpointBuilder useSessionCredentials(
+                boolean useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
+            return this;
+        }
+        /**
+         * Set whether the EKS client should expect to use Session Credentials.
+         * This is useful in a situation in which the user needs to assume an
+         * IAM role for doing operations in EKS.
+         * 
+         * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
+         * type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default EKS2EndpointBuilder useSessionCredentials(
+                String useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
             return this;
         }
     }
@@ -462,7 +514,7 @@ public interface EKS2EndpointBuilderFactory {
             return this;
         }
         /**
-         * To use a existing configured AWS EKS as client.
+         * To use an existing configured AWS EKS client.
          * 
          * The option is a:
          * &lt;code&gt;software.amazon.awssdk.services.eks.EksClient&lt;/code&gt; type.
@@ -478,7 +530,7 @@ public interface EKS2EndpointBuilderFactory {
             return this;
         }
         /**
-         * To use a existing configured AWS EKS as client.
+         * To use an existing configured AWS EKS client.
          * 
          * The option will be converted to a
          * &lt;code&gt;software.amazon.awssdk.services.eks.EksClient&lt;/code&gt; type.
@@ -571,7 +623,7 @@ public interface EKS2EndpointBuilderFactory {
          * @return the name of the header {@code AwsEKSOperation}.
          */
         public String awsEKSOperation() {
-            return "AwsEKSOperation";
+            return "CamelAwsEKSOperation";
         }
 
         /**
@@ -584,7 +636,7 @@ public interface EKS2EndpointBuilderFactory {
          * @return the name of the header {@code AwsEKSMaxResults}.
          */
         public String awsEKSMaxResults() {
-            return "AwsEKSMaxResults";
+            return "CamelAwsEKSMaxResults";
         }
 
         /**
@@ -597,7 +649,7 @@ public interface EKS2EndpointBuilderFactory {
          * @return the name of the header {@code AwsEKSDescription}.
          */
         public String awsEKSDescription() {
-            return "AwsEKSDescription";
+            return "CamelAwsEKSDescription";
         }
 
         /**
@@ -610,7 +662,7 @@ public interface EKS2EndpointBuilderFactory {
          * @return the name of the header {@code AwsEKSClusterName}.
          */
         public String awsEKSClusterName() {
-            return "AwsEKSClusterName";
+            return "CamelAwsEKSClusterName";
         }
 
         /**
@@ -623,7 +675,7 @@ public interface EKS2EndpointBuilderFactory {
          * @return the name of the header {@code AwsEKSRoleARN}.
          */
         public String awsEKSRoleARN() {
-            return "AwsEKSRoleARN";
+            return "CamelAwsEKSRoleARN";
         }
 
         /**
@@ -637,7 +689,7 @@ public interface EKS2EndpointBuilderFactory {
          * @return the name of the header {@code AwsEKSVPCConfig}.
          */
         public String awsEKSVPCConfig() {
-            return "AwsEKSVPCConfig";
+            return "CamelAwsEKSVPCConfig";
         }
     }
     static EKS2EndpointBuilder endpointBuilder(String componentName, String path) {

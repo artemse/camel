@@ -197,7 +197,7 @@ public class FileWatchConsumer extends DefaultConsumer {
         }
 
         String pattern = getEndpoint().getAntInclude();
-        if (pattern == null || pattern.trim().isEmpty()) {
+        if (pattern == null || pattern.isBlank()) {
             return true;
         }
 
@@ -244,6 +244,7 @@ public class FileWatchConsumer extends DefaultConsumer {
                 try {
                     event = eventQueue.poll(1000, TimeUnit.MILLISECONDS);
                 } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                     return;
                 }
 

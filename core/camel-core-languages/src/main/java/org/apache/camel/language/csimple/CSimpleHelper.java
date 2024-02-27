@@ -66,6 +66,10 @@ public final class CSimpleHelper {
     private CSimpleHelper() {
     }
 
+    public static <T> T messageAs(Exchange exchange, Class<T> type) {
+        return exchange.getMessage(type);
+    }
+
     public static <T> T bodyAs(Message message, Class<T> type) {
         return message.getBody(type);
     }
@@ -376,11 +380,11 @@ public final class CSimpleHelper {
             }
         }
 
-        Object[] properties = new Object[5];
-        properties[2] = type;
-        properties[3] = ref;
-        properties[1] = method;
-        properties[4] = scope;
+        Object[] properties = new Object[7];
+        properties[3] = type;
+        properties[4] = ref;
+        properties[2] = method;
+        properties[5] = scope;
         Expression exp = bean.createExpression(null, properties);
         exp.init(exchange.getContext());
         return exp.evaluate(exchange, Object.class);

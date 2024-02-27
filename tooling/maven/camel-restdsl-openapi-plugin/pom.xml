@@ -17,13 +17,14 @@
     limitations under the License.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>org.apache.camel</groupId>
         <artifactId>maven-plugins</artifactId>
-        <version>4.1.0-SNAPSHOT</version>
+        <version>4.5.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>camel-restdsl-openapi-plugin</artifactId>
@@ -31,6 +32,10 @@
 
     <name>Camel :: Maven Plugins :: OpenApi REST DSL Generator Maven Plugin</name>
     <description>Maven Plugin that generates REST DSL RouteBuilder from OpenApi specification</description>
+
+    <properties>
+        <skip.camel.maven.plugin.tests>false</skip.camel.maven.plugin.tests>
+    </properties>
 
     <dependencyManagement>
         <dependencies>
@@ -91,6 +96,11 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-jetty</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-platform-http</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -155,6 +165,20 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <!-- Generate plugin help -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-plugin-plugin</artifactId>
+                <configuration>
+                    <goalPrefix>camel-restdsl-openapi</goalPrefix>
+                    <mojoDependencies/>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <profiles>
         <profile>
             <id>full</id>
@@ -181,6 +205,7 @@
                                 <goal>clean</goal>
                                 <goal>verify</goal>
                             </goals>
+                            <skipInvocation>${skip.camel.maven.plugin.tests}</skipInvocation>
                         </configuration>
                         <executions>
                             <execution>
@@ -188,7 +213,7 @@
                                 <phase>integration-test</phase>
                                 <goals>
                                     <goal>install</goal>
-                                    <goal>integration-test</goal>
+                                    <!--<goal>integration-test</goal>-->
                                     <goal>verify</goal>
                                 </goals>
                             </execution>

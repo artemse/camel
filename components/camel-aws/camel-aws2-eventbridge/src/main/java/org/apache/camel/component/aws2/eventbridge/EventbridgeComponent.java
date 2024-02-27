@@ -43,7 +43,7 @@ public class EventbridgeComponent extends HealthCheckComponent {
 
     @Override
     protected Endpoint createEndpoint(String uri, String remaining, Map<String, Object> parameters) throws Exception {
-        if (remaining == null || remaining.trim().length() == 0) {
+        if (remaining == null || remaining.isBlank()) {
             throw new IllegalArgumentException("Event bus name must be specified.");
         }
         EventbridgeConfiguration configuration
@@ -53,10 +53,11 @@ public class EventbridgeComponent extends HealthCheckComponent {
         setProperties(endpoint, parameters);
         if (Boolean.FALSE.equals(configuration.isUseDefaultCredentialsProvider())
                 && Boolean.FALSE.equals(configuration.isUseProfileCredentialsProvider())
+                && Boolean.FALSE.equals(configuration.isUseSessionCredentials())
                 && configuration.getEventbridgeClient() == null
                 && (configuration.getAccessKey() == null || configuration.getSecretKey() == null)) {
             throw new IllegalArgumentException(
-                    "useDefaultCredentialsProvider is set to false, useProfileCredentialsProvider is set to false, Amazon Eventbridge client or accessKey and secretKey must be specified");
+                    "useDefaultCredentialsProvider is set to false, useProfileCredentialsProvider is set to false, useSessionCredentials is set to false, Amazon Eventbridge client or accessKey and secretKey must be specified");
         }
 
         return endpoint;

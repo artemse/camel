@@ -44,7 +44,7 @@ public class Ses2Component extends HealthCheckComponent {
     @Override
     protected Endpoint createEndpoint(String uri, String remaining, Map<String, Object> parameters) throws Exception {
 
-        if (remaining == null || remaining.trim().length() == 0) {
+        if (remaining == null || remaining.isBlank()) {
             throw new IllegalArgumentException("From must be specified.");
         }
         Ses2Configuration configuration = this.configuration != null ? this.configuration.copy() : new Ses2Configuration();
@@ -53,10 +53,11 @@ public class Ses2Component extends HealthCheckComponent {
         setProperties(endpoint, parameters);
         if (Boolean.FALSE.equals(configuration.isUseDefaultCredentialsProvider())
                 && Boolean.FALSE.equals(configuration.isUseProfileCredentialsProvider())
+                && Boolean.FALSE.equals(configuration.isUseSessionCredentials())
                 && configuration.getAmazonSESClient() == null
                 && (configuration.getAccessKey() == null || configuration.getSecretKey() == null)) {
             throw new IllegalArgumentException(
-                    "useDefaultCredentialsProvider is set to false, useProfileCredentialsProvider is set to false, AmazonSESClient or accessKey and secretKey must be specified");
+                    "useDefaultCredentialsProvider is set to false, useProfileCredentialsProvider is set to false, useSessionCredentials is set to false, AmazonSESClient or accessKey and secretKey must be specified");
         }
 
         return endpoint;

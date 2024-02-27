@@ -45,7 +45,7 @@ import org.apache.camel.spi.DumpRoutesStrategy;
 import org.apache.camel.spi.ModelToXMLDumper;
 import org.apache.camel.spi.ModelToYAMLDumper;
 import org.apache.camel.spi.Resource;
-import org.apache.camel.spi.annotations.ServiceFactory;
+import org.apache.camel.spi.annotations.JdkService;
 import org.apache.camel.support.PluginHelper;
 import org.apache.camel.support.ResourceSupport;
 import org.apache.camel.support.service.ServiceSupport;
@@ -60,7 +60,7 @@ import static org.apache.camel.support.LoggerHelper.stripSourceLocationLineNumbe
 /**
  * Default {@link DumpRoutesStrategy} that dumps the routes to standard logger.
  */
-@ServiceFactory("default-" + DumpRoutesStrategy.FACTORY)
+@JdkService("default-" + DumpRoutesStrategy.FACTORY)
 public class DefaultDumpRoutesStrategy extends ServiceSupport implements DumpRoutesStrategy, CamelContextAware {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultDumpRoutesStrategy.class);
@@ -431,7 +431,8 @@ public class DefaultDumpRoutesStrategy extends ServiceSupport implements DumpRou
                     Resource resource = entry.getKey();
 
                     StringBuilder sbLocal = new StringBuilder();
-                    doDumpXml(camelContext, def, resource == dummy ? null : resource, dumper, "rest", "route-configurations",
+                    doDumpXml(camelContext, def, resource == dummy ? null : resource, dumper, "routeConfiguration",
+                            "route-configurations",
                             sbLocal, sbLog);
                     // dump each resource into its own file
                     doDumpToDirectory(resource, sbLocal, "route-configurations", "xml", files);
@@ -529,9 +530,10 @@ public class DefaultDumpRoutesStrategy extends ServiceSupport implements DumpRou
             // remove spring schema xmlns that camel-jaxb dumper includes
             xml = StringHelper.replaceFirst(xml, " xmlns=\"http://camel.apache.org/schema/spring\">", ">");
             xml = xml.replace("</" + replace + ">", "</" + replace + ">\n");
-            // remove outer routes tag
-            xml = StringHelper.replaceFirst(xml, "<routes>", "");
-            xml = StringHelper.replaceFirst(xml, "</routes>", "");
+            // remove outer tag (routes, rests, etc)
+            replace = replace + "s";
+            xml = StringHelper.replaceFirst(xml, "<" + replace + ">", "");
+            xml = StringHelper.replaceFirst(xml, "</" + replace + ">", "");
 
             sbLocal.append(xml);
             appendLogDump(resource, xml, sbLog);
@@ -591,7 +593,7 @@ public class DefaultDumpRoutesStrategy extends ServiceSupport implements DumpRou
             loc = extractLocationName(resource.getLocation());
         }
         if (loc != null) {
-            sbLog.append(String.format("\nSource: %s%n%s%n%s%n", loc, DIVIDER, dump));
+            sbLog.append(String.format("%nSource: %s%n%s%n%s%n", loc, DIVIDER, dump));
         } else {
             sbLog.append(String.format("%n%n%s%n", dump));
         }
@@ -622,7 +624,8 @@ public class DefaultDumpRoutesStrategy extends ServiceSupport implements DumpRou
         if (loc != null) {
             if (loc.contains(":")) {
                 // strip prefix
-                loc = loc.substring(loc.indexOf(':') + 1);
+                loc = StringHelper.after(loc, ":", loc);
+
                 // file based such as xml and yaml
                 loc = FileUtil.stripPath(loc);
             }

@@ -42,11 +42,15 @@ import org.apache.camel.support.service.ServiceHelper;
 import org.apache.camel.support.service.ServiceSupport;
 import org.apache.camel.util.FileUtil;
 import org.apache.camel.util.ObjectHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default {@link RoutesLoader}.
  */
 public class DefaultRoutesLoader extends ServiceSupport implements RoutesLoader, StaticService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultRoutesLoader.class);
 
     /**
      * Prefix to use for looking up existing {@link RoutesLoader} from the {@link org.apache.camel.spi.Registry}.
@@ -56,6 +60,7 @@ public class DefaultRoutesLoader extends ServiceSupport implements RoutesLoader,
     private final Map<String, RoutesBuilderLoader> loaders;
 
     private CamelContext camelContext;
+    private boolean ignoreLoadingError;
 
     public DefaultRoutesLoader() {
         this(null);
@@ -81,6 +86,14 @@ public class DefaultRoutesLoader extends ServiceSupport implements RoutesLoader,
     @Override
     public void setCamelContext(CamelContext camelContext) {
         this.camelContext = camelContext;
+    }
+
+    public boolean isIgnoreLoadingError() {
+        return ignoreLoadingError;
+    }
+
+    public void setIgnoreLoadingError(boolean ignoreLoadingError) {
+        this.ignoreLoadingError = ignoreLoadingError;
     }
 
     @Override
@@ -134,10 +147,28 @@ public class DefaultRoutesLoader extends ServiceSupport implements RoutesLoader,
                 // extended loader can load all resources ine one unit
                 ExtendedRoutesBuilderLoader extLoader = (ExtendedRoutesBuilderLoader) loader;
                 // pre-parse before loading
-                extLoader.preParseRoutes(entry.getValue());
+                List<Resource> files = entry.getValue();
+                try {
+                    extLoader.preParseRoutes(files);
+                } catch (Exception e) {
+                    if (isIgnoreLoadingError()) {
+                        LOG.warn("Loading resources error: {} due to: {}. This exception is ignored.", files, e.getMessage());
+                    } else {
+                        throw e;
+                    }
+                }
             } else {
                 for (Resource resource : entry.getValue()) {
-                    loader.preParseRoute(resource);
+                    try {
+                        loader.preParseRoute(resource);
+                    } catch (Exception e) {
+                        if (isIgnoreLoadingError()) {
+                            LOG.warn("Loading resources error: {} due to: {}. This exception is ignored.", resource,
+                                    e.getMessage());
+                        } else {
+                            throw e;
+                        }
+                    }
                 }
             }
         }
@@ -148,15 +179,33 @@ public class DefaultRoutesLoader extends ServiceSupport implements RoutesLoader,
             if (loader instanceof ExtendedRoutesBuilderLoader) {
                 // extended loader can load all resources ine one unit
                 ExtendedRoutesBuilderLoader extLoader = (ExtendedRoutesBuilderLoader) loader;
-                Collection<RoutesBuilder> builders = extLoader.loadRoutesBuilders(entry.getValue());
-                if (builders != null) {
-                    answer.addAll(builders);
+                List<Resource> files = entry.getValue();
+                try {
+                    Collection<RoutesBuilder> builders = extLoader.loadRoutesBuilders(files);
+                    if (builders != null) {
+                        answer.addAll(builders);
+                    }
+                } catch (Exception e) {
+                    if (isIgnoreLoadingError()) {
+                        LOG.warn("Loading resources error: {} due to: {}. This exception is ignored.", files, e.getMessage());
+                    } else {
+                        throw e;
+                    }
                 }
             } else {
                 for (Resource resource : entry.getValue()) {
-                    RoutesBuilder builder = loader.loadRoutesBuilder(resource);
-                    if (builder != null) {
-                        answer.add(builder);
+                    try {
+                        RoutesBuilder builder = loader.loadRoutesBuilder(resource);
+                        if (builder != null) {
+                            answer.add(builder);
+                        }
+                    } catch (Exception e) {
+                        if (isIgnoreLoadingError()) {
+                            LOG.warn("Loading resources error: {} due to: {}. This exception is ignored.", resource,
+                                    e.getMessage());
+                        } else {
+                            throw e;
+                        }
                     }
                 }
             }
@@ -182,7 +231,11 @@ public class DefaultRoutesLoader extends ServiceSupport implements RoutesLoader,
                 RoutesBuilderLoader.class);
 
         if (answer == null) {
-            answer = loaders.computeIfAbsent(extension, this::resolveService);
+            answer = loaders.values().stream()
+                    // find existing loader that support this extension
+                    .filter(l -> l.isSupportedExtension(extension)).findFirst()
+                    // or resolve loader from classpath
+                    .orElse(loaders.computeIfAbsent(extension, this::resolveService));
         }
 
         return answer;
@@ -198,8 +251,20 @@ public class DefaultRoutesLoader extends ServiceSupport implements RoutesLoader,
         final CamelContext ecc = getCamelContext();
         final FactoryFinder finder = ecc.getCamelContextExtension().getBootstrapFactoryFinder(RoutesBuilderLoader.FACTORY_PATH);
 
+        // the marker files are generated with dot as dash
+        String sanitized = extension.replace(".", "-");
         RoutesBuilderLoader answer
-                = ResolverHelper.resolveService(getCamelContext(), finder, extension, RoutesBuilderLoader.class).orElse(null);
+                = ResolverHelper.resolveService(getCamelContext(), finder, sanitized, RoutesBuilderLoader.class).orElse(null);
+
+        // if it's a multi-extension then fallback to parent
+        if (answer == null && extension.contains(".")) {
+            String single = FileUtil.onlyExt(extension, true);
+            answer = ResolverHelper.resolveService(getCamelContext(), finder, single, RoutesBuilderLoader.class).orElse(null);
+            if (answer != null && !answer.isSupportedExtension(extension)) {
+                // okay we cannot support this extension as fallback
+                answer = null;
+            }
+        }
 
         if (answer != null) {
             CamelContextAware.trySetCamelContext(answer, getCamelContext());

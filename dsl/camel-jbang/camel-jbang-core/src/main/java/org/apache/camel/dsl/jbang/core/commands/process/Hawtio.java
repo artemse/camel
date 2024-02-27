@@ -37,8 +37,8 @@ public class Hawtio extends CamelCommand {
     String name;
 
     @CommandLine.Option(names = { "--version" },
-                        description = "Version of the Hawtio web console", defaultValue = "2.17.6")
-    String version = "2.17.6";
+                        description = "Version of the Hawtio web console", defaultValue = "3.0.1")
+    String version = "3.0.1";
 
     // use port 8888 as 8080 is too commonly used
     @CommandLine.Option(names = { "--port" },
@@ -139,8 +139,11 @@ public class Hawtio extends CamelCommand {
             // keep JVM running
             installHangupInterceptor();
             shutdownLatch.await();
-
-        } catch (Throwable e) {
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.err.println("Interrupted while launching Hawtio");
+            return 1;
+        } catch (Exception e) {
             System.err.println("Cannot launch Hawtio due to: " + e.getMessage());
             return 1;
         } finally {

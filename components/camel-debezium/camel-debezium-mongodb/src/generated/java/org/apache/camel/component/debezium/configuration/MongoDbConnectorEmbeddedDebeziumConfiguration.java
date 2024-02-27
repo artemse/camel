@@ -13,6 +13,8 @@ public class MongoDbConnectorEmbeddedDebeziumConfiguration
 
     private static final String LABEL_NAME = "consumer,mongodb";
     @UriParam(label = LABEL_NAME)
+    private String customMetricTags;
+    @UriParam(label = LABEL_NAME)
     private String mongodbConnectionString;
     @UriParam(label = LABEL_NAME)
     @Metadata(required = true)
@@ -43,6 +45,8 @@ public class MongoDbConnectorEmbeddedDebeziumConfiguration
     private int snapshotFetchSize;
     @UriParam(label = LABEL_NAME, defaultValue = "30s", javaType = "java.time.Duration")
     private long mongodbPollIntervalMs = 30000;
+    @UriParam(label = LABEL_NAME, defaultValue = "INSERT_INSERT")
+    private String incrementalSnapshotWatermarkingStrategy = "INSERT_INSERT";
     @UriParam(label = LABEL_NAME)
     private String mongodbUser;
     @UriParam(label = LABEL_NAME, defaultValue = "0ms", javaType = "java.time.Duration")
@@ -67,8 +71,8 @@ public class MongoDbConnectorEmbeddedDebeziumConfiguration
     private int maxQueueSize = 8192;
     @UriParam(label = LABEL_NAME)
     private String collectionIncludeList;
-    @UriParam(label = LABEL_NAME, defaultValue = "replica_set")
-    private String mongodbConnectionMode = "replica_set";
+    @UriParam(label = LABEL_NAME, defaultValue = "sharded")
+    private String mongodbConnectionMode = "sharded";
     @UriParam(label = LABEL_NAME, defaultValue = "10s", javaType = "java.time.Duration")
     private long retriableRestartConnectorWaitMs = 10000;
     @UriParam(label = LABEL_NAME, defaultValue = "change_streams_update_full")
@@ -97,6 +101,8 @@ public class MongoDbConnectorEmbeddedDebeziumConfiguration
     @UriParam(label = LABEL_NAME, defaultValue = "5s", javaType = "java.time.Duration")
     private long signalPollIntervalMs = 5000;
     @UriParam(label = LABEL_NAME)
+    private String postProcessors;
+    @UriParam(label = LABEL_NAME)
     private String notificationEnabledChannels;
     @UriParam(label = LABEL_NAME, defaultValue = "0ms", javaType = "java.time.Duration")
     private int mongodbSocketTimeoutMs = 0;
@@ -114,6 +120,20 @@ public class MongoDbConnectorEmbeddedDebeziumConfiguration
     private int mongodbHeartbeatFrequencyMs = 10000;
     @UriParam(label = LABEL_NAME)
     private String databaseIncludeList;
+
+    /**
+     * The custom metric tags will accept key-value pairs to customize the MBean
+     * object name which should be appended the end of regular name, each key
+     * would represent a tag for the MBean object name, and the corresponding
+     * value would be the value of that tag the key is. For example: k1=v1,k2=v2
+     */
+    public void setCustomMetricTags(String customMetricTags) {
+        this.customMetricTags = customMetricTags;
+    }
+
+    public String getCustomMetricTags() {
+        return customMetricTags;
+    }
 
     /**
      * Database connection string.
@@ -300,6 +320,22 @@ public class MongoDbConnectorEmbeddedDebeziumConfiguration
     }
 
     /**
+     * Specify the strategy used for watermarking during an incremental
+     * snapshot: 'insert_insert' both open and close signal is written into
+     * signal data collection (default); 'insert_delete' only open signal is
+     * written on signal data collection, the close will delete the relative
+     * open signal;
+     */
+    public void setIncrementalSnapshotWatermarkingStrategy(
+            String incrementalSnapshotWatermarkingStrategy) {
+        this.incrementalSnapshotWatermarkingStrategy = incrementalSnapshotWatermarkingStrategy;
+    }
+
+    public String getIncrementalSnapshotWatermarkingStrategy() {
+        return incrementalSnapshotWatermarkingStrategy;
+    }
+
+    /**
      * Database user for connecting to MongoDB, if necessary.
      */
     public void setMongodbUser(String mongodbUser) {
@@ -364,8 +400,8 @@ public class MongoDbConnectorEmbeddedDebeziumConfiguration
     }
 
     /**
-     * A comma-separated list of regular expressions that match the database
-     * names for which changes are to be excluded
+     * A comma-separated list of regular expressions or literals that match the
+     * database names for which changes are to be excluded
      */
     public void setDatabaseExcludeList(String databaseExcludeList) {
         this.databaseExcludeList = databaseExcludeList;
@@ -445,8 +481,8 @@ public class MongoDbConnectorEmbeddedDebeziumConfiguration
     }
 
     /**
-     * A comma-separated list of regular expressions that match the collection
-     * names for which changes are to be captured
+     * A comma-separated list of regular expressions or literals that match the
+     * collection names for which changes are to be captured
      */
     public void setCollectionIncludeList(String collectionIncludeList) {
         this.collectionIncludeList = collectionIncludeList;
@@ -458,9 +494,9 @@ public class MongoDbConnectorEmbeddedDebeziumConfiguration
 
     /**
      * The method used to connect to MongoDB cluster. Options include:
-     * 'replica_set' (the default) to individually connect to each replica set /
-     * shard 'sharded' to connect via single connection obtained from connection
-     * string
+     * 'replica_set' to individually connect to each replica set / shard
+     * 'sharded' (the default) to connect via single connection obtained from
+     * connection string
      */
     public void setMongodbConnectionMode(String mongodbConnectionMode) {
         this.mongodbConnectionMode = mongodbConnectionMode;
@@ -588,8 +624,8 @@ public class MongoDbConnectorEmbeddedDebeziumConfiguration
     }
 
     /**
-     * A comma-separated list of regular expressions that match the collection
-     * names for which changes are to be excluded
+     * A comma-separated list of regular expressions or literals that match the
+     * collection names for which changes are to be excluded
      */
     public void setCollectionExcludeList(String collectionExcludeList) {
         this.collectionExcludeList = collectionExcludeList;
@@ -635,6 +671,19 @@ public class MongoDbConnectorEmbeddedDebeziumConfiguration
 
     public long getSignalPollIntervalMs() {
         return signalPollIntervalMs;
+    }
+
+    /**
+     * Optional list of post processors. The processors are defined using
+     * '<post.processor.prefix>.type' config option and configured using options
+     * '<post.processor.prefix.<option>'
+     */
+    public void setPostProcessors(String postProcessors) {
+        this.postProcessors = postProcessors;
+    }
+
+    public String getPostProcessors() {
+        return postProcessors;
     }
 
     /**
@@ -744,8 +793,8 @@ public class MongoDbConnectorEmbeddedDebeziumConfiguration
     }
 
     /**
-     * A comma-separated list of regular expressions that match the database
-     * names for which changes are to be captured
+     * A comma-separated list of regular expressions or literals that match the
+     * database names for which changes are to be captured
      */
     public void setDatabaseIncludeList(String databaseIncludeList) {
         this.databaseIncludeList = databaseIncludeList;
@@ -759,6 +808,7 @@ public class MongoDbConnectorEmbeddedDebeziumConfiguration
     protected Configuration createConnectorConfiguration() {
         final Configuration.Builder configBuilder = Configuration.create();
         
+        addPropertyIfNotNull(configBuilder, "custom.metric.tags", customMetricTags);
         addPropertyIfNotNull(configBuilder, "mongodb.connection.string", mongodbConnectionString);
         addPropertyIfNotNull(configBuilder, "mongodb.password", mongodbPassword);
         addPropertyIfNotNull(configBuilder, "query.fetch.size", queryFetchSize);
@@ -774,6 +824,7 @@ public class MongoDbConnectorEmbeddedDebeziumConfiguration
         addPropertyIfNotNull(configBuilder, "mongodb.connect.timeout.ms", mongodbConnectTimeoutMs);
         addPropertyIfNotNull(configBuilder, "snapshot.fetch.size", snapshotFetchSize);
         addPropertyIfNotNull(configBuilder, "mongodb.poll.interval.ms", mongodbPollIntervalMs);
+        addPropertyIfNotNull(configBuilder, "incremental.snapshot.watermarking.strategy", incrementalSnapshotWatermarkingStrategy);
         addPropertyIfNotNull(configBuilder, "mongodb.user", mongodbUser);
         addPropertyIfNotNull(configBuilder, "heartbeat.interval.ms", heartbeatIntervalMs);
         addPropertyIfNotNull(configBuilder, "snapshot.collection.filter.overrides", snapshotCollectionFilterOverrides);
@@ -800,6 +851,7 @@ public class MongoDbConnectorEmbeddedDebeziumConfiguration
         addPropertyIfNotNull(configBuilder, "snapshot.include.collection.list", snapshotIncludeCollectionList);
         addPropertyIfNotNull(configBuilder, "max.queue.size.in.bytes", maxQueueSizeInBytes);
         addPropertyIfNotNull(configBuilder, "signal.poll.interval.ms", signalPollIntervalMs);
+        addPropertyIfNotNull(configBuilder, "post.processors", postProcessors);
         addPropertyIfNotNull(configBuilder, "notification.enabled.channels", notificationEnabledChannels);
         addPropertyIfNotNull(configBuilder, "mongodb.socket.timeout.ms", mongodbSocketTimeoutMs);
         addPropertyIfNotNull(configBuilder, "event.processing.failure.handling.mode", eventProcessingFailureHandlingMode);

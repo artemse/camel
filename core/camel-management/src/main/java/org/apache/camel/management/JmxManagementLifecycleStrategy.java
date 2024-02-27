@@ -49,8 +49,8 @@ import org.apache.camel.TimerListener;
 import org.apache.camel.VetoCamelContextStartException;
 import org.apache.camel.cluster.CamelClusterService;
 import org.apache.camel.health.HealthCheckRegistry;
-import org.apache.camel.impl.debugger.BacklogDebugger;
 import org.apache.camel.impl.debugger.BacklogTracer;
+import org.apache.camel.impl.debugger.DefaultBacklogDebugger;
 import org.apache.camel.management.mbean.ManagedAsyncProcessorAwaitManager;
 import org.apache.camel.management.mbean.ManagedBacklogDebugger;
 import org.apache.camel.management.mbean.ManagedBacklogTracer;
@@ -74,6 +74,7 @@ import org.apache.camel.management.mbean.ManagedTracer;
 import org.apache.camel.management.mbean.ManagedTransformerRegistry;
 import org.apache.camel.management.mbean.ManagedTypeConverterRegistry;
 import org.apache.camel.management.mbean.ManagedValidatorRegistry;
+import org.apache.camel.management.mbean.ManagedVariableRepository;
 import org.apache.camel.model.InterceptDefinition;
 import org.apache.camel.model.OnCompletionDefinition;
 import org.apache.camel.model.OnExceptionDefinition;
@@ -83,6 +84,7 @@ import org.apache.camel.model.ProcessorDefinitionHelper;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.spi.AsyncProcessorAwaitManager;
 import org.apache.camel.spi.BeanIntrospection;
+import org.apache.camel.spi.BrowsableVariableRepository;
 import org.apache.camel.spi.ConsumerCache;
 import org.apache.camel.spi.DataFormat;
 import org.apache.camel.spi.DumpRoutesStrategy;
@@ -136,7 +138,7 @@ public class JmxManagementLifecycleStrategy extends ServiceSupport implements Li
     private volatile boolean initialized;
     private final Set<String> knowRouteIds = new HashSet<>();
     private final Map<BacklogTracer, ManagedBacklogTracer> managedBacklogTracers = new HashMap<>();
-    private final Map<BacklogDebugger, ManagedBacklogDebugger> managedBacklogDebuggers = new HashMap<>();
+    private final Map<DefaultBacklogDebugger, ManagedBacklogDebugger> managedBacklogDebuggers = new HashMap<>();
     private final Map<ThreadPoolExecutor, Object> managedThreadPools = new HashMap<>();
 
     public JmxManagementLifecycleStrategy() {
@@ -507,7 +509,7 @@ public class JmxManagementLifecycleStrategy extends ServiceSupport implements Li
                 managedBacklogTracers.put(backlogTracer, mt);
             }
             return mt;
-        } else if (service instanceof BacklogDebugger backlogDebugger) {
+        } else if (service instanceof DefaultBacklogDebugger backlogDebugger) {
             // special for backlog debugger
             ManagedBacklogDebugger md = managedBacklogDebuggers.get(backlogDebugger);
             if (md == null) {
@@ -565,6 +567,8 @@ public class JmxManagementLifecycleStrategy extends ServiceSupport implements Li
             answer = new ManagedTransformerRegistry(context, transformerRegistry);
         } else if (service instanceof ValidatorRegistry<?> validatorRegistry) {
             answer = new ManagedValidatorRegistry(context, validatorRegistry);
+        } else if (service instanceof BrowsableVariableRepository variableRepository) {
+            answer = new ManagedVariableRepository(context, variableRepository);
         } else if (service instanceof CamelClusterService) {
             answer = getManagementObjectStrategy().getManagedObjectForClusterService(context, (CamelClusterService) service);
         } else if (service != null) {
@@ -924,6 +928,15 @@ public class JmxManagementLifecycleStrategy extends ServiceSupport implements Li
         ManagementAgent agent = getManagementStrategy().getManagementAgent();
         if (agent == null) {
             // do not register if no agent
+            return false;
+        }
+
+        if (route != null && route.isCreatedByKamelet() && !agent.getRegisterRoutesCreateByKamelet()) {
+            // skip routes created from kamelets
+            return false;
+        }
+        if (route != null && route.isCreatedByRouteTemplate() && !agent.getRegisterRoutesCreateByTemplate()) {
+            // skip routes created from route templates
             return false;
         }
 

@@ -74,12 +74,23 @@ import org.jboss.jandex.ClassInfo.NestingType;
 import org.jboss.jandex.DotName;
 import org.jboss.jandex.IndexView;
 
+import static java.lang.reflect.Modifier.isStatic;
+
 @Mojo(name = "generate-schema", threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME,
       defaultPhase = LifecyclePhase.PROCESS_CLASSES)
 public class SchemaGeneratorMojo extends AbstractGeneratorMojo {
 
     public static final DotName XML_ROOT_ELEMENT = DotName.createSimple(XmlRootElement.class.getName());
     public static final DotName XML_TYPE = DotName.createSimple(XmlType.class.getName());
+
+    // special for app package
+    private static final DotName APP_PACKAGE = DotName.createSimple("org.apache.camel.model.app");
+    private static final Map<String, String> APP_NAME_MAPPINGS = Map.of(
+            "BeanConstructorDefinition", "constructor",
+            "BeanConstructorsDefinition", "constructors",
+            "BeanPropertiesDefinition", "properties",
+            "BeanPropertyDefinition", "property",
+            "RegistryBeanDefinition", "bean");
 
     // special when using expression/predicates in the model
     private static final String ONE_OF_TYPE_NAME = "org.apache.camel.model.ExpressionSubElementDefinition";
@@ -150,12 +161,27 @@ public class SchemaGeneratorMojo extends AbstractGeneratorMojo {
                 .filter(cpa -> cpa.target().asClass().name().toString().startsWith("org.apache.camel.model."))
                 .map(cpa -> cpa.target().asClass())
                 .collect(Collectors.toSet());
+
         if (!coreElements.isEmpty()) {
             getLog().info(String.format("Found %d core elements", coreElements.size()));
         }
 
+        // add special for bean DSL in app package
+        Set<ClassInfo> appElements = index.getClassesInPackage(APP_PACKAGE).stream()
+                .filter(cpa -> cpa.hasAnnotation(XML_TYPE))
+                .filter(cpa -> cpa.kind() == Kind.CLASS)
+                .collect(Collectors.toSet());
+
+        if (!coreElements.isEmpty()) {
+            getLog().info(String.format("Found %d app elements", appElements.size()));
+        }
+
+        Set<ClassInfo> classes = new TreeSet<>(Comparator.comparing(ClassInfo::name));
+        classes.addAll(coreElements);
+        classes.addAll(appElements);
+
         // we want them to be sorted
-        for (ClassInfo element : coreElements) {
+        for (ClassInfo element : classes) {
             processModelClass(element);
         }
 
@@ -189,10 +215,26 @@ public class SchemaGeneratorMojo extends AbstractGeneratorMojo {
             return;
         }
 
-        AnnotationValue annotationValue = element.classAnnotation(XML_ROOT_ELEMENT).value("name");
-        String aName = annotationValue != null ? annotationValue.asString() : null;
+        String aName = null;
+        if (element.hasAnnotation(XML_ROOT_ELEMENT)) {
+            AnnotationValue av = element.declaredAnnotation(XML_ROOT_ELEMENT).value("name");
+            aName = av != null ? av.asString() : null;
+        }
         if (Strings.isNullOrEmpty(aName) || "##default".equals(aName)) {
-            aName = element.classAnnotation(XML_TYPE).value("name").asString();
+            if (element.hasAnnotation(XML_TYPE)) {
+                AnnotationValue av = element.declaredAnnotation(XML_TYPE).value("name");
+                aName = av != null ? av.asString() : null;
+            }
+        }
+        if (aName == null) {
+            // special for app package
+            String sn = element.name().withoutPackagePrefix();
+            aName = APP_NAME_MAPPINGS.get(sn);
+        }
+        if (aName == null) {
+            getLog().warn(
+                    "Class is not annotated with @XmlRootElement or @XmlType. Skipping class: " + element.name().toString());
+            return;
         }
         final String name = aName;
 
@@ -207,8 +249,9 @@ public class SchemaGeneratorMojo extends AbstractGeneratorMojo {
         String javaTypeName = element.name().toString();
         Class<?> classElement = loadClass(javaTypeName);
 
-        // gather eip information
+        // gather eip information and what metadata the EIP can store as exchange properties
         EipModel eipModel = findEipModelProperties(classElement, name);
+        findEipModelExchangeProperties(classElement, name, eipModel);
 
         // get endpoint information which is divided into paths and options
         // (though there should really only be one path)
@@ -230,15 +273,18 @@ public class SchemaGeneratorMojo extends AbstractGeneratorMojo {
             // filter out outputs if we do not support it
             eipModel.getOptions().removeIf(o -> "outputs".equals(o.getName()));
         }
+        if ("route".equals(eipModel.getName())) {
+            // route should not have disabled
+            eipModel.getOptions().removeIf(o -> "disabled".equals(o.getName()));
+        }
 
         // write json schema file
         String packageName = javaTypeName.substring(0, javaTypeName.lastIndexOf('.'));
         String json = JsonMapper.createParameterJsonSchema(eipModel);
         updateResource(
                 resourcesOutputDir.toPath(),
-                packageName.replace('.', '/') + "/" + fileName,
+                "META-INF/" + packageName.replace('.', '/') + "/" + fileName,
                 json);
-
     }
 
     private IndexView getIndex() {
@@ -283,6 +329,57 @@ public class SchemaGeneratorMojo extends AbstractGeneratorMojo {
         }
 
         return model;
+    }
+
+    protected void findEipModelExchangeProperties(Class<?> classElement, String name, EipModel eipModel) {
+        // load Exchange and find options for this EIP
+        Class<?> clazz;
+        if ("circuitBreaker".equals(name)) {
+            // special for circuit breaker
+            clazz = loadClass("org.apache.camel.spi.CircuitBreakerConstants");
+        } else {
+            clazz = loadClass("org.apache.camel.Exchange");
+        }
+        for (Field field : clazz.getFields()) {
+            if ((isStatic(field.getModifiers()) && field.getType() == String.class)
+                    && field.isAnnotationPresent(Metadata.class)) {
+                Metadata metadata = field.getAnnotation(Metadata.class);
+                String labels = metadata.label();
+                for (String lab : labels.split(",")) {
+                    if (lab.equals(name)) {
+                        EipOptionModel o = new EipOptionModel();
+                        o.setKind("exchangeProperty");
+                        // SPLIT_INDEX => CamelSplitIndex
+                        String n = field.getName().toLowerCase().replace('_', '-');
+                        String n2 = SchemaHelper.dashToCamelCase(n);
+                        String valueName = "Camel" + Character.toUpperCase(n2.charAt(0)) + n2.substring(1);
+                        o.setName(valueName);
+                        o.setDescription(metadata.description());
+                        if (!metadata.displayName().isEmpty()) {
+                            o.setDisplayName(metadata.displayName());
+                        } else {
+                            o.setDisplayName(Strings.asTitle(o.getName().substring(5)));
+                        }
+                        o.setRequired(metadata.required());
+                        o.setDefaultValue(metadata.defaultValue());
+                        o.setDeprecated(field.isAnnotationPresent(Deprecated.class));
+                        if (!metadata.deprecationNote().isEmpty()) {
+                            o.setDeprecationNote(metadata.deprecationNote());
+                        }
+                        o.setSecret(metadata.secret());
+                        o.setJavaType(metadata.javaType());
+                        // special if the property is for input (such as AGGREGATION_COMPLETE_CURRENT_GROUP)
+                        if (labels.startsWith("consumer,")) {
+                            o.setLabel("consumer");
+                        } else {
+                            o.setLabel("producer");
+                        }
+                        eipModel.addExchangeProperty(o);
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     protected void findClassProperties(
@@ -672,10 +769,18 @@ public class SchemaGeneratorMojo extends AbstractGeneratorMojo {
                 false, null, null, false, false);
         eipOptions.add(ep);
 
-        // precondition
-        docComment = findJavaDoc(null, "precondition", null, classElement, true);
-        ep = createOption("precondition", "Precondition", "attribute", "java.lang.String", false, "", "", docComment, false,
+        // autoStartup
+        docComment = findJavaDoc(null, "autoStartup", null, classElement, true);
+        ep = createOption("autoStartup", "Auto Startup", "attribute", "java.lang.String", false, "true", "", docComment, false,
                 null, false, null, null, false, false);
+        eipOptions.add(ep);
+
+        // startupOrder
+        docComment = findJavaDoc(null, "startupOrder", null, classElement, true);
+        ep = createOption("startupOrder", "Startup Order", "attribute", "java.lang.Integer", false, "", "advanced", docComment,
+                false,
+                null,
+                false, null, null, false, false);
         eipOptions.add(ep);
 
         // stream cache
@@ -706,21 +811,9 @@ public class SchemaGeneratorMojo extends AbstractGeneratorMojo {
 
         // delayer
         docComment = findJavaDoc(null, "delayer", null, classElement, true);
-        ep = createOption("delayer", "Delayer", "attribute", "java.lang.String", false, "", "", docComment, false, null, false,
+        ep = createOption("delayer", "Delayer", "attribute", "java.lang.String", false, "advanced", "", docComment, false, null,
+                false,
                 null, null, false, true);
-        eipOptions.add(ep);
-
-        // autoStartup
-        docComment = findJavaDoc(null, "autoStartup", null, classElement, true);
-        ep = createOption("autoStartup", "Auto Startup", "attribute", "java.lang.String", false, "true", "", docComment, false,
-                null, false, null, null, false, false);
-        eipOptions.add(ep);
-
-        // startupOrder
-        docComment = findJavaDoc(null, "startupOrder", null, classElement, true);
-        ep = createOption("startupOrder", "Startup Order", "attribute", "java.lang.Integer", false, "", "", docComment, false,
-                null,
-                false, null, null, false, false);
         eipOptions.add(ep);
 
         // errorHandlerRef
@@ -742,7 +835,8 @@ public class SchemaGeneratorMojo extends AbstractGeneratorMojo {
         enums.add("Default");
         enums.add("Defer");
         docComment = findJavaDoc(null, "shutdownRoute", "Default", classElement, true);
-        ep = createOption("shutdownRoute", "Shutdown Route", "attribute", "org.apache.camel.ShutdownRoute", false, "", "",
+        ep = createOption("shutdownRoute", "Shutdown Route", "attribute", "org.apache.camel.ShutdownRoute", false, "",
+                "advanced",
                 docComment, false, null, true, enums, null, false, false);
         eipOptions.add(ep);
 
@@ -752,8 +846,29 @@ public class SchemaGeneratorMojo extends AbstractGeneratorMojo {
         enums.add("CompleteAllTasks");
         docComment = findJavaDoc(null, "shutdownRunningTask", "CompleteCurrentTaskOnly", classElement, true);
         ep = createOption("shutdownRunningTask", "Shutdown Running Task", "attribute", "org.apache.camel.ShutdownRunningTask",
-                false, "", "", docComment, false, null, true, enums,
+                false, "", "advanced", docComment, false, null, true, enums,
                 null, false, false);
+        eipOptions.add(ep);
+
+        // precondition
+        docComment = findJavaDoc(null, "precondition", null, classElement, true);
+        ep = createOption("precondition", "Precondition", "attribute", "java.lang.String", false, "", "advanced", docComment,
+                false,
+                null, false, null, null, false, false);
+        eipOptions.add(ep);
+
+        // input type
+        docComment = findJavaDoc(null, "inputType", null, classElement, true);
+        ep = createOption("inputType", "Input Type", "element", "org.apache.camel.model.InputTypeDefinition", false, "",
+                "advanced", docComment, false,
+                null, false, null, null, false, false);
+        eipOptions.add(ep);
+
+        // output type
+        docComment = findJavaDoc(null, "outputType", null, classElement, true);
+        ep = createOption("outputType", "Output Type", "element", "org.apache.camel.model.OutputTypeDefinition", false, "",
+                "advanced", docComment, false,
+                null, false, null, null, false, false);
         eipOptions.add(ep);
 
         // input
@@ -803,7 +918,7 @@ public class SchemaGeneratorMojo extends AbstractGeneratorMojo {
 
         // description
         docComment = findJavaDoc(null, "description", null, classElement, true);
-        ep = createOption("description", "Description", "element", "org.apache.camel.model.DescriptionDefinition", false, "",
+        ep = createOption("description", "Description", "element", "java.lang.String", false, "",
                 "",
                 docComment, false, null, false, null, null,
                 false, false);
@@ -1440,19 +1555,21 @@ public class SchemaGeneratorMojo extends AbstractGeneratorMojo {
                 return 20;
             }
 
-            // these should be first
+            // these should be in top
             if ("expression".equals(name)) {
                 return 10;
             }
 
-            // these should be last
-            if ("description".equals(name)) {
-                return -10;
+            // these should be first
+            if ("disabled".equals(name)) {
+                return 98;
+            } else if ("description".equals(name)) {
+                return 99;
             } else if ("id".equals(name)) {
-                return -9;
+                return 100;
             } else if ("pattern".equals(name) && "to".equals(model.getName())) {
                 // and pattern only for the to model
-                return -8;
+                return -10;
             }
             return 0;
         }

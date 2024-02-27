@@ -100,12 +100,17 @@ public interface KameletComponentBuilderFactory {
         }
         /**
          * Allows for bridging the consumer to the Camel routing Error Handler,
-         * which mean any exceptions occurred while the consumer is trying to
-         * pickup incoming messages, or the likes, will now be processed as a
-         * message and handled by the routing Error Handler. By default the
-         * consumer will use the org.apache.camel.spi.ExceptionHandler to deal
-         * with exceptions, that will be logged at WARN or ERROR level and
-         * ignored.
+         * which mean any exceptions (if possible) occurred while the Camel
+         * consumer is trying to pickup incoming messages, or the likes, will
+         * now be processed as a message and handled by the routing Error
+         * Handler. Important: This is only possible if the 3rd party component
+         * allows Camel to be alerted if an exception was thrown. Some
+         * components handle this internally only, and therefore
+         * bridgeErrorHandler is not possible. In other situations we may
+         * improve the Camel component to hook into the 3rd party component and
+         * make this possible for future releases. By default the consumer will
+         * use the org.apache.camel.spi.ExceptionHandler to deal with
+         * exceptions, that will be logged at WARN or ERROR level and ignored.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -198,6 +203,23 @@ public interface KameletComponentBuilderFactory {
             return this;
         }
         /**
+         * Kamelets, by default, will not do fine-grained error handling, but
+         * works in no-error-handler mode. This can be turned off, to use old
+         * behaviour in earlier versions of Camel.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: true
+         * Group: advanced
+         * 
+         * @param noErrorHandler the value to set
+         * @return the dsl builder
+         */
+        default KameletComponentBuilder noErrorHandler(boolean noErrorHandler) {
+            doSetProperty("noErrorHandler", noErrorHandler);
+            return this;
+        }
+        /**
          * To plugin a custom listener for when the Kamelet component is loading
          * Kamelets from external resources.
          * 
@@ -239,6 +261,7 @@ public interface KameletComponentBuilderFactory {
             case "lazyStartProducer": ((KameletComponent) component).setLazyStartProducer((boolean) value); return true;
             case "timeout": ((KameletComponent) component).setTimeout((long) value); return true;
             case "autowiredEnabled": ((KameletComponent) component).setAutowiredEnabled((boolean) value); return true;
+            case "noErrorHandler": ((KameletComponent) component).setNoErrorHandler((boolean) value); return true;
             case "routeTemplateLoaderListener": ((KameletComponent) component).setRouteTemplateLoaderListener((org.apache.camel.spi.RouteTemplateLoaderListener) value); return true;
             default: return false;
             }

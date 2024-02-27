@@ -17,6 +17,7 @@
 package org.apache.camel.test.junit5;
 
 import java.lang.annotation.Annotation;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -101,6 +102,7 @@ public abstract class CamelTestSupport
     private static final ThreadLocal<FluentProducerTemplate> THREAD_FLUENT_TEMPLATE = new ThreadLocal<>();
     private static final ThreadLocal<ConsumerTemplate> THREAD_CONSUMER = new ThreadLocal<>();
     private static final ThreadLocal<Service> THREAD_SERVICE = new ThreadLocal<>();
+    public static final String SEPARATOR = "********************************************************************************";
     protected Properties extra;
     protected volatile ModelCamelContext context;
     protected volatile ProducerTemplate template;
@@ -341,9 +343,9 @@ public abstract class CamelTestSupport
 
     @BeforeEach
     public void setUp() throws Exception {
-        LOG.info("********************************************************************************");
+        LOG.info(SEPARATOR);
         LOG.info("Testing: {} ({})", currentTestName, getClass().getName());
-        LOG.info("********************************************************************************");
+        LOG.info(SEPARATOR);
 
         doSpringBootCheck();
         doQuarkusCheck();
@@ -565,7 +567,7 @@ public abstract class CamelTestSupport
     public void tearDown() throws Exception {
         long time = watch.taken();
 
-        LOG.info("********************************************************************************");
+        LOG.info(SEPARATOR);
         LOG.info("Testing done: {} ({})", currentTestName, getClass().getName());
         LOG.info("Took: {} ({} millis)", TimeUtils.printDuration(time, true), time);
 
@@ -586,7 +588,7 @@ public abstract class CamelTestSupport
                         timeTaken());
             }
         }
-        LOG.info("********************************************************************************");
+        LOG.info(SEPARATOR);
 
         if (isCreateCamelContextPerClass()) {
             // will tear down test specially in afterAll callback
@@ -859,7 +861,7 @@ public abstract class CamelTestSupport
      * @param  create                  whether or not to allow the endpoint to be created if it doesn't exist
      * @return                         the mock endpoint or an {@link NoSuchEndpointException} is thrown if it could not
      *                                 be resolved
-     * @throws NoSuchEndpointException is the mock endpoint does not exists
+     * @throws NoSuchEndpointException is the mock endpoint does not exist
      */
     protected MockEndpoint getMockEndpoint(String uri, boolean create) throws NoSuchEndpointException {
         // look for existing mock endpoints that have the same queue name, and
@@ -869,7 +871,7 @@ public abstract class CamelTestSupport
         String n;
         try {
             n = URISupport.normalizeUri(uri);
-        } catch (Exception e) {
+        } catch (URISyntaxException e) {
             throw RuntimeCamelException.wrapRuntimeException(e);
         }
         // strip query

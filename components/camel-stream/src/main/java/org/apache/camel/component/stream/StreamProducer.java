@@ -60,11 +60,6 @@ public class StreamProducer extends DefaultAsyncProducer {
     }
 
     @Override
-    protected void doStart() throws Exception {
-        super.doStart();
-    }
-
-    @Override
     protected void doStop() throws Exception {
         super.doStop();
         closeStream(null, true);
@@ -83,6 +78,9 @@ public class StreamProducer extends DefaultAsyncProducer {
                     closeStream(exchange, false);
                 }
             }
+        } catch (InterruptedException e) {
+            exchange.setException(e);
+            Thread.currentThread().interrupt();
         } catch (Exception e) {
             exchange.setException(e);
         }

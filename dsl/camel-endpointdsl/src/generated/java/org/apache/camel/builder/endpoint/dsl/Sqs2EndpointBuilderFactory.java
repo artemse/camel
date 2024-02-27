@@ -61,7 +61,7 @@ public interface Sqs2EndpointBuilderFactory {
             return this;
         }
         /**
-         * Setting the autocreation of the queue.
+         * Setting the auto-creation of the queue.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -77,7 +77,7 @@ public interface Sqs2EndpointBuilderFactory {
             return this;
         }
         /**
-         * Setting the autocreation of the queue.
+         * Setting the auto-creation of the queue.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -129,7 +129,7 @@ public interface Sqs2EndpointBuilderFactory {
         }
         /**
          * Set the need for overriding the endpoint. This option needs to be
-         * used in combination with uriEndpointOverride option.
+         * used in combination with the uriEndpointOverride option.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -146,7 +146,7 @@ public interface Sqs2EndpointBuilderFactory {
         }
         /**
          * Set the need for overriding the endpoint. This option needs to be
-         * used in combination with uriEndpointOverride option.
+         * used in combination with the uriEndpointOverride option.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -179,7 +179,7 @@ public interface Sqs2EndpointBuilderFactory {
         }
         /**
          * Specify the queue owner aws account id when you need to connect the
-         * queue with different account owner.
+         * queue with a different account owner.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
@@ -196,7 +196,7 @@ public interface Sqs2EndpointBuilderFactory {
         /**
          * The region in which SQS client needs to work. When using this
          * parameter, the configuration will expect the lowercase name of the
-         * region (for example ap-east-1) You'll need to use the name
+         * region (for example, ap-east-1) You'll need to use the name
          * Region.EU_WEST_1.id().
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -340,8 +340,8 @@ public interface Sqs2EndpointBuilderFactory {
             return this;
         }
         /**
-         * Whether or not to send the DeleteMessage to the SQS queue if the
-         * exchange has property with key Sqs2Constants#SQS_DELETE_FILTERED
+         * Whether to send the DeleteMessage to the SQS queue if the exchange
+         * has property with key Sqs2Constants#SQS_DELETE_FILTERED
          * (CamelAwsSqsDeleteFiltered) set to true.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
@@ -358,8 +358,8 @@ public interface Sqs2EndpointBuilderFactory {
             return this;
         }
         /**
-         * Whether or not to send the DeleteMessage to the SQS queue if the
-         * exchange has property with key Sqs2Constants#SQS_DELETE_FILTERED
+         * Whether to send the DeleteMessage to the SQS queue if the exchange
+         * has property with key Sqs2Constants#SQS_DELETE_FILTERED
          * (CamelAwsSqsDeleteFiltered) set to true.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
@@ -377,7 +377,7 @@ public interface Sqs2EndpointBuilderFactory {
             return this;
         }
         /**
-         * If enabled then a scheduled background task will keep extending the
+         * If enabled, then a scheduled background task will keep extending the
          * message visibility on SQS. This is needed if it takes a long time to
          * process the message. If set to true defaultVisibilityTimeout must be
          * set. See details at Amazon docs.
@@ -396,7 +396,7 @@ public interface Sqs2EndpointBuilderFactory {
             return this;
         }
         /**
-         * If enabled then a scheduled background task will keep extending the
+         * If enabled, then a scheduled background task will keep extending the
          * message visibility on SQS. This is needed if it takes a long time to
          * process the message. If set to true defaultVisibilityTimeout must be
          * set. See details at Amazon docs.
@@ -590,8 +590,8 @@ public interface Sqs2EndpointBuilderFactory {
          * subsequent retrieve requests after being retrieved by a
          * ReceiveMessage request to set in the
          * com.amazonaws.services.sqs.model.SetQueueAttributesRequest. This only
-         * make sense if its different from defaultVisibilityTimeout. It changes
-         * the queue visibility timeout attribute permanently.
+         * makes sense if it's different from defaultVisibilityTimeout. It
+         * changes the queue visibility timeout attribute permanently.
          * 
          * The option is a: &lt;code&gt;java.lang.Integer&lt;/code&gt; type.
          * 
@@ -610,8 +610,8 @@ public interface Sqs2EndpointBuilderFactory {
          * subsequent retrieve requests after being retrieved by a
          * ReceiveMessage request to set in the
          * com.amazonaws.services.sqs.model.SetQueueAttributesRequest. This only
-         * make sense if its different from defaultVisibilityTimeout. It changes
-         * the queue visibility timeout attribute permanently.
+         * makes sense if it's different from defaultVisibilityTimeout. It
+         * changes the queue visibility timeout attribute permanently.
          * 
          * The option will be converted to a
          * &lt;code&gt;java.lang.Integer&lt;/code&gt; type.
@@ -823,7 +823,7 @@ public interface Sqs2EndpointBuilderFactory {
         /**
          * To define the queueUrl explicitly. All other parameters, which would
          * influence the queueUrl, are ignored. This parameter is intended to be
-         * used, to connect to a mock implementation of SQS, for testing
+         * used to connect to a mock implementation of SQS, for testing
          * purposes.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -1376,7 +1376,7 @@ public interface Sqs2EndpointBuilderFactory {
             return this;
         }
         /**
-         * If using a profile credentials provider this parameter will set the
+         * If using a profile credentials provider, this parameter will set the
          * profile name.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -1403,6 +1403,21 @@ public interface Sqs2EndpointBuilderFactory {
          */
         default Sqs2EndpointConsumerBuilder secretKey(String secretKey) {
             doSetProperty("secretKey", secretKey);
+            return this;
+        }
+        /**
+         * Amazon AWS Session Token used when the user needs to assume an IAM
+         * role.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: security
+         * 
+         * @param sessionToken the value to set
+         * @return the dsl builder
+         */
+        default Sqs2EndpointConsumerBuilder sessionToken(String sessionToken) {
+            doSetProperty("sessionToken", sessionToken);
             return this;
         }
         /**
@@ -1510,6 +1525,43 @@ public interface Sqs2EndpointBuilderFactory {
             doSetProperty("useProfileCredentialsProvider", useProfileCredentialsProvider);
             return this;
         }
+        /**
+         * Set whether the SQS client should expect to use Session Credentials.
+         * This is useful in a situation in which the user needs to assume an
+         * IAM role for doing operations in SQS.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default Sqs2EndpointConsumerBuilder useSessionCredentials(
+                boolean useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
+            return this;
+        }
+        /**
+         * Set whether the SQS client should expect to use Session Credentials.
+         * This is useful in a situation in which the user needs to assume an
+         * IAM role for doing operations in SQS.
+         * 
+         * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
+         * type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default Sqs2EndpointConsumerBuilder useSessionCredentials(
+                String useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
+            return this;
+        }
     }
 
     /**
@@ -1524,12 +1576,17 @@ public interface Sqs2EndpointBuilderFactory {
         }
         /**
          * Allows for bridging the consumer to the Camel routing Error Handler,
-         * which mean any exceptions occurred while the consumer is trying to
-         * pickup incoming messages, or the likes, will now be processed as a
-         * message and handled by the routing Error Handler. By default the
-         * consumer will use the org.apache.camel.spi.ExceptionHandler to deal
-         * with exceptions, that will be logged at WARN or ERROR level and
-         * ignored.
+         * which mean any exceptions (if possible) occurred while the Camel
+         * consumer is trying to pickup incoming messages, or the likes, will
+         * now be processed as a message and handled by the routing Error
+         * Handler. Important: This is only possible if the 3rd party component
+         * allows Camel to be alerted if an exception was thrown. Some
+         * components handle this internally only, and therefore
+         * bridgeErrorHandler is not possible. In other situations we may
+         * improve the Camel component to hook into the 3rd party component and
+         * make this possible for future releases. By default the consumer will
+         * use the org.apache.camel.spi.ExceptionHandler to deal with
+         * exceptions, that will be logged at WARN or ERROR level and ignored.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -1546,12 +1603,17 @@ public interface Sqs2EndpointBuilderFactory {
         }
         /**
          * Allows for bridging the consumer to the Camel routing Error Handler,
-         * which mean any exceptions occurred while the consumer is trying to
-         * pickup incoming messages, or the likes, will now be processed as a
-         * message and handled by the routing Error Handler. By default the
-         * consumer will use the org.apache.camel.spi.ExceptionHandler to deal
-         * with exceptions, that will be logged at WARN or ERROR level and
-         * ignored.
+         * which mean any exceptions (if possible) occurred while the Camel
+         * consumer is trying to pickup incoming messages, or the likes, will
+         * now be processed as a message and handled by the routing Error
+         * Handler. Important: This is only possible if the 3rd party component
+         * allows Camel to be alerted if an exception was thrown. Some
+         * components handle this internally only, and therefore
+         * bridgeErrorHandler is not possible. In other situations we may
+         * improve the Camel component to hook into the 3rd party component and
+         * make this possible for future releases. By default the consumer will
+         * use the org.apache.camel.spi.ExceptionHandler to deal with
+         * exceptions, that will be logged at WARN or ERROR level and ignored.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -1676,7 +1738,7 @@ public interface Sqs2EndpointBuilderFactory {
             return this;
         }
         /**
-         * To use the AmazonSQS as client.
+         * To use the AmazonSQS client.
          * 
          * The option is a:
          * &lt;code&gt;software.amazon.awssdk.services.sqs.SqsClient&lt;/code&gt; type.
@@ -1692,7 +1754,7 @@ public interface Sqs2EndpointBuilderFactory {
             return this;
         }
         /**
-         * To use the AmazonSQS as client.
+         * To use the AmazonSQS client.
          * 
          * The option will be converted to a
          * &lt;code&gt;software.amazon.awssdk.services.sqs.SqsClient&lt;/code&gt; type.
@@ -1769,7 +1831,7 @@ public interface Sqs2EndpointBuilderFactory {
             return this;
         }
         /**
-         * Setting the autocreation of the queue.
+         * Setting the auto-creation of the queue.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -1785,7 +1847,7 @@ public interface Sqs2EndpointBuilderFactory {
             return this;
         }
         /**
-         * Setting the autocreation of the queue.
+         * Setting the auto-creation of the queue.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -1837,7 +1899,7 @@ public interface Sqs2EndpointBuilderFactory {
         }
         /**
          * Set the need for overriding the endpoint. This option needs to be
-         * used in combination with uriEndpointOverride option.
+         * used in combination with the uriEndpointOverride option.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -1854,7 +1916,7 @@ public interface Sqs2EndpointBuilderFactory {
         }
         /**
          * Set the need for overriding the endpoint. This option needs to be
-         * used in combination with uriEndpointOverride option.
+         * used in combination with the uriEndpointOverride option.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -1887,7 +1949,7 @@ public interface Sqs2EndpointBuilderFactory {
         }
         /**
          * Specify the queue owner aws account id when you need to connect the
-         * queue with different account owner.
+         * queue with a different account owner.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
@@ -1904,7 +1966,7 @@ public interface Sqs2EndpointBuilderFactory {
         /**
          * The region in which SQS client needs to work. When using this
          * parameter, the configuration will expect the lowercase name of the
-         * region (for example ap-east-1) You'll need to use the name
+         * region (for example, ap-east-1) You'll need to use the name
          * Region.EU_WEST_1.id().
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -1981,9 +2043,10 @@ public interface Sqs2EndpointBuilderFactory {
         }
         /**
          * Only for FIFO queues. Strategy for setting the messageDeduplicationId
-         * on the message. Can be one of the following options: useExchangeId,
-         * useContentBasedDeduplication. For the useContentBasedDeduplication
-         * option, no messageDeduplicationId will be set on the message.
+         * on the message. It can be one of the following options:
+         * useExchangeId, useContentBasedDeduplication. For the
+         * useContentBasedDeduplication option, no messageDeduplicationId will
+         * be set on the message.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
@@ -2000,7 +2063,7 @@ public interface Sqs2EndpointBuilderFactory {
         }
         /**
          * Only for FIFO queues. Strategy for setting the messageGroupId on the
-         * message. Can be one of the following options: useConstant,
+         * message. It can be one of the following options: useConstant,
          * useExchangeId, usePropertyValue. For the usePropertyValue option, the
          * value of property CamelAwsMessageGroupId will be used.
          * 
@@ -2018,13 +2081,13 @@ public interface Sqs2EndpointBuilderFactory {
         }
         /**
          * What to do if sending to AWS SQS has more messages than AWS allows
-         * (currently only maximum 10 message headers is allowed). WARN will log
-         * a WARN about the limit is for each additional header, so the message
-         * can be sent to AWS. WARN_ONCE will only log one time a WARN about the
-         * limit is hit, and drop additional headers, so the message can be sent
-         * to AWS. IGNORE will ignore (no logging) and drop additional headers,
-         * so the message can be sent to AWS. FAIL will cause an exception to be
-         * thrown and the message is not sent to AWS.
+         * (currently only maximum 10 message headers are allowed). WARN will
+         * log a WARN about the limit is for each additional header, so the
+         * message can be sent to AWS. WARN_ONCE will only log one time a WARN
+         * about the limit is hit, and drop additional headers, so the message
+         * can be sent to AWS. IGNORE will ignore (no logging) and drop
+         * additional headers, so the message can be sent to AWS. FAIL will
+         * cause an exception to be thrown and the message is not sent to AWS.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
@@ -2236,7 +2299,7 @@ public interface Sqs2EndpointBuilderFactory {
         /**
          * To define the queueUrl explicitly. All other parameters, which would
          * influence the queueUrl, are ignored. This parameter is intended to be
-         * used, to connect to a mock implementation of SQS, for testing
+         * used to connect to a mock implementation of SQS, for testing
          * purposes.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -2315,7 +2378,7 @@ public interface Sqs2EndpointBuilderFactory {
             return this;
         }
         /**
-         * If using a profile credentials provider this parameter will set the
+         * If using a profile credentials provider, this parameter will set the
          * profile name.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -2342,6 +2405,21 @@ public interface Sqs2EndpointBuilderFactory {
          */
         default Sqs2EndpointProducerBuilder secretKey(String secretKey) {
             doSetProperty("secretKey", secretKey);
+            return this;
+        }
+        /**
+         * Amazon AWS Session Token used when the user needs to assume an IAM
+         * role.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: security
+         * 
+         * @param sessionToken the value to set
+         * @return the dsl builder
+         */
+        default Sqs2EndpointProducerBuilder sessionToken(String sessionToken) {
+            doSetProperty("sessionToken", sessionToken);
             return this;
         }
         /**
@@ -2449,6 +2527,43 @@ public interface Sqs2EndpointBuilderFactory {
             doSetProperty("useProfileCredentialsProvider", useProfileCredentialsProvider);
             return this;
         }
+        /**
+         * Set whether the SQS client should expect to use Session Credentials.
+         * This is useful in a situation in which the user needs to assume an
+         * IAM role for doing operations in SQS.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default Sqs2EndpointProducerBuilder useSessionCredentials(
+                boolean useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
+            return this;
+        }
+        /**
+         * Set whether the SQS client should expect to use Session Credentials.
+         * This is useful in a situation in which the user needs to assume an
+         * IAM role for doing operations in SQS.
+         * 
+         * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
+         * type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default Sqs2EndpointProducerBuilder useSessionCredentials(
+                String useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
+            return this;
+        }
     }
 
     /**
@@ -2511,7 +2626,7 @@ public interface Sqs2EndpointBuilderFactory {
             return this;
         }
         /**
-         * To use the AmazonSQS as client.
+         * To use the AmazonSQS client.
          * 
          * The option is a:
          * &lt;code&gt;software.amazon.awssdk.services.sqs.SqsClient&lt;/code&gt; type.
@@ -2527,7 +2642,7 @@ public interface Sqs2EndpointBuilderFactory {
             return this;
         }
         /**
-         * To use the AmazonSQS as client.
+         * To use the AmazonSQS client.
          * 
          * The option will be converted to a
          * &lt;code&gt;software.amazon.awssdk.services.sqs.SqsClient&lt;/code&gt; type.
@@ -2604,7 +2719,7 @@ public interface Sqs2EndpointBuilderFactory {
             return this;
         }
         /**
-         * Setting the autocreation of the queue.
+         * Setting the auto-creation of the queue.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -2619,7 +2734,7 @@ public interface Sqs2EndpointBuilderFactory {
             return this;
         }
         /**
-         * Setting the autocreation of the queue.
+         * Setting the auto-creation of the queue.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -2670,7 +2785,7 @@ public interface Sqs2EndpointBuilderFactory {
         }
         /**
          * Set the need for overriding the endpoint. This option needs to be
-         * used in combination with uriEndpointOverride option.
+         * used in combination with the uriEndpointOverride option.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -2686,7 +2801,7 @@ public interface Sqs2EndpointBuilderFactory {
         }
         /**
          * Set the need for overriding the endpoint. This option needs to be
-         * used in combination with uriEndpointOverride option.
+         * used in combination with the uriEndpointOverride option.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -2718,7 +2833,7 @@ public interface Sqs2EndpointBuilderFactory {
         }
         /**
          * Specify the queue owner aws account id when you need to connect the
-         * queue with different account owner.
+         * queue with a different account owner.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
@@ -2735,7 +2850,7 @@ public interface Sqs2EndpointBuilderFactory {
         /**
          * The region in which SQS client needs to work. When using this
          * parameter, the configuration will expect the lowercase name of the
-         * region (for example ap-east-1) You'll need to use the name
+         * region (for example, ap-east-1) You'll need to use the name
          * Region.EU_WEST_1.id().
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -2928,7 +3043,7 @@ public interface Sqs2EndpointBuilderFactory {
         /**
          * To define the queueUrl explicitly. All other parameters, which would
          * influence the queueUrl, are ignored. This parameter is intended to be
-         * used, to connect to a mock implementation of SQS, for testing
+         * used to connect to a mock implementation of SQS, for testing
          * purposes.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -3007,7 +3122,7 @@ public interface Sqs2EndpointBuilderFactory {
             return this;
         }
         /**
-         * If using a profile credentials provider this parameter will set the
+         * If using a profile credentials provider, this parameter will set the
          * profile name.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -3034,6 +3149,21 @@ public interface Sqs2EndpointBuilderFactory {
          */
         default Sqs2EndpointBuilder secretKey(String secretKey) {
             doSetProperty("secretKey", secretKey);
+            return this;
+        }
+        /**
+         * Amazon AWS Session Token used when the user needs to assume an IAM
+         * role.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: security
+         * 
+         * @param sessionToken the value to set
+         * @return the dsl builder
+         */
+        default Sqs2EndpointBuilder sessionToken(String sessionToken) {
+            doSetProperty("sessionToken", sessionToken);
             return this;
         }
         /**
@@ -3141,6 +3271,43 @@ public interface Sqs2EndpointBuilderFactory {
             doSetProperty("useProfileCredentialsProvider", useProfileCredentialsProvider);
             return this;
         }
+        /**
+         * Set whether the SQS client should expect to use Session Credentials.
+         * This is useful in a situation in which the user needs to assume an
+         * IAM role for doing operations in SQS.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default Sqs2EndpointBuilder useSessionCredentials(
+                boolean useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
+            return this;
+        }
+        /**
+         * Set whether the SQS client should expect to use Session Credentials.
+         * This is useful in a situation in which the user needs to assume an
+         * IAM role for doing operations in SQS.
+         * 
+         * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
+         * type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default Sqs2EndpointBuilder useSessionCredentials(
+                String useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
+            return this;
+        }
     }
 
     /**
@@ -3155,7 +3322,7 @@ public interface Sqs2EndpointBuilderFactory {
             return (Sqs2EndpointBuilder) this;
         }
         /**
-         * To use the AmazonSQS as client.
+         * To use the AmazonSQS client.
          * 
          * The option is a:
          * &lt;code&gt;software.amazon.awssdk.services.sqs.SqsClient&lt;/code&gt; type.
@@ -3171,7 +3338,7 @@ public interface Sqs2EndpointBuilderFactory {
             return this;
         }
         /**
-         * To use the AmazonSQS as client.
+         * To use the AmazonSQS client.
          * 
          * The option will be converted to a
          * &lt;code&gt;software.amazon.awssdk.services.sqs.SqsClient&lt;/code&gt; type.
@@ -3300,7 +3467,7 @@ public interface Sqs2EndpointBuilderFactory {
          * @return the name of the header {@code AwsSqsAttributes}.
          */
         public String awsSqsAttributes() {
-            return "AwsSqsAttributes";
+            return "CamelAwsSqsAttributes";
         }
 
         /**
@@ -3313,7 +3480,7 @@ public interface Sqs2EndpointBuilderFactory {
          * @return the name of the header {@code AwsSqsMessageAttributes}.
          */
         public String awsSqsMessageAttributes() {
-            return "AwsSqsMessageAttributes";
+            return "CamelAwsSqsMessageAttributes";
         }
 
         /**
@@ -3326,7 +3493,7 @@ public interface Sqs2EndpointBuilderFactory {
          * @return the name of the header {@code AwsSqsMD5OfBody}.
          */
         public String awsSqsMD5OfBody() {
-            return "AwsSqsMD5OfBody";
+            return "CamelAwsSqsMD5OfBody";
         }
 
         /**
@@ -3339,7 +3506,7 @@ public interface Sqs2EndpointBuilderFactory {
          * @return the name of the header {@code AwsSqsMessageId}.
          */
         public String awsSqsMessageId() {
-            return "AwsSqsMessageId";
+            return "CamelAwsSqsMessageId";
         }
 
         /**
@@ -3352,7 +3519,7 @@ public interface Sqs2EndpointBuilderFactory {
          * @return the name of the header {@code AwsSqsReceiptHandle}.
          */
         public String awsSqsReceiptHandle() {
-            return "AwsSqsReceiptHandle";
+            return "CamelAwsSqsReceiptHandle";
         }
 
         /**
@@ -3365,7 +3532,7 @@ public interface Sqs2EndpointBuilderFactory {
          * @return the name of the header {@code AwsSqsDelaySeconds}.
          */
         public String awsSqsDelaySeconds() {
-            return "AwsSqsDelaySeconds";
+            return "CamelAwsSqsDelaySeconds";
         }
 
         /**
@@ -3378,7 +3545,7 @@ public interface Sqs2EndpointBuilderFactory {
          * @return the name of the header {@code AwsSqsPrefix}.
          */
         public String awsSqsPrefix() {
-            return "AwsSqsPrefix";
+            return "CamelAwsSqsPrefix";
         }
 
         /**
@@ -3391,7 +3558,7 @@ public interface Sqs2EndpointBuilderFactory {
          * @return the name of the header {@code AwsSqsOperation}.
          */
         public String awsSqsOperation() {
-            return "AwsSqsOperation";
+            return "CamelAwsSqsOperation";
         }
     }
     static Sqs2EndpointBuilder endpointBuilder(String componentName, String path) {

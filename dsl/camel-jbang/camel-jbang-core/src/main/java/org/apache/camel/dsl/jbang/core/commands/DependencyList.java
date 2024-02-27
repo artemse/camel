@@ -28,6 +28,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import org.apache.camel.dsl.jbang.core.common.CommandLineHelper;
 import org.apache.camel.dsl.jbang.core.common.RuntimeUtil;
 import org.apache.camel.dsl.jbang.core.common.XmlHelper;
 import org.apache.camel.tooling.maven.MavenGav;
@@ -39,9 +40,9 @@ import picocli.CommandLine;
                      description = "Displays all Camel dependencies required to run")
 public class DependencyList extends Export {
 
-    protected static final String EXPORT_DIR = ".camel-jbang/export";
+    protected static final String EXPORT_DIR = CommandLineHelper.CAMEL_JBANG_WORK_DIR + "/export";
 
-    @CommandLine.Option(names = { "--output" }, description = "Output format (gav or maven)", defaultValue = "gav")
+    @CommandLine.Option(names = { "--output" }, description = "Output format (gav, maven, jbang)", defaultValue = "gav")
     protected String output;
 
     public DependencyList(CamelJBangMain main) {
@@ -56,7 +57,7 @@ public class DependencyList extends Export {
 
     @Override
     protected Integer export() throws Exception {
-        if (!"gav".equals(output) && !"maven".equals(output)) {
+        if (!"gav".equals(output) && !"maven".equals(output) && !"jbang".equals(output)) {
             System.err.println("--output must be either gav or maven, was: " + output);
             return 1;
         }
@@ -143,8 +144,11 @@ public class DependencyList extends Export {
                 }
                 // sort GAVs
                 gavs.sort(mavenGavComparator());
+                int i = 0;
+                int total = gavs.size();
                 for (MavenGav gav : gavs) {
-                    outputGav(gav);
+                    outputGav(gav, i, total);
+                    i++;
                 }
             }
             // cleanup dir after complete
@@ -154,15 +158,24 @@ public class DependencyList extends Export {
         return answer;
     }
 
-    protected void outputGav(MavenGav gav) {
+    protected void outputGav(MavenGav gav, int index, int total) {
         if ("gav".equals(output)) {
-            System.out.println(gav.toString());
+            printer().println(String.valueOf(gav));
         } else if ("maven".equals(output)) {
-            System.out.println("<dependency>");
-            System.out.printf("    <groupId>%s</groupId>%n", gav.getGroupId());
-            System.out.printf("    <artifactId>%s</artifactId>%n", gav.getArtifactId());
-            System.out.printf("    <version>%s</version>%n", gav.getVersion());
-            System.out.println("</dependency>");
+            printer().println("<dependency>");
+            printer().printf("    <groupId>%s</groupId>%n", gav.getGroupId());
+            printer().printf("    <artifactId>%s</artifactId>%n", gav.getArtifactId());
+            printer().printf("    <version>%s</version>%n", gav.getVersion());
+            printer().println("</dependency>");
+        } else if ("jbang".equals(output)) {
+            if (index == 0) {
+                printer().println("//DEPS org.apache.camel:camel-bom:" + gav.getVersion() + "@pom");
+            }
+            if (gav.getGroupId().equals("org.apache.camel")) {
+                // jbang has version in @pom so we should remove this
+                gav.setVersion(null);
+            }
+            printer().println("//DEPS " + gav);
         }
     }
 

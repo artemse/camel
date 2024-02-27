@@ -42,6 +42,7 @@ import org.apache.camel.util.IOHelper;
 import org.apache.camel.util.ObjectHelper;
 import org.apache.camel.util.OrderedLocationProperties;
 import org.apache.camel.util.OrderedProperties;
+import org.apache.camel.util.StopWatch;
 import org.apache.camel.util.StringHelper;
 import org.apache.camel.util.TimeUtils;
 import org.slf4j.Logger;
@@ -51,13 +52,14 @@ public final class MainHelper {
     private static final Logger LOG = LoggerFactory.getLogger(MainHelper.class);
 
     private final String version;
-    private final long startDate;
+    private final StopWatch stopWatch;
     private final Set<String> componentEnvNames = new HashSet<>();
     private final Set<String> dataformatEnvNames = new HashSet<>();
     private final Set<String> languageEnvNames = new HashSet<>();
 
     public MainHelper() {
-        startDate = System.currentTimeMillis();
+        stopWatch = new StopWatch();
+
         try {
             InputStream is = MainHelper.class.getResourceAsStream("/org/apache/camel/main/components.properties");
             loadLines(is, componentEnvNames, s -> "CAMEL_COMPONENT_" + s.toUpperCase(Locale.US).replace('-', '_'));
@@ -82,7 +84,7 @@ public final class MainHelper {
     }
 
     public String getUptime() {
-        long delta = System.currentTimeMillis() - startDate;
+        long delta = stopWatch.taken();
         if (delta == 0) {
             return "";
         }
@@ -239,7 +241,8 @@ public final class MainHelper {
 
     public static String optionKey(String key) {
         // as we ignore case for property names we should use keys in same case and without dashes
-        key = StringHelper.dashToCamelCase(key);
+        // we need to preserve inside [] and quotes
+        key = StringHelper.dashToCamelCase(key, true);
         return key;
     }
 

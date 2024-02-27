@@ -67,6 +67,23 @@ public interface AzureStorageQueueComponentBuilderFactory {
             return this;
         }
         /**
+         * Determines the credential strategy to adopt.
+         * 
+         * The option is a:
+         * &lt;code&gt;org.apache.camel.component.azure.storage.queue.CredentialType&lt;/code&gt; type.
+         * 
+         * Default: SHARED_ACCOUNT_KEY
+         * Group: common
+         * 
+         * @param credentialType the value to set
+         * @return the dsl builder
+         */
+        default AzureStorageQueueComponentBuilder credentialType(
+                org.apache.camel.component.azure.storage.queue.CredentialType credentialType) {
+            doSetProperty("credentialType", credentialType);
+            return this;
+        }
+        /**
          * Service client to a storage account to interact with the queue
          * service. This client does not hold any state about a particular
          * storage account but is instead a convenient way of sending off
@@ -92,12 +109,17 @@ public interface AzureStorageQueueComponentBuilderFactory {
         }
         /**
          * Allows for bridging the consumer to the Camel routing Error Handler,
-         * which mean any exceptions occurred while the consumer is trying to
-         * pickup incoming messages, or the likes, will now be processed as a
-         * message and handled by the routing Error Handler. By default the
-         * consumer will use the org.apache.camel.spi.ExceptionHandler to deal
-         * with exceptions, that will be logged at WARN or ERROR level and
-         * ignored.
+         * which mean any exceptions (if possible) occurred while the Camel
+         * consumer is trying to pickup incoming messages, or the likes, will
+         * now be processed as a message and handled by the routing Error
+         * Handler. Important: This is only possible if the 3rd party component
+         * allows Camel to be alerted if an exception was thrown. Some
+         * components handle this internally only, and therefore
+         * bridgeErrorHandler is not possible. In other situations we may
+         * improve the Camel component to hook into the 3rd party component and
+         * make this possible for future releases. By default the consumer will
+         * use the org.apache.camel.spi.ExceptionHandler to deal with
+         * exceptions, that will be logged at WARN or ERROR level and ignored.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -392,6 +414,7 @@ public interface AzureStorageQueueComponentBuilderFactory {
                 Object value) {
             switch (name) {
             case "configuration": ((QueueComponent) component).setConfiguration((org.apache.camel.component.azure.storage.queue.QueueConfiguration) value); return true;
+            case "credentialType": getOrCreateConfiguration((QueueComponent) component).setCredentialType((org.apache.camel.component.azure.storage.queue.CredentialType) value); return true;
             case "serviceClient": getOrCreateConfiguration((QueueComponent) component).setServiceClient((com.azure.storage.queue.QueueServiceClient) value); return true;
             case "bridgeErrorHandler": ((QueueComponent) component).setBridgeErrorHandler((boolean) value); return true;
             case "createQueue": getOrCreateConfiguration((QueueComponent) component).setCreateQueue((boolean) value); return true;

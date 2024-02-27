@@ -46,7 +46,7 @@ public interface AWS2S3EndpointBuilderFactory {
         }
         /**
          * Setting the autocreation of the S3 bucket bucketName. This will apply
-         * also in case of moveAfterRead option enabled and it will create the
+         * also in case of moveAfterRead option enabled, and it will create the
          * destinationBucket if it doesn't exist already.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
@@ -64,7 +64,7 @@ public interface AWS2S3EndpointBuilderFactory {
         }
         /**
          * Setting the autocreation of the S3 bucket bucketName. This will apply
-         * also in case of moveAfterRead option enabled and it will create the
+         * also in case of moveAfterRead option enabled, and it will create the
          * destinationBucket if it doesn't exist already.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
@@ -133,8 +133,8 @@ public interface AWS2S3EndpointBuilderFactory {
             return this;
         }
         /**
-         * Set the need for overidding the endpoint. This option needs to be
-         * used in combination with uriEndpointOverride option.
+         * Set the need for overriding the endpoint. This option needs to be
+         * used in combination with the uriEndpointOverride option.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -150,8 +150,8 @@ public interface AWS2S3EndpointBuilderFactory {
             return this;
         }
         /**
-         * Set the need for overidding the endpoint. This option needs to be
-         * used in combination with uriEndpointOverride option.
+         * Set the need for overriding the endpoint. This option needs to be
+         * used in combination with the uriEndpointOverride option.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -230,9 +230,9 @@ public interface AWS2S3EndpointBuilderFactory {
             return this;
         }
         /**
-         * The region in which S3 client needs to work. When using this
+         * The region in which the S3 client needs to work. When using this
          * parameter, the configuration will expect the lowercase name of the
-         * region (for example ap-east-1) You'll need to use the name
+         * region (for example, ap-east-1) You'll need to use the name
          * Region.EU_WEST_1.id().
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -263,14 +263,14 @@ public interface AWS2S3EndpointBuilderFactory {
             return this;
         }
         /**
-         * Delete objects from S3 after they have been retrieved. The delete is
-         * only performed if the Exchange is committed. If a rollback occurs,
+         * Delete objects from S3 after they have been retrieved. The deleting
+         * is only performed if the Exchange is committed. If a rollback occurs,
          * the object is not deleted. If this option is false, then the same
-         * objects will be retrieve over and over again on the polls. Therefore
-         * you need to use the Idempotent Consumer EIP in the route to filter
-         * out duplicates. You can filter using the AWS2S3Constants#BUCKET_NAME
-         * and AWS2S3Constants#KEY headers, or only the AWS2S3Constants#KEY
-         * header.
+         * objects will be retrieved over and over again in the polls.
+         * Therefore, you need to use the Idempotent Consumer EIP in the route
+         * to filter out duplicates. You can filter using the
+         * AWS2S3Constants#BUCKET_NAME and AWS2S3Constants#KEY headers, or only
+         * the AWS2S3Constants#KEY header.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -286,14 +286,14 @@ public interface AWS2S3EndpointBuilderFactory {
             return this;
         }
         /**
-         * Delete objects from S3 after they have been retrieved. The delete is
-         * only performed if the Exchange is committed. If a rollback occurs,
+         * Delete objects from S3 after they have been retrieved. The deleting
+         * is only performed if the Exchange is committed. If a rollback occurs,
          * the object is not deleted. If this option is false, then the same
-         * objects will be retrieve over and over again on the polls. Therefore
-         * you need to use the Idempotent Consumer EIP in the route to filter
-         * out duplicates. You can filter using the AWS2S3Constants#BUCKET_NAME
-         * and AWS2S3Constants#KEY headers, or only the AWS2S3Constants#KEY
-         * header.
+         * objects will be retrieved over and over again in the polls.
+         * Therefore, you need to use the Idempotent Consumer EIP in the route
+         * to filter out duplicates. You can filter using the
+         * AWS2S3Constants#BUCKET_NAME and AWS2S3Constants#KEY headers, or only
+         * the AWS2S3Constants#KEY header.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -327,7 +327,7 @@ public interface AWS2S3EndpointBuilderFactory {
         }
         /**
          * Define the destination bucket prefix to use when an object must be
-         * moved and moveAfterRead is set to true.
+         * moved, and moveAfterRead is set to true.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
@@ -343,7 +343,7 @@ public interface AWS2S3EndpointBuilderFactory {
         }
         /**
          * Define the destination bucket suffix to use when an object must be
-         * moved and moveAfterRead is set to true.
+         * moved, and moveAfterRead is set to true.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
@@ -386,9 +386,9 @@ public interface AWS2S3EndpointBuilderFactory {
             return this;
         }
         /**
-         * If it is true, the S3 Object Body will be ignored completely, if it
-         * is set to false the S3 Object will be put in the body. Setting this
-         * to true, will override any behavior defined by includeBody option.
+         * If it is true, the S3 Object Body will be ignored completely if it is
+         * set to false, the S3 Object will be put in the body. Setting this to
+         * true will override any behavior defined by includeBody option.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -403,9 +403,9 @@ public interface AWS2S3EndpointBuilderFactory {
             return this;
         }
         /**
-         * If it is true, the S3 Object Body will be ignored completely, if it
-         * is set to false the S3 Object will be put in the body. Setting this
-         * to true, will override any behavior defined by includeBody option.
+         * If it is true, the S3 Object Body will be ignored completely if it is
+         * set to false, the S3 Object will be put in the body. Setting this to
+         * true will override any behavior defined by includeBody option.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -422,15 +422,15 @@ public interface AWS2S3EndpointBuilderFactory {
         }
         /**
          * If it is true, the S3Object exchange will be consumed and put into
-         * the body and closed. If false the S3Object stream will be put raw
+         * the body and closed. If false, the S3Object stream will be put raw
          * into the body and the headers will be set with the S3 object
-         * metadata. This option is strongly related to autocloseBody option. In
-         * case of setting includeBody to true because the S3Object stream will
-         * be consumed then it will also be closed, while in case of includeBody
-         * false then it will be up to the caller to close the S3Object stream.
-         * However setting autocloseBody to true when includeBody is false it
-         * will schedule to close the S3Object stream automatically on exchange
-         * completion.
+         * metadata. This option is strongly related to the autocloseBody
+         * option. In case of setting includeBody to true because the S3Object
+         * stream will be consumed then it will also be closed, while in case of
+         * includeBody false then it will be up to the caller to close the
+         * S3Object stream. However, setting autocloseBody to true when
+         * includeBody is false it will schedule to close the S3Object stream
+         * automatically on exchange completion.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -446,15 +446,15 @@ public interface AWS2S3EndpointBuilderFactory {
         }
         /**
          * If it is true, the S3Object exchange will be consumed and put into
-         * the body and closed. If false the S3Object stream will be put raw
+         * the body and closed. If false, the S3Object stream will be put raw
          * into the body and the headers will be set with the S3 object
-         * metadata. This option is strongly related to autocloseBody option. In
-         * case of setting includeBody to true because the S3Object stream will
-         * be consumed then it will also be closed, while in case of includeBody
-         * false then it will be up to the caller to close the S3Object stream.
-         * However setting autocloseBody to true when includeBody is false it
-         * will schedule to close the S3Object stream automatically on exchange
-         * completion.
+         * metadata. This option is strongly related to the autocloseBody
+         * option. In case of setting includeBody to true because the S3Object
+         * stream will be consumed then it will also be closed, while in case of
+         * includeBody false then it will be up to the caller to close the
+         * S3Object stream. However, setting autocloseBody to true when
+         * includeBody is false it will schedule to close the S3Object stream
+         * automatically on exchange completion.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -577,7 +577,7 @@ public interface AWS2S3EndpointBuilderFactory {
         }
         /**
          * Move objects from S3 bucket to a different bucket after they have
-         * been retrieved. To accomplish the operation the destinationBucket
+         * been retrieved. To accomplish the operation, the destinationBucket
          * option must be set. The copy bucket operation is only performed if
          * the Exchange is committed. If a rollback occurs, the object is not
          * moved.
@@ -597,7 +597,7 @@ public interface AWS2S3EndpointBuilderFactory {
         }
         /**
          * Move objects from S3 bucket to a different bucket after they have
-         * been retrieved. To accomplish the operation the destinationBucket
+         * been retrieved. To accomplish the operation, the destinationBucket
          * option must be set. The copy bucket operation is only performed if
          * the Exchange is committed. If a rollback occurs, the object is not
          * moved.
@@ -1217,7 +1217,7 @@ public interface AWS2S3EndpointBuilderFactory {
             return this;
         }
         /**
-         * If using a profile credentials provider this parameter will set the
+         * If using a profile credentials provider, this parameter will set the
          * profile name.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -1244,6 +1244,21 @@ public interface AWS2S3EndpointBuilderFactory {
          */
         default AWS2S3EndpointConsumerBuilder secretKey(String secretKey) {
             doSetProperty("secretKey", secretKey);
+            return this;
+        }
+        /**
+         * Amazon AWS Session Token used when the user needs to assume an IAM
+         * role.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: security
+         * 
+         * @param sessionToken the value to set
+         * @return the dsl builder
+         */
+        default AWS2S3EndpointConsumerBuilder sessionToken(String sessionToken) {
+            doSetProperty("sessionToken", sessionToken);
             return this;
         }
         /**
@@ -1351,6 +1366,43 @@ public interface AWS2S3EndpointBuilderFactory {
             doSetProperty("useProfileCredentialsProvider", useProfileCredentialsProvider);
             return this;
         }
+        /**
+         * Set whether the S3 client should expect to use Session Credentials.
+         * This is useful in a situation in which the user needs to assume an
+         * IAM role for doing operations in S3.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default AWS2S3EndpointConsumerBuilder useSessionCredentials(
+                boolean useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
+            return this;
+        }
+        /**
+         * Set whether the S3 client should expect to use Session Credentials.
+         * This is useful in a situation in which the user needs to assume an
+         * IAM role for doing operations in S3.
+         * 
+         * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
+         * type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default AWS2S3EndpointConsumerBuilder useSessionCredentials(
+                String useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
+            return this;
+        }
     }
 
     /**
@@ -1379,7 +1431,8 @@ public interface AWS2S3EndpointBuilderFactory {
             return this;
         }
         /**
-         * Define the id of Customer key to use in case CustomerKey is enabled.
+         * Define the id of the Customer key to use in case CustomerKey is
+         * enabled.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
@@ -1453,12 +1506,17 @@ public interface AWS2S3EndpointBuilderFactory {
         }
         /**
          * Allows for bridging the consumer to the Camel routing Error Handler,
-         * which mean any exceptions occurred while the consumer is trying to
-         * pickup incoming messages, or the likes, will now be processed as a
-         * message and handled by the routing Error Handler. By default the
-         * consumer will use the org.apache.camel.spi.ExceptionHandler to deal
-         * with exceptions, that will be logged at WARN or ERROR level and
-         * ignored.
+         * which mean any exceptions (if possible) occurred while the Camel
+         * consumer is trying to pickup incoming messages, or the likes, will
+         * now be processed as a message and handled by the routing Error
+         * Handler. Important: This is only possible if the 3rd party component
+         * allows Camel to be alerted if an exception was thrown. Some
+         * components handle this internally only, and therefore
+         * bridgeErrorHandler is not possible. In other situations we may
+         * improve the Camel component to hook into the 3rd party component and
+         * make this possible for future releases. By default the consumer will
+         * use the org.apache.camel.spi.ExceptionHandler to deal with
+         * exceptions, that will be logged at WARN or ERROR level and ignored.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -1475,12 +1533,17 @@ public interface AWS2S3EndpointBuilderFactory {
         }
         /**
          * Allows for bridging the consumer to the Camel routing Error Handler,
-         * which mean any exceptions occurred while the consumer is trying to
-         * pickup incoming messages, or the likes, will now be processed as a
-         * message and handled by the routing Error Handler. By default the
-         * consumer will use the org.apache.camel.spi.ExceptionHandler to deal
-         * with exceptions, that will be logged at WARN or ERROR level and
-         * ignored.
+         * which mean any exceptions (if possible) occurred while the Camel
+         * consumer is trying to pickup incoming messages, or the likes, will
+         * now be processed as a message and handled by the routing Error
+         * Handler. Important: This is only possible if the 3rd party component
+         * allows Camel to be alerted if an exception was thrown. Some
+         * components handle this internally only, and therefore
+         * bridgeErrorHandler is not possible. In other situations we may
+         * improve the Camel component to hook into the 3rd party component and
+         * make this possible for future releases. By default the consumer will
+         * use the org.apache.camel.spi.ExceptionHandler to deal with
+         * exceptions, that will be logged at WARN or ERROR level and ignored.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -1685,7 +1748,7 @@ public interface AWS2S3EndpointBuilderFactory {
         }
         /**
          * Setting the autocreation of the S3 bucket bucketName. This will apply
-         * also in case of moveAfterRead option enabled and it will create the
+         * also in case of moveAfterRead option enabled, and it will create the
          * destinationBucket if it doesn't exist already.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
@@ -1703,7 +1766,7 @@ public interface AWS2S3EndpointBuilderFactory {
         }
         /**
          * Setting the autocreation of the S3 bucket bucketName. This will apply
-         * also in case of moveAfterRead option enabled and it will create the
+         * also in case of moveAfterRead option enabled, and it will create the
          * destinationBucket if it doesn't exist already.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
@@ -1772,8 +1835,8 @@ public interface AWS2S3EndpointBuilderFactory {
             return this;
         }
         /**
-         * Set the need for overidding the endpoint. This option needs to be
-         * used in combination with uriEndpointOverride option.
+         * Set the need for overriding the endpoint. This option needs to be
+         * used in combination with the uriEndpointOverride option.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -1789,8 +1852,8 @@ public interface AWS2S3EndpointBuilderFactory {
             return this;
         }
         /**
-         * Set the need for overidding the endpoint. This option needs to be
-         * used in combination with uriEndpointOverride option.
+         * Set the need for overriding the endpoint. This option needs to be
+         * used in combination with the uriEndpointOverride option.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -1869,9 +1932,9 @@ public interface AWS2S3EndpointBuilderFactory {
             return this;
         }
         /**
-         * The region in which S3 client needs to work. When using this
+         * The region in which the S3 client needs to work. When using this
          * parameter, the configuration will expect the lowercase name of the
-         * region (for example ap-east-1) You'll need to use the name
+         * region (for example, ap-east-1) You'll need to use the name
          * Region.EU_WEST_1.id().
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -2042,8 +2105,11 @@ public interface AWS2S3EndpointBuilderFactory {
             return this;
         }
         /**
-         * If it is true, camel will upload the file with multi part format, the
-         * part size is decided by the option of partSize.
+         * If it is true, camel will upload the file with multipart format. The
+         * part size is decided by the partSize option. Camel will only do
+         * multipart uploads for files that are larger than the part-size
+         * thresholds. Files that are smaller will be uploaded in a single
+         * operation.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -2059,8 +2125,11 @@ public interface AWS2S3EndpointBuilderFactory {
             return this;
         }
         /**
-         * If it is true, camel will upload the file with multi part format, the
-         * part size is decided by the option of partSize.
+         * If it is true, camel will upload the file with multipart format. The
+         * part size is decided by the partSize option. Camel will only do
+         * multipart uploads for files that are larger than the part-size
+         * thresholds. Files that are smaller will be uploaded in a single
+         * operation.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -2142,8 +2211,10 @@ public interface AWS2S3EndpointBuilderFactory {
             return this;
         }
         /**
-         * Setup the partSize which is used in multi part upload, the default
-         * size is 25M.
+         * Set up the partSize which is used in multipart upload, the default
+         * size is 25M. Camel will only do multipart uploads for files that are
+         * larger than the part-size thresholds. Files that are smaller will be
+         * uploaded in a single operation.
          * 
          * The option is a: &lt;code&gt;long&lt;/code&gt; type.
          * 
@@ -2158,8 +2229,10 @@ public interface AWS2S3EndpointBuilderFactory {
             return this;
         }
         /**
-         * Setup the partSize which is used in multi part upload, the default
-         * size is 25M.
+         * Set up the partSize which is used in multipart upload, the default
+         * size is 25M. Camel will only do multipart uploads for files that are
+         * larger than the part-size thresholds. Files that are smaller will be
+         * uploaded in a single operation.
          * 
          * The option will be converted to a &lt;code&gt;long&lt;/code&gt; type.
          * 
@@ -2223,7 +2296,7 @@ public interface AWS2S3EndpointBuilderFactory {
             return this;
         }
         /**
-         * When stream mode is true the upload to bucket will be done in
+         * When stream mode is true, the upload to bucket will be done in
          * streaming.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
@@ -2240,7 +2313,7 @@ public interface AWS2S3EndpointBuilderFactory {
             return this;
         }
         /**
-         * When stream mode is true the upload to bucket will be done in
+         * When stream mode is true, the upload to bucket will be done in
          * streaming.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
@@ -2380,7 +2453,7 @@ public interface AWS2S3EndpointBuilderFactory {
             return this;
         }
         /**
-         * If using a profile credentials provider this parameter will set the
+         * If using a profile credentials provider, this parameter will set the
          * profile name.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -2407,6 +2480,21 @@ public interface AWS2S3EndpointBuilderFactory {
          */
         default AWS2S3EndpointProducerBuilder secretKey(String secretKey) {
             doSetProperty("secretKey", secretKey);
+            return this;
+        }
+        /**
+         * Amazon AWS Session Token used when the user needs to assume an IAM
+         * role.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: security
+         * 
+         * @param sessionToken the value to set
+         * @return the dsl builder
+         */
+        default AWS2S3EndpointProducerBuilder sessionToken(String sessionToken) {
+            doSetProperty("sessionToken", sessionToken);
             return this;
         }
         /**
@@ -2514,6 +2602,43 @@ public interface AWS2S3EndpointBuilderFactory {
             doSetProperty("useProfileCredentialsProvider", useProfileCredentialsProvider);
             return this;
         }
+        /**
+         * Set whether the S3 client should expect to use Session Credentials.
+         * This is useful in a situation in which the user needs to assume an
+         * IAM role for doing operations in S3.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default AWS2S3EndpointProducerBuilder useSessionCredentials(
+                boolean useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
+            return this;
+        }
+        /**
+         * Set whether the S3 client should expect to use Session Credentials.
+         * This is useful in a situation in which the user needs to assume an
+         * IAM role for doing operations in S3.
+         * 
+         * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
+         * type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default AWS2S3EndpointProducerBuilder useSessionCredentials(
+                String useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
+            return this;
+        }
     }
 
     /**
@@ -2542,7 +2667,8 @@ public interface AWS2S3EndpointBuilderFactory {
             return this;
         }
         /**
-         * Define the id of Customer key to use in case CustomerKey is enabled.
+         * Define the id of the Customer key to use in case CustomerKey is
+         * enabled.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
@@ -2813,7 +2939,7 @@ public interface AWS2S3EndpointBuilderFactory {
         }
         /**
          * Setting the autocreation of the S3 bucket bucketName. This will apply
-         * also in case of moveAfterRead option enabled and it will create the
+         * also in case of moveAfterRead option enabled, and it will create the
          * destinationBucket if it doesn't exist already.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
@@ -2830,7 +2956,7 @@ public interface AWS2S3EndpointBuilderFactory {
         }
         /**
          * Setting the autocreation of the S3 bucket bucketName. This will apply
-         * also in case of moveAfterRead option enabled and it will create the
+         * also in case of moveAfterRead option enabled, and it will create the
          * destinationBucket if it doesn't exist already.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
@@ -2896,8 +3022,8 @@ public interface AWS2S3EndpointBuilderFactory {
             return this;
         }
         /**
-         * Set the need for overidding the endpoint. This option needs to be
-         * used in combination with uriEndpointOverride option.
+         * Set the need for overriding the endpoint. This option needs to be
+         * used in combination with the uriEndpointOverride option.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -2912,8 +3038,8 @@ public interface AWS2S3EndpointBuilderFactory {
             return this;
         }
         /**
-         * Set the need for overidding the endpoint. This option needs to be
-         * used in combination with uriEndpointOverride option.
+         * Set the need for overriding the endpoint. This option needs to be
+         * used in combination with the uriEndpointOverride option.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -2991,9 +3117,9 @@ public interface AWS2S3EndpointBuilderFactory {
             return this;
         }
         /**
-         * The region in which S3 client needs to work. When using this
+         * The region in which the S3 client needs to work. When using this
          * parameter, the configuration will expect the lowercase name of the
-         * region (for example ap-east-1) You'll need to use the name
+         * region (for example, ap-east-1) You'll need to use the name
          * Region.EU_WEST_1.id().
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -3114,7 +3240,7 @@ public interface AWS2S3EndpointBuilderFactory {
             return this;
         }
         /**
-         * If using a profile credentials provider this parameter will set the
+         * If using a profile credentials provider, this parameter will set the
          * profile name.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -3141,6 +3267,21 @@ public interface AWS2S3EndpointBuilderFactory {
          */
         default AWS2S3EndpointBuilder secretKey(String secretKey) {
             doSetProperty("secretKey", secretKey);
+            return this;
+        }
+        /**
+         * Amazon AWS Session Token used when the user needs to assume an IAM
+         * role.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: security
+         * 
+         * @param sessionToken the value to set
+         * @return the dsl builder
+         */
+        default AWS2S3EndpointBuilder sessionToken(String sessionToken) {
+            doSetProperty("sessionToken", sessionToken);
             return this;
         }
         /**
@@ -3248,6 +3389,43 @@ public interface AWS2S3EndpointBuilderFactory {
             doSetProperty("useProfileCredentialsProvider", useProfileCredentialsProvider);
             return this;
         }
+        /**
+         * Set whether the S3 client should expect to use Session Credentials.
+         * This is useful in a situation in which the user needs to assume an
+         * IAM role for doing operations in S3.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default AWS2S3EndpointBuilder useSessionCredentials(
+                boolean useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
+            return this;
+        }
+        /**
+         * Set whether the S3 client should expect to use Session Credentials.
+         * This is useful in a situation in which the user needs to assume an
+         * IAM role for doing operations in S3.
+         * 
+         * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
+         * type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default AWS2S3EndpointBuilder useSessionCredentials(
+                String useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
+            return this;
+        }
     }
 
     /**
@@ -3276,7 +3454,8 @@ public interface AWS2S3EndpointBuilderFactory {
             return this;
         }
         /**
-         * Define the id of Customer key to use in case CustomerKey is enabled.
+         * Define the id of the Customer key to use in case CustomerKey is
+         * enabled.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
@@ -3401,7 +3580,7 @@ public interface AWS2S3EndpointBuilderFactory {
          * Path parameter: bucketNameOrArn (required)
          * Bucket name or ARN
          * 
-         * @param path //bucketNameOrArn
+         * @param path bucketNameOrArn
          * @return the dsl builder
          */
         default AWS2S3EndpointBuilder aws2S3(String path) {
@@ -3422,7 +3601,7 @@ public interface AWS2S3EndpointBuilderFactory {
          * 
          * @param componentName to use a custom component name for the endpoint
          * instead of the default name
-         * @param path //bucketNameOrArn
+         * @param path bucketNameOrArn
          * @return the dsl builder
          */
         default AWS2S3EndpointBuilder aws2S3(String componentName, String path) {
@@ -3451,7 +3630,7 @@ public interface AWS2S3EndpointBuilderFactory {
          * @return the name of the header {@code AwsS3BucketName}.
          */
         public String awsS3BucketName() {
-            return "AwsS3BucketName";
+            return "CamelAwsS3BucketName";
         }
 
         /**
@@ -3465,7 +3644,7 @@ public interface AWS2S3EndpointBuilderFactory {
          * @return the name of the header {@code AwsS3BucketDestinationName}.
          */
         public String awsS3BucketDestinationName() {
-            return "AwsS3BucketDestinationName";
+            return "CamelAwsS3BucketDestinationName";
         }
 
         /**
@@ -3479,7 +3658,7 @@ public interface AWS2S3EndpointBuilderFactory {
          * @return the name of the header {@code AwsS3ContentControl}.
          */
         public String awsS3ContentControl() {
-            return "AwsS3ContentControl";
+            return "CamelAwsS3ContentControl";
         }
 
         /**
@@ -3494,7 +3673,7 @@ public interface AWS2S3EndpointBuilderFactory {
          * @return the name of the header {@code AwsS3ContentDisposition}.
          */
         public String awsS3ContentDisposition() {
-            return "AwsS3ContentDisposition";
+            return "CamelAwsS3ContentDisposition";
         }
 
         /**
@@ -3510,7 +3689,7 @@ public interface AWS2S3EndpointBuilderFactory {
          * @return the name of the header {@code AwsS3ContentEncoding}.
          */
         public String awsS3ContentEncoding() {
-            return "AwsS3ContentEncoding";
+            return "CamelAwsS3ContentEncoding";
         }
 
         /**
@@ -3524,7 +3703,7 @@ public interface AWS2S3EndpointBuilderFactory {
          * @return the name of the header {@code AwsS3ContentLength}.
          */
         public String awsS3ContentLength() {
-            return "AwsS3ContentLength";
+            return "CamelAwsS3ContentLength";
         }
 
         /**
@@ -3540,7 +3719,7 @@ public interface AWS2S3EndpointBuilderFactory {
          * @return the name of the header {@code AwsS3ContentMD5}.
          */
         public String awsS3ContentMD5() {
-            return "AwsS3ContentMD5";
+            return "CamelAwsS3ContentMD5";
         }
 
         /**
@@ -3555,7 +3734,7 @@ public interface AWS2S3EndpointBuilderFactory {
          * @return the name of the header {@code AwsS3ContentType}.
          */
         public String awsS3ContentType() {
-            return "AwsS3ContentType";
+            return "CamelAwsS3ContentType";
         }
 
         /**
@@ -3572,7 +3751,7 @@ public interface AWS2S3EndpointBuilderFactory {
          * @return the name of the header {@code AwsS3ETag}.
          */
         public String awsS3ETag() {
-            return "AwsS3ETag";
+            return "CamelAwsS3ETag";
         }
 
         /**
@@ -3586,7 +3765,7 @@ public interface AWS2S3EndpointBuilderFactory {
          * @return the name of the header {@code AwsS3Key}.
          */
         public String awsS3Key() {
-            return "AwsS3Key";
+            return "CamelAwsS3Key";
         }
 
         /**
@@ -3599,7 +3778,7 @@ public interface AWS2S3EndpointBuilderFactory {
          * @return the name of the header {@code AwsS3DestinationKey}.
          */
         public String awsS3DestinationKey() {
-            return "AwsS3DestinationKey";
+            return "CamelAwsS3DestinationKey";
         }
 
         /**
@@ -3614,7 +3793,7 @@ public interface AWS2S3EndpointBuilderFactory {
          * @return the name of the header {@code AwsS3LastModified}.
          */
         public String awsS3LastModified() {
-            return "AwsS3LastModified";
+            return "CamelAwsS3LastModified";
         }
 
         /**
@@ -3627,7 +3806,7 @@ public interface AWS2S3EndpointBuilderFactory {
          * @return the name of the header {@code AwsS3StorageClass}.
          */
         public String awsS3StorageClass() {
-            return "AwsS3StorageClass";
+            return "CamelAwsS3StorageClass";
         }
 
         /**
@@ -3643,7 +3822,7 @@ public interface AWS2S3EndpointBuilderFactory {
          * @return the name of the header {@code AwsS3VersionId}.
          */
         public String awsS3VersionId() {
-            return "AwsS3VersionId";
+            return "CamelAwsS3VersionId";
         }
 
         /**
@@ -3658,7 +3837,7 @@ public interface AWS2S3EndpointBuilderFactory {
          * @return the name of the header {@code AwsS3CannedAcl}.
          */
         public String awsS3CannedAcl() {
-            return "AwsS3CannedAcl";
+            return "CamelAwsS3CannedAcl";
         }
 
         /**
@@ -3672,7 +3851,7 @@ public interface AWS2S3EndpointBuilderFactory {
          * @return the name of the header {@code AwsS3Acl}.
          */
         public String awsS3Acl() {
-            return "AwsS3Acl";
+            return "CamelAwsS3Acl";
         }
 
         /**
@@ -3686,7 +3865,7 @@ public interface AWS2S3EndpointBuilderFactory {
          * @return the name of the header {@code AwsS3Operation}.
          */
         public String awsS3Operation() {
-            return "AwsS3Operation";
+            return "CamelAwsS3Operation";
         }
 
         /**
@@ -3700,7 +3879,7 @@ public interface AWS2S3EndpointBuilderFactory {
          * @return the name of the header {@code AwsS3ServerSideEncryption}.
          */
         public String awsS3ServerSideEncryption() {
-            return "AwsS3ServerSideEncryption";
+            return "CamelAwsS3ServerSideEncryption";
         }
 
         /**
@@ -3714,7 +3893,7 @@ public interface AWS2S3EndpointBuilderFactory {
          * @return the name of the header {@code AwsS3ExpirationTime}.
          */
         public String awsS3ExpirationTime() {
-            return "AwsS3ExpirationTime";
+            return "CamelAwsS3ExpirationTime";
         }
 
         /**
@@ -3729,7 +3908,7 @@ public interface AWS2S3EndpointBuilderFactory {
          * @return the name of the header {@code AwsS3ReplicationStatus}.
          */
         public String awsS3ReplicationStatus() {
-            return "AwsS3ReplicationStatus";
+            return "CamelAwsS3ReplicationStatus";
         }
 
         /**
@@ -3742,7 +3921,7 @@ public interface AWS2S3EndpointBuilderFactory {
          * @return the name of the header {@code AwsS3RangeStart}.
          */
         public String awsS3RangeStart() {
-            return "AwsS3RangeStart";
+            return "CamelAwsS3RangeStart";
         }
 
         /**
@@ -3755,7 +3934,7 @@ public interface AWS2S3EndpointBuilderFactory {
          * @return the name of the header {@code AwsS3RangeEnd}.
          */
         public String awsS3RangeEnd() {
-            return "AwsS3RangeEnd";
+            return "CamelAwsS3RangeEnd";
         }
 
         /**
@@ -3769,7 +3948,7 @@ public interface AWS2S3EndpointBuilderFactory {
          * AwsS3DowloadLinkExpirationTime}.
          */
         public String awsS3DowloadLinkExpirationTime() {
-            return "AwsS3DowloadLinkExpirationTime";
+            return "CamelAwsS3DowloadLinkExpirationTime";
         }
 
         /**
@@ -3783,7 +3962,7 @@ public interface AWS2S3EndpointBuilderFactory {
          * AwsS3DownloadLinkBrowserCompatible}.
          */
         public String awsS3DownloadLinkBrowserCompatible() {
-            return "AwsS3DownloadLinkBrowserCompatible";
+            return "CamelAwsS3DownloadLinkBrowserCompatible";
         }
 
         /**
@@ -3798,7 +3977,7 @@ public interface AWS2S3EndpointBuilderFactory {
          * AwsS3DownloadLinkHttpRequestHeaders}.
          */
         public String awsS3DownloadLinkHttpRequestHeaders() {
-            return "AwsS3DownloadLinkHttpRequestHeaders";
+            return "CamelAwsS3DownloadLinkHttpRequestHeaders";
         }
 
         /**
@@ -3813,7 +3992,7 @@ public interface AWS2S3EndpointBuilderFactory {
          * AwsS3DownloadLinkSignedPayload}.
          */
         public String awsS3DownloadLinkSignedPayload() {
-            return "AwsS3DownloadLinkSignedPayload";
+            return "CamelAwsS3DownloadLinkSignedPayload";
         }
 
         /**
@@ -3828,7 +4007,7 @@ public interface AWS2S3EndpointBuilderFactory {
          * @return the name of the header {@code AwsS3Metadata}.
          */
         public String awsS3Metadata() {
-            return "AwsS3Metadata";
+            return "CamelAwsS3Metadata";
         }
 
         /**
@@ -3841,7 +4020,7 @@ public interface AWS2S3EndpointBuilderFactory {
          * @return the name of the header {@code MessageTimestamp}.
          */
         public String messageTimestamp() {
-            return "MessageTimestamp";
+            return "CamelMessageTimestamp";
         }
 
         /**
@@ -3856,7 +4035,7 @@ public interface AWS2S3EndpointBuilderFactory {
          * @return the name of the header {@code AwsS3Prefix}.
          */
         public String awsS3Prefix() {
-            return "AwsS3Prefix";
+            return "CamelAwsS3Prefix";
         }
 
         /**
@@ -3871,7 +4050,7 @@ public interface AWS2S3EndpointBuilderFactory {
          * @return the name of the header {@code AwsS3Delimiter}.
          */
         public String awsS3Delimiter() {
-            return "AwsS3Delimiter";
+            return "CamelAwsS3Delimiter";
         }
     }
     static AWS2S3EndpointBuilder endpointBuilder(

@@ -57,6 +57,7 @@ import org.apache.camel.util.URISupport;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class RestDefinition extends OptionalIdentifiedDefinition<RestDefinition> implements ResourceAware {
 
+    public static final String MISSING_VERB = "Must add verb first, such as get/post/delete";
     @XmlAttribute
     private String path;
     @XmlAttribute
@@ -78,6 +79,9 @@ public class RestDefinition extends OptionalIdentifiedDefinition<RestDefinition>
     @XmlAttribute
     @Metadata(label = "advanced", javaType = "java.lang.Boolean", defaultValue = "false")
     private String enableCORS;
+    @XmlAttribute
+    @Metadata(label = "advanced", javaType = "java.lang.Boolean", defaultValue = "false")
+    private String enableNoContentResponse;
     @XmlAttribute
     @Metadata(label = "advanced", javaType = "java.lang.Boolean", defaultValue = "true")
     private String apiDocs;
@@ -252,6 +256,19 @@ public class RestDefinition extends OptionalIdentifiedDefinition<RestDefinition>
         this.enableCORS = enableCORS;
     }
 
+    public String getEnableNoContentResponse() {
+        return enableNoContentResponse;
+    }
+
+    /**
+     * Whether to return HTTP 204 with an empty body when a response contains an empty JSON object or XML root object.
+     * <p/>
+     * The default value is false.
+     */
+    public void setEnableNoContentResponse(String enableNoContentResponse) {
+        this.enableNoContentResponse = enableNoContentResponse;
+    }
+
     public String getApiDocs() {
         return apiDocs;
     }
@@ -398,7 +415,7 @@ public class RestDefinition extends OptionalIdentifiedDefinition<RestDefinition>
 
     public RestDefinition routeId(String routeId) {
         if (getVerbs().isEmpty()) {
-            throw new IllegalArgumentException("Must add verb first, such as get/post/delete");
+            throw new IllegalArgumentException(MISSING_VERB);
         }
         // add on last verb as that is how the Java DSL works
         VerbDefinition verb = getVerbs().get(getVerbs().size() - 1);
@@ -442,7 +459,7 @@ public class RestDefinition extends OptionalIdentifiedDefinition<RestDefinition>
 
     public ParamDefinition param() {
         if (getVerbs().isEmpty()) {
-            throw new IllegalArgumentException("Must add verb first, such as get/post/delete");
+            throw new IllegalArgumentException(MISSING_VERB);
         }
         VerbDefinition verb = getVerbs().get(getVerbs().size() - 1);
         return param(verb);
@@ -450,7 +467,7 @@ public class RestDefinition extends OptionalIdentifiedDefinition<RestDefinition>
 
     public RestDefinition param(ParamDefinition param) {
         if (getVerbs().isEmpty()) {
-            throw new IllegalArgumentException("Must add verb first, such as get/post/delete");
+            throw new IllegalArgumentException(MISSING_VERB);
         }
         VerbDefinition verb = getVerbs().get(getVerbs().size() - 1);
         verb.getParams().add(param);
@@ -459,7 +476,7 @@ public class RestDefinition extends OptionalIdentifiedDefinition<RestDefinition>
 
     public RestDefinition params(List<ParamDefinition> params) {
         if (getVerbs().isEmpty()) {
-            throw new IllegalArgumentException("Must add verb first, such as get/post/delete");
+            throw new IllegalArgumentException(MISSING_VERB);
         }
         VerbDefinition verb = getVerbs().get(getVerbs().size() - 1);
         verb.getParams().addAll(params);
@@ -472,7 +489,7 @@ public class RestDefinition extends OptionalIdentifiedDefinition<RestDefinition>
 
     public RestDefinition responseMessage(ResponseMessageDefinition msg) {
         if (getVerbs().isEmpty()) {
-            throw new IllegalArgumentException("Must add verb first, such as get/post/delete");
+            throw new IllegalArgumentException(MISSING_VERB);
         }
         VerbDefinition verb = getVerbs().get(getVerbs().size() - 1);
         verb.getResponseMsgs().add(msg);
@@ -481,7 +498,7 @@ public class RestDefinition extends OptionalIdentifiedDefinition<RestDefinition>
 
     public ResponseMessageDefinition responseMessage() {
         if (getVerbs().isEmpty()) {
-            throw new IllegalArgumentException("Must add verb first, such as get/post/delete");
+            throw new IllegalArgumentException(MISSING_VERB);
         }
         VerbDefinition verb = getVerbs().get(getVerbs().size() - 1);
         return responseMessage(verb);
@@ -493,7 +510,7 @@ public class RestDefinition extends OptionalIdentifiedDefinition<RestDefinition>
 
     public RestDefinition responseMessages(List<ResponseMessageDefinition> msgs) {
         if (getVerbs().isEmpty()) {
-            throw new IllegalArgumentException("Must add verb first, such as get/post/delete");
+            throw new IllegalArgumentException(MISSING_VERB);
         }
         VerbDefinition verb = getVerbs().get(getVerbs().size() - 1);
         verb.getResponseMsgs().addAll(msgs);
@@ -502,7 +519,7 @@ public class RestDefinition extends OptionalIdentifiedDefinition<RestDefinition>
 
     public RestDefinition responseMessage(int code, String message) {
         if (getVerbs().isEmpty()) {
-            throw new IllegalArgumentException("Must add verb first, such as get/post/delete");
+            throw new IllegalArgumentException(MISSING_VERB);
         }
         VerbDefinition verb = getVerbs().get(getVerbs().size() - 1);
         ResponseMessageDefinition msg = responseMessage(verb);
@@ -513,7 +530,7 @@ public class RestDefinition extends OptionalIdentifiedDefinition<RestDefinition>
 
     public RestDefinition responseMessage(String code, String message) {
         if (getVerbs().isEmpty()) {
-            throw new IllegalArgumentException("Must add verb first, such as get/post/delete");
+            throw new IllegalArgumentException(MISSING_VERB);
         }
         VerbDefinition verb = getVerbs().get(getVerbs().size() - 1);
         ResponseMessageDefinition response = responseMessage(verb);
@@ -548,7 +565,7 @@ public class RestDefinition extends OptionalIdentifiedDefinition<RestDefinition>
     public RestDefinition type(Class<?> classType) {
         // add to last verb
         if (getVerbs().isEmpty()) {
-            throw new IllegalArgumentException("Must add verb first, such as get/post/delete");
+            throw new IllegalArgumentException(MISSING_VERB);
         }
 
         VerbDefinition verb = getVerbs().get(getVerbs().size() - 1);
@@ -560,7 +577,7 @@ public class RestDefinition extends OptionalIdentifiedDefinition<RestDefinition>
     public RestDefinition outType(Class<?> classType) {
         // add to last verb
         if (getVerbs().isEmpty()) {
-            throw new IllegalArgumentException("Must add verb first, such as get/post/delete");
+            throw new IllegalArgumentException(MISSING_VERB);
         }
 
         VerbDefinition verb = getVerbs().get(getVerbs().size() - 1);
@@ -616,6 +633,18 @@ public class RestDefinition extends OptionalIdentifiedDefinition<RestDefinition>
             // add on last verb as that is how the Java DSL works
             VerbDefinition verb = getVerbs().get(getVerbs().size() - 1);
             verb.setEnableCORS(Boolean.toString(enableCORS));
+        }
+
+        return this;
+    }
+
+    public RestDefinition enableNoContentResponse(boolean enableNoContentResponse) {
+        if (getVerbs().isEmpty()) {
+            this.enableNoContentResponse = Boolean.toString(enableNoContentResponse);
+        } else {
+            // add on last verb as that is how the Java DSL works
+            VerbDefinition verb = getVerbs().get(getVerbs().size() - 1);
+            verb.setEnableNoContentResponse(Boolean.toString(enableNoContentResponse));
         }
 
         return this;
@@ -680,7 +709,7 @@ public class RestDefinition extends OptionalIdentifiedDefinition<RestDefinition>
     public RestDefinition to(String uri) {
         // add to last verb
         if (getVerbs().isEmpty()) {
-            throw new IllegalArgumentException("Must add verb first, such as get/post/delete");
+            throw new IllegalArgumentException(MISSING_VERB);
         }
 
         ToDefinition to = new ToDefinition(uri);
@@ -907,6 +936,11 @@ public class RestDefinition extends OptionalIdentifiedDefinition<RestDefinition>
                 binding.setEnableCORS(verb.getEnableCORS());
             } else {
                 binding.setEnableCORS(getEnableCORS());
+            }
+            if (verb.getEnableNoContentResponse() != null) {
+                binding.setEnableNoContentResponse(verb.getEnableNoContentResponse());
+            } else {
+                binding.setEnableNoContentResponse(getEnableNoContentResponse());
             }
             for (ParamDefinition param : verb.getParams()) {
                 // register all the default values for the query and header parameters

@@ -17,7 +17,6 @@
 package org.apache.camel.dsl.jbang.core.commands.action;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +24,6 @@ import java.util.Map;
 import org.apache.camel.dsl.jbang.core.commands.CamelJBangMain;
 import org.apache.camel.util.FileUtil;
 import org.apache.camel.util.IOHelper;
-import org.apache.camel.util.StopWatch;
 import org.apache.camel.util.json.JsonArray;
 import org.apache.camel.util.json.JsonObject;
 import org.apache.camel.util.json.Jsoner;
@@ -60,8 +58,8 @@ public class CamelSourceTop extends ActionWatchCommand {
         if (pids.isEmpty()) {
             return 0;
         } else if (pids.size() > 1) {
-            System.out.println("Name or pid " + name + " matches " + pids.size()
-                               + " running Camel integrations. Specify a name or PID that matches exactly one.");
+            printer().println("Name or pid " + name + " matches " + pids.size()
+                              + " running Camel integrations. Specify a name or PID that matches exactly one.");
             return 0;
         }
 
@@ -133,7 +131,7 @@ public class CamelSourceTop extends ActionWatchCommand {
                 }
             }
         } else {
-            System.out.println("Response from running Camel with PID " + pid + " not received within 5 seconds");
+            printer().println("Response from running Camel with PID " + pid + " not received within 5 seconds");
             return 1;
         }
 
@@ -155,38 +153,21 @@ public class CamelSourceTop extends ActionWatchCommand {
 
     protected void printSource(List<Row> rows) {
         for (Row row : rows) {
-            System.out.printf("Route: %s\tSource: %s Total: %s Mean: %s Max: %s Min: %s Last: %s%n", row.routeId, row.location,
+            printer().printf("Route: %s\tSource: %s Total: %s Mean: %s Max: %s Min: %s Last: %s%n", row.routeId, row.location,
                     row.total, row.mean != null ? row.mean : "", row.max,
                     row.min, row.last != null ? row.last : "");
             for (int i = 0; i < row.code.size(); i++) {
                 Code code = row.code.get(i);
                 String c = Jsoner.unescape(code.code);
                 String arrow = code.match ? "-->" : "   ";
-                System.out.printf("%4d: %s %s%n", code.line, arrow, c);
+                printer().printf("%4d: %s %s%n", code.line, arrow, c);
             }
-            System.out.println();
+            printer().println();
         }
     }
 
     protected JsonObject waitForOutputFile(File outputFile) {
-        StopWatch watch = new StopWatch();
-        while (watch.taken() < 5000) {
-            try {
-                // give time for response to be ready
-                Thread.sleep(100);
-
-                if (outputFile.exists()) {
-                    FileInputStream fis = new FileInputStream(outputFile);
-                    String text = IOHelper.loadText(fis);
-                    IOHelper.close(fis);
-                    return (JsonObject) Jsoner.deserialize(text);
-                }
-
-            } catch (Exception e) {
-                // ignore
-            }
-        }
-        return null;
+        return getJsonObject(outputFile);
     }
 
     protected int sortRow(Row o1, Row o2) {

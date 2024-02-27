@@ -43,7 +43,7 @@ public interface Sns2EndpointBuilderFactory {
             return (AdvancedSns2EndpointBuilder) this;
         }
         /**
-         * Setting the autocreation of the topic.
+         * Setting the auto-creation of the topic.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -58,7 +58,7 @@ public interface Sns2EndpointBuilderFactory {
             return this;
         }
         /**
-         * Setting the autocreation of the topic.
+         * Setting the auto-creation of the topic.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -124,9 +124,10 @@ public interface Sns2EndpointBuilderFactory {
         }
         /**
          * Only for FIFO Topic. Strategy for setting the messageDeduplicationId
-         * on the message. Can be one of the following options: useExchangeId,
-         * useContentBasedDeduplication. For the useContentBasedDeduplication
-         * option, no messageDeduplicationId will be set on the message.
+         * on the message. It can be one of the following options:
+         * useExchangeId, useContentBasedDeduplication. For the
+         * useContentBasedDeduplication option, no messageDeduplicationId will
+         * be set on the message.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
@@ -143,9 +144,9 @@ public interface Sns2EndpointBuilderFactory {
         }
         /**
          * Only for FIFO Topic. Strategy for setting the messageGroupId on the
-         * message. Can be one of the following options: useConstant,
+         * message. It can be one of the following options: useConstant,
          * useExchangeId, usePropertyValue. For the usePropertyValue option, the
-         * value of property CamelAwsMessageGroupId will be used.
+         * value of property CamelAwsSnsMessageGroupId will be used.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
@@ -174,8 +175,8 @@ public interface Sns2EndpointBuilderFactory {
             return this;
         }
         /**
-         * Set the need for overidding the endpoint. This option needs to be
-         * used in combination with uriEndpointOverride option.
+         * Set the need for overriding the endpoint. This option needs to be
+         * used in combination with the uriEndpointOverride option.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -190,8 +191,8 @@ public interface Sns2EndpointBuilderFactory {
             return this;
         }
         /**
-         * Set the need for overidding the endpoint. This option needs to be
-         * used in combination with uriEndpointOverride option.
+         * Set the need for overriding the endpoint. This option needs to be
+         * used in combination with the uriEndpointOverride option.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -240,9 +241,9 @@ public interface Sns2EndpointBuilderFactory {
             return this;
         }
         /**
-         * The region in which SNS client needs to work. When using this
+         * The region in which the SNS client needs to work. When using this
          * parameter, the configuration will expect the lowercase name of the
-         * region (for example ap-east-1) You'll need to use the name
+         * region (for example, ap-east-1) You'll need to use the name
          * Region.EU_WEST_1.id().
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -444,7 +445,7 @@ public interface Sns2EndpointBuilderFactory {
             return this;
         }
         /**
-         * If using a profile credentials provider this parameter will set the
+         * If using a profile credentials provider, this parameter will set the
          * profile name.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -471,6 +472,21 @@ public interface Sns2EndpointBuilderFactory {
          */
         default Sns2EndpointBuilder secretKey(String secretKey) {
             doSetProperty("secretKey", secretKey);
+            return this;
+        }
+        /**
+         * Amazon AWS Session Token used when the user needs to assume an IAM
+         * role.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: security
+         * 
+         * @param sessionToken the value to set
+         * @return the dsl builder
+         */
+        default Sns2EndpointBuilder sessionToken(String sessionToken) {
+            doSetProperty("sessionToken", sessionToken);
             return this;
         }
         /**
@@ -576,6 +592,43 @@ public interface Sns2EndpointBuilderFactory {
         default Sns2EndpointBuilder useProfileCredentialsProvider(
                 String useProfileCredentialsProvider) {
             doSetProperty("useProfileCredentialsProvider", useProfileCredentialsProvider);
+            return this;
+        }
+        /**
+         * Set whether the SNS client should expect to use Session Credentials.
+         * This is useful in a situation in which the user needs to assume an
+         * IAM role for doing operations in SNS.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default Sns2EndpointBuilder useSessionCredentials(
+                boolean useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
+            return this;
+        }
+        /**
+         * Set whether the SNS client should expect to use Session Credentials.
+         * This is useful in a situation in which the user needs to assume an
+         * IAM role for doing operations in SNS.
+         * 
+         * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
+         * type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default Sns2EndpointBuilder useSessionCredentials(
+                String useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
             return this;
         }
     }
@@ -750,7 +803,7 @@ public interface Sns2EndpointBuilderFactory {
          * @return the name of the header {@code AwsSnsMessageId}.
          */
         public String awsSnsMessageId() {
-            return "AwsSnsMessageId";
+            return "CamelAwsSnsMessageId";
         }
 
         /**
@@ -764,7 +817,7 @@ public interface Sns2EndpointBuilderFactory {
          * @return the name of the header {@code AwsSnsSubject}.
          */
         public String awsSnsSubject() {
-            return "AwsSnsSubject";
+            return "CamelAwsSnsSubject";
         }
 
         /**
@@ -777,7 +830,7 @@ public interface Sns2EndpointBuilderFactory {
          * @return the name of the header {@code AwsSnsMessageStructure}.
          */
         public String awsSnsMessageStructure() {
-            return "AwsSnsMessageStructure";
+            return "CamelAwsSnsMessageStructure";
         }
     }
     static Sns2EndpointBuilder endpointBuilder(String componentName, String path) {

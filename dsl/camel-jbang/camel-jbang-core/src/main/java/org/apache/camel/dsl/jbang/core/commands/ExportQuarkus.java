@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 
 import org.apache.camel.catalog.CamelCatalog;
 import org.apache.camel.dsl.jbang.core.common.CatalogLoader;
+import org.apache.camel.dsl.jbang.core.common.CommandLineHelper;
 import org.apache.camel.dsl.jbang.core.common.RuntimeUtil;
 import org.apache.camel.tooling.maven.MavenGav;
 import org.apache.camel.tooling.model.ArtifactModel;
@@ -60,24 +61,24 @@ class ExportQuarkus extends Export {
         File profile = new File(getProfile() + ".properties");
 
         // the settings file has information what to export
-        File settings = new File(Run.WORK_DIR + "/" + Run.RUN_SETTINGS_FILE);
+        File settings = new File(CommandLineHelper.getWorkDir(), Run.RUN_SETTINGS_FILE);
         if (fresh || files != null || !settings.exists()) {
             // allow to automatic build
             if (!quiet) {
-                System.out.println("Generating fresh run data");
+                printer().println("Generating fresh run data");
             }
-            int silent = runSilently();
+            int silent = runSilently(ignoreLoadingError);
             if (silent != 0) {
                 return silent;
             }
         } else {
             if (!quiet) {
-                System.out.println("Reusing existing run data");
+                printer().println("Reusing existing run data");
             }
         }
 
         if (!quiet) {
-            System.out.println("Exporting as Quarkus project to: " + exportDir);
+            printer().println("Exporting as Quarkus project to: " + exportDir);
         }
 
         // use a temporary work dir
@@ -190,34 +191,13 @@ class ExportQuarkus extends Export {
                 properties.setProperty("camel.main.routes-include-pattern", routes);
             }
         }
-        if (secretsRefresh) {
-            if (secretsRefreshProviders != null) {
-                List<String> providers = getSecretProviders();
-
-                for (String provider : providers) {
-                    switch (provider) {
-                        case "aws":
-                            exportAwsSecretsRefreshProp(properties);
-                            break;
-                        case "gcp":
-                            exportGcpSecretsRefreshProp(properties);
-                            break;
-                        case "azure":
-                            exportAzureSecretsRefreshProp(properties);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
-        }
     }
 
     private static String removeScheme(String s) {
         if (s.contains(":")) {
             s = StringHelper.after(s, ":");
         }
-        s = s.replace(".camel-jbang/", "");
+        s = s.replace(CommandLineHelper.CAMEL_JBANG_WORK_DIR + "/", "");
         return s;
     }
 
@@ -310,39 +290,6 @@ class ExportQuarkus extends Export {
                 }
             }
             gavs.add(gav);
-        }
-
-        if (secretsRefresh) {
-            if (secretsRefreshProviders != null) {
-                List<String> providers = getSecretProviders();
-                for (String provider : providers) {
-                    switch (provider) {
-                        case "aws":
-                            MavenGav awsGav = new MavenGav();
-                            awsGav.setGroupId("org.apache.camel.quarkus");
-                            awsGav.setArtifactId("camel-quarkus-aws-secrets-manager");
-                            awsGav.setVersion(null);
-                            gavs.add(awsGav);
-                            break;
-                        case "gcp":
-                            MavenGav gcpGav = new MavenGav();
-                            gcpGav.setGroupId("org.apache.camel.quarkus");
-                            gcpGav.setArtifactId("camel-quarkus-google-secret-manager");
-                            gcpGav.setVersion(null);
-                            gavs.add(gcpGav);
-                            break;
-                        case "azure":
-                            MavenGav azureGav = new MavenGav();
-                            azureGav.setGroupId("org.apache.camel.quarkus");
-                            azureGav.setArtifactId("camel-quarkus-azure-key-vault");
-                            azureGav.setVersion(null);
-                            gavs.add(azureGav);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
         }
 
         // sort artifacts
@@ -477,38 +424,6 @@ class ExportQuarkus extends Export {
                 sb.append("            </exclusions>\n");
             }
             sb.append("        </dependency>\n");
-        }
-        if (secretsRefresh) {
-            if (secretsRefreshProviders != null) {
-                List<String> providers = getSecretProviders();
-                for (String provider : providers) {
-                    switch (provider) {
-                        case "aws":
-                            sb.append("        <dependency>\n");
-                            sb.append("            <groupId>").append("org.apache.camel.quarkus").append("</groupId>\n");
-                            sb.append("            <artifactId>").append("camel-quarkus-aws-secrets-manager")
-                                    .append("</artifactId>\n");
-                            sb.append("        </dependency>\n");
-                            break;
-                        case "gcp":
-                            sb.append("        <dependency>\n");
-                            sb.append("            <groupId>").append("org.apache.camel.quarkus").append("</groupId>\n");
-                            sb.append("            <artifactId>").append("camel-quarkus-google-secret-manager")
-                                    .append("</artifactId>\n");
-                            sb.append("        </dependency>\n");
-                            break;
-                        case "azure":
-                            sb.append("        <dependency>\n");
-                            sb.append("            <groupId>").append("org.apache.camel.quarkus").append("</groupId>\n");
-                            sb.append("            <artifactId>").append("camel-quarkus-azure-key-vault")
-                                    .append("</artifactId>\n");
-                            sb.append("        </dependency>\n");
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
         }
         context = context.replaceFirst("\\{\\{ \\.CamelDependencies }}", sb.toString());
 

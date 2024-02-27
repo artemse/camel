@@ -42,8 +42,8 @@ public interface Ddb2EndpointBuilderFactory {
             return (AdvancedDdb2EndpointBuilder) this;
         }
         /**
-         * Determines whether or not strong consistency should be enforced when
-         * data is read.
+         * Determines whether strong consistency should be enforced when data is
+         * read.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -58,8 +58,8 @@ public interface Ddb2EndpointBuilderFactory {
             return this;
         }
         /**
-         * Determines whether or not strong consistency should be enforced when
-         * data is read.
+         * Determines whether strong consistency should be enforced when data is
+         * read.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -185,7 +185,7 @@ public interface Ddb2EndpointBuilderFactory {
             return this;
         }
         /**
-         * Set the need for overidding the endpoint. This option needs to be
+         * Set the need for overriding the endpoint. This option needs to be
          * used in combination with uriEndpointOverride option.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
@@ -201,7 +201,7 @@ public interface Ddb2EndpointBuilderFactory {
             return this;
         }
         /**
-         * Set the need for overidding the endpoint. This option needs to be
+         * Set the need for overriding the endpoint. This option needs to be
          * used in combination with uriEndpointOverride option.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
@@ -436,6 +436,21 @@ public interface Ddb2EndpointBuilderFactory {
             return this;
         }
         /**
+         * Amazon AWS Session Token used when the user needs to assume a IAM
+         * role.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: security
+         * 
+         * @param sessionToken the value to set
+         * @return the dsl builder
+         */
+        default Ddb2EndpointBuilder sessionToken(String sessionToken) {
+            doSetProperty("sessionToken", sessionToken);
+            return this;
+        }
+        /**
          * If we want to trust all certificates in case of overriding the
          * endpoint.
          * 
@@ -540,6 +555,43 @@ public interface Ddb2EndpointBuilderFactory {
         default Ddb2EndpointBuilder useProfileCredentialsProvider(
                 String useProfileCredentialsProvider) {
             doSetProperty("useProfileCredentialsProvider", useProfileCredentialsProvider);
+            return this;
+        }
+        /**
+         * Set whether the DDB client should expect to use Session Credentials.
+         * This is useful in situation in which the user needs to assume a IAM
+         * role for doing operations in DDB.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default Ddb2EndpointBuilder useSessionCredentials(
+                boolean useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
+            return this;
+        }
+        /**
+         * Set whether the DDB client should expect to use Session Credentials.
+         * This is useful in situation in which the user needs to assume a IAM
+         * role for doing operations in DDB.
+         * 
+         * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
+         * type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default Ddb2EndpointBuilder useSessionCredentials(
+                String useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
             return this;
         }
     }
@@ -712,7 +764,7 @@ public interface Ddb2EndpointBuilderFactory {
          * @return the name of the header {@code AwsDdbAttributes}.
          */
         public String awsDdbAttributes() {
-            return "AwsDdbAttributes";
+            return "CamelAwsDdbAttributes";
         }
 
         /**
@@ -726,7 +778,7 @@ public interface Ddb2EndpointBuilderFactory {
          * @return the name of the header {@code AwsDdbAttributeNames}.
          */
         public String awsDdbAttributeNames() {
-            return "AwsDdbAttributeNames";
+            return "CamelAwsDdbAttributeNames";
         }
 
         /**
@@ -740,7 +792,7 @@ public interface Ddb2EndpointBuilderFactory {
          * @return the name of the header {@code AwsDdbBatchItems}.
          */
         public String awsDdbBatchItems() {
-            return "AwsDdbBatchItems";
+            return "CamelAwsDdbBatchItems";
         }
 
         /**
@@ -753,7 +805,7 @@ public interface Ddb2EndpointBuilderFactory {
          * @return the name of the header {@code AwsDdbBatchResponse}.
          */
         public String awsDdbBatchResponse() {
-            return "AwsDdbBatchResponse";
+            return "CamelAwsDdbBatchResponse";
         }
 
         /**
@@ -767,7 +819,7 @@ public interface Ddb2EndpointBuilderFactory {
          * @return the name of the header {@code AwsDdbConsistentRead}.
          */
         public String awsDdbConsistentRead() {
-            return "AwsDdbConsistentRead";
+            return "CamelAwsDdbConsistentRead";
         }
 
         /**
@@ -781,7 +833,7 @@ public interface Ddb2EndpointBuilderFactory {
          * @return the name of the header {@code AwsDdbConsumedCapacity}.
          */
         public String awsDdbConsumedCapacity() {
-            return "AwsDdbConsumedCapacity";
+            return "CamelAwsDdbConsumedCapacity";
         }
 
         /**
@@ -794,7 +846,7 @@ public interface Ddb2EndpointBuilderFactory {
          * @return the name of the header {@code AwsDdbCount}.
          */
         public String awsDdbCount() {
-            return "AwsDdbCount";
+            return "CamelAwsDdbCount";
         }
 
         /**
@@ -807,7 +859,7 @@ public interface Ddb2EndpointBuilderFactory {
          * @return the name of the header {@code AwsDdbCreationDate}.
          */
         public String awsDdbCreationDate() {
-            return "AwsDdbCreationDate";
+            return "CamelAwsDdbCreationDate";
         }
 
         /**
@@ -820,7 +872,7 @@ public interface Ddb2EndpointBuilderFactory {
          * @return the name of the header {@code AwsDdbIndexName}.
          */
         public String awsDdbIndexName() {
-            return "AwsDdbIndexName";
+            return "CamelAwsDdbIndexName";
         }
 
         /**
@@ -834,7 +886,7 @@ public interface Ddb2EndpointBuilderFactory {
          * @return the name of the header {@code AwsDdbItem}.
          */
         public String awsDdbItem() {
-            return "AwsDdbItem";
+            return "CamelAwsDdbItem";
         }
 
         /**
@@ -847,7 +899,7 @@ public interface Ddb2EndpointBuilderFactory {
          * @return the name of the header {@code AwsDdbItems}.
          */
         public String awsDdbItems() {
-            return "AwsDdbItems";
+            return "CamelAwsDdbItems";
         }
 
         /**
@@ -860,7 +912,7 @@ public interface Ddb2EndpointBuilderFactory {
          * @return the name of the header {@code AwsDdbTableItemCount}.
          */
         public String awsDdbTableItemCount() {
-            return "AwsDdbTableItemCount";
+            return "CamelAwsDdbTableItemCount";
         }
 
         /**
@@ -873,7 +925,7 @@ public interface Ddb2EndpointBuilderFactory {
          * @return the name of the header {@code AwsDdbKey}.
          */
         public String awsDdbKey() {
-            return "AwsDdbKey";
+            return "CamelAwsDdbKey";
         }
 
         /**
@@ -888,7 +940,7 @@ public interface Ddb2EndpointBuilderFactory {
          * @return the name of the header {@code AwsDdbKeyConditions}.
          */
         public String awsDdbKeyConditions() {
-            return "AwsDdbKeyConditions";
+            return "CamelAwsDdbKeyConditions";
         }
 
         /**
@@ -902,7 +954,7 @@ public interface Ddb2EndpointBuilderFactory {
          * @return the name of the header {@code AwsDdbKeySchema}.
          */
         public String awsDdbKeySchema() {
-            return "AwsDdbKeySchema";
+            return "CamelAwsDdbKeySchema";
         }
 
         /**
@@ -916,7 +968,7 @@ public interface Ddb2EndpointBuilderFactory {
          * @return the name of the header {@code AwsDdbLastEvaluatedKey}.
          */
         public String awsDdbLastEvaluatedKey() {
-            return "AwsDdbLastEvaluatedKey";
+            return "CamelAwsDdbLastEvaluatedKey";
         }
 
         /**
@@ -929,7 +981,7 @@ public interface Ddb2EndpointBuilderFactory {
          * @return the name of the header {@code AwsDdbLimit}.
          */
         public String awsDdbLimit() {
-            return "AwsDdbLimit";
+            return "CamelAwsDdbLimit";
         }
 
         /**
@@ -943,7 +995,7 @@ public interface Ddb2EndpointBuilderFactory {
          * @return the name of the header {@code AwsDdbOperation}.
          */
         public String awsDdbOperation() {
-            return "AwsDdbOperation";
+            return "CamelAwsDdbOperation";
         }
 
         /**
@@ -957,7 +1009,7 @@ public interface Ddb2EndpointBuilderFactory {
          * @return the name of the header {@code AwsDdbProvisionedThroughput}.
          */
         public String awsDdbProvisionedThroughput() {
-            return "AwsDdbProvisionedThroughput";
+            return "CamelAwsDdbProvisionedThroughput";
         }
 
         /**
@@ -970,7 +1022,7 @@ public interface Ddb2EndpointBuilderFactory {
          * @return the name of the header {@code AwsDdbReadCapacity}.
          */
         public String awsDdbReadCapacity() {
-            return "AwsDdbReadCapacity";
+            return "CamelAwsDdbReadCapacity";
         }
 
         /**
@@ -985,7 +1037,7 @@ public interface Ddb2EndpointBuilderFactory {
          * @return the name of the header {@code AwsDdbReturnValues}.
          */
         public String awsDdbReturnValues() {
-            return "AwsDdbReturnValues";
+            return "CamelAwsDdbReturnValues";
         }
 
         /**
@@ -998,7 +1050,7 @@ public interface Ddb2EndpointBuilderFactory {
          * @return the name of the header {@code AwsDdbScannedCount}.
          */
         public String awsDdbScannedCount() {
-            return "AwsDdbScannedCount";
+            return "CamelAwsDdbScannedCount";
         }
 
         /**
@@ -1011,7 +1063,7 @@ public interface Ddb2EndpointBuilderFactory {
          * @return the name of the header {@code AwsDdbScanIndexForward}.
          */
         public String awsDdbScanIndexForward() {
-            return "AwsDdbScanIndexForward";
+            return "CamelAwsDdbScanIndexForward";
         }
 
         /**
@@ -1024,7 +1076,7 @@ public interface Ddb2EndpointBuilderFactory {
          * @return the name of the header {@code AwsDdbScanFilter}.
          */
         public String awsDdbScanFilter() {
-            return "AwsDdbScanFilter";
+            return "CamelAwsDdbScanFilter";
         }
 
         /**
@@ -1037,7 +1089,7 @@ public interface Ddb2EndpointBuilderFactory {
          * @return the name of the header {@code AwsDdbStartKey}.
          */
         public String awsDdbStartKey() {
-            return "AwsDdbStartKey";
+            return "CamelAwsDdbStartKey";
         }
 
         /**
@@ -1050,7 +1102,7 @@ public interface Ddb2EndpointBuilderFactory {
          * @return the name of the header {@code AwsDdbTableName}.
          */
         public String awsDdbTableName() {
-            return "AwsDdbTableName";
+            return "CamelAwsDdbTableName";
         }
 
         /**
@@ -1063,7 +1115,7 @@ public interface Ddb2EndpointBuilderFactory {
          * @return the name of the header {@code AwsDdbTableSize}.
          */
         public String awsDdbTableSize() {
-            return "AwsDdbTableSize";
+            return "CamelAwsDdbTableSize";
         }
 
         /**
@@ -1076,7 +1128,7 @@ public interface Ddb2EndpointBuilderFactory {
          * @return the name of the header {@code AwsDdbTableStatus}.
          */
         public String awsDdbTableStatus() {
-            return "AwsDdbTableStatus";
+            return "CamelAwsDdbTableStatus";
         }
 
         /**
@@ -1089,7 +1141,7 @@ public interface Ddb2EndpointBuilderFactory {
          * @return the name of the header {@code AwsDdbUpdateCondition}.
          */
         public String awsDdbUpdateCondition() {
-            return "AwsDdbUpdateCondition";
+            return "CamelAwsDdbUpdateCondition";
         }
 
         /**
@@ -1102,7 +1154,7 @@ public interface Ddb2EndpointBuilderFactory {
          * @return the name of the header {@code AwsDdbUpdateValues}.
          */
         public String awsDdbUpdateValues() {
-            return "AwsDdbUpdateValues";
+            return "CamelAwsDdbUpdateValues";
         }
 
         /**
@@ -1116,7 +1168,7 @@ public interface Ddb2EndpointBuilderFactory {
          * @return the name of the header {@code AwsDdbUnprocessedKeys}.
          */
         public String awsDdbUnprocessedKeys() {
-            return "AwsDdbUnprocessedKeys";
+            return "CamelAwsDdbUnprocessedKeys";
         }
 
         /**
@@ -1129,7 +1181,7 @@ public interface Ddb2EndpointBuilderFactory {
          * @return the name of the header {@code AwsDdbWriteCapacity}.
          */
         public String awsDdbWriteCapacity() {
-            return "AwsDdbWriteCapacity";
+            return "CamelAwsDdbWriteCapacity";
         }
     }
     static Ddb2EndpointBuilder endpointBuilder(String componentName, String path) {

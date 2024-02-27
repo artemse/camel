@@ -1393,12 +1393,17 @@ public interface SalesforceEndpointBuilderFactory {
         }
         /**
          * Allows for bridging the consumer to the Camel routing Error Handler,
-         * which mean any exceptions occurred while the consumer is trying to
-         * pickup incoming messages, or the likes, will now be processed as a
-         * message and handled by the routing Error Handler. By default the
-         * consumer will use the org.apache.camel.spi.ExceptionHandler to deal
-         * with exceptions, that will be logged at WARN or ERROR level and
-         * ignored.
+         * which mean any exceptions (if possible) occurred while the Camel
+         * consumer is trying to pickup incoming messages, or the likes, will
+         * now be processed as a message and handled by the routing Error
+         * Handler. Important: This is only possible if the 3rd party component
+         * allows Camel to be alerted if an exception was thrown. Some
+         * components handle this internally only, and therefore
+         * bridgeErrorHandler is not possible. In other situations we may
+         * improve the Camel component to hook into the 3rd party component and
+         * make this possible for future releases. By default the consumer will
+         * use the org.apache.camel.spi.ExceptionHandler to deal with
+         * exceptions, that will be logged at WARN or ERROR level and ignored.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -1415,12 +1420,17 @@ public interface SalesforceEndpointBuilderFactory {
         }
         /**
          * Allows for bridging the consumer to the Camel routing Error Handler,
-         * which mean any exceptions occurred while the consumer is trying to
-         * pickup incoming messages, or the likes, will now be processed as a
-         * message and handled by the routing Error Handler. By default the
-         * consumer will use the org.apache.camel.spi.ExceptionHandler to deal
-         * with exceptions, that will be logged at WARN or ERROR level and
-         * ignored.
+         * which mean any exceptions (if possible) occurred while the Camel
+         * consumer is trying to pickup incoming messages, or the likes, will
+         * now be processed as a message and handled by the routing Error
+         * Handler. Important: This is only possible if the 3rd party component
+         * allows Camel to be alerted if an exception was thrown. Some
+         * components handle this internally only, and therefore
+         * bridgeErrorHandler is not possible. In other situations we may
+         * improve the Camel component to hook into the 3rd party component and
+         * make this possible for future releases. By default the consumer will
+         * use the org.apache.camel.spi.ExceptionHandler to deal with
+         * exceptions, that will be logged at WARN or ERROR level and ignored.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -2756,6 +2766,73 @@ public interface SalesforceEndpointBuilderFactory {
             return this;
         }
         /**
+         * Name of Platform Event, Change Data Capture Event, custom event, etc.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: producer
+         * 
+         * @param eventName the value to set
+         * @return the dsl builder
+         */
+        default SalesforceEndpointProducerBuilder eventName(String eventName) {
+            doSetProperty("eventName", eventName);
+            return this;
+        }
+        /**
+         * EXPANDED: Apache Avro format but doesnt strictly adhere to the record
+         * complex type. COMPACT: Apache Avro, adheres to the specification for
+         * the record complex type. This parameter is available in API version
+         * 43.0 and later.
+         * 
+         * The option is a:
+         * &lt;code&gt;org.apache.camel.component.salesforce.internal.dto.EventSchemaFormatEnum&lt;/code&gt; type.
+         * 
+         * Group: producer
+         * 
+         * @param eventSchemaFormat the value to set
+         * @return the dsl builder
+         */
+        default SalesforceEndpointProducerBuilder eventSchemaFormat(
+                org.apache.camel.component.salesforce.internal.dto.EventSchemaFormatEnum eventSchemaFormat) {
+            doSetProperty("eventSchemaFormat", eventSchemaFormat);
+            return this;
+        }
+        /**
+         * EXPANDED: Apache Avro format but doesnt strictly adhere to the record
+         * complex type. COMPACT: Apache Avro, adheres to the specification for
+         * the record complex type. This parameter is available in API version
+         * 43.0 and later.
+         * 
+         * The option will be converted to a
+         * &lt;code&gt;org.apache.camel.component.salesforce.internal.dto.EventSchemaFormatEnum&lt;/code&gt; type.
+         * 
+         * Group: producer
+         * 
+         * @param eventSchemaFormat the value to set
+         * @return the dsl builder
+         */
+        default SalesforceEndpointProducerBuilder eventSchemaFormat(
+                String eventSchemaFormat) {
+            doSetProperty("eventSchemaFormat", eventSchemaFormat);
+            return this;
+        }
+        /**
+         * The ID of the event schema.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: producer
+         * 
+         * @param eventSchemaId the value to set
+         * @return the dsl builder
+         */
+        default SalesforceEndpointProducerBuilder eventSchemaId(
+                String eventSchemaId) {
+            doSetProperty("eventSchemaId", eventSchemaId);
+            return this;
+        }
+        /**
          * Comma separated list of message headers to include as HTTP parameters
          * for Raw operation.
          * 
@@ -4087,17 +4164,18 @@ public interface SalesforceEndpointBuilderFactory {
          * 
          * Path parameter: operationName (required)
          * The operation to use
-         * There are 68 enums and the value can be one of: getVersions,
+         * There are 69 enums and the value can be one of: getVersions,
          * getResources, getGlobalObjects, getBasicInfo, getDescription,
          * getSObject, createSObject, updateSObject, deleteSObject,
          * getSObjectWithId, upsertSObject, deleteSObjectWithId, getBlobField,
-         * query, queryMore, queryAll, search, apexCall, recent, createJob,
-         * getJob, closeJob, abortJob, createBatch, getBatch, getAllBatches,
-         * getRequest, getResults, createBatchQuery, getQueryResultIds,
-         * getQueryResult, getRecentReports, getReportDescription,
-         * executeSyncReport, executeAsyncReport, getReportInstances,
-         * getReportResults, limits, approval, approvals, composite-tree,
-         * composite-batch, composite, compositeRetrieveSObjectCollections,
+         * query, queryMore, queryAll, search, apexCall, recent, getEventSchema,
+         * createJob, getJob, closeJob, abortJob, createBatch, getBatch,
+         * getAllBatches, getRequest, getResults, createBatchQuery,
+         * getQueryResultIds, getQueryResult, getRecentReports,
+         * getReportDescription, executeSyncReport, executeAsyncReport,
+         * getReportInstances, getReportResults, limits, approval, approvals,
+         * composite-tree, composite-batch, composite,
+         * compositeRetrieveSObjectCollections,
          * compositeCreateSObjectCollections, compositeUpdateSObjectCollections,
          * compositeUpsertSObjectCollections, compositeDeleteSObjectCollections,
          * bulk2GetAllJobs, bulk2CreateJob, bulk2GetJob, bulk2CreateBatch,
@@ -4128,17 +4206,18 @@ public interface SalesforceEndpointBuilderFactory {
          * 
          * Path parameter: operationName (required)
          * The operation to use
-         * There are 68 enums and the value can be one of: getVersions,
+         * There are 69 enums and the value can be one of: getVersions,
          * getResources, getGlobalObjects, getBasicInfo, getDescription,
          * getSObject, createSObject, updateSObject, deleteSObject,
          * getSObjectWithId, upsertSObject, deleteSObjectWithId, getBlobField,
-         * query, queryMore, queryAll, search, apexCall, recent, createJob,
-         * getJob, closeJob, abortJob, createBatch, getBatch, getAllBatches,
-         * getRequest, getResults, createBatchQuery, getQueryResultIds,
-         * getQueryResult, getRecentReports, getReportDescription,
-         * executeSyncReport, executeAsyncReport, getReportInstances,
-         * getReportResults, limits, approval, approvals, composite-tree,
-         * composite-batch, composite, compositeRetrieveSObjectCollections,
+         * query, queryMore, queryAll, search, apexCall, recent, getEventSchema,
+         * createJob, getJob, closeJob, abortJob, createBatch, getBatch,
+         * getAllBatches, getRequest, getResults, createBatchQuery,
+         * getQueryResultIds, getQueryResult, getRecentReports,
+         * getReportDescription, executeSyncReport, executeAsyncReport,
+         * getReportInstances, getReportResults, limits, approval, approvals,
+         * composite-tree, composite-batch, composite,
+         * compositeRetrieveSObjectCollections,
          * compositeCreateSObjectCollections, compositeUpdateSObjectCollections,
          * compositeUpsertSObjectCollections, compositeDeleteSObjectCollections,
          * bulk2GetAllJobs, bulk2CreateJob, bulk2GetJob, bulk2CreateBatch,
@@ -4183,7 +4262,7 @@ public interface SalesforceEndpointBuilderFactory {
          * @return the name of the header {@code SalesforceReplayId}.
          */
         public String salesforceReplayId() {
-            return "SalesforceReplayId";
+            return "CamelSalesforceReplayId";
         }
 
         /**
@@ -4196,7 +4275,7 @@ public interface SalesforceEndpointBuilderFactory {
          * @return the name of the header {@code SalesforcePubSubReplayId}.
          */
         public String salesforcePubSubReplayId() {
-            return "SalesforcePubSubReplayId";
+            return "CamelSalesforcePubSubReplayId";
         }
 
         /**
@@ -4209,7 +4288,7 @@ public interface SalesforceEndpointBuilderFactory {
          * @return the name of the header {@code SalesforceChangeEventSchema}.
          */
         public String salesforceChangeEventSchema() {
-            return "SalesforceChangeEventSchema";
+            return "CamelSalesforceChangeEventSchema";
         }
 
         /**
@@ -4222,7 +4301,7 @@ public interface SalesforceEndpointBuilderFactory {
          * @return the name of the header {@code SalesforceEventType}.
          */
         public String salesforceEventType() {
-            return "SalesforceEventType";
+            return "CamelSalesforceEventType";
         }
 
         /**
@@ -4235,7 +4314,7 @@ public interface SalesforceEndpointBuilderFactory {
          * @return the name of the header {@code SalesforceCommitTimestamp}.
          */
         public String salesforceCommitTimestamp() {
-            return "SalesforceCommitTimestamp";
+            return "CamelSalesforceCommitTimestamp";
         }
 
         /**
@@ -4248,7 +4327,7 @@ public interface SalesforceEndpointBuilderFactory {
          * @return the name of the header {@code SalesforceCommitUser}.
          */
         public String salesforceCommitUser() {
-            return "SalesforceCommitUser";
+            return "CamelSalesforceCommitUser";
         }
 
         /**
@@ -4261,7 +4340,7 @@ public interface SalesforceEndpointBuilderFactory {
          * @return the name of the header {@code SalesforceCommitNumber}.
          */
         public String salesforceCommitNumber() {
-            return "SalesforceCommitNumber";
+            return "CamelSalesforceCommitNumber";
         }
 
         /**
@@ -4274,7 +4353,7 @@ public interface SalesforceEndpointBuilderFactory {
          * @return the name of the header {@code SalesforceRecordIds}.
          */
         public String salesforceRecordIds() {
-            return "SalesforceRecordIds";
+            return "CamelSalesforceRecordIds";
         }
 
         /**
@@ -4287,7 +4366,7 @@ public interface SalesforceEndpointBuilderFactory {
          * @return the name of the header {@code SalesforceChangeType}.
          */
         public String salesforceChangeType() {
-            return "SalesforceChangeType";
+            return "CamelSalesforceChangeType";
         }
 
         /**
@@ -4300,7 +4379,7 @@ public interface SalesforceEndpointBuilderFactory {
          * @return the name of the header {@code SalesforceChangeOrigin}.
          */
         public String salesforceChangeOrigin() {
-            return "SalesforceChangeOrigin";
+            return "CamelSalesforceChangeOrigin";
         }
 
         /**
@@ -4313,7 +4392,7 @@ public interface SalesforceEndpointBuilderFactory {
          * @return the name of the header {@code SalesforceTransactionKey}.
          */
         public String salesforceTransactionKey() {
-            return "SalesforceTransactionKey";
+            return "CamelSalesforceTransactionKey";
         }
 
         /**
@@ -4326,7 +4405,7 @@ public interface SalesforceEndpointBuilderFactory {
          * @return the name of the header {@code SalesforceSequenceNumber}.
          */
         public String salesforceSequenceNumber() {
-            return "SalesforceSequenceNumber";
+            return "CamelSalesforceSequenceNumber";
         }
 
         /**
@@ -4339,7 +4418,7 @@ public interface SalesforceEndpointBuilderFactory {
          * @return the name of the header {@code SalesforceIsTransactionEnd}.
          */
         public String salesforceIsTransactionEnd() {
-            return "SalesforceIsTransactionEnd";
+            return "CamelSalesforceIsTransactionEnd";
         }
 
         /**
@@ -4352,7 +4431,7 @@ public interface SalesforceEndpointBuilderFactory {
          * @return the name of the header {@code SalesforceEntityName}.
          */
         public String salesforceEntityName() {
-            return "SalesforceEntityName";
+            return "CamelSalesforceEntityName";
         }
 
         /**
@@ -4365,7 +4444,7 @@ public interface SalesforceEndpointBuilderFactory {
          * @return the name of the header {@code SalesforcePlatformEventSchema}.
          */
         public String salesforcePlatformEventSchema() {
-            return "SalesforcePlatformEventSchema";
+            return "CamelSalesforcePlatformEventSchema";
         }
 
         /**
@@ -4378,7 +4457,7 @@ public interface SalesforceEndpointBuilderFactory {
          * @return the name of the header {@code SalesforceCreatedDate}.
          */
         public String salesforceCreatedDate() {
-            return "SalesforceCreatedDate";
+            return "CamelSalesforceCreatedDate";
         }
 
         /**
@@ -4391,7 +4470,7 @@ public interface SalesforceEndpointBuilderFactory {
          * @return the name of the header {@code SalesforceTopicName}.
          */
         public String salesforceTopicName() {
-            return "SalesforceTopicName";
+            return "CamelSalesforceTopicName";
         }
 
         /**
@@ -4404,7 +4483,7 @@ public interface SalesforceEndpointBuilderFactory {
          * @return the name of the header {@code SalesforceChannel}.
          */
         public String salesforceChannel() {
-            return "SalesforceChannel";
+            return "CamelSalesforceChannel";
         }
 
         /**
@@ -4417,7 +4496,7 @@ public interface SalesforceEndpointBuilderFactory {
          * @return the name of the header {@code SalesforceClientId}.
          */
         public String salesforceClientId() {
-            return "SalesforceClientId";
+            return "CamelSalesforceClientId";
         }
 
         /**
@@ -4431,7 +4510,7 @@ public interface SalesforceEndpointBuilderFactory {
          * SalesforceQueryResultTotalSize}.
          */
         public String salesforceQueryResultTotalSize() {
-            return "SalesforceQueryResultTotalSize";
+            return "CamelSalesforceQueryResultTotalSize";
         }
     }
     static SalesforceEndpointBuilder endpointBuilder(

@@ -504,12 +504,17 @@ public interface KubernetesEventsEndpointBuilderFactory {
         }
         /**
          * Allows for bridging the consumer to the Camel routing Error Handler,
-         * which mean any exceptions occurred while the consumer is trying to
-         * pickup incoming messages, or the likes, will now be processed as a
-         * message and handled by the routing Error Handler. By default the
-         * consumer will use the org.apache.camel.spi.ExceptionHandler to deal
-         * with exceptions, that will be logged at WARN or ERROR level and
-         * ignored.
+         * which mean any exceptions (if possible) occurred while the Camel
+         * consumer is trying to pickup incoming messages, or the likes, will
+         * now be processed as a message and handled by the routing Error
+         * Handler. Important: This is only possible if the 3rd party component
+         * allows Camel to be alerted if an exception was thrown. Some
+         * components handle this internally only, and therefore
+         * bridgeErrorHandler is not possible. In other situations we may
+         * improve the Camel component to hook into the 3rd party component and
+         * make this possible for future releases. By default the consumer will
+         * use the org.apache.camel.spi.ExceptionHandler to deal with
+         * exceptions, that will be logged at WARN or ERROR level and ignored.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -526,12 +531,17 @@ public interface KubernetesEventsEndpointBuilderFactory {
         }
         /**
          * Allows for bridging the consumer to the Camel routing Error Handler,
-         * which mean any exceptions occurred while the consumer is trying to
-         * pickup incoming messages, or the likes, will now be processed as a
-         * message and handled by the routing Error Handler. By default the
-         * consumer will use the org.apache.camel.spi.ExceptionHandler to deal
-         * with exceptions, that will be logged at WARN or ERROR level and
-         * ignored.
+         * which mean any exceptions (if possible) occurred while the Camel
+         * consumer is trying to pickup incoming messages, or the likes, will
+         * now be processed as a message and handled by the routing Error
+         * Handler. Important: This is only possible if the 3rd party component
+         * allows Camel to be alerted if an exception was thrown. Some
+         * components handle this internally only, and therefore
+         * bridgeErrorHandler is not possible. In other situations we may
+         * improve the Camel component to hook into the 3rd party component and
+         * make this possible for future releases. By default the consumer will
+         * use the org.apache.camel.spi.ExceptionHandler to deal with
+         * exceptions, that will be logged at WARN or ERROR level and ignored.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -1449,7 +1459,13 @@ public interface KubernetesEventsEndpointBuilderFactory {
          * Syntax: <code>kubernetes-events:masterUrl</code>
          * 
          * Path parameter: masterUrl (required)
-         * Kubernetes Master url
+         * URL to a remote Kubernetes API server. This should only be used when
+         * your Camel application is connecting from outside Kubernetes. If you
+         * run your Camel application inside Kubernetes, then you can use local
+         * or client as the URL to tell Camel to run in local mode. If you
+         * connect remotely to Kubernetes, then you may also need some of the
+         * many other configuration options for secured connection with
+         * certificates, etc.
          * 
          * @param path masterUrl
          * @return the dsl builder
@@ -1469,7 +1485,13 @@ public interface KubernetesEventsEndpointBuilderFactory {
          * Syntax: <code>kubernetes-events:masterUrl</code>
          * 
          * Path parameter: masterUrl (required)
-         * Kubernetes Master url
+         * URL to a remote Kubernetes API server. This should only be used when
+         * your Camel application is connecting from outside Kubernetes. If you
+         * run your Camel application inside Kubernetes, then you can use local
+         * or client as the URL to tell Camel to run in local mode. If you
+         * connect remotely to Kubernetes, then you may also need some of the
+         * many other configuration options for secured connection with
+         * certificates, etc.
          * 
          * @param componentName to use a custom component name for the endpoint
          * instead of the default name
@@ -1503,7 +1525,7 @@ public interface KubernetesEventsEndpointBuilderFactory {
          * @return the name of the header {@code KubernetesOperation}.
          */
         public String kubernetesOperation() {
-            return "KubernetesOperation";
+            return "CamelKubernetesOperation";
         }
 
         /**
@@ -1516,7 +1538,7 @@ public interface KubernetesEventsEndpointBuilderFactory {
          * @return the name of the header {@code KubernetesNamespaceName}.
          */
         public String kubernetesNamespaceName() {
-            return "KubernetesNamespaceName";
+            return "CamelKubernetesNamespaceName";
         }
 
         /**
@@ -1529,7 +1551,7 @@ public interface KubernetesEventsEndpointBuilderFactory {
          * @return the name of the header {@code KubernetesEventsLabels}.
          */
         public String kubernetesEventsLabels() {
-            return "KubernetesEventsLabels";
+            return "CamelKubernetesEventsLabels";
         }
 
         /**
@@ -1544,7 +1566,7 @@ public interface KubernetesEventsEndpointBuilderFactory {
          * @return the name of the header {@code KubernetesEventTime}.
          */
         public String kubernetesEventTime() {
-            return "KubernetesEventTime";
+            return "CamelKubernetesEventTime";
         }
 
         /**
@@ -1558,7 +1580,7 @@ public interface KubernetesEventsEndpointBuilderFactory {
          * @return the name of the header {@code KubernetesEventAction}.
          */
         public String kubernetesEventAction() {
-            return "KubernetesEventAction";
+            return "CamelKubernetesEventAction";
         }
 
         /**
@@ -1571,7 +1593,7 @@ public interface KubernetesEventsEndpointBuilderFactory {
          * @return the name of the header {@code KubernetesEventType}.
          */
         public String kubernetesEventType() {
-            return "KubernetesEventType";
+            return "CamelKubernetesEventType";
         }
 
         /**
@@ -1584,7 +1606,7 @@ public interface KubernetesEventsEndpointBuilderFactory {
          * @return the name of the header {@code KubernetesEventReason}.
          */
         public String kubernetesEventReason() {
-            return "KubernetesEventReason";
+            return "CamelKubernetesEventReason";
         }
 
         /**
@@ -1597,7 +1619,7 @@ public interface KubernetesEventsEndpointBuilderFactory {
          * @return the name of the header {@code KubernetesEventNote}.
          */
         public String kubernetesEventNote() {
-            return "KubernetesEventNote";
+            return "CamelKubernetesEventNote";
         }
 
         /**
@@ -1611,7 +1633,7 @@ public interface KubernetesEventsEndpointBuilderFactory {
          * @return the name of the header {@code KubernetesEventRegarding}.
          */
         public String kubernetesEventRegarding() {
-            return "KubernetesEventRegarding";
+            return "CamelKubernetesEventRegarding";
         }
 
         /**
@@ -1625,7 +1647,7 @@ public interface KubernetesEventsEndpointBuilderFactory {
          * @return the name of the header {@code KubernetesEventRelated}.
          */
         public String kubernetesEventRelated() {
-            return "KubernetesEventRelated";
+            return "CamelKubernetesEventRelated";
         }
 
         /**
@@ -1639,7 +1661,7 @@ public interface KubernetesEventsEndpointBuilderFactory {
          * KubernetesEventReportingController}.
          */
         public String kubernetesEventReportingController() {
-            return "KubernetesEventReportingController";
+            return "CamelKubernetesEventReportingController";
         }
 
         /**
@@ -1653,7 +1675,7 @@ public interface KubernetesEventsEndpointBuilderFactory {
          * KubernetesEventReportingInstance}.
          */
         public String kubernetesEventReportingInstance() {
-            return "KubernetesEventReportingInstance";
+            return "CamelKubernetesEventReportingInstance";
         }
 
         /**
@@ -1666,7 +1688,7 @@ public interface KubernetesEventsEndpointBuilderFactory {
          * @return the name of the header {@code KubernetesEventName}.
          */
         public String kubernetesEventName() {
-            return "KubernetesEventName";
+            return "CamelKubernetesEventName";
         }
 
         /**
@@ -1679,7 +1701,7 @@ public interface KubernetesEventsEndpointBuilderFactory {
          * @return the name of the header {@code KubernetesEventTimestamp}.
          */
         public String kubernetesEventTimestamp() {
-            return "KubernetesEventTimestamp";
+            return "CamelKubernetesEventTimestamp";
         }
     }
     static KubernetesEventsEndpointBuilder endpointBuilder(

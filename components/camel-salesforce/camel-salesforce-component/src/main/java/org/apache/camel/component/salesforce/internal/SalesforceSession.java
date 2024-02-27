@@ -50,10 +50,10 @@ import org.apache.camel.component.salesforce.internal.dto.LoginToken;
 import org.apache.camel.support.jsse.KeyStoreParameters;
 import org.apache.camel.support.service.ServiceSupport;
 import org.apache.camel.util.ObjectHelper;
-import org.eclipse.jetty.client.HttpConversation;
-import org.eclipse.jetty.client.api.ContentResponse;
-import org.eclipse.jetty.client.api.Request;
-import org.eclipse.jetty.client.util.FormContentProvider;
+import org.eclipse.jetty.client.ContentResponse;
+import org.eclipse.jetty.client.FormRequestContent;
+import org.eclipse.jetty.client.Request;
+import org.eclipse.jetty.client.transport.HttpConversation;
 import org.eclipse.jetty.http.HttpMethod;
 import org.eclipse.jetty.http.HttpStatus;
 import org.eclipse.jetty.util.Fields;
@@ -118,6 +118,7 @@ public class SalesforceSession extends ServiceSupport {
                 }
                 latch.await();
             } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
                 throw new RuntimeException("Failed to login.", ex);
             }
             LOG.debug("done waiting");
@@ -145,6 +146,7 @@ public class SalesforceSession extends ServiceSupport {
                     try {
                         Thread.sleep(backoff);
                     } catch (InterruptedException ex) {
+                        Thread.currentThread().interrupt();
                         throw new RuntimeException("Failed to login.", ex);
                     }
                 }
@@ -180,7 +182,8 @@ public class SalesforceSession extends ServiceSupport {
                 parseLoginResponse(loginResponse, loginResponse.getContentAsString());
 
             } catch (InterruptedException e) {
-                throw new SalesforceException("Login error: " + e.getMessage(), e);
+                Thread.currentThread().interrupt();
+                throw new SalesforceException("Login error: interrupted", e);
             } catch (TimeoutException e) {
                 throw new SalesforceException("Login request timeout: " + e.getMessage(), e);
             } catch (ExecutionException e) {
@@ -236,7 +239,7 @@ public class SalesforceSession extends ServiceSupport {
             post = httpClient.newHttpRequest(conversation, URI.create(loginUrl)).method(HttpMethod.POST);
         }
 
-        return post.content(new FormContentProvider(fields)).timeout(timeout, TimeUnit.MILLISECONDS);
+        return post.body(new FormRequestContent(fields)).timeout(timeout, TimeUnit.MILLISECONDS);
     }
 
     String generateJwtAssertion() {
@@ -363,7 +366,6 @@ public class SalesforceSession extends ServiceSupport {
             final ContentResponse logoutResponse = logoutGet.send();
 
             final int statusCode = logoutResponse.getStatus();
-            final String reason = logoutResponse.getReason();
 
             if (statusCode == HttpStatus.OK_200) {
                 LOG.debug("Logout successful");
@@ -372,8 +374,8 @@ public class SalesforceSession extends ServiceSupport {
             }
 
         } catch (InterruptedException e) {
-            String msg = "Logout error: " + e.getMessage();
-            throw new SalesforceException(msg, e);
+            Thread.currentThread().interrupt();
+            throw new SalesforceException("Interrupted while logging out", e);
         } catch (ExecutionException e) {
             final Throwable ex = e.getCause();
             throw new SalesforceException("Unexpected logout exception: " + ex.getMessage(), ex);

@@ -19,7 +19,11 @@ public class OracleConnectorEmbeddedDebeziumConfiguration
     @UriParam(label = LABEL_NAME)
     private String messageKeyColumns;
     @UriParam(label = LABEL_NAME)
+    private String customMetricTags;
+    @UriParam(label = LABEL_NAME)
     private String logMiningArchiveDestinationName;
+    @UriParam(label = LABEL_NAME)
+    private String openlogreplicatorHost;
     @UriParam(label = LABEL_NAME, defaultValue = "source")
     private String signalEnabledChannels = "source";
     @UriParam(label = LABEL_NAME, defaultValue = "true")
@@ -80,6 +84,8 @@ public class OracleConnectorEmbeddedDebeziumConfiguration
     private String databaseConnectionAdapter = "LogMiner";
     @UriParam(label = LABEL_NAME, defaultValue = "LOG_MINING_FLUSH")
     private String logMiningFlushTableName = "LOG_MINING_FLUSH";
+    @UriParam(label = LABEL_NAME)
+    private String openlogreplicatorSource;
     @UriParam(label = LABEL_NAME, defaultValue = "memory")
     private String logMiningBufferType = "memory";
     @UriParam(label = LABEL_NAME, defaultValue = "5s", javaType = "java.time.Duration")
@@ -128,6 +134,8 @@ public class OracleConnectorEmbeddedDebeziumConfiguration
     private String databaseUser;
     @UriParam(label = LABEL_NAME)
     private String datatypePropagateSourceType;
+    @UriParam(label = LABEL_NAME, defaultValue = "INSERT_INSERT")
+    private String incrementalSnapshotWatermarkingStrategy = "INSERT_INSERT";
     @UriParam(label = LABEL_NAME, defaultValue = "0ms", javaType = "java.time.Duration")
     private int heartbeatIntervalMs = 0;
     @UriParam(label = LABEL_NAME, defaultValue = "false")
@@ -155,6 +163,8 @@ public class OracleConnectorEmbeddedDebeziumConfiguration
     private int maxQueueSize = 8192;
     @UriParam(label = LABEL_NAME)
     private String racNodes;
+    @UriParam(label = LABEL_NAME)
+    private String logMiningBufferInfinispanCacheGlobal;
     @UriParam(label = LABEL_NAME, defaultValue = "0")
     private long logMiningBufferTransactionEventsThreshold = 0;
     @UriParam(label = LABEL_NAME, defaultValue = "0ms", javaType = "java.time.Duration")
@@ -174,6 +184,8 @@ public class OracleConnectorEmbeddedDebeziumConfiguration
     private String sourceinfoStructMaker = "io.debezium.connector.oracle.OracleSourceInfoStructMaker";
     @UriParam(label = LABEL_NAME, defaultValue = "0")
     private long logMiningArchiveLogHours = 0;
+    @UriParam(label = LABEL_NAME)
+    private int openlogreplicatorPort;
     @UriParam(label = LABEL_NAME, defaultValue = "100000")
     private long logMiningBatchSizeMax = 100000;
     @UriParam(label = LABEL_NAME, defaultValue = "0")
@@ -182,6 +194,8 @@ public class OracleConnectorEmbeddedDebeziumConfiguration
     private String databaseUrl;
     @UriParam(label = LABEL_NAME, defaultValue = "adaptive")
     private String timePrecisionMode = "adaptive";
+    @UriParam(label = LABEL_NAME)
+    private String postProcessors;
     @UriParam(label = LABEL_NAME, defaultValue = "1528")
     private int databasePort = 1528;
     @UriParam(label = LABEL_NAME, defaultValue = "200ms", javaType = "java.time.Duration")
@@ -252,6 +266,20 @@ public class OracleConnectorEmbeddedDebeziumConfiguration
     }
 
     /**
+     * The custom metric tags will accept key-value pairs to customize the MBean
+     * object name which should be appended the end of regular name, each key
+     * would represent a tag for the MBean object name, and the corresponding
+     * value would be the value of that tag the key is. For example: k1=v1,k2=v2
+     */
+    public void setCustomMetricTags(String customMetricTags) {
+        this.customMetricTags = customMetricTags;
+    }
+
+    public String getCustomMetricTags() {
+        return customMetricTags;
+    }
+
+    /**
      * Sets the specific archive log destination as the source for reading
      * archive logs.When not set, the connector will automatically select the
      * first LOCAL and VALID destination.
@@ -263,6 +291,17 @@ public class OracleConnectorEmbeddedDebeziumConfiguration
 
     public String getLogMiningArchiveDestinationName() {
         return logMiningArchiveDestinationName;
+    }
+
+    /**
+     * The hostname of the OpenLogReplicator network service
+     */
+    public void setOpenlogreplicatorHost(String openlogreplicatorHost) {
+        this.openlogreplicatorHost = openlogreplicatorHost;
+    }
+
+    public String getOpenlogreplicatorHost() {
+        return openlogreplicatorHost;
     }
 
     /**
@@ -685,6 +724,18 @@ public class OracleConnectorEmbeddedDebeziumConfiguration
     }
 
     /**
+     * The configured logical source name in the OpenLogReplicator configuration
+     * that is to stream changes
+     */
+    public void setOpenlogreplicatorSource(String openlogreplicatorSource) {
+        this.openlogreplicatorSource = openlogreplicatorSource;
+    }
+
+    public String getOpenlogreplicatorSource() {
+        return openlogreplicatorSource;
+    }
+
+    /**
      * The buffer type controls how the connector manages buffering transaction
      * data.
      * 
@@ -1008,6 +1059,22 @@ public class OracleConnectorEmbeddedDebeziumConfiguration
     }
 
     /**
+     * Specify the strategy used for watermarking during an incremental
+     * snapshot: 'insert_insert' both open and close signal is written into
+     * signal data collection (default); 'insert_delete' only open signal is
+     * written on signal data collection, the close will delete the relative
+     * open signal;
+     */
+    public void setIncrementalSnapshotWatermarkingStrategy(
+            String incrementalSnapshotWatermarkingStrategy) {
+        this.incrementalSnapshotWatermarkingStrategy = incrementalSnapshotWatermarkingStrategy;
+    }
+
+    public String getIncrementalSnapshotWatermarkingStrategy() {
+        return incrementalSnapshotWatermarkingStrategy;
+    }
+
+    /**
      * Length of an interval in milli-seconds in in which the connector
      * periodically sends heartbeat messages to a heartbeat topic. Use 0 to
      * disable heartbeat messages. Disabled by default.
@@ -1175,6 +1242,18 @@ public class OracleConnectorEmbeddedDebeziumConfiguration
     }
 
     /**
+     * Specifies the XML configuration for the Infinispan 'global' configuration
+     */
+    public void setLogMiningBufferInfinispanCacheGlobal(
+            String logMiningBufferInfinispanCacheGlobal) {
+        this.logMiningBufferInfinispanCacheGlobal = logMiningBufferInfinispanCacheGlobal;
+    }
+
+    public String getLogMiningBufferInfinispanCacheGlobal() {
+        return logMiningBufferInfinispanCacheGlobal;
+    }
+
+    /**
      * The number of events a transaction can include before the transaction is
      * discarded. This is useful for managing buffer memory and/or space when
      * dealing with very large transactions. Defaults to 0, meaning that no
@@ -1299,6 +1378,17 @@ public class OracleConnectorEmbeddedDebeziumConfiguration
     }
 
     /**
+     * The port of the OpenLogReplicator network service
+     */
+    public void setOpenlogreplicatorPort(int openlogreplicatorPort) {
+        this.openlogreplicatorPort = openlogreplicatorPort;
+    }
+
+    public int getOpenlogreplicatorPort() {
+        return openlogreplicatorPort;
+    }
+
+    /**
      * The maximum SCN interval size that this connector will use when reading
      * from redo/archive logs.
      */
@@ -1351,6 +1441,19 @@ public class OracleConnectorEmbeddedDebeziumConfiguration
 
     public String getTimePrecisionMode() {
         return timePrecisionMode;
+    }
+
+    /**
+     * Optional list of post processors. The processors are defined using
+     * '<post.processor.prefix>.type' config option and configured using options
+     * '<post.processor.prefix.<option>'
+     */
+    public void setPostProcessors(String postProcessors) {
+        this.postProcessors = postProcessors;
+    }
+
+    public String getPostProcessors() {
+        return postProcessors;
     }
 
     /**
@@ -1458,7 +1561,9 @@ public class OracleConnectorEmbeddedDebeziumConfiguration
         addPropertyIfNotNull(configBuilder, "snapshot.locking.mode", snapshotLockingMode);
         addPropertyIfNotNull(configBuilder, "log.mining.buffer.drop.on.stop", logMiningBufferDropOnStop);
         addPropertyIfNotNull(configBuilder, "message.key.columns", messageKeyColumns);
+        addPropertyIfNotNull(configBuilder, "custom.metric.tags", customMetricTags);
         addPropertyIfNotNull(configBuilder, "log.mining.archive.destination.name", logMiningArchiveDestinationName);
+        addPropertyIfNotNull(configBuilder, "openlogreplicator.host", openlogreplicatorHost);
         addPropertyIfNotNull(configBuilder, "signal.enabled.channels", signalEnabledChannels);
         addPropertyIfNotNull(configBuilder, "include.schema.changes", includeSchemaChanges);
         addPropertyIfNotNull(configBuilder, "signal.data.collection", signalDataCollection);
@@ -1489,6 +1594,7 @@ public class OracleConnectorEmbeddedDebeziumConfiguration
         addPropertyIfNotNull(configBuilder, "database.pdb.name", databasePdbName);
         addPropertyIfNotNull(configBuilder, "database.connection.adapter", databaseConnectionAdapter);
         addPropertyIfNotNull(configBuilder, "log.mining.flush.table.name", logMiningFlushTableName);
+        addPropertyIfNotNull(configBuilder, "openlogreplicator.source", openlogreplicatorSource);
         addPropertyIfNotNull(configBuilder, "log.mining.buffer.type", logMiningBufferType);
         addPropertyIfNotNull(configBuilder, "signal.poll.interval.ms", signalPollIntervalMs);
         addPropertyIfNotNull(configBuilder, "notification.enabled.channels", notificationEnabledChannels);
@@ -1513,6 +1619,7 @@ public class OracleConnectorEmbeddedDebeziumConfiguration
         addPropertyIfNotNull(configBuilder, "log.mining.sleep.time.max.ms", logMiningSleepTimeMaxMs);
         addPropertyIfNotNull(configBuilder, "database.user", databaseUser);
         addPropertyIfNotNull(configBuilder, "datatype.propagate.source.type", datatypePropagateSourceType);
+        addPropertyIfNotNull(configBuilder, "incremental.snapshot.watermarking.strategy", incrementalSnapshotWatermarkingStrategy);
         addPropertyIfNotNull(configBuilder, "heartbeat.interval.ms", heartbeatIntervalMs);
         addPropertyIfNotNull(configBuilder, "schema.history.internal.skip.unparseable.ddl", schemaHistoryInternalSkipUnparseableDdl);
         addPropertyIfNotNull(configBuilder, "column.include.list", columnIncludeList);
@@ -1526,6 +1633,7 @@ public class OracleConnectorEmbeddedDebeziumConfiguration
         addPropertyIfNotNull(configBuilder, "log.mining.scn.gap.detection.time.interval.max.ms", logMiningScnGapDetectionTimeIntervalMaxMs);
         addPropertyIfNotNull(configBuilder, "max.queue.size", maxQueueSize);
         addPropertyIfNotNull(configBuilder, "rac.nodes", racNodes);
+        addPropertyIfNotNull(configBuilder, "log.mining.buffer.infinispan.cache.global", logMiningBufferInfinispanCacheGlobal);
         addPropertyIfNotNull(configBuilder, "log.mining.buffer.transaction.events.threshold", logMiningBufferTransactionEventsThreshold);
         addPropertyIfNotNull(configBuilder, "log.mining.transaction.retention.ms", logMiningTransactionRetentionMs);
         addPropertyIfNotNull(configBuilder, "provide.transaction.metadata", provideTransactionMetadata);
@@ -1535,10 +1643,12 @@ public class OracleConnectorEmbeddedDebeziumConfiguration
         addPropertyIfNotNull(configBuilder, "include.schema.comments", includeSchemaComments);
         addPropertyIfNotNull(configBuilder, "sourceinfo.struct.maker", sourceinfoStructMaker);
         addPropertyIfNotNull(configBuilder, "log.mining.archive.log.hours", logMiningArchiveLogHours);
+        addPropertyIfNotNull(configBuilder, "openlogreplicator.port", openlogreplicatorPort);
         addPropertyIfNotNull(configBuilder, "log.mining.batch.size.max", logMiningBatchSizeMax);
         addPropertyIfNotNull(configBuilder, "max.queue.size.in.bytes", maxQueueSizeInBytes);
         addPropertyIfNotNull(configBuilder, "database.url", databaseUrl);
         addPropertyIfNotNull(configBuilder, "time.precision.mode", timePrecisionMode);
+        addPropertyIfNotNull(configBuilder, "post.processors", postProcessors);
         addPropertyIfNotNull(configBuilder, "database.port", databasePort);
         addPropertyIfNotNull(configBuilder, "log.mining.sleep.time.increment.ms", logMiningSleepTimeIncrementMs);
         addPropertyIfNotNull(configBuilder, "schema.history.internal", schemaHistoryInternal);

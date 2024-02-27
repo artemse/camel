@@ -43,7 +43,11 @@ public class DebeziumMySqlEndpointConfigurer extends PropertyConfigurerSupport i
         case "connectKeepAliveIntervalMs": target.getConfiguration().setConnectKeepAliveIntervalMs(property(camelContext, java.time.Duration.class, value).toMillis()); return true;
         case "connecttimeoutms":
         case "connectTimeoutMs": target.getConfiguration().setConnectTimeoutMs(property(camelContext, int.class, value)); return true;
+        case "connectoradapter":
+        case "connectorAdapter": target.getConfiguration().setConnectorAdapter(property(camelContext, java.lang.String.class, value)); return true;
         case "converters": target.getConfiguration().setConverters(property(camelContext, java.lang.String.class, value)); return true;
+        case "custommetrictags":
+        case "customMetricTags": target.getConfiguration().setCustomMetricTags(property(camelContext, java.lang.String.class, value)); return true;
         case "databaseexcludelist":
         case "databaseExcludeList": target.getConfiguration().setDatabaseExcludeList(property(camelContext, java.lang.String.class, value)); return true;
         case "databasehostname":
@@ -114,6 +118,8 @@ public class DebeziumMySqlEndpointConfigurer extends PropertyConfigurerSupport i
         case "incrementalSnapshotAllowSchemaChanges": target.getConfiguration().setIncrementalSnapshotAllowSchemaChanges(property(camelContext, boolean.class, value)); return true;
         case "incrementalsnapshotchunksize":
         case "incrementalSnapshotChunkSize": target.getConfiguration().setIncrementalSnapshotChunkSize(property(camelContext, int.class, value)); return true;
+        case "incrementalsnapshotwatermarkingstrategy":
+        case "incrementalSnapshotWatermarkingStrategy": target.getConfiguration().setIncrementalSnapshotWatermarkingStrategy(property(camelContext, java.lang.String.class, value)); return true;
         case "internalkeyconverter":
         case "internalKeyConverter": target.getConfiguration().setInternalKeyConverter(property(camelContext, java.lang.String.class, value)); return true;
         case "internalvalueconverter":
@@ -150,6 +156,8 @@ public class DebeziumMySqlEndpointConfigurer extends PropertyConfigurerSupport i
         case "offsetStorageTopic": target.getConfiguration().setOffsetStorageTopic(property(camelContext, java.lang.String.class, value)); return true;
         case "pollintervalms":
         case "pollIntervalMs": target.getConfiguration().setPollIntervalMs(property(camelContext, java.time.Duration.class, value).toMillis()); return true;
+        case "postprocessors":
+        case "postProcessors": target.getConfiguration().setPostProcessors(property(camelContext, java.lang.String.class, value)); return true;
         case "providetransactionmetadata":
         case "provideTransactionMetadata": target.getConfiguration().setProvideTransactionMetadata(property(camelContext, boolean.class, value)); return true;
         case "queryfetchsize":
@@ -241,7 +249,11 @@ public class DebeziumMySqlEndpointConfigurer extends PropertyConfigurerSupport i
         case "connectKeepAliveIntervalMs": return long.class;
         case "connecttimeoutms":
         case "connectTimeoutMs": return int.class;
+        case "connectoradapter":
+        case "connectorAdapter": return java.lang.String.class;
         case "converters": return java.lang.String.class;
+        case "custommetrictags":
+        case "customMetricTags": return java.lang.String.class;
         case "databaseexcludelist":
         case "databaseExcludeList": return java.lang.String.class;
         case "databasehostname":
@@ -312,6 +324,8 @@ public class DebeziumMySqlEndpointConfigurer extends PropertyConfigurerSupport i
         case "incrementalSnapshotAllowSchemaChanges": return boolean.class;
         case "incrementalsnapshotchunksize":
         case "incrementalSnapshotChunkSize": return int.class;
+        case "incrementalsnapshotwatermarkingstrategy":
+        case "incrementalSnapshotWatermarkingStrategy": return java.lang.String.class;
         case "internalkeyconverter":
         case "internalKeyConverter": return java.lang.String.class;
         case "internalvalueconverter":
@@ -348,6 +362,8 @@ public class DebeziumMySqlEndpointConfigurer extends PropertyConfigurerSupport i
         case "offsetStorageTopic": return java.lang.String.class;
         case "pollintervalms":
         case "pollIntervalMs": return long.class;
+        case "postprocessors":
+        case "postProcessors": return java.lang.String.class;
         case "providetransactionmetadata":
         case "provideTransactionMetadata": return boolean.class;
         case "queryfetchsize":
@@ -440,7 +456,11 @@ public class DebeziumMySqlEndpointConfigurer extends PropertyConfigurerSupport i
         case "connectKeepAliveIntervalMs": return target.getConfiguration().getConnectKeepAliveIntervalMs();
         case "connecttimeoutms":
         case "connectTimeoutMs": return target.getConfiguration().getConnectTimeoutMs();
+        case "connectoradapter":
+        case "connectorAdapter": return target.getConfiguration().getConnectorAdapter();
         case "converters": return target.getConfiguration().getConverters();
+        case "custommetrictags":
+        case "customMetricTags": return target.getConfiguration().getCustomMetricTags();
         case "databaseexcludelist":
         case "databaseExcludeList": return target.getConfiguration().getDatabaseExcludeList();
         case "databasehostname":
@@ -511,6 +531,8 @@ public class DebeziumMySqlEndpointConfigurer extends PropertyConfigurerSupport i
         case "incrementalSnapshotAllowSchemaChanges": return target.getConfiguration().isIncrementalSnapshotAllowSchemaChanges();
         case "incrementalsnapshotchunksize":
         case "incrementalSnapshotChunkSize": return target.getConfiguration().getIncrementalSnapshotChunkSize();
+        case "incrementalsnapshotwatermarkingstrategy":
+        case "incrementalSnapshotWatermarkingStrategy": return target.getConfiguration().getIncrementalSnapshotWatermarkingStrategy();
         case "internalkeyconverter":
         case "internalKeyConverter": return target.getConfiguration().getInternalKeyConverter();
         case "internalvalueconverter":
@@ -547,6 +569,8 @@ public class DebeziumMySqlEndpointConfigurer extends PropertyConfigurerSupport i
         case "offsetStorageTopic": return target.getConfiguration().getOffsetStorageTopic();
         case "pollintervalms":
         case "pollIntervalMs": return target.getConfiguration().getPollIntervalMs();
+        case "postprocessors":
+        case "postProcessors": return target.getConfiguration().getPostProcessors();
         case "providetransactionmetadata":
         case "provideTransactionMetadata": return target.getConfiguration().isProvideTransactionMetadata();
         case "queryfetchsize":

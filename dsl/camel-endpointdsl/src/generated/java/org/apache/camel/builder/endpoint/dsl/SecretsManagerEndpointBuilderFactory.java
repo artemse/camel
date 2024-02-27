@@ -109,8 +109,8 @@ public interface SecretsManagerEndpointBuilderFactory {
             return this;
         }
         /**
-         * Set the need for overidding the endpoint. This option needs to be
-         * used in combination with uriEndpointOverride option.
+         * Set the need for overriding the endpoint. This option needs to be
+         * used in combination with the uriEndpointOverride option.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -126,8 +126,8 @@ public interface SecretsManagerEndpointBuilderFactory {
             return this;
         }
         /**
-         * Set the need for overidding the endpoint. This option needs to be
-         * used in combination with uriEndpointOverride option.
+         * Set the need for overriding the endpoint. This option needs to be
+         * used in combination with the uriEndpointOverride option.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -175,7 +175,7 @@ public interface SecretsManagerEndpointBuilderFactory {
             return this;
         }
         /**
-         * If using a profile credentials provider this parameter will set the
+         * If using a profile credentials provider, this parameter will set the
          * profile name.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -191,10 +191,10 @@ public interface SecretsManagerEndpointBuilderFactory {
             return this;
         }
         /**
-         * The region in which Secrets Manager client needs to work. When using
-         * this parameter, the configuration will expect the lowercase name of
-         * the region (for example ap-east-1) You'll need to use the name
-         * Region.EU_WEST_1.id().
+         * The region in which a Secrets Manager client needs to work. When
+         * using this parameter, the configuration will expect the lowercase
+         * name of the region (for example, ap-east-1) You'll need to use the
+         * name Region.EU_WEST_1.id().
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
@@ -365,6 +365,21 @@ public interface SecretsManagerEndpointBuilderFactory {
             return this;
         }
         /**
+         * Amazon AWS Session Token used when the user needs to assume an IAM
+         * role.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: security
+         * 
+         * @param sessionToken the value to set
+         * @return the dsl builder
+         */
+        default SecretsManagerEndpointBuilder sessionToken(String sessionToken) {
+            doSetProperty("sessionToken", sessionToken);
+            return this;
+        }
+        /**
          * If we want to trust all certificates in case of overriding the
          * endpoint.
          * 
@@ -436,6 +451,43 @@ public interface SecretsManagerEndpointBuilderFactory {
             doSetProperty("useDefaultCredentialsProvider", useDefaultCredentialsProvider);
             return this;
         }
+        /**
+         * Set whether the Secrets Manager client should expect to use Session
+         * Credentials. This is useful in a situation in which the user needs to
+         * assume an IAM role for doing operations in Secrets Manager.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default SecretsManagerEndpointBuilder useSessionCredentials(
+                boolean useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
+            return this;
+        }
+        /**
+         * Set whether the Secrets Manager client should expect to use Session
+         * Credentials. This is useful in a situation in which the user needs to
+         * assume an IAM role for doing operations in Secrets Manager.
+         * 
+         * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
+         * type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default SecretsManagerEndpointBuilder useSessionCredentials(
+                String useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
+            return this;
+        }
     }
 
     /**
@@ -497,7 +549,7 @@ public interface SecretsManagerEndpointBuilderFactory {
             return this;
         }
         /**
-         * To use a existing configured AWS Secrets Manager as client.
+         * To use an existing configured AWS Secrets Manager client.
          * 
          * The option is a:
          * &lt;code&gt;software.amazon.awssdk.services.secretsmanager.SecretsManagerClient&lt;/code&gt; type.
@@ -513,7 +565,7 @@ public interface SecretsManagerEndpointBuilderFactory {
             return this;
         }
         /**
-         * To use a existing configured AWS Secrets Manager as client.
+         * To use an existing configured AWS Secrets Manager client.
          * 
          * The option will be converted to a
          * &lt;code&gt;software.amazon.awssdk.services.secretsmanager.SecretsManagerClient&lt;/code&gt; type.
@@ -608,7 +660,7 @@ public interface SecretsManagerEndpointBuilderFactory {
          * @return the name of the header {@code AwsSecretsManagerOperation}.
          */
         public String awsSecretsManagerOperation() {
-            return "AwsSecretsManagerOperation";
+            return "CamelAwsSecretsManagerOperation";
         }
 
         /**
@@ -621,7 +673,7 @@ public interface SecretsManagerEndpointBuilderFactory {
          * @return the name of the header {@code AwsSecretsManagerMaxResults}.
          */
         public String awsSecretsManagerMaxResults() {
-            return "AwsSecretsManagerMaxResults";
+            return "CamelAwsSecretsManagerMaxResults";
         }
 
         /**
@@ -634,7 +686,7 @@ public interface SecretsManagerEndpointBuilderFactory {
          * @return the name of the header {@code AwsSecretsManagerSecretName}.
          */
         public String awsSecretsManagerSecretName() {
-            return "AwsSecretsManagerSecretName";
+            return "CamelAwsSecretsManagerSecretName";
         }
 
         /**
@@ -648,7 +700,7 @@ public interface SecretsManagerEndpointBuilderFactory {
          * AwsSecretsManagerSecretDescription}.
          */
         public String awsSecretsManagerSecretDescription() {
-            return "AwsSecretsManagerSecretDescription";
+            return "CamelAwsSecretsManagerSecretDescription";
         }
 
         /**
@@ -661,7 +713,7 @@ public interface SecretsManagerEndpointBuilderFactory {
          * @return the name of the header {@code AwsSecretsManagerSecretId}.
          */
         public String awsSecretsManagerSecretId() {
-            return "AwsSecretsManagerSecretId";
+            return "CamelAwsSecretsManagerSecretId";
         }
 
         /**
@@ -675,7 +727,7 @@ public interface SecretsManagerEndpointBuilderFactory {
          * AwsSecretsManagerLambdaRotationFunctionArn}.
          */
         public String awsSecretsManagerLambdaRotationFunctionArn() {
-            return "AwsSecretsManagerLambdaRotationFunctionArn";
+            return "CamelAwsSecretsManagerLambdaRotationFunctionArn";
         }
 
         /**
@@ -689,7 +741,7 @@ public interface SecretsManagerEndpointBuilderFactory {
          * AwsSecretsManagerSecretVersionId}.
          */
         public String awsSecretsManagerSecretVersionId() {
-            return "AwsSecretsManagerSecretVersionId";
+            return "CamelAwsSecretsManagerSecretVersionId";
         }
 
         /**
@@ -703,7 +755,7 @@ public interface SecretsManagerEndpointBuilderFactory {
          * AwsSecretsManagerSecretReplicationRegions}.
          */
         public String awsSecretsManagerSecretReplicationRegions() {
-            return "AwsSecretsManagerSecretReplicationRegions";
+            return "CamelAwsSecretsManagerSecretReplicationRegions";
         }
     }
     static SecretsManagerEndpointBuilder endpointBuilder(

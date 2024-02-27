@@ -94,6 +94,7 @@ public class ListService extends ProcessWatchCommand {
                         fetchServices(root, row, "netty", rows);
                         fetchServices(root, row, "mina", rows);
                         fetchServices(root, row, "mllp", rows);
+                        fetchServices(root, row, "knative", rows);
                     }
                 });
 
@@ -101,7 +102,7 @@ public class ListService extends ProcessWatchCommand {
         rows.sort(this::sortRow);
 
         if (!rows.isEmpty()) {
-            System.out.println(AsciiTable.getTable(AsciiTable.NO_BORDERS, rows, Arrays.asList(
+            printer().println(AsciiTable.getTable(AsciiTable.NO_BORDERS, rows, Arrays.asList(
                     new Column().header("PID").headerAlign(HorizontalAlign.CENTER).with(r -> r.pid),
                     new Column().header("NAME").dataAlign(HorizontalAlign.LEFT).maxWidth(30, OverflowBehaviour.ELLIPSIS_RIGHT)
                             .with(r -> r.name),
@@ -119,14 +120,23 @@ public class ListService extends ProcessWatchCommand {
             jo = (JsonObject) jo.get(component);
         }
         if (jo != null) {
-            JsonArray arr = (JsonArray) jo.get("endpoints");
+            JsonArray arr = (JsonArray) jo.get("consumers");
             if (arr != null) {
                 for (Object o : arr) {
                     row = row.copy();
                     jo = (JsonObject) o;
                     row.component = component;
                     row.protocol = jo.getString("protocol");
-                    row.service = row.protocol + ":" + jo.getString("host") + ":" + jo.getInteger("port");
+                    String p = row.protocol + ":";
+                    if (p.startsWith("http")) {
+                        // we want double slashes for http protocols
+                        p = p + "//";
+                    }
+                    row.service = p + jo.getString("host") + ":" + jo.getInteger("port");
+                    String path = jo.getString("path");
+                    if (path != null) {
+                        row.service += "/" + path;
+                    }
                     rows.add(row);
                 }
             }

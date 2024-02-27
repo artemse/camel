@@ -61,6 +61,7 @@ public final class BacklogTracer extends ServiceSupport implements org.apache.ca
     private boolean bodyIncludeStreams;
     private boolean bodyIncludeFiles = true;
     private boolean includeExchangeProperties = true;
+    private boolean includeExchangeVariables = true;
     private boolean includeException = true;
     private boolean traceRests;
     private boolean traceTemplates;
@@ -237,6 +238,16 @@ public final class BacklogTracer extends ServiceSupport implements org.apache.ca
     }
 
     @Override
+    public boolean isIncludeExchangeVariables() {
+        return includeExchangeVariables;
+    }
+
+    @Override
+    public void setIncludeExchangeVariables(boolean includeExchangeVariables) {
+        this.includeExchangeVariables = includeExchangeVariables;
+    }
+
+    @Override
     public boolean isIncludeException() {
         return includeException;
     }
@@ -398,10 +409,6 @@ public final class BacklogTracer extends ServiceSupport implements org.apache.ca
 
     public long incrementTraceCounter() {
         return traceCounter.incrementAndGet();
-    }
-
-    @Override
-    protected void doStart() throws Exception {
     }
 
     @Override

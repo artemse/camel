@@ -86,6 +86,7 @@ public class RouteDefinition extends OutputDefinition<RouteDefinition>
     private boolean contextScopedErrorHandler = true;
     private Boolean rest;
     private Boolean template;
+    private Boolean kamelet;
     private RestDefinition restDefinition;
     private RestBindingDefinition restBindingDefinition;
     private InputTypeDefinition inputType;
@@ -214,6 +215,36 @@ public class RouteDefinition extends OutputDefinition<RouteDefinition>
      */
     public RouteDefinition from(EndpointConsumerBuilder endpoint) {
         setInput(new FromDefinition(endpoint));
+        return this;
+    }
+
+    /**
+     * Creates an input to the route, and uses a variable to store a copy of the received message body (only body, not
+     * headers). This is handy for easy access to the received message body via variables.
+     *
+     * @param  uri             the from uri
+     * @param  variableReceive the name of the variable
+     * @return                 the builder
+     */
+    public RouteDefinition fromV(@AsEndpointUri String uri, String variableReceive) {
+        FromDefinition from = new FromDefinition(uri);
+        from.setVariableReceive(variableReceive);
+        setInput(from);
+        return this;
+    }
+
+    /**
+     * Creates an input to the route, and uses a variable to store a copy of the received message body (only body, not
+     * headers). This is handy for easy access to the received message body via variables.
+     *
+     * @param  endpoint        the from endpoint
+     * @param  variableReceive the name of the variable
+     * @return                 the builder
+     */
+    public RouteDefinition fromV(EndpointConsumerBuilder endpoint, String variableReceive) {
+        FromDefinition from = new FromDefinition(endpoint);
+        from.setVariableReceive(variableReceive);
+        setInput(from);
         return this;
     }
 
@@ -783,9 +814,10 @@ public class RouteDefinition extends OutputDefinition<RouteDefinition>
         // does not have a <from> as it is implied to be the rest endpoint
         this.input = input;
 
-        if (getCamelContext() != null && (getCamelContext().isSourceLocationEnabled() || getCamelContext().isDebugging()
-                || getCamelContext().isTracing())) {
-            // we want to capture source location:line for every output
+        if (getCamelContext() != null && (getCamelContext().isSourceLocationEnabled()
+                || getCamelContext().isDebugging() || getCamelContext().isDebugStandby()
+                || getCamelContext().isTracing() || getCamelContext().isTracingStandby())) {
+            // we want to capture source location:line for every output (also when debugging or tracing enabled/standby)
             ProcessorDefinitionHelper.prepareSourceLocation(getResource(), input);
         }
     }
@@ -1147,7 +1179,7 @@ public class RouteDefinition extends OutputDefinition<RouteDefinition>
     }
 
     /**
-     * This route is created from a route template.
+     * This route is created from a route template (or from a Kamelet).
      */
     public void setTemplate(Boolean template) {
         this.template = template;
@@ -1157,6 +1189,19 @@ public class RouteDefinition extends OutputDefinition<RouteDefinition>
     @Metadata(label = "advanced")
     public Boolean isTemplate() {
         return template;
+    }
+
+    /**
+     * This route is created from a Kamelet.
+     */
+    public void setKamelet(Boolean kamelet) {
+        this.kamelet = kamelet;
+    }
+
+    @XmlAttribute
+    @Metadata(label = "advanced")
+    public Boolean isKamelet() {
+        return kamelet;
     }
 
     public RestDefinition getRestDefinition() {

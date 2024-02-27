@@ -73,12 +73,17 @@ public interface DebeziumSqlserverComponentBuilderFactory {
         }
         /**
          * Allows for bridging the consumer to the Camel routing Error Handler,
-         * which mean any exceptions occurred while the consumer is trying to
-         * pickup incoming messages, or the likes, will now be processed as a
-         * message and handled by the routing Error Handler. By default the
-         * consumer will use the org.apache.camel.spi.ExceptionHandler to deal
-         * with exceptions, that will be logged at WARN or ERROR level and
-         * ignored.
+         * which mean any exceptions (if possible) occurred while the Camel
+         * consumer is trying to pickup incoming messages, or the likes, will
+         * now be processed as a message and handled by the routing Error
+         * Handler. Important: This is only possible if the 3rd party component
+         * allows Camel to be alerted if an exception was thrown. Some
+         * components handle this internally only, and therefore
+         * bridgeErrorHandler is not possible. In other situations we may
+         * improve the Camel component to hook into the 3rd party component and
+         * make this possible for future releases. By default the consumer will
+         * use the org.apache.camel.spi.ExceptionHandler to deal with
+         * exceptions, that will be logged at WARN or ERROR level and ignored.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -383,6 +388,25 @@ public interface DebeziumSqlserverComponentBuilderFactory {
         default DebeziumSqlserverComponentBuilder converters(
                 java.lang.String converters) {
             doSetProperty("converters", converters);
+            return this;
+        }
+        /**
+         * The custom metric tags will accept key-value pairs to customize the
+         * MBean object name which should be appended the end of regular name,
+         * each key would represent a tag for the MBean object name, and the
+         * corresponding value would be the value of that tag the key is. For
+         * example: k1=v1,k2=v2.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: sqlserver
+         * 
+         * @param customMetricTags the value to set
+         * @return the dsl builder
+         */
+        default DebeziumSqlserverComponentBuilder customMetricTags(
+                java.lang.String customMetricTags) {
+            doSetProperty("customMetricTags", customMetricTags);
             return this;
         }
         /**
@@ -708,6 +732,26 @@ public interface DebeziumSqlserverComponentBuilderFactory {
             return this;
         }
         /**
+         * Specify the strategy used for watermarking during an incremental
+         * snapshot: 'insert_insert' both open and close signal is written into
+         * signal data collection (default); 'insert_delete' only open signal is
+         * written on signal data collection, the close will delete the relative
+         * open signal;.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Default: INSERT_INSERT
+         * Group: sqlserver
+         * 
+         * @param incrementalSnapshotWatermarkingStrategy the value to set
+         * @return the dsl builder
+         */
+        default DebeziumSqlserverComponentBuilder incrementalSnapshotWatermarkingStrategy(
+                java.lang.String incrementalSnapshotWatermarkingStrategy) {
+            doSetProperty("incrementalSnapshotWatermarkingStrategy", incrementalSnapshotWatermarkingStrategy);
+            return this;
+        }
+        /**
          * Maximum size of each batch of source records. Defaults to 2048.
          * 
          * The option is a: &lt;code&gt;int&lt;/code&gt; type.
@@ -847,6 +891,22 @@ public interface DebeziumSqlserverComponentBuilderFactory {
             return this;
         }
         /**
+         * Optional list of post processors. The processors are defined using
+         * '.type' config option and configured using options ''.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: sqlserver
+         * 
+         * @param postProcessors the value to set
+         * @return the dsl builder
+         */
+        default DebeziumSqlserverComponentBuilder postProcessors(
+                java.lang.String postProcessors) {
+            doSetProperty("postProcessors", postProcessors);
+            return this;
+        }
+        /**
          * Enables transaction metadata extraction together with event counting.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
@@ -860,23 +920,6 @@ public interface DebeziumSqlserverComponentBuilderFactory {
         default DebeziumSqlserverComponentBuilder provideTransactionMetadata(
                 boolean provideTransactionMetadata) {
             doSetProperty("provideTransactionMetadata", provideTransactionMetadata);
-            return this;
-        }
-        /**
-         * The maximum number of records that should be loaded into memory while
-         * streaming. A value of '0' uses the default JDBC fetch size.
-         * 
-         * The option is a: &lt;code&gt;int&lt;/code&gt; type.
-         * 
-         * Default: 0
-         * Group: sqlserver
-         * 
-         * @param queryFetchSize the value to set
-         * @return the dsl builder
-         */
-        default DebeziumSqlserverComponentBuilder queryFetchSize(
-                int queryFetchSize) {
-            doSetProperty("queryFetchSize", queryFetchSize);
             return this;
         }
         /**
@@ -1459,6 +1502,7 @@ public interface DebeziumSqlserverComponentBuilderFactory {
             case "columnIncludeList": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setColumnIncludeList((java.lang.String) value); return true;
             case "columnPropagateSourceType": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setColumnPropagateSourceType((java.lang.String) value); return true;
             case "converters": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setConverters((java.lang.String) value); return true;
+            case "customMetricTags": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setCustomMetricTags((java.lang.String) value); return true;
             case "databaseHostname": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setDatabaseHostname((java.lang.String) value); return true;
             case "databaseInstance": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setDatabaseInstance((java.lang.String) value); return true;
             case "databaseNames": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setDatabaseNames((java.lang.String) value); return true;
@@ -1477,6 +1521,7 @@ public interface DebeziumSqlserverComponentBuilderFactory {
             case "incrementalSnapshotAllowSchemaChanges": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setIncrementalSnapshotAllowSchemaChanges((boolean) value); return true;
             case "incrementalSnapshotChunkSize": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setIncrementalSnapshotChunkSize((int) value); return true;
             case "incrementalSnapshotOptionRecompile": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setIncrementalSnapshotOptionRecompile((boolean) value); return true;
+            case "incrementalSnapshotWatermarkingStrategy": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setIncrementalSnapshotWatermarkingStrategy((java.lang.String) value); return true;
             case "maxBatchSize": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setMaxBatchSize((int) value); return true;
             case "maxIterationTransactions": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setMaxIterationTransactions((int) value); return true;
             case "maxQueueSize": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setMaxQueueSize((int) value); return true;
@@ -1485,8 +1530,8 @@ public interface DebeziumSqlserverComponentBuilderFactory {
             case "notificationEnabledChannels": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setNotificationEnabledChannels((java.lang.String) value); return true;
             case "notificationSinkTopicName": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setNotificationSinkTopicName((java.lang.String) value); return true;
             case "pollIntervalMs": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setPollIntervalMs((long) value); return true;
+            case "postProcessors": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setPostProcessors((java.lang.String) value); return true;
             case "provideTransactionMetadata": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setProvideTransactionMetadata((boolean) value); return true;
-            case "queryFetchSize": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setQueryFetchSize((int) value); return true;
             case "retriableRestartConnectorWaitMs": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setRetriableRestartConnectorWaitMs((long) value); return true;
             case "schemaHistoryInternal": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setSchemaHistoryInternal((java.lang.String) value); return true;
             case "schemaHistoryInternalFileFilename": getOrCreateConfiguration((DebeziumSqlserverComponent) component).setSchemaHistoryInternalFileFilename((java.lang.String) value); return true;

@@ -103,8 +103,8 @@ public interface Aws2CwComponentBuilderFactory {
             return this;
         }
         /**
-         * Set the need for overidding the endpoint. This option needs to be
-         * used in combination with uriEndpointOverride option.
+         * Set the need for overriding the endpoint. This option needs to be
+         * used in combination with the uriEndpointOverride option.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -121,7 +121,7 @@ public interface Aws2CwComponentBuilderFactory {
         /**
          * The region in which CW client needs to work. When using this
          * parameter, the configuration will expect the lowercase name of the
-         * region (for example ap-east-1) You'll need to use the name
+         * region (for example, ap-east-1) You'll need to use the name
          * Region.EU_WEST_1.id().
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -325,7 +325,7 @@ public interface Aws2CwComponentBuilderFactory {
             return this;
         }
         /**
-         * If using a profile credentials provider this parameter will set the
+         * If using a profile credentials provider, this parameter will set the
          * profile name.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -352,6 +352,22 @@ public interface Aws2CwComponentBuilderFactory {
          */
         default Aws2CwComponentBuilder secretKey(java.lang.String secretKey) {
             doSetProperty("secretKey", secretKey);
+            return this;
+        }
+        /**
+         * Amazon AWS Session Token used when the user needs to assume an IAM
+         * role.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: security
+         * 
+         * @param sessionToken the value to set
+         * @return the dsl builder
+         */
+        default Aws2CwComponentBuilder sessionToken(
+                java.lang.String sessionToken) {
+            doSetProperty("sessionToken", sessionToken);
             return this;
         }
         /**
@@ -406,6 +422,24 @@ public interface Aws2CwComponentBuilderFactory {
             doSetProperty("useProfileCredentialsProvider", useProfileCredentialsProvider);
             return this;
         }
+        /**
+         * Set whether the CloudWatch client should expect to use Session
+         * Credentials. This is useful in a situation in which the user needs to
+         * assume an IAM role for doing operations in CloudWatch.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default Aws2CwComponentBuilder useSessionCredentials(
+                boolean useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
+            return this;
+        }
     }
 
     class Aws2CwComponentBuilderImpl
@@ -449,9 +483,11 @@ public interface Aws2CwComponentBuilderFactory {
             case "accessKey": getOrCreateConfiguration((Cw2Component) component).setAccessKey((java.lang.String) value); return true;
             case "profileCredentialsName": getOrCreateConfiguration((Cw2Component) component).setProfileCredentialsName((java.lang.String) value); return true;
             case "secretKey": getOrCreateConfiguration((Cw2Component) component).setSecretKey((java.lang.String) value); return true;
+            case "sessionToken": getOrCreateConfiguration((Cw2Component) component).setSessionToken((java.lang.String) value); return true;
             case "trustAllCertificates": getOrCreateConfiguration((Cw2Component) component).setTrustAllCertificates((boolean) value); return true;
             case "useDefaultCredentialsProvider": getOrCreateConfiguration((Cw2Component) component).setUseDefaultCredentialsProvider((boolean) value); return true;
             case "useProfileCredentialsProvider": getOrCreateConfiguration((Cw2Component) component).setUseProfileCredentialsProvider((boolean) value); return true;
+            case "useSessionCredentials": getOrCreateConfiguration((Cw2Component) component).setUseSessionCredentials((boolean) value); return true;
             default: return false;
             }
         }

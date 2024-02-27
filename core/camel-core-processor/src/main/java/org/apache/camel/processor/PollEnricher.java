@@ -16,6 +16,8 @@
  */
 package org.apache.camel.processor;
 
+import java.util.Map;
+
 import org.apache.camel.AggregationStrategy;
 import org.apache.camel.AsyncCallback;
 import org.apache.camel.CamelContext;
@@ -32,12 +34,14 @@ import org.apache.camel.PollingConsumer;
 import org.apache.camel.spi.ConsumerCache;
 import org.apache.camel.spi.EndpointUtilizationStatistics;
 import org.apache.camel.spi.ExceptionHandler;
+import org.apache.camel.spi.HeadersMapFactory;
 import org.apache.camel.spi.IdAware;
 import org.apache.camel.spi.NormalizedEndpointUri;
 import org.apache.camel.spi.RouteIdAware;
 import org.apache.camel.support.AsyncProcessorSupport;
 import org.apache.camel.support.BridgeExceptionHandlerToErrorHandler;
 import org.apache.camel.support.DefaultConsumer;
+import org.apache.camel.support.EndpointHelper;
 import org.apache.camel.support.EventDrivenPollingConsumer;
 import org.apache.camel.support.ExchangeHelper;
 import org.apache.camel.support.cache.DefaultConsumerCache;
@@ -63,37 +67,42 @@ public class PollEnricher extends AsyncProcessorSupport implements IdAware, Rout
 
     private CamelContext camelContext;
     private ConsumerCache consumerCache;
+    private HeadersMapFactory headersMapFactory;
+    private volatile String scheme;
     private String id;
     private String routeId;
+    private String variableReceive;
     private AggregationStrategy aggregationStrategy;
     private final Expression expression;
-    private final String destination;
+    private final String uri;
     private long timeout;
     private boolean aggregateOnException;
     private int cacheSize;
     private boolean ignoreInvalidEndpoint;
+    private boolean autoStartupComponents = true;
 
     /**
      * Creates a new {@link PollEnricher}.
      *
      * @param expression expression to use to compute the endpoint to poll from.
+     * @param uri        the endpoint to poll from.
      * @param timeout    timeout in millis
      */
-    public PollEnricher(Expression expression, long timeout) {
+    public PollEnricher(Expression expression, String uri, long timeout) {
         this.expression = expression;
-        this.destination = null;
+        this.uri = uri;
         this.timeout = timeout;
     }
 
     /**
      * Creates a new {@link PollEnricher}.
      *
-     * @param destination the endpoint to poll from.
-     * @param timeout     timeout in millis
+     * @param uri     the endpoint to poll from.
+     * @param timeout timeout in millis
      */
-    public PollEnricher(String destination, long timeout) {
+    public PollEnricher(String uri, long timeout) {
         this.expression = null;
-        this.destination = destination;
+        this.uri = uri;
         this.timeout = timeout;
     }
 
@@ -148,6 +157,14 @@ public class PollEnricher extends AsyncProcessorSupport implements IdAware, Rout
         this.aggregationStrategy = aggregationStrategy;
     }
 
+    public String getVariableReceive() {
+        return variableReceive;
+    }
+
+    public void setVariableReceive(String variableReceive) {
+        this.variableReceive = variableReceive;
+    }
+
     public long getTimeout() {
         return timeout;
     }
@@ -187,6 +204,14 @@ public class PollEnricher extends AsyncProcessorSupport implements IdAware, Rout
         this.ignoreInvalidEndpoint = ignoreInvalidEndpoint;
     }
 
+    public boolean isAutoStartupComponents() {
+        return autoStartupComponents;
+    }
+
+    public void setAutoStartupComponents(boolean autoStartupComponents) {
+        this.autoStartupComponents = autoStartupComponents;
+    }
+
     /**
      * Enriches the input data (<code>exchange</code>) by first obtaining additional data from an endpoint represented
      * by an endpoint <code>producer</code> and second by aggregating input data and additional data. Aggregation of
@@ -214,7 +239,8 @@ public class PollEnricher extends AsyncProcessorSupport implements IdAware, Rout
         Object recipient = null;
         boolean prototype = cacheSize < 0;
         try {
-            recipient = destination != null ? destination : expression.evaluate(exchange, Object.class);
+            // favour using expression to compute the recipient endpoint
+            recipient = expression != null ? expression.evaluate(exchange, Object.class) : uri;
             recipient = prepareRecipient(exchange, recipient);
             Endpoint existing = getExistingEndpoint(camelContext, recipient);
             if (existing == null) {
@@ -295,6 +321,22 @@ public class PollEnricher extends AsyncProcessorSupport implements IdAware, Rout
             cause = resourceExchange.getException();
         }
 
+        // if we should store the received message body in a variable,
+        // then we need to preserve the original message body
+        Object originalBody = null;
+        Map<String, Object> originalHeaders = null;
+        if (variableReceive != null) {
+            try {
+                originalBody = exchange.getMessage().getBody();
+                // do a defensive copy of the headers
+                originalHeaders = headersMapFactory.newMap(exchange.getMessage().getHeaders());
+            } catch (Exception throwable) {
+                exchange.setException(throwable);
+                callback.done(true);
+                return true;
+            }
+        }
+
         try {
             if (!isAggregateOnException() && resourceExchange != null && resourceExchange.isFailed()) {
                 // copy resource exchange onto original exchange (preserving pattern)
@@ -308,6 +350,12 @@ public class PollEnricher extends AsyncProcessorSupport implements IdAware, Rout
                 // must catch any exception from aggregation
                 Exchange aggregatedExchange = aggregationStrategy.aggregate(exchange, resourceExchange);
                 if (aggregatedExchange != null) {
+                    if (variableReceive != null) {
+                        // result should be stored in variable instead of message body
+                        ExchangeHelper.setVariableFromMessageBodyAndHeaders(exchange, variableReceive, exchange.getMessage());
+                        exchange.getMessage().setBody(originalBody);
+                        exchange.getMessage().setHeaders(originalHeaders);
+                    }
                     // copy aggregation result onto original exchange (preserving pattern)
                     copyResultsPreservePattern(exchange, aggregatedExchange);
                     // handover any synchronization
@@ -437,11 +485,25 @@ public class PollEnricher extends AsyncProcessorSupport implements IdAware, Rout
             expression.init(camelContext);
         }
 
+        if (isAutoStartupComponents() && uri != null) {
+            // in case path has property placeholders then try to let property component resolve those
+            String u = EndpointHelper.resolveEndpointUriPropertyPlaceholders(camelContext, uri);
+            // find out which component it is
+            scheme = ExchangeHelper.resolveScheme(u);
+        }
+
+        headersMapFactory = camelContext.getCamelContextExtension().getHeadersMapFactory();
+
         ServiceHelper.initService(consumerCache, aggregationStrategy);
     }
 
     @Override
     protected void doStart() throws Exception {
+        // ensure the component is started
+        if (autoStartupComponents && scheme != null) {
+            camelContext.getComponent(scheme);
+        }
+
         ServiceHelper.startService(consumerCache, aggregationStrategy);
     }
 

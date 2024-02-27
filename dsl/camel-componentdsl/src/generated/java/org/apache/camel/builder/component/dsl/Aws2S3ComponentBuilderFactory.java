@@ -52,7 +52,7 @@ public interface Aws2S3ComponentBuilderFactory {
                 ComponentBuilder<AWS2S3Component> {
         /**
          * Setting the autocreation of the S3 bucket bucketName. This will apply
-         * also in case of moveAfterRead option enabled and it will create the
+         * also in case of moveAfterRead option enabled, and it will create the
          * destinationBucket if it doesn't exist already.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
@@ -116,8 +116,8 @@ public interface Aws2S3ComponentBuilderFactory {
             return this;
         }
         /**
-         * Set the need for overidding the endpoint. This option needs to be
-         * used in combination with uriEndpointOverride option.
+         * Set the need for overriding the endpoint. This option needs to be
+         * used in combination with the uriEndpointOverride option.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -178,9 +178,9 @@ public interface Aws2S3ComponentBuilderFactory {
             return this;
         }
         /**
-         * The region in which S3 client needs to work. When using this
+         * The region in which the S3 client needs to work. When using this
          * parameter, the configuration will expect the lowercase name of the
-         * region (for example ap-east-1) You'll need to use the name
+         * region (for example, ap-east-1) You'll need to use the name
          * Region.EU_WEST_1.id().
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -226,7 +226,8 @@ public interface Aws2S3ComponentBuilderFactory {
             return this;
         }
         /**
-         * Define the id of Customer key to use in case CustomerKey is enabled.
+         * Define the id of the Customer key to use in case CustomerKey is
+         * enabled.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
@@ -257,12 +258,17 @@ public interface Aws2S3ComponentBuilderFactory {
         }
         /**
          * Allows for bridging the consumer to the Camel routing Error Handler,
-         * which mean any exceptions occurred while the consumer is trying to
-         * pickup incoming messages, or the likes, will now be processed as a
-         * message and handled by the routing Error Handler. By default the
-         * consumer will use the org.apache.camel.spi.ExceptionHandler to deal
-         * with exceptions, that will be logged at WARN or ERROR level and
-         * ignored.
+         * which mean any exceptions (if possible) occurred while the Camel
+         * consumer is trying to pickup incoming messages, or the likes, will
+         * now be processed as a message and handled by the routing Error
+         * Handler. Important: This is only possible if the 3rd party component
+         * allows Camel to be alerted if an exception was thrown. Some
+         * components handle this internally only, and therefore
+         * bridgeErrorHandler is not possible. In other situations we may
+         * improve the Camel component to hook into the 3rd party component and
+         * make this possible for future releases. By default the consumer will
+         * use the org.apache.camel.spi.ExceptionHandler to deal with
+         * exceptions, that will be logged at WARN or ERROR level and ignored.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -278,14 +284,14 @@ public interface Aws2S3ComponentBuilderFactory {
             return this;
         }
         /**
-         * Delete objects from S3 after they have been retrieved. The delete is
-         * only performed if the Exchange is committed. If a rollback occurs,
+         * Delete objects from S3 after they have been retrieved. The deleting
+         * is only performed if the Exchange is committed. If a rollback occurs,
          * the object is not deleted. If this option is false, then the same
-         * objects will be retrieve over and over again on the polls. Therefore
-         * you need to use the Idempotent Consumer EIP in the route to filter
-         * out duplicates. You can filter using the AWS2S3Constants#BUCKET_NAME
-         * and AWS2S3Constants#KEY headers, or only the AWS2S3Constants#KEY
-         * header.
+         * objects will be retrieved over and over again in the polls.
+         * Therefore, you need to use the Idempotent Consumer EIP in the route
+         * to filter out duplicates. You can filter using the
+         * AWS2S3Constants#BUCKET_NAME and AWS2S3Constants#KEY headers, or only
+         * the AWS2S3Constants#KEY header.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -317,7 +323,7 @@ public interface Aws2S3ComponentBuilderFactory {
         }
         /**
          * Define the destination bucket prefix to use when an object must be
-         * moved and moveAfterRead is set to true.
+         * moved, and moveAfterRead is set to true.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
@@ -333,7 +339,7 @@ public interface Aws2S3ComponentBuilderFactory {
         }
         /**
          * Define the destination bucket suffix to use when an object must be
-         * moved and moveAfterRead is set to true.
+         * moved, and moveAfterRead is set to true.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
@@ -377,9 +383,9 @@ public interface Aws2S3ComponentBuilderFactory {
             return this;
         }
         /**
-         * If it is true, the S3 Object Body will be ignored completely, if it
-         * is set to false the S3 Object will be put in the body. Setting this
-         * to true, will override any behavior defined by includeBody option.
+         * If it is true, the S3 Object Body will be ignored completely if it is
+         * set to false, the S3 Object will be put in the body. Setting this to
+         * true will override any behavior defined by includeBody option.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -395,15 +401,15 @@ public interface Aws2S3ComponentBuilderFactory {
         }
         /**
          * If it is true, the S3Object exchange will be consumed and put into
-         * the body and closed. If false the S3Object stream will be put raw
+         * the body and closed. If false, the S3Object stream will be put raw
          * into the body and the headers will be set with the S3 object
-         * metadata. This option is strongly related to autocloseBody option. In
-         * case of setting includeBody to true because the S3Object stream will
-         * be consumed then it will also be closed, while in case of includeBody
-         * false then it will be up to the caller to close the S3Object stream.
-         * However setting autocloseBody to true when includeBody is false it
-         * will schedule to close the S3Object stream automatically on exchange
-         * completion.
+         * metadata. This option is strongly related to the autocloseBody
+         * option. In case of setting includeBody to true because the S3Object
+         * stream will be consumed then it will also be closed, while in case of
+         * includeBody false then it will be up to the caller to close the
+         * S3Object stream. However, setting autocloseBody to true when
+         * includeBody is false it will schedule to close the S3Object stream
+         * automatically on exchange completion.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -436,7 +442,7 @@ public interface Aws2S3ComponentBuilderFactory {
         }
         /**
          * Move objects from S3 bucket to a different bucket after they have
-         * been retrieved. To accomplish the operation the destinationBucket
+         * been retrieved. To accomplish the operation, the destinationBucket
          * option must be set. The copy bucket operation is only performed if
          * the Exchange is committed. If a rollback occurs, the object is not
          * moved.
@@ -573,8 +579,11 @@ public interface Aws2S3ComponentBuilderFactory {
             return this;
         }
         /**
-         * If it is true, camel will upload the file with multi part format, the
-         * part size is decided by the option of partSize.
+         * If it is true, camel will upload the file with multipart format. The
+         * part size is decided by the partSize option. Camel will only do
+         * multipart uploads for files that are larger than the part-size
+         * thresholds. Files that are smaller will be uploaded in a single
+         * operation.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -622,8 +631,10 @@ public interface Aws2S3ComponentBuilderFactory {
             return this;
         }
         /**
-         * Setup the partSize which is used in multi part upload, the default
-         * size is 25M.
+         * Set up the partSize which is used in multipart upload, the default
+         * size is 25M. Camel will only do multipart uploads for files that are
+         * larger than the part-size thresholds. Files that are smaller will be
+         * uploaded in a single operation.
          * 
          * The option is a: &lt;code&gt;long&lt;/code&gt; type.
          * 
@@ -671,7 +682,7 @@ public interface Aws2S3ComponentBuilderFactory {
             return this;
         }
         /**
-         * When stream mode is true the upload to bucket will be done in
+         * When stream mode is true, the upload to bucket will be done in
          * streaming.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
@@ -912,7 +923,7 @@ public interface Aws2S3ComponentBuilderFactory {
             return this;
         }
         /**
-         * If using a profile credentials provider this parameter will set the
+         * If using a profile credentials provider, this parameter will set the
          * profile name.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -939,6 +950,22 @@ public interface Aws2S3ComponentBuilderFactory {
          */
         default Aws2S3ComponentBuilder secretKey(java.lang.String secretKey) {
             doSetProperty("secretKey", secretKey);
+            return this;
+        }
+        /**
+         * Amazon AWS Session Token used when the user needs to assume an IAM
+         * role.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: security
+         * 
+         * @param sessionToken the value to set
+         * @return the dsl builder
+         */
+        default Aws2S3ComponentBuilder sessionToken(
+                java.lang.String sessionToken) {
+            doSetProperty("sessionToken", sessionToken);
             return this;
         }
         /**
@@ -990,6 +1017,24 @@ public interface Aws2S3ComponentBuilderFactory {
         default Aws2S3ComponentBuilder useProfileCredentialsProvider(
                 boolean useProfileCredentialsProvider) {
             doSetProperty("useProfileCredentialsProvider", useProfileCredentialsProvider);
+            return this;
+        }
+        /**
+         * Set whether the S3 client should expect to use Session Credentials.
+         * This is useful in a situation in which the user needs to assume an
+         * IAM role for doing operations in S3.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default Aws2S3ComponentBuilder useSessionCredentials(
+                boolean useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
             return this;
         }
     }
@@ -1070,9 +1115,11 @@ public interface Aws2S3ComponentBuilderFactory {
             case "accessKey": getOrCreateConfiguration((AWS2S3Component) component).setAccessKey((java.lang.String) value); return true;
             case "profileCredentialsName": getOrCreateConfiguration((AWS2S3Component) component).setProfileCredentialsName((java.lang.String) value); return true;
             case "secretKey": getOrCreateConfiguration((AWS2S3Component) component).setSecretKey((java.lang.String) value); return true;
+            case "sessionToken": getOrCreateConfiguration((AWS2S3Component) component).setSessionToken((java.lang.String) value); return true;
             case "trustAllCertificates": getOrCreateConfiguration((AWS2S3Component) component).setTrustAllCertificates((boolean) value); return true;
             case "useDefaultCredentialsProvider": getOrCreateConfiguration((AWS2S3Component) component).setUseDefaultCredentialsProvider((boolean) value); return true;
             case "useProfileCredentialsProvider": getOrCreateConfiguration((AWS2S3Component) component).setUseProfileCredentialsProvider((boolean) value); return true;
+            case "useSessionCredentials": getOrCreateConfiguration((AWS2S3Component) component).setUseSessionCredentials((boolean) value); return true;
             default: return false;
             }
         }

@@ -34,6 +34,8 @@ import org.apache.camel.util.json.JsonObject;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
+import static org.apache.camel.dsl.jbang.core.common.CamelCommandHelper.extractState;
+
 @Command(name = "context",
          description = "Top status of Camel integrations",
          sortOptions = false)
@@ -142,7 +144,7 @@ public class CamelContextTop extends ProcessWatchCommand {
         rows.sort(this::sortRow);
 
         if (!rows.isEmpty()) {
-            System.out.println(AsciiTable.getTable(AsciiTable.NO_BORDERS, rows, Arrays.asList(
+            printer().println(AsciiTable.getTable(AsciiTable.NO_BORDERS, rows, Arrays.asList(
                     new Column().header("PID").headerAlign(HorizontalAlign.CENTER).with(r -> r.pid),
                     new Column().header("NAME").dataAlign(HorizontalAlign.LEFT).maxWidth(30, OverflowBehaviour.ELLIPSIS_RIGHT)
                             .with(r -> r.name),

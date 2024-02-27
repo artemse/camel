@@ -163,6 +163,19 @@ public interface ComponentsBuilderFactory {
         return org.apache.camel.builder.component.dsl.AwsCloudtrailComponentBuilderFactory.awsCloudtrail();
     }
     /**
+     * AWS Config Service (camel-aws-config)
+     * Manage AWS Config service.
+     * 
+     * Category: cloud,management
+     * Since: 4.3
+     * Maven coordinates: org.apache.camel:camel-aws-config
+     * 
+     * @return the dsl builder
+     */
+    static org.apache.camel.builder.component.dsl.AwsConfigComponentBuilderFactory.AwsConfigComponentBuilder awsConfig() {
+        return org.apache.camel.builder.component.dsl.AwsConfigComponentBuilderFactory.awsConfig();
+    }
+    /**
      * AWS Secrets Manager (camel-aws-secrets-manager)
      * Manage secrets using AWS Secrets Manager.
      * 
@@ -371,6 +384,19 @@ public interface ComponentsBuilderFactory {
         return org.apache.camel.builder.component.dsl.Aws2MskComponentBuilderFactory.aws2Msk();
     }
     /**
+     * AWS RedshiftData (camel-aws2-redshift)
+     * Perform operations on AWS Redshift using Redshift Data API.
+     * 
+     * Category: cloud,serverless,database,bigdata
+     * Since: 4.1
+     * Maven coordinates: org.apache.camel:camel-aws2-redshift
+     * 
+     * @return the dsl builder
+     */
+    static org.apache.camel.builder.component.dsl.Aws2RedshiftDataComponentBuilderFactory.Aws2RedshiftDataComponentBuilder aws2RedshiftData() {
+        return org.apache.camel.builder.component.dsl.Aws2RedshiftDataComponentBuilderFactory.aws2RedshiftData();
+    }
+    /**
      * AWS S3 Storage Service (camel-aws2-s3)
      * Store and retrieve objects from AWS S3 Storage Service.
      * 
@@ -450,7 +476,7 @@ public interface ComponentsBuilderFactory {
     }
     /**
      * AWS Timestream (camel-aws2-timestream)
-     * A Camel Amazon Web Services TimeStream component
+     * Write records and execute queries on AWS time-series database
      * 
      * Category: cloud,database
      * Since: 4.1
@@ -529,7 +555,7 @@ public interface ComponentsBuilderFactory {
     }
     /**
      * Azure ServiceBus (camel-azure-servicebus)
-     * Send and receive messages to/from Azure Event Bus.
+     * Send and receive messages to/from Azure Service Bus.
      * 
      * Category: cloud,messaging
      * Since: 3.12
@@ -554,8 +580,8 @@ public interface ComponentsBuilderFactory {
         return org.apache.camel.builder.component.dsl.AzureStorageBlobComponentBuilderFactory.azureStorageBlob();
     }
     /**
-     * Azure Storage Datalake Service (camel-azure-storage-datalake)
-     * Sends and receives files to/from Azure DataLake Storage.
+     * Azure Storage Data Lake Service (camel-azure-storage-datalake)
+     * Sends and receives files to/from Azure Data Lake Storage.
      * 
      * Category: cloud,file,bigdata
      * Since: 3.8
@@ -1208,6 +1234,21 @@ public interface ComponentsBuilderFactory {
         return org.apache.camel.builder.component.dsl.DynamicRouterComponentBuilderFactory.dynamicRouter();
     }
     /**
+     * Dynamic Router Control (camel-dynamic-router)
+     * The Dynamic Router control endpoint for operations that allow routing
+     * participants to subscribe or unsubscribe to participate in dynamic
+     * message routing.
+     * 
+     * Category: messaging
+     * Since: 4.4
+     * Maven coordinates: org.apache.camel:camel-dynamic-router
+     * 
+     * @return the dsl builder
+     */
+    static org.apache.camel.builder.component.dsl.DynamicRouterControlComponentBuilderFactory.DynamicRouterControlComponentBuilder dynamicRouterControl() {
+        return org.apache.camel.builder.component.dsl.DynamicRouterControlComponentBuilderFactory.dynamicRouterControl();
+    }
+    /**
      * Ehcache (camel-ehcache)
      * Perform caching operations using Ehcache.
      * 
@@ -1234,6 +1275,20 @@ public interface ComponentsBuilderFactory {
         return org.apache.camel.builder.component.dsl.ElasticsearchComponentBuilderFactory.elasticsearch();
     }
     /**
+     * Elasticsearch Low level Rest Client (camel-elasticsearch-rest-client)
+     * Perform queries and other operations on Elasticsearch or OpenSearch (uses
+     * low-level client).
+     * 
+     * Category: search
+     * Since: 4.3
+     * Maven coordinates: org.apache.camel:camel-elasticsearch-rest-client
+     * 
+     * @return the dsl builder
+     */
+    static org.apache.camel.builder.component.dsl.ElasticsearchRestClientComponentBuilderFactory.ElasticsearchRestClientComponentBuilder elasticsearchRestClient() {
+        return org.apache.camel.builder.component.dsl.ElasticsearchRestClientComponentBuilderFactory.elasticsearchRestClient();
+    }
+    /**
      * Etcd v3 (camel-etcd3)
      * Get, set, delete or watch keys in etcd key-value store.
      * 
@@ -1258,19 +1313,6 @@ public interface ComponentsBuilderFactory {
      */
     static org.apache.camel.builder.component.dsl.ExecComponentBuilderFactory.ExecComponentBuilder exec() {
         return org.apache.camel.builder.component.dsl.ExecComponentBuilderFactory.exec();
-    }
-    /**
-     * Facebook (camel-facebook)
-     * Send requests to Facebook APIs supported by Facebook4J.
-     * 
-     * Category: social
-     * Since: 2.14
-     * Maven coordinates: org.apache.camel:camel-facebook
-     * 
-     * @return the dsl builder
-     */
-    static org.apache.camel.builder.component.dsl.FacebookComponentBuilderFactory.FacebookComponentBuilder facebook() {
-        return org.apache.camel.builder.component.dsl.FacebookComponentBuilderFactory.facebook();
     }
     /**
      * FHIR (camel-fhir)
@@ -1614,6 +1656,7 @@ public interface ComponentsBuilderFactory {
      * 
      * @return the dsl builder
      */
+    @Deprecated
     static org.apache.camel.builder.component.dsl.GrapeComponentBuilderFactory.GrapeComponentBuilder grape() {
         return org.apache.camel.builder.component.dsl.GrapeComponentBuilderFactory.grape();
     }
@@ -1813,19 +1856,6 @@ public interface ComponentsBuilderFactory {
      */
     static org.apache.camel.builder.component.dsl.HazelcastTopicComponentBuilderFactory.HazelcastTopicComponentBuilder hazelcastTopic() {
         return org.apache.camel.builder.component.dsl.HazelcastTopicComponentBuilderFactory.hazelcastTopic();
-    }
-    /**
-     * HDFS (camel-hdfs)
-     * Read and write from/to an HDFS filesystem using Hadoop 2.x.
-     * 
-     * Category: bigdata,file
-     * Since: 2.14
-     * Maven coordinates: org.apache.camel:camel-hdfs
-     * 
-     * @return the dsl builder
-     */
-    static org.apache.camel.builder.component.dsl.HdfsComponentBuilderFactory.HdfsComponentBuilder hdfs() {
-        return org.apache.camel.builder.component.dsl.HdfsComponentBuilderFactory.hdfs();
     }
     /**
      * HTTP (camel-http)
@@ -2217,7 +2247,7 @@ public interface ComponentsBuilderFactory {
     }
     /**
      * Jetty (camel-jetty)
-     * Expose HTTP endpoints using Jetty 11.
+     * Expose HTTP endpoints using Jetty 12.
      * 
      * Category: http
      * Since: 1.2
@@ -2335,7 +2365,7 @@ public interface ComponentsBuilderFactory {
     }
     /**
      * JSLT (camel-jslt)
-     * Query or transform JSON payloads using an JSLT.
+     * Query or transform JSON payloads using JSLT.
      * 
      * Category: transformation
      * Since: 3.1
@@ -2401,6 +2431,19 @@ public interface ComponentsBuilderFactory {
         return org.apache.camel.builder.component.dsl.Jt400ComponentBuilderFactory.jt400();
     }
     /**
+     * JTE (camel-jte)
+     * Transform messages using a Java based template engine (JTE).
+     * 
+     * Category: transformation
+     * Since: 4.4
+     * Maven coordinates: org.apache.camel:camel-jte
+     * 
+     * @return the dsl builder
+     */
+    static org.apache.camel.builder.component.dsl.JteComponentBuilderFactory.JteComponentBuilder jte() {
+        return org.apache.camel.builder.component.dsl.JteComponentBuilderFactory.jte();
+    }
+    /**
      * Kafka (camel-kafka)
      * Sent and receive messages to/from an Apache Kafka broker.
      * 
@@ -2452,6 +2495,19 @@ public interface ComponentsBuilderFactory {
      */
     static org.apache.camel.builder.component.dsl.KubernetesConfigMapsComponentBuilderFactory.KubernetesConfigMapsComponentBuilder kubernetesConfigMaps() {
         return org.apache.camel.builder.component.dsl.KubernetesConfigMapsComponentBuilderFactory.kubernetesConfigMaps();
+    }
+    /**
+     * Kubernetes Cronjob (camel-kubernetes)
+     * Perform operations on Kubernetes CronJob.
+     * 
+     * Category: container,cloud
+     * Since: 4.3
+     * Maven coordinates: org.apache.camel:camel-kubernetes
+     * 
+     * @return the dsl builder
+     */
+    static org.apache.camel.builder.component.dsl.KubernetesCronjobComponentBuilderFactory.KubernetesCronjobComponentBuilder kubernetesCronjob() {
+        return org.apache.camel.builder.component.dsl.KubernetesCronjobComponentBuilderFactory.kubernetesCronjob();
     }
     /**
      * Kubernetes Custom Resources (camel-kubernetes)
@@ -3332,6 +3388,19 @@ public interface ComponentsBuilderFactory {
         return org.apache.camel.builder.component.dsl.PulsarComponentBuilderFactory.pulsar();
     }
     /**
+     * Qdrant (camel-qdrant)
+     * Perform operations on the Qdrant Vector Database.
+     * 
+     * Category: database,ai
+     * Since: 4.5
+     * Maven coordinates: org.apache.camel:camel-qdrant
+     * 
+     * @return the dsl builder
+     */
+    static org.apache.camel.builder.component.dsl.QdrantComponentBuilderFactory.QdrantComponentBuilder qdrant() {
+        return org.apache.camel.builder.component.dsl.QdrantComponentBuilderFactory.qdrant();
+    }
+    /**
      * Quartz (camel-quartz)
      * Schedule sending of messages using the Quartz 2.x scheduler.
      * 
@@ -3429,7 +3498,7 @@ public interface ComponentsBuilderFactory {
     }
     /**
      * Robot Framework (camel-robotframework)
-     * Pass camel exchanges to acceptence test written in Robot DSL.
+     * Pass camel exchanges to acceptance test written in Robot DSL.
      * 
      * Category: testing
      * Since: 3.0
@@ -3654,6 +3723,19 @@ public interface ComponentsBuilderFactory {
         return org.apache.camel.builder.component.dsl.SlackComponentBuilderFactory.slack();
     }
     /**
+     * SMB (camel-smb)
+     * Receive files from SMB (Server Message Block) shares.
+     * 
+     * Category: file
+     * Since: 4.3
+     * Maven coordinates: org.apache.camel:camel-smb
+     * 
+     * @return the dsl builder
+     */
+    static org.apache.camel.builder.component.dsl.SmbComponentBuilderFactory.SmbComponentBuilder smb() {
+        return org.apache.camel.builder.component.dsl.SmbComponentBuilderFactory.smb();
+    }
+    /**
      * SMPP (camel-smpp)
      * Send and receive SMS messages using a SMSC (Short Message Service
      * Center).
@@ -3736,7 +3818,7 @@ public interface ComponentsBuilderFactory {
     }
     /**
      * Splunk HEC (camel-splunk-hec)
-     * The splunk component allows to publish events in Splunk using the HTTP
+     * The splunk component allows publishing events in Splunk using the HTTP
      * Event Collector.
      * 
      * Category: monitoring
@@ -3802,7 +3884,7 @@ public interface ComponentsBuilderFactory {
     }
     /**
      * Spring RabbitMQ (camel-spring-rabbitmq)
-     * Send and receive messages from RabbitMQ using Spring RabbitMQ client.
+     * Send and receive messages from RabbitMQ using the Spring RabbitMQ client.
      * 
      * Category: messaging
      * Since: 3.8
@@ -3907,7 +3989,7 @@ public interface ComponentsBuilderFactory {
     }
     /**
      * Stomp (camel-stomp)
-     * Send and rececive messages to/from STOMP (Simple Text Oriented Messaging
+     * Send and receive messages to/from STOMP (Simple Text Oriented Messaging
      * Protocol) compliant message brokers.
      * 
      * Category: messaging
@@ -3960,7 +4042,7 @@ public interface ComponentsBuilderFactory {
     }
     /**
      * Telegram (camel-telegram)
-     * Send and receive messages acting as a Telegram Bot Telegram Bot API.
+     * Send and receive messages using the Telegram Bot API.
      * 
      * Category: cloud,api,chat
      * Since: 2.18
@@ -3984,6 +4066,19 @@ public interface ComponentsBuilderFactory {
      */
     static org.apache.camel.builder.component.dsl.ThriftComponentBuilderFactory.ThriftComponentBuilder thrift() {
         return org.apache.camel.builder.component.dsl.ThriftComponentBuilderFactory.thrift();
+    }
+    /**
+     * Thymeleaf (camel-thymeleaf)
+     * Transform messages using a Thymeleaf template.
+     * 
+     * Category: transformation
+     * Since: 4.1
+     * Maven coordinates: org.apache.camel:camel-thymeleaf
+     * 
+     * @return the dsl builder
+     */
+    static org.apache.camel.builder.component.dsl.ThymeleafComponentBuilderFactory.ThymeleafComponentBuilder thymeleaf() {
+        return org.apache.camel.builder.component.dsl.ThymeleafComponentBuilderFactory.thymeleaf();
     }
     /**
      * Tika (camel-tika)
@@ -4144,6 +4239,19 @@ public interface ComponentsBuilderFactory {
         return org.apache.camel.builder.component.dsl.VertxWebsocketComponentBuilderFactory.vertxWebsocket();
     }
     /**
+     * Wasm (camel-wasm)
+     * Invoke Wasm functions.
+     * 
+     * Category: core,script
+     * Since: 4.4
+     * Maven coordinates: org.apache.camel:camel-wasm
+     * 
+     * @return the dsl builder
+     */
+    static org.apache.camel.builder.component.dsl.WasmComponentBuilderFactory.WasmComponentBuilder wasm() {
+        return org.apache.camel.builder.component.dsl.WasmComponentBuilderFactory.wasm();
+    }
+    /**
      * Weather (camel-weather)
      * Poll the weather information from Open Weather Map.
      * 
@@ -4197,8 +4305,8 @@ public interface ComponentsBuilderFactory {
         return org.apache.camel.builder.component.dsl.WhatsappComponentBuilderFactory.whatsapp();
     }
     /**
-     * Wordpress (camel-wordpress)
-     * Manage posts and users using Wordpress API.
+     * WordPress (camel-wordpress)
+     * Manage posts and users using the WordPress API.
      * 
      * Category: cloud,api,cms
      * Since: 2.21
@@ -4328,8 +4436,8 @@ public interface ComponentsBuilderFactory {
     }
     /**
      * Zeebe (camel-zeebe)
-     * Zeebe component which does integrage with Camunda Zeebe to interact with
-     * the API.
+     * Zeebe component which integrates with Camunda Zeebe to interact with the
+     * API.
      * 
      * Category: workflow,saas
      * Since: 3.21

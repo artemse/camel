@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.apache.camel</groupId>
         <artifactId>maven-plugins</artifactId>
-        <version>4.1.0-SNAPSHOT</version>
+        <version>4.5.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>camel-maven-plugin</artifactId>
@@ -119,6 +119,7 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-plugin-plugin</artifactId>
                         <configuration>
+                            <goalPrefix>camel</goalPrefix>
                             <mojoDependencies>
                                 <dep>org.codehaus.mojo:exec-maven-plugin</dep>
                                 <dep>org.apache.maven:maven-plugin-api</dep>

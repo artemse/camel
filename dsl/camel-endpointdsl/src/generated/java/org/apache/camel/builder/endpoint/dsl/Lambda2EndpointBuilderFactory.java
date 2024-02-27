@@ -77,8 +77,8 @@ public interface Lambda2EndpointBuilderFactory {
             return this;
         }
         /**
-         * Set the need for overidding the endpoint. This option needs to be
-         * used in combination with uriEndpointOverride option.
+         * Set the need for overriding the endpoint. This option needs to be
+         * used in combination with the uriEndpointOverride option.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -93,8 +93,8 @@ public interface Lambda2EndpointBuilderFactory {
             return this;
         }
         /**
-         * Set the need for overidding the endpoint. This option needs to be
-         * used in combination with uriEndpointOverride option.
+         * Set the need for overriding the endpoint. This option needs to be
+         * used in combination with the uriEndpointOverride option.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -141,9 +141,9 @@ public interface Lambda2EndpointBuilderFactory {
             return this;
         }
         /**
-         * The region in which Lambda client needs to work. When using this
+         * The region in which the Lambda client needs to work. When using this
          * parameter, the configuration will expect the lowercase name of the
-         * region (for example ap-east-1) You'll need to use the name
+         * region (for example, ap-east-1) You'll need to use the name
          * Region.EU_WEST_1.id().
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -264,7 +264,7 @@ public interface Lambda2EndpointBuilderFactory {
             return this;
         }
         /**
-         * If using a profile credentials provider this parameter will set the
+         * If using a profile credentials provider, this parameter will set the
          * profile name.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -291,6 +291,21 @@ public interface Lambda2EndpointBuilderFactory {
          */
         default Lambda2EndpointBuilder secretKey(String secretKey) {
             doSetProperty("secretKey", secretKey);
+            return this;
+        }
+        /**
+         * Amazon AWS Session Token used when the user needs to assume an IAM
+         * role.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: security
+         * 
+         * @param sessionToken the value to set
+         * @return the dsl builder
+         */
+        default Lambda2EndpointBuilder sessionToken(String sessionToken) {
+            doSetProperty("sessionToken", sessionToken);
             return this;
         }
         /**
@@ -400,6 +415,43 @@ public interface Lambda2EndpointBuilderFactory {
             doSetProperty("useProfileCredentialsProvider", useProfileCredentialsProvider);
             return this;
         }
+        /**
+         * Set whether the Lambda client should expect to use Session
+         * Credentials. This is useful in a situation in which the user needs to
+         * assume an IAM role for doing operations in Lambda.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default Lambda2EndpointBuilder useSessionCredentials(
+                boolean useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
+            return this;
+        }
+        /**
+         * Set whether the Lambda client should expect to use Session
+         * Credentials. This is useful in a situation in which the user needs to
+         * assume an IAM role for doing operations in Lambda.
+         * 
+         * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
+         * type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default Lambda2EndpointBuilder useSessionCredentials(
+                String useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
+            return this;
+        }
     }
 
     /**
@@ -461,7 +513,7 @@ public interface Lambda2EndpointBuilderFactory {
             return this;
         }
         /**
-         * To use a existing configured AwsLambdaClient as client.
+         * To use an existing configured AwsLambdaClient client.
          * 
          * The option is a:
          * &lt;code&gt;software.amazon.awssdk.services.lambda.LambdaClient&lt;/code&gt; type.
@@ -477,7 +529,7 @@ public interface Lambda2EndpointBuilderFactory {
             return this;
         }
         /**
-         * To use a existing configured AwsLambdaClient as client.
+         * To use an existing configured AwsLambdaClient client.
          * 
          * The option will be converted to a
          * &lt;code&gt;software.amazon.awssdk.services.lambda.LambdaClient&lt;/code&gt; type.
@@ -574,7 +626,7 @@ public interface Lambda2EndpointBuilderFactory {
          * @return the name of the header {@code AwsLambdaOperation}.
          */
         public String awsLambdaOperation() {
-            return "AwsLambdaOperation";
+            return "CamelAwsLambdaOperation";
         }
 
         /**
@@ -589,7 +641,7 @@ public interface Lambda2EndpointBuilderFactory {
          * @return the name of the header {@code AwsLambdaS3Bucket}.
          */
         public String awsLambdaS3Bucket() {
-            return "AwsLambdaS3Bucket";
+            return "CamelAwsLambdaS3Bucket";
         }
 
         /**
@@ -603,7 +655,7 @@ public interface Lambda2EndpointBuilderFactory {
          * @return the name of the header {@code AwsLambdaS3Key}.
          */
         public String awsLambdaS3Key() {
-            return "AwsLambdaS3Key";
+            return "CamelAwsLambdaS3Key";
         }
 
         /**
@@ -617,7 +669,7 @@ public interface Lambda2EndpointBuilderFactory {
          * @return the name of the header {@code AwsLambdaS3ObjectVersion}.
          */
         public String awsLambdaS3ObjectVersion() {
-            return "AwsLambdaS3ObjectVersion";
+            return "CamelAwsLambdaS3ObjectVersion";
         }
 
         /**
@@ -631,7 +683,7 @@ public interface Lambda2EndpointBuilderFactory {
          * @return the name of the header {@code AwsLambdaZipFile}.
          */
         public String awsLambdaZipFile() {
-            return "AwsLambdaZipFile";
+            return "CamelAwsLambdaZipFile";
         }
 
         /**
@@ -644,7 +696,7 @@ public interface Lambda2EndpointBuilderFactory {
          * @return the name of the header {@code AwsLambdaDescription}.
          */
         public String awsLambdaDescription() {
-            return "AwsLambdaDescription";
+            return "CamelAwsLambdaDescription";
         }
 
         /**
@@ -660,7 +712,7 @@ public interface Lambda2EndpointBuilderFactory {
          * @return the name of the header {@code AwsLambdaRole}.
          */
         public String awsLambdaRole() {
-            return "AwsLambdaRole";
+            return "CamelAwsLambdaRole";
         }
 
         /**
@@ -676,7 +728,7 @@ public interface Lambda2EndpointBuilderFactory {
          * @return the name of the header {@code AwsLambdaRuntime}.
          */
         public String awsLambdaRuntime() {
-            return "AwsLambdaRuntime";
+            return "CamelAwsLambdaRuntime";
         }
 
         /**
@@ -692,7 +744,7 @@ public interface Lambda2EndpointBuilderFactory {
          * @return the name of the header {@code AwsLambdaHandler}.
          */
         public String awsLambdaHandler() {
-            return "AwsLambdaHandler";
+            return "CamelAwsLambdaHandler";
         }
 
         /**
@@ -706,7 +758,7 @@ public interface Lambda2EndpointBuilderFactory {
          * @return the name of the header {@code AwsLambdaTargetArn}.
          */
         public String awsLambdaTargetArn() {
-            return "AwsLambdaTargetArn";
+            return "CamelAwsLambdaTargetArn";
         }
 
         /**
@@ -720,7 +772,7 @@ public interface Lambda2EndpointBuilderFactory {
          * @return the name of the header {@code AwsLambdaMemorySize}.
          */
         public String awsLambdaMemorySize() {
-            return "AwsLambdaMemorySize";
+            return "CamelAwsLambdaMemorySize";
         }
 
         /**
@@ -735,7 +787,7 @@ public interface Lambda2EndpointBuilderFactory {
          * @return the name of the header {@code AwsLambdaKMSKeyArn}.
          */
         public String awsLambdaKMSKeyArn() {
-            return "AwsLambdaKMSKeyArn";
+            return "CamelAwsLambdaKMSKeyArn";
         }
 
         /**
@@ -749,7 +801,7 @@ public interface Lambda2EndpointBuilderFactory {
          * @return the name of the header {@code AwsLambdaEnvironmentVariables}.
          */
         public String awsLambdaEnvironmentVariables() {
-            return "AwsLambdaEnvironmentVariables";
+            return "CamelAwsLambdaEnvironmentVariables";
         }
 
         /**
@@ -763,7 +815,7 @@ public interface Lambda2EndpointBuilderFactory {
          * @return the name of the header {@code AwsLambdaPublish}.
          */
         public String awsLambdaPublish() {
-            return "AwsLambdaPublish";
+            return "CamelAwsLambdaPublish";
         }
 
         /**
@@ -777,7 +829,7 @@ public interface Lambda2EndpointBuilderFactory {
          * @return the name of the header {@code AwsLambdaTimeout}.
          */
         public String awsLambdaTimeout() {
-            return "AwsLambdaTimeout";
+            return "CamelAwsLambdaTimeout";
         }
 
         /**
@@ -790,7 +842,7 @@ public interface Lambda2EndpointBuilderFactory {
          * @return the name of the header {@code AwsLambdaTags}.
          */
         public String awsLambdaTags() {
-            return "AwsLambdaTags";
+            return "CamelAwsLambdaTags";
         }
 
         /**
@@ -803,7 +855,7 @@ public interface Lambda2EndpointBuilderFactory {
          * @return the name of the header {@code AwsLambdaTracingConfig}.
          */
         public String awsLambdaTracingConfig() {
-            return "AwsLambdaTracingConfig";
+            return "CamelAwsLambdaTracingConfig";
         }
 
         /**
@@ -817,7 +869,7 @@ public interface Lambda2EndpointBuilderFactory {
          * @return the name of the header {@code AwsLambdaSecurityGroupIds}.
          */
         public String awsLambdaSecurityGroupIds() {
-            return "AwsLambdaSecurityGroupIds";
+            return "CamelAwsLambdaSecurityGroupIds";
         }
 
         /**
@@ -831,7 +883,7 @@ public interface Lambda2EndpointBuilderFactory {
          * @return the name of the header {@code AwsLambdaSubnetIds}.
          */
         public String awsLambdaSubnetIds() {
-            return "AwsLambdaSubnetIds";
+            return "CamelAwsLambdaSubnetIds";
         }
 
         /**
@@ -844,7 +896,7 @@ public interface Lambda2EndpointBuilderFactory {
          * @return the name of the header {@code AwsLambdaEventSourceArn}.
          */
         public String awsLambdaEventSourceArn() {
-            return "AwsLambdaEventSourceArn";
+            return "CamelAwsLambdaEventSourceArn";
         }
 
         /**
@@ -858,7 +910,7 @@ public interface Lambda2EndpointBuilderFactory {
          * @return the name of the header {@code AwsLambdaEventSourceBatchSize}.
          */
         public String awsLambdaEventSourceBatchSize() {
-            return "AwsLambdaEventSourceBatchSize";
+            return "CamelAwsLambdaEventSourceBatchSize";
         }
 
         /**
@@ -871,7 +923,7 @@ public interface Lambda2EndpointBuilderFactory {
          * @return the name of the header {@code AwsLambdaEventSourceUuid}.
          */
         public String awsLambdaEventSourceUuid() {
-            return "AwsLambdaEventSourceUuid";
+            return "CamelAwsLambdaEventSourceUuid";
         }
 
         /**
@@ -884,7 +936,7 @@ public interface Lambda2EndpointBuilderFactory {
          * @return the name of the header {@code AwsLambdaResourceArn}.
          */
         public String awsLambdaResourceArn() {
-            return "AwsLambdaResourceArn";
+            return "CamelAwsLambdaResourceArn";
         }
 
         /**
@@ -897,7 +949,7 @@ public interface Lambda2EndpointBuilderFactory {
          * @return the name of the header {@code AwsLambdaResourceTags}.
          */
         public String awsLambdaResourceTags() {
-            return "AwsLambdaResourceTags";
+            return "CamelAwsLambdaResourceTags";
         }
 
         /**
@@ -910,7 +962,7 @@ public interface Lambda2EndpointBuilderFactory {
          * @return the name of the header {@code AwsLambdaResourceTagKeys}.
          */
         public String awsLambdaResourceTagKeys() {
-            return "AwsLambdaResourceTagKeys";
+            return "CamelAwsLambdaResourceTagKeys";
         }
 
         /**
@@ -924,7 +976,7 @@ public interface Lambda2EndpointBuilderFactory {
          * @return the name of the header {@code AwsLambdaVersionDescription}.
          */
         public String awsLambdaVersionDescription() {
-            return "AwsLambdaVersionDescription";
+            return "CamelAwsLambdaVersionDescription";
         }
 
         /**
@@ -938,7 +990,7 @@ public interface Lambda2EndpointBuilderFactory {
          * @return the name of the header {@code AwsLambdaVersionRevisionId}.
          */
         public String awsLambdaVersionRevisionId() {
-            return "AwsLambdaVersionRevisionId";
+            return "CamelAwsLambdaVersionRevisionId";
         }
 
         /**
@@ -951,7 +1003,7 @@ public interface Lambda2EndpointBuilderFactory {
          * @return the name of the header {@code AwsLambdaFunctionVersion}.
          */
         public String awsLambdaFunctionVersion() {
-            return "AwsLambdaFunctionVersion";
+            return "CamelAwsLambdaFunctionVersion";
         }
 
         /**
@@ -965,7 +1017,7 @@ public interface Lambda2EndpointBuilderFactory {
          * @return the name of the header {@code AwsLambdaAliasFunctionName}.
          */
         public String awsLambdaAliasFunctionName() {
-            return "AwsLambdaAliasFunctionName";
+            return "CamelAwsLambdaAliasFunctionName";
         }
 
         /**
@@ -979,7 +1031,7 @@ public interface Lambda2EndpointBuilderFactory {
          * AwsLambdaAliasFunctionDescription}.
          */
         public String awsLambdaAliasFunctionDescription() {
-            return "AwsLambdaAliasFunctionDescription";
+            return "CamelAwsLambdaAliasFunctionDescription";
         }
     }
     static Lambda2EndpointBuilder endpointBuilder(

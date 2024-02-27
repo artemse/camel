@@ -55,6 +55,8 @@ public class FileEndpoint extends GenericFileEndpoint<File> {
     private static final Integer CHMOD_WRITE_MASK = 02;
     private static final Integer CHMOD_READ_MASK = 04;
     private static final Integer CHMOD_EXECUTE_MASK = 01;
+    private static final String PARAM_OPERATIONS = "operations";
+    public static final String PARAM_FILE = "file";
 
     private final FileOperations operations = new FileOperations(this);
 
@@ -67,6 +69,8 @@ public class FileEndpoint extends GenericFileEndpoint<File> {
     private boolean renameUsingCopy;
     @UriParam(label = "consumer,advanced")
     private boolean includeHiddenFiles;
+    @UriParam(label = "consumer,advanced")
+    private boolean includeHiddenDirs;
     @UriParam(label = "consumer,advanced")
     private boolean startingDirectoryMustExist;
     @UriParam(label = "consumer,advanced")
@@ -93,7 +97,7 @@ public class FileEndpoint extends GenericFileEndpoint<File> {
 
     @Override
     public FileConsumer createConsumer(Processor processor) throws Exception {
-        ObjectHelper.notNull(operations, "operations");
+        ObjectHelper.notNull(operations, PARAM_OPERATIONS);
         ObjectHelper.notNull(file, "file");
 
         // auto create starting directory if needed
@@ -155,8 +159,8 @@ public class FileEndpoint extends GenericFileEndpoint<File> {
 
     @Override
     public PollingConsumer createPollingConsumer() throws Exception {
-        ObjectHelper.notNull(operations, "operations");
-        ObjectHelper.notNull(file, "file");
+        ObjectHelper.notNull(operations, PARAM_OPERATIONS);
+        ObjectHelper.notNull(file, PARAM_FILE);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Creating GenericFilePollingConsumer with queueSize: {} blockWhenFull: {} blockTimeout: {}",
@@ -174,7 +178,7 @@ public class FileEndpoint extends GenericFileEndpoint<File> {
 
     @Override
     public GenericFileProducer<File> createProducer() throws Exception {
-        ObjectHelper.notNull(operations, "operations");
+        ObjectHelper.notNull(operations, PARAM_OPERATIONS);
 
         // you cannot use temp file and file exists append
         if (getFileExist() == GenericFileExist.Append && (getTempPrefix() != null || getTempFileName() != null)) {
@@ -305,6 +309,18 @@ public class FileEndpoint extends GenericFileEndpoint<File> {
         this.includeHiddenFiles = includeHiddenFiles;
     }
 
+    public boolean isIncludeHiddenDirs() {
+        return includeHiddenDirs;
+    }
+
+    /**
+     * Whether to accept hidden directories. Directories which names starts with dot is regarded as a hidden directory,
+     * and by default not included. Set this option to true to include hidden directories in the file consumer.
+     */
+    public void setIncludeHiddenDirs(boolean includeHiddenDirs) {
+        this.includeHiddenDirs = includeHiddenDirs;
+    }
+
     public boolean isStartingDirectoryMustExist() {
         return startingDirectoryMustExist;
     }
@@ -312,7 +328,7 @@ public class FileEndpoint extends GenericFileEndpoint<File> {
     /**
      * Whether the starting directory must exist. Mind that the autoCreate option is default enabled, which means the
      * starting directory is normally auto created if it doesn't exist. You can disable autoCreate and enable this to
-     * ensure the starting directory must exist. Will thrown an exception if the directory doesn't exist.
+     * ensure the starting directory must exist. Will throw an exception if the directory doesn't exist.
      */
     public void setStartingDirectoryMustExist(boolean startingDirectoryMustExist) {
         this.startingDirectoryMustExist = startingDirectoryMustExist;

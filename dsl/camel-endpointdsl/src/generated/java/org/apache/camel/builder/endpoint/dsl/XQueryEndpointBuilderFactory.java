@@ -76,21 +76,6 @@ public interface XQueryEndpointBuilderFactory {
             return this;
         }
         /**
-         * To use a Camel Message header as the input source instead of Message
-         * body.
-         * 
-         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
-         * 
-         * Group: common
-         * 
-         * @param headerName the value to set
-         * @return the dsl builder
-         */
-        default XQueryEndpointConsumerBuilder headerName(String headerName) {
-            doSetProperty("headerName", headerName);
-            return this;
-        }
-        /**
          * Allows to control which namespace prefixes to use for a set of
          * namespace mappings.
          * 
@@ -123,22 +108,6 @@ public interface XQueryEndpointBuilderFactory {
         default XQueryEndpointConsumerBuilder namespacePrefixes(
                 String namespacePrefixes) {
             doSetProperty("namespacePrefixes", namespacePrefixes);
-            return this;
-        }
-        /**
-         * To use a Camel Exchange property as the input source instead of
-         * Message body. It has a lower precedent than the name of header if
-         * both are set.
-         * 
-         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
-         * 
-         * Group: common
-         * 
-         * @param propertyName the value to set
-         * @return the dsl builder
-         */
-        default XQueryEndpointConsumerBuilder propertyName(String propertyName) {
-            doSetProperty("propertyName", propertyName);
             return this;
         }
         /**
@@ -203,6 +172,23 @@ public interface XQueryEndpointBuilderFactory {
          */
         default XQueryEndpointConsumerBuilder resultType(String resultType) {
             doSetProperty("resultType", resultType);
+            return this;
+        }
+        /**
+         * Source to use, instead of message body. You can prefix with
+         * variable:, header:, or property: to specify kind of source.
+         * Otherwise, the source is assumed to be a variable. Use empty or null
+         * to use default source, which is the message body.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: common
+         * 
+         * @param source the value to set
+         * @return the dsl builder
+         */
+        default XQueryEndpointConsumerBuilder source(String source) {
+            doSetProperty("source", source);
             return this;
         }
         /**
@@ -762,12 +748,17 @@ public interface XQueryEndpointBuilderFactory {
         }
         /**
          * Allows for bridging the consumer to the Camel routing Error Handler,
-         * which mean any exceptions occurred while the consumer is trying to
-         * pickup incoming messages, or the likes, will now be processed as a
-         * message and handled by the routing Error Handler. By default the
-         * consumer will use the org.apache.camel.spi.ExceptionHandler to deal
-         * with exceptions, that will be logged at WARN or ERROR level and
-         * ignored.
+         * which mean any exceptions (if possible) occurred while the Camel
+         * consumer is trying to pickup incoming messages, or the likes, will
+         * now be processed as a message and handled by the routing Error
+         * Handler. Important: This is only possible if the 3rd party component
+         * allows Camel to be alerted if an exception was thrown. Some
+         * components handle this internally only, and therefore
+         * bridgeErrorHandler is not possible. In other situations we may
+         * improve the Camel component to hook into the 3rd party component and
+         * make this possible for future releases. By default the consumer will
+         * use the org.apache.camel.spi.ExceptionHandler to deal with
+         * exceptions, that will be logged at WARN or ERROR level and ignored.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -784,12 +775,17 @@ public interface XQueryEndpointBuilderFactory {
         }
         /**
          * Allows for bridging the consumer to the Camel routing Error Handler,
-         * which mean any exceptions occurred while the consumer is trying to
-         * pickup incoming messages, or the likes, will now be processed as a
-         * message and handled by the routing Error Handler. By default the
-         * consumer will use the org.apache.camel.spi.ExceptionHandler to deal
-         * with exceptions, that will be logged at WARN or ERROR level and
-         * ignored.
+         * which mean any exceptions (if possible) occurred while the Camel
+         * consumer is trying to pickup incoming messages, or the likes, will
+         * now be processed as a message and handled by the routing Error
+         * Handler. Important: This is only possible if the 3rd party component
+         * allows Camel to be alerted if an exception was thrown. Some
+         * components handle this internally only, and therefore
+         * bridgeErrorHandler is not possible. In other situations we may
+         * improve the Camel component to hook into the 3rd party component and
+         * make this possible for future releases. By default the consumer will
+         * use the org.apache.camel.spi.ExceptionHandler to deal with
+         * exceptions, that will be logged at WARN or ERROR level and ignored.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -1149,21 +1145,6 @@ public interface XQueryEndpointBuilderFactory {
             return this;
         }
         /**
-         * To use a Camel Message header as the input source instead of Message
-         * body.
-         * 
-         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
-         * 
-         * Group: common
-         * 
-         * @param headerName the value to set
-         * @return the dsl builder
-         */
-        default XQueryEndpointProducerBuilder headerName(String headerName) {
-            doSetProperty("headerName", headerName);
-            return this;
-        }
-        /**
          * Allows to control which namespace prefixes to use for a set of
          * namespace mappings.
          * 
@@ -1196,22 +1177,6 @@ public interface XQueryEndpointBuilderFactory {
         default XQueryEndpointProducerBuilder namespacePrefixes(
                 String namespacePrefixes) {
             doSetProperty("namespacePrefixes", namespacePrefixes);
-            return this;
-        }
-        /**
-         * To use a Camel Exchange property as the input source instead of
-         * Message body. It has a lower precedent than the name of header if
-         * both are set.
-         * 
-         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
-         * 
-         * Group: common
-         * 
-         * @param propertyName the value to set
-         * @return the dsl builder
-         */
-        default XQueryEndpointProducerBuilder propertyName(String propertyName) {
-            doSetProperty("propertyName", propertyName);
             return this;
         }
         /**
@@ -1276,6 +1241,23 @@ public interface XQueryEndpointBuilderFactory {
          */
         default XQueryEndpointProducerBuilder resultType(String resultType) {
             doSetProperty("resultType", resultType);
+            return this;
+        }
+        /**
+         * Source to use, instead of message body. You can prefix with
+         * variable:, header:, or property: to specify kind of source.
+         * Otherwise, the source is assumed to be a variable. Use empty or null
+         * to use default source, which is the message body.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: common
+         * 
+         * @param source the value to set
+         * @return the dsl builder
+         */
+        default XQueryEndpointProducerBuilder source(String source) {
+            doSetProperty("source", source);
             return this;
         }
         /**
@@ -1608,21 +1590,6 @@ public interface XQueryEndpointBuilderFactory {
             return this;
         }
         /**
-         * To use a Camel Message header as the input source instead of Message
-         * body.
-         * 
-         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
-         * 
-         * Group: common
-         * 
-         * @param headerName the value to set
-         * @return the dsl builder
-         */
-        default XQueryEndpointBuilder headerName(String headerName) {
-            doSetProperty("headerName", headerName);
-            return this;
-        }
-        /**
          * Allows to control which namespace prefixes to use for a set of
          * namespace mappings.
          * 
@@ -1654,22 +1621,6 @@ public interface XQueryEndpointBuilderFactory {
          */
         default XQueryEndpointBuilder namespacePrefixes(String namespacePrefixes) {
             doSetProperty("namespacePrefixes", namespacePrefixes);
-            return this;
-        }
-        /**
-         * To use a Camel Exchange property as the input source instead of
-         * Message body. It has a lower precedent than the name of header if
-         * both are set.
-         * 
-         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
-         * 
-         * Group: common
-         * 
-         * @param propertyName the value to set
-         * @return the dsl builder
-         */
-        default XQueryEndpointBuilder propertyName(String propertyName) {
-            doSetProperty("propertyName", propertyName);
             return this;
         }
         /**
@@ -1734,6 +1685,23 @@ public interface XQueryEndpointBuilderFactory {
          */
         default XQueryEndpointBuilder resultType(String resultType) {
             doSetProperty("resultType", resultType);
+            return this;
+        }
+        /**
+         * Source to use, instead of message body. You can prefix with
+         * variable:, header:, or property: to specify kind of source.
+         * Otherwise, the source is assumed to be a variable. Use empty or null
+         * to use default source, which is the message body.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: common
+         * 
+         * @param source the value to set
+         * @return the dsl builder
+         */
+        default XQueryEndpointBuilder source(String source) {
+            doSetProperty("source", source);
             return this;
         }
         /**

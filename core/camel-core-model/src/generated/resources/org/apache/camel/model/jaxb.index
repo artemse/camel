@@ -8,6 +8,8 @@ ClaimCheckDefinition
 ClaimCheckOperation
 ContextScanDefinition
 ConvertBodyDefinition
+ConvertHeaderDefinition
+ConvertVariableDefinition
 DataFormatDefinition
 DelayDefinition
 DynamicRouterDefinition
@@ -56,6 +58,7 @@ RemoveHeaderDefinition
 RemoveHeadersDefinition
 RemovePropertiesDefinition
 RemovePropertyDefinition
+RemoveVariableDefinition
 ResequenceDefinition
 Resilience4jConfigurationDefinition
 RestContextRefDefinition
@@ -82,7 +85,9 @@ ScriptDefinition
 SetBodyDefinition
 SetExchangePatternDefinition
 SetHeaderDefinition
+SetHeadersDefinition
 SetPropertyDefinition
+SetVariableDefinition
 SortDefinition
 SplitDefinition
 StepDefinition
@@ -94,6 +99,7 @@ TemplatedRoutesDefinition
 ThreadPoolProfileDefinition
 ThreadsDefinition
 ThrottleDefinition
+ThrottlingMode
 ThrowExceptionDefinition
 ToDefinition
 ToDynamicDefinition

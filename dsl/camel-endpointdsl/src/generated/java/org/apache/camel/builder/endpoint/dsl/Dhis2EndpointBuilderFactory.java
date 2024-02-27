@@ -585,7 +585,7 @@ public interface Dhis2EndpointBuilderFactory {
             return this;
         }
         /**
-         * DHIS2 account password for accessing the DHIS2 API.
+         * Password of the DHIS2 username.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
@@ -599,7 +599,23 @@ public interface Dhis2EndpointBuilderFactory {
             return this;
         }
         /**
-         * DHIS2 account username for accessing the DHIS2 API.
+         * Personal access token to authenticate with DHIS2. This option is
+         * mutually exclusive to username and password.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: security
+         * 
+         * @param personalAccessToken the value to set
+         * @return the dsl builder
+         */
+        default Dhis2EndpointConsumerBuilder personalAccessToken(
+                String personalAccessToken) {
+            doSetProperty("personalAccessToken", personalAccessToken);
+            return this;
+        }
+        /**
+         * Username of the DHIS2 user to operate as.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
@@ -625,12 +641,17 @@ public interface Dhis2EndpointBuilderFactory {
         }
         /**
          * Allows for bridging the consumer to the Camel routing Error Handler,
-         * which mean any exceptions occurred while the consumer is trying to
-         * pickup incoming messages, or the likes, will now be processed as a
-         * message and handled by the routing Error Handler. By default the
-         * consumer will use the org.apache.camel.spi.ExceptionHandler to deal
-         * with exceptions, that will be logged at WARN or ERROR level and
-         * ignored.
+         * which mean any exceptions (if possible) occurred while the Camel
+         * consumer is trying to pickup incoming messages, or the likes, will
+         * now be processed as a message and handled by the routing Error
+         * Handler. Important: This is only possible if the 3rd party component
+         * allows Camel to be alerted if an exception was thrown. Some
+         * components handle this internally only, and therefore
+         * bridgeErrorHandler is not possible. In other situations we may
+         * improve the Camel component to hook into the 3rd party component and
+         * make this possible for future releases. By default the consumer will
+         * use the org.apache.camel.spi.ExceptionHandler to deal with
+         * exceptions, that will be logged at WARN or ERROR level and ignored.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -647,12 +668,17 @@ public interface Dhis2EndpointBuilderFactory {
         }
         /**
          * Allows for bridging the consumer to the Camel routing Error Handler,
-         * which mean any exceptions occurred while the consumer is trying to
-         * pickup incoming messages, or the likes, will now be processed as a
-         * message and handled by the routing Error Handler. By default the
-         * consumer will use the org.apache.camel.spi.ExceptionHandler to deal
-         * with exceptions, that will be logged at WARN or ERROR level and
-         * ignored.
+         * which mean any exceptions (if possible) occurred while the Camel
+         * consumer is trying to pickup incoming messages, or the likes, will
+         * now be processed as a message and handled by the routing Error
+         * Handler. Important: This is only possible if the 3rd party component
+         * allows Camel to be alerted if an exception was thrown. Some
+         * components handle this internally only, and therefore
+         * bridgeErrorHandler is not possible. In other situations we may
+         * improve the Camel component to hook into the 3rd party component and
+         * make this possible for future releases. By default the consumer will
+         * use the org.apache.camel.spi.ExceptionHandler to deal with
+         * exceptions, that will be logged at WARN or ERROR level and ignored.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -778,7 +804,9 @@ public interface Dhis2EndpointBuilderFactory {
         }
         /**
          * References a user-defined
-         * org.hisp.dhis.integration.sdk.api.Dhis2Client.
+         * org.hisp.dhis.integration.sdk.api.Dhis2Client. This option is
+         * mutually exclusive to the baseApiUrl, username, password, and
+         * personalAccessToken options.
          * 
          * The option is a:
          * &lt;code&gt;org.hisp.dhis.integration.sdk.api.Dhis2Client&lt;/code&gt; type.
@@ -795,7 +823,9 @@ public interface Dhis2EndpointBuilderFactory {
         }
         /**
          * References a user-defined
-         * org.hisp.dhis.integration.sdk.api.Dhis2Client.
+         * org.hisp.dhis.integration.sdk.api.Dhis2Client. This option is
+         * mutually exclusive to the baseApiUrl, username, password, and
+         * personalAccessToken options.
          * 
          * The option will be converted to a
          * &lt;code&gt;org.hisp.dhis.integration.sdk.api.Dhis2Client&lt;/code&gt; type.
@@ -850,7 +880,7 @@ public interface Dhis2EndpointBuilderFactory {
             return this;
         }
         /**
-         * DHIS2 account password for accessing the DHIS2 API.
+         * Password of the DHIS2 username.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
@@ -864,7 +894,23 @@ public interface Dhis2EndpointBuilderFactory {
             return this;
         }
         /**
-         * DHIS2 account username for accessing the DHIS2 API.
+         * Personal access token to authenticate with DHIS2. This option is
+         * mutually exclusive to username and password.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: security
+         * 
+         * @param personalAccessToken the value to set
+         * @return the dsl builder
+         */
+        default Dhis2EndpointProducerBuilder personalAccessToken(
+                String personalAccessToken) {
+            doSetProperty("personalAccessToken", personalAccessToken);
+            return this;
+        }
+        /**
+         * Username of the DHIS2 user to operate as.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
@@ -939,7 +985,9 @@ public interface Dhis2EndpointBuilderFactory {
         }
         /**
          * References a user-defined
-         * org.hisp.dhis.integration.sdk.api.Dhis2Client.
+         * org.hisp.dhis.integration.sdk.api.Dhis2Client. This option is
+         * mutually exclusive to the baseApiUrl, username, password, and
+         * personalAccessToken options.
          * 
          * The option is a:
          * &lt;code&gt;org.hisp.dhis.integration.sdk.api.Dhis2Client&lt;/code&gt; type.
@@ -956,7 +1004,9 @@ public interface Dhis2EndpointBuilderFactory {
         }
         /**
          * References a user-defined
-         * org.hisp.dhis.integration.sdk.api.Dhis2Client.
+         * org.hisp.dhis.integration.sdk.api.Dhis2Client. This option is
+         * mutually exclusive to the baseApiUrl, username, password, and
+         * personalAccessToken options.
          * 
          * The option will be converted to a
          * &lt;code&gt;org.hisp.dhis.integration.sdk.api.Dhis2Client&lt;/code&gt; type.
@@ -1012,7 +1062,7 @@ public interface Dhis2EndpointBuilderFactory {
             return this;
         }
         /**
-         * DHIS2 account password for accessing the DHIS2 API.
+         * Password of the DHIS2 username.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
@@ -1026,7 +1076,23 @@ public interface Dhis2EndpointBuilderFactory {
             return this;
         }
         /**
-         * DHIS2 account username for accessing the DHIS2 API.
+         * Personal access token to authenticate with DHIS2. This option is
+         * mutually exclusive to username and password.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: security
+         * 
+         * @param personalAccessToken the value to set
+         * @return the dsl builder
+         */
+        default Dhis2EndpointBuilder personalAccessToken(
+                String personalAccessToken) {
+            doSetProperty("personalAccessToken", personalAccessToken);
+            return this;
+        }
+        /**
+         * Username of the DHIS2 user to operate as.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
@@ -1053,7 +1119,9 @@ public interface Dhis2EndpointBuilderFactory {
         }
         /**
          * References a user-defined
-         * org.hisp.dhis.integration.sdk.api.Dhis2Client.
+         * org.hisp.dhis.integration.sdk.api.Dhis2Client. This option is
+         * mutually exclusive to the baseApiUrl, username, password, and
+         * personalAccessToken options.
          * 
          * The option is a:
          * &lt;code&gt;org.hisp.dhis.integration.sdk.api.Dhis2Client&lt;/code&gt; type.
@@ -1070,7 +1138,9 @@ public interface Dhis2EndpointBuilderFactory {
         }
         /**
          * References a user-defined
-         * org.hisp.dhis.integration.sdk.api.Dhis2Client.
+         * org.hisp.dhis.integration.sdk.api.Dhis2Client. This option is
+         * mutually exclusive to the baseApiUrl, username, password, and
+         * personalAccessToken options.
          * 
          * The option will be converted to a
          * &lt;code&gt;org.hisp.dhis.integration.sdk.api.Dhis2Client&lt;/code&gt; type.

@@ -253,7 +253,7 @@ public class XMLConverterHelper {
     private int[] retrieveSaxonVersion(ClassLoader loader) {
         try {
             final Class<?> versionClass = loader.loadClass("net.sf.saxon.Version");
-            final Method method = versionClass.getDeclaredMethod("getStructuredVersionNumber", int[].class);
+            final Method method = versionClass.getDeclaredMethod("getStructuredVersionNumber");
             final Object result = method.invoke(null);
             return (int[]) result;
         } catch (ClassNotFoundException e) {
@@ -312,7 +312,7 @@ public class XMLConverterHelper {
             StringBuilder featureString = new StringBuilder();
             // just log the configured feature
             for (String feature : features) {
-                if (featureString.length() != 0) {
+                if (!featureString.isEmpty()) {
                     featureString.append(", ");
                 }
                 featureString.append(feature);

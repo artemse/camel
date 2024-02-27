@@ -239,9 +239,9 @@ public final class AdviceWith {
         }
 
         String beforeAsXml = null;
-        final ModelToXMLDumper modelToXMLDumper = PluginHelper.getModelToXMLDumper(ecc);
         if (logRoutesAsXml && LOG.isInfoEnabled()) {
             try {
+                ModelToXMLDumper modelToXMLDumper = PluginHelper.getModelToXMLDumper(ecc);
                 beforeAsXml = modelToXMLDumper.dumpModelAsXml(camelContext, definition);
             } catch (Exception e) {
                 // ignore, it may be due jaxb is not on classpath etc
@@ -278,6 +278,7 @@ public final class AdviceWith {
 
         if (beforeAsXml != null && logRoutesAsXml && LOG.isInfoEnabled()) {
             try {
+                ModelToXMLDumper modelToXMLDumper = PluginHelper.getModelToXMLDumper(ecc);
                 String afterAsXml = modelToXMLDumper.dumpModelAsXml(camelContext, merged);
                 LOG.info("Adviced route before/after as XML:\n{}\n\n{}", beforeAsXml, afterAsXml);
             } catch (Exception e) {
@@ -313,7 +314,7 @@ public final class AdviceWith {
                     }
                 }
                 if (rd == null) {
-                    throw new IllegalArgumentException("Cannot advice route as route with id: " + routeId + " does not exists");
+                    throw new IllegalArgumentException("Cannot advice route as route with id: " + routeId + " does not exist");
                 }
             } else {
                 // grab first route

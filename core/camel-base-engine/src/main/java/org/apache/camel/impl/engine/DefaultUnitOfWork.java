@@ -244,7 +244,7 @@ public class DefaultUnitOfWork implements UnitOfWork {
     @Override
     public void done(Exchange exchange) {
         if (log.isTraceEnabled()) {
-            log.trace("UnitOfWork done for ExchangeId: {} with {}", exchange.getExchangeId(), exchange);
+            log.trace("UnitOfWork done for ExchangeId: {}", exchange.getExchangeId());
         }
 
         // at first done the synchronizations
@@ -365,6 +365,28 @@ public class DefaultUnitOfWork implements UnitOfWork {
     @Override
     public int routeStackLevel() {
         return routes.size();
+    }
+
+    public int routeStackLevel(boolean includeRouteTemplate, boolean includeKamelet) {
+        if (includeKamelet && includeRouteTemplate) {
+            return routes.size();
+        }
+
+        int level = 0;
+        for (Route r : routes) {
+            if (r.isCreatedByKamelet()) {
+                if (includeKamelet) {
+                    level++;
+                }
+            } else if (r.isCreatedByRouteTemplate()) {
+                if (includeRouteTemplate) {
+                    level++;
+                }
+            } else {
+                level++;
+            }
+        }
+        return level;
     }
 
     @Override

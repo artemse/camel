@@ -73,12 +73,17 @@ public interface DebeziumOracleComponentBuilderFactory {
         }
         /**
          * Allows for bridging the consumer to the Camel routing Error Handler,
-         * which mean any exceptions occurred while the consumer is trying to
-         * pickup incoming messages, or the likes, will now be processed as a
-         * message and handled by the routing Error Handler. By default the
-         * consumer will use the org.apache.camel.spi.ExceptionHandler to deal
-         * with exceptions, that will be logged at WARN or ERROR level and
-         * ignored.
+         * which mean any exceptions (if possible) occurred while the Camel
+         * consumer is trying to pickup incoming messages, or the likes, will
+         * now be processed as a message and handled by the routing Error
+         * Handler. Important: This is only possible if the 3rd party component
+         * allows Camel to be alerted if an exception was thrown. Some
+         * components handle this internally only, and therefore
+         * bridgeErrorHandler is not possible. In other situations we may
+         * improve the Camel component to hook into the 3rd party component and
+         * make this possible for future releases. By default the consumer will
+         * use the org.apache.camel.spi.ExceptionHandler to deal with
+         * exceptions, that will be logged at WARN or ERROR level and ignored.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -383,6 +388,25 @@ public interface DebeziumOracleComponentBuilderFactory {
         default DebeziumOracleComponentBuilder converters(
                 java.lang.String converters) {
             doSetProperty("converters", converters);
+            return this;
+        }
+        /**
+         * The custom metric tags will accept key-value pairs to customize the
+         * MBean object name which should be appended the end of regular name,
+         * each key would represent a tag for the MBean object name, and the
+         * corresponding value would be the value of that tag the key is. For
+         * example: k1=v1,k2=v2.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: oracle
+         * 
+         * @param customMetricTags the value to set
+         * @return the dsl builder
+         */
+        default DebeziumOracleComponentBuilder customMetricTags(
+                java.lang.String customMetricTags) {
+            doSetProperty("customMetricTags", customMetricTags);
             return this;
         }
         /**
@@ -701,6 +725,26 @@ public interface DebeziumOracleComponentBuilderFactory {
             return this;
         }
         /**
+         * Specify the strategy used for watermarking during an incremental
+         * snapshot: 'insert_insert' both open and close signal is written into
+         * signal data collection (default); 'insert_delete' only open signal is
+         * written on signal data collection, the close will delete the relative
+         * open signal;.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Default: INSERT_INSERT
+         * Group: oracle
+         * 
+         * @param incrementalSnapshotWatermarkingStrategy the value to set
+         * @return the dsl builder
+         */
+        default DebeziumOracleComponentBuilder incrementalSnapshotWatermarkingStrategy(
+                java.lang.String incrementalSnapshotWatermarkingStrategy) {
+            doSetProperty("incrementalSnapshotWatermarkingStrategy", incrementalSnapshotWatermarkingStrategy);
+            return this;
+        }
+        /**
          * Specify how INTERVAL columns should be represented in change events,
          * including: 'string' represents values as an exact ISO formatted
          * string; 'numeric' (default) represents values using the inexact
@@ -891,6 +935,22 @@ public interface DebeziumOracleComponentBuilderFactory {
         default DebeziumOracleComponentBuilder logMiningBufferInfinispanCacheEvents(
                 java.lang.String logMiningBufferInfinispanCacheEvents) {
             doSetProperty("logMiningBufferInfinispanCacheEvents", logMiningBufferInfinispanCacheEvents);
+            return this;
+        }
+        /**
+         * Specifies the XML configuration for the Infinispan 'global'
+         * configuration.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: oracle
+         * 
+         * @param logMiningBufferInfinispanCacheGlobal the value to set
+         * @return the dsl builder
+         */
+        default DebeziumOracleComponentBuilder logMiningBufferInfinispanCacheGlobal(
+                java.lang.String logMiningBufferInfinispanCacheGlobal) {
+            doSetProperty("logMiningBufferInfinispanCacheGlobal", logMiningBufferInfinispanCacheGlobal);
             return this;
         }
         /**
@@ -1343,6 +1403,52 @@ public interface DebeziumOracleComponentBuilderFactory {
             return this;
         }
         /**
+         * The hostname of the OpenLogReplicator network service.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: oracle
+         * 
+         * @param openlogreplicatorHost the value to set
+         * @return the dsl builder
+         */
+        default DebeziumOracleComponentBuilder openlogreplicatorHost(
+                java.lang.String openlogreplicatorHost) {
+            doSetProperty("openlogreplicatorHost", openlogreplicatorHost);
+            return this;
+        }
+        /**
+         * The port of the OpenLogReplicator network service.
+         * 
+         * The option is a: &lt;code&gt;int&lt;/code&gt; type.
+         * 
+         * Group: oracle
+         * 
+         * @param openlogreplicatorPort the value to set
+         * @return the dsl builder
+         */
+        default DebeziumOracleComponentBuilder openlogreplicatorPort(
+                int openlogreplicatorPort) {
+            doSetProperty("openlogreplicatorPort", openlogreplicatorPort);
+            return this;
+        }
+        /**
+         * The configured logical source name in the OpenLogReplicator
+         * configuration that is to stream changes.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: oracle
+         * 
+         * @param openlogreplicatorSource the value to set
+         * @return the dsl builder
+         */
+        default DebeziumOracleComponentBuilder openlogreplicatorSource(
+                java.lang.String openlogreplicatorSource) {
+            doSetProperty("openlogreplicatorSource", openlogreplicatorSource);
+            return this;
+        }
+        /**
          * Time to wait for new change events to appear after receiving no
          * events, given in milliseconds. Defaults to 500 ms.
          * 
@@ -1357,6 +1463,22 @@ public interface DebeziumOracleComponentBuilderFactory {
         default DebeziumOracleComponentBuilder pollIntervalMs(
                 long pollIntervalMs) {
             doSetProperty("pollIntervalMs", pollIntervalMs);
+            return this;
+        }
+        /**
+         * Optional list of post processors. The processors are defined using
+         * '.type' config option and configured using options ''.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: oracle
+         * 
+         * @param postProcessors the value to set
+         * @return the dsl builder
+         */
+        default DebeziumOracleComponentBuilder postProcessors(
+                java.lang.String postProcessors) {
+            doSetProperty("postProcessors", postProcessors);
             return this;
         }
         /**
@@ -2004,6 +2126,7 @@ public interface DebeziumOracleComponentBuilderFactory {
             case "columnIncludeList": getOrCreateConfiguration((DebeziumOracleComponent) component).setColumnIncludeList((java.lang.String) value); return true;
             case "columnPropagateSourceType": getOrCreateConfiguration((DebeziumOracleComponent) component).setColumnPropagateSourceType((java.lang.String) value); return true;
             case "converters": getOrCreateConfiguration((DebeziumOracleComponent) component).setConverters((java.lang.String) value); return true;
+            case "customMetricTags": getOrCreateConfiguration((DebeziumOracleComponent) component).setCustomMetricTags((java.lang.String) value); return true;
             case "databaseConnectionAdapter": getOrCreateConfiguration((DebeziumOracleComponent) component).setDatabaseConnectionAdapter((java.lang.String) value); return true;
             case "databaseDbname": getOrCreateConfiguration((DebeziumOracleComponent) component).setDatabaseDbname((java.lang.String) value); return true;
             case "databaseHostname": getOrCreateConfiguration((DebeziumOracleComponent) component).setDatabaseHostname((java.lang.String) value); return true;
@@ -2022,6 +2145,7 @@ public interface DebeziumOracleComponentBuilderFactory {
             case "heartbeatTopicsPrefix": getOrCreateConfiguration((DebeziumOracleComponent) component).setHeartbeatTopicsPrefix((java.lang.String) value); return true;
             case "includeSchemaChanges": getOrCreateConfiguration((DebeziumOracleComponent) component).setIncludeSchemaChanges((boolean) value); return true;
             case "includeSchemaComments": getOrCreateConfiguration((DebeziumOracleComponent) component).setIncludeSchemaComments((boolean) value); return true;
+            case "incrementalSnapshotWatermarkingStrategy": getOrCreateConfiguration((DebeziumOracleComponent) component).setIncrementalSnapshotWatermarkingStrategy((java.lang.String) value); return true;
             case "intervalHandlingMode": getOrCreateConfiguration((DebeziumOracleComponent) component).setIntervalHandlingMode((java.lang.String) value); return true;
             case "lobEnabled": getOrCreateConfiguration((DebeziumOracleComponent) component).setLobEnabled((boolean) value); return true;
             case "logMiningArchiveDestinationName": getOrCreateConfiguration((DebeziumOracleComponent) component).setLogMiningArchiveDestinationName((java.lang.String) value); return true;
@@ -2033,6 +2157,7 @@ public interface DebeziumOracleComponentBuilderFactory {
             case "logMiningBatchSizeMin": getOrCreateConfiguration((DebeziumOracleComponent) component).setLogMiningBatchSizeMin((long) value); return true;
             case "logMiningBufferDropOnStop": getOrCreateConfiguration((DebeziumOracleComponent) component).setLogMiningBufferDropOnStop((boolean) value); return true;
             case "logMiningBufferInfinispanCacheEvents": getOrCreateConfiguration((DebeziumOracleComponent) component).setLogMiningBufferInfinispanCacheEvents((java.lang.String) value); return true;
+            case "logMiningBufferInfinispanCacheGlobal": getOrCreateConfiguration((DebeziumOracleComponent) component).setLogMiningBufferInfinispanCacheGlobal((java.lang.String) value); return true;
             case "logMiningBufferInfinispanCacheProcessedTransactions": getOrCreateConfiguration((DebeziumOracleComponent) component).setLogMiningBufferInfinispanCacheProcessedTransactions((java.lang.String) value); return true;
             case "logMiningBufferInfinispanCacheSchemaChanges": getOrCreateConfiguration((DebeziumOracleComponent) component).setLogMiningBufferInfinispanCacheSchemaChanges((java.lang.String) value); return true;
             case "logMiningBufferInfinispanCacheTransactions": getOrCreateConfiguration((DebeziumOracleComponent) component).setLogMiningBufferInfinispanCacheTransactions((java.lang.String) value); return true;
@@ -2058,7 +2183,11 @@ public interface DebeziumOracleComponentBuilderFactory {
             case "messageKeyColumns": getOrCreateConfiguration((DebeziumOracleComponent) component).setMessageKeyColumns((java.lang.String) value); return true;
             case "notificationEnabledChannels": getOrCreateConfiguration((DebeziumOracleComponent) component).setNotificationEnabledChannels((java.lang.String) value); return true;
             case "notificationSinkTopicName": getOrCreateConfiguration((DebeziumOracleComponent) component).setNotificationSinkTopicName((java.lang.String) value); return true;
+            case "openlogreplicatorHost": getOrCreateConfiguration((DebeziumOracleComponent) component).setOpenlogreplicatorHost((java.lang.String) value); return true;
+            case "openlogreplicatorPort": getOrCreateConfiguration((DebeziumOracleComponent) component).setOpenlogreplicatorPort((int) value); return true;
+            case "openlogreplicatorSource": getOrCreateConfiguration((DebeziumOracleComponent) component).setOpenlogreplicatorSource((java.lang.String) value); return true;
             case "pollIntervalMs": getOrCreateConfiguration((DebeziumOracleComponent) component).setPollIntervalMs((long) value); return true;
+            case "postProcessors": getOrCreateConfiguration((DebeziumOracleComponent) component).setPostProcessors((java.lang.String) value); return true;
             case "provideTransactionMetadata": getOrCreateConfiguration((DebeziumOracleComponent) component).setProvideTransactionMetadata((boolean) value); return true;
             case "queryFetchSize": getOrCreateConfiguration((DebeziumOracleComponent) component).setQueryFetchSize((int) value); return true;
             case "racNodes": getOrCreateConfiguration((DebeziumOracleComponent) component).setRacNodes((java.lang.String) value); return true;

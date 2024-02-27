@@ -28,8 +28,17 @@ public interface ManagedRouteMBean extends ManagedPerformanceCounterMBean {
     @ManagedAttribute(description = "Route ID")
     String getRouteId();
 
+    @ManagedAttribute(description = "Node Prefix ID")
+    String getNodePrefixId();
+
     @ManagedAttribute(description = "Route Group")
     String getRouteGroup();
+
+    @ManagedAttribute(description = "Is this route created from a route template (or Kamelet)")
+    boolean isCreatedByRouteTemplate();
+
+    @ManagedAttribute(description = "Is this route created from a Kamelet")
+    boolean isCreatedByKamelet();
 
     @ManagedAttribute(description = "Route Properties")
     TabularData getRouteProperties();
@@ -162,4 +171,11 @@ public interface ManagedRouteMBean extends ManagedPerformanceCounterMBean {
 
     @ManagedOperation(description = "IDs for the processors that are part of this route")
     Collection<String> processorIds() throws Exception;
+
+    @ManagedOperation(description = "Updates the route from XML")
+    void updateRouteFromXml(String xml) throws Exception;
+
+    @ManagedAttribute(description = "Whether update route from XML is enabled")
+    boolean isUpdateRouteEnabled();
+
 }

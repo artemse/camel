@@ -24,7 +24,7 @@
     <parent>
         <groupId>org.apache.camel</groupId>
         <artifactId>components</artifactId>
-        <version>4.1.0-SNAPSHOT</version>
+        <version>4.5.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>camel-platform-http-main</artifactId>
@@ -43,6 +43,7 @@
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-main</artifactId>
         </dependency>
+
         <!-- use vertx as http engine -->
         <dependency>
             <groupId>org.apache.camel</groupId>

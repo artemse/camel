@@ -33,6 +33,8 @@ import org.apache.camel.StaticService;
 import org.apache.camel.api.management.ManagedAttribute;
 import org.apache.camel.api.management.ManagedResource;
 import org.apache.camel.component.platform.http.PlatformHttpConstants;
+import org.apache.camel.component.platform.http.vertx.auth.AuthenticationConfig;
+import org.apache.camel.component.platform.http.vertx.auth.AuthenticationConfig.AuthenticationConfigEntry;
 import org.apache.camel.support.CamelContextHelper;
 import org.apache.camel.support.service.ServiceHelper;
 import org.apache.camel.support.service.ServiceSupport;
@@ -183,7 +185,17 @@ public class VertxPlatformHttpServer extends ServiceSupport implements CamelCont
             subRouter.route().handler(createCorsHandler(configuration));
         }
 
-        router.mountSubRouter(configuration.getPath(), subRouter);
+        if (configuration.getSessionConfig().isEnabled()) {
+            subRouter.route().handler(
+                    configuration.getSessionConfig().createSessionHandler(vertx));
+        }
+
+        AuthenticationConfig authenticationConfig = configuration.getAuthenticationConfig();
+        if (authenticationConfig.isEnabled()) {
+            addAuthenticationHandlersStartingFromMoreSpecificPaths(authenticationConfig);
+        }
+
+        router.route(configuration.getPath() + "*").subRouter(subRouter);
 
         context.getRegistry().bind(
                 VertxPlatformHttpRouter.PLATFORM_HTTP_ROUTER_NAME,
@@ -227,6 +239,7 @@ public class VertxPlatformHttpServer extends ServiceSupport implements CamelCont
                     try {
                         latch.await();
                     } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
                         throw new RuntimeException(e);
                     }
                 },
@@ -264,6 +277,7 @@ public class VertxPlatformHttpServer extends ServiceSupport implements CamelCont
                         try {
                             latch.await();
                         } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
                             throw new RuntimeException(e);
                         }
                     },
@@ -301,6 +315,7 @@ public class VertxPlatformHttpServer extends ServiceSupport implements CamelCont
                         try {
                             latch.await();
                         } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
                             throw new RuntimeException(e);
                         }
                     },
@@ -309,5 +324,26 @@ public class VertxPlatformHttpServer extends ServiceSupport implements CamelCont
             this.vertx = null;
             this.localVertx = false;
         }
+    }
+
+    private void addAuthenticationHandlersStartingFromMoreSpecificPaths(AuthenticationConfig authenticationConfig) {
+        authenticationConfig.getEntries()
+                .stream()
+                .sorted(this::compareUrlPathsSpecificity)
+                .forEach(entry -> subRouter.route(entry.getPath()).handler(entry.createAuthenticationHandler(vertx)));
+    }
+
+    private int compareUrlPathsSpecificity(AuthenticationConfigEntry entry1, AuthenticationConfigEntry entry2) {
+        long entry1PathLength = entry1.getPath().chars().filter(ch -> ch == '/').count();
+        long entry2PathLength = entry2.getPath().chars().filter(ch -> ch == '/').count();
+        if (entry1PathLength == entry2PathLength) {
+            if (entry1.getPath().endsWith("*")) {
+                return 1;
+            }
+            if (entry2.getPath().endsWith("*")) {
+                return -1;
+            }
+        }
+        return (int) (entry2PathLength - entry1PathLength);
     }
 }

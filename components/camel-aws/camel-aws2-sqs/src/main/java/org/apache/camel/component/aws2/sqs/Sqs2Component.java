@@ -44,7 +44,7 @@ public class Sqs2Component extends HealthCheckComponent {
     @Override
     protected Endpoint createEndpoint(String uri, String remaining, Map<String, Object> parameters) throws Exception {
 
-        if (remaining == null || remaining.trim().length() == 0) {
+        if (remaining == null || remaining.isBlank()) {
             throw new IllegalArgumentException("Queue name must be specified.");
         }
         Sqs2Configuration configuration = this.configuration != null ? this.configuration.copy() : new Sqs2Configuration();
@@ -65,10 +65,11 @@ public class Sqs2Component extends HealthCheckComponent {
         //validation of client has to be done after endpoint initialization (in case that sqs client is autowired)
         // - covered by SqsDeadletterWithClientRegistryLocalstackIT
         if (!configuration.isUseDefaultCredentialsProvider() && !configuration.isUseProfileCredentialsProvider()
+                && !configuration.isUseSessionCredentials()
                 && configuration.getAmazonSQSClient() == null
                 && (configuration.getAccessKey() == null || configuration.getSecretKey() == null)) {
             throw new IllegalArgumentException(
-                    "useDefaultCredentialsProvider is set to false, useProfileCredentialsProvider is set to false, AmazonSQSClient or accessKey and secretKey must be specified");
+                    "useDefaultCredentialsProvider is set to false, useProfileCredentialsProvider is set to false, useSessionCredentials is set to false, AmazonSQSClient or accessKey and secretKey must be specified");
         }
         // Verify that visibilityTimeout is set if extendMessageVisibility is
         // set to true.

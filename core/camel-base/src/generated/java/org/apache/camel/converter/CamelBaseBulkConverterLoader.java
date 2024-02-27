@@ -9,7 +9,7 @@ import org.apache.camel.Ordered;
 import org.apache.camel.TypeConversionException;
 import org.apache.camel.TypeConverterLoaderException;
 import org.apache.camel.TypeConverter;
-import org.apache.camel.converter.TypeConvertible;
+import org.apache.camel.spi.TypeConvertible;
 import org.apache.camel.spi.BulkTypeConverters;
 import org.apache.camel.spi.TypeConverterLoader;
 import org.apache.camel.spi.TypeConverterRegistry;
@@ -297,7 +297,7 @@ public final class CamelBaseBulkConverterLoader implements TypeConverterLoader, 
             if (value instanceof byte[]) {
                 return org.apache.camel.converter.ObjectConverter.toNumber((byte[]) value, exchange);
             }
-        } else if (to == java.lang.Short.class) {
+        } else if (to == java.lang.Short.class || to == short.class) {
             if (value instanceof java.lang.Number) {
                 Object obj = org.apache.camel.converter.ObjectConverter.toShort((java.lang.Number) value);
                 if (obj == null) {
@@ -845,7 +845,7 @@ public final class CamelBaseBulkConverterLoader implements TypeConverterLoader, 
             if (from == byte[].class) {
                 return this;
             }
-        } else if (to == java.lang.Short.class) {
+        } else if (to == java.lang.Short.class || to == short.class) {
             if (from == java.lang.Number.class) {
                 return this;
             }

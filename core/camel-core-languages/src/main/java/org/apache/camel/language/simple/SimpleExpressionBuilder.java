@@ -16,6 +16,7 @@
  */
 package org.apache.camel.language.simple;
 
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -38,6 +39,7 @@ import org.apache.camel.spi.UuidGenerator;
 import org.apache.camel.support.CamelContextHelper;
 import org.apache.camel.support.ClassicUuidGenerator;
 import org.apache.camel.support.DefaultUuidGenerator;
+import org.apache.camel.support.ExchangeHelper;
 import org.apache.camel.support.ExpressionAdapter;
 import org.apache.camel.support.LanguageHelper;
 import org.apache.camel.support.MessageHelper;
@@ -72,6 +74,20 @@ public final class SimpleExpressionBuilder {
                 (exchange, exp) -> {
                     String text = exp.evaluate(exchange, String.class);
                     return exchange.getIn().getHeader(text);
+                });
+    }
+
+    /**
+     * Returns the expression for the variable invoking methods defined in a simple OGNL notation
+     *
+     * @param ognl methods to invoke on the variable in a simple OGNL syntax
+     */
+    public static Expression variablesOgnlExpression(final String ognl) {
+        return new KeyedOgnlExpressionAdapter(
+                ognl, "variableOgnl(" + ognl + ")",
+                (exchange, exp) -> {
+                    String text = exp.evaluate(exchange, String.class);
+                    return ExchangeHelper.getVariable(exchange, text);
                 });
     }
 
@@ -187,6 +203,41 @@ public final class SimpleExpressionBuilder {
                 } else {
                     return "join(" + expression + "," + separator + ")";
                 }
+            }
+        };
+    }
+
+    /**
+     * Hashes the value using the given algorithm
+     */
+    public static Expression hashExpression(final String expression, final String algorithm) {
+        return new ExpressionAdapter() {
+            private Expression exp;
+
+            @Override
+            public void init(CamelContext context) {
+                exp = context.resolveLanguage("simple").createExpression(expression);
+                exp.init(context);
+            }
+
+            @Override
+            public Object evaluate(Exchange exchange) {
+                byte[] data = exp.evaluate(exchange, byte[].class);
+                if (data != null && data.length > 0) {
+                    try {
+                        MessageDigest digest = MessageDigest.getInstance(algorithm);
+                        byte[] bytes = digest.digest(data);
+                        return StringHelper.bytesToHex(bytes);
+                    } catch (Exception e) {
+                        throw CamelExecutionException.wrapCamelExecutionException(exchange, e);
+                    }
+                }
+                return null;
+            }
+
+            @Override
+            public String toString() {
+                return "hash(" + expression + "," + algorithm + ")";
             }
         };
     }
@@ -560,6 +611,8 @@ public final class SimpleExpressionBuilder {
             date = LanguageHelper.dateFromExchangeCreated(exchange);
         } else if (command.startsWith("header.")) {
             date = LanguageHelper.dateFromHeader(exchange, command, (e, o) -> tryConvertingAsDate(e, o, command));
+        } else if (command.startsWith("variable.")) {
+            date = LanguageHelper.dateFromVariable(exchange, command, (e, o) -> tryConvertingAsDate(e, o, command));
         } else if (command.startsWith("exchangeProperty.")) {
             date = LanguageHelper.dateFromExchangeProperty(exchange, command, (e, o) -> tryConvertingAsDate(e, o, command));
         } else if ("file".equals(command)) {
@@ -639,7 +692,7 @@ public final class SimpleExpressionBuilder {
                 } catch (InvalidPayloadException e) {
                     throw CamelExecutionException.wrapCamelExecutionException(exchange, e);
                 }
-                Expression ognlExp = bean.createExpression(null, new Object[] { body, ognl });
+                Expression ognlExp = bean.createExpression(null, new Object[] { null, body, ognl });
                 ognlExp.init(exchange.getContext());
                 return ognlExp.evaluate(exchange, Object.class);
             }
@@ -698,6 +751,52 @@ public final class SimpleExpressionBuilder {
     }
 
     /**
+     * Returns the expression for the message converted to the given type and invoking methods on the converted message
+     * defined in a simple OGNL notation
+     */
+    public static Expression messageOgnlExpression(final String name, final String ognl) {
+        return new ExpressionAdapter() {
+            private ClassResolver classResolver;
+            private Expression exp;
+            private Language bean;
+
+            @Override
+            public Object evaluate(Exchange exchange) {
+                String text = exp.evaluate(exchange, String.class);
+                Class<?> type;
+                try {
+                    type = classResolver.resolveMandatoryClass(text);
+                } catch (ClassNotFoundException e) {
+                    throw CamelExecutionException.wrapCamelExecutionException(exchange, e);
+                }
+                Object msg = exchange.getMessage(type);
+                if (msg != null) {
+                    // ognl is able to evaluate method name if it contains nested functions
+                    // so we should not eager evaluate ognl as a string
+                    Expression ognlExp = bean.createExpression(null, new Object[] { null, msg, ognl });
+                    ognlExp.init(exchange.getContext());
+                    return ognlExp.evaluate(exchange, Object.class);
+                } else {
+                    return null;
+                }
+            }
+
+            @Override
+            public void init(CamelContext context) {
+                classResolver = context.getClassResolver();
+                exp = ExpressionBuilder.simpleExpression(name);
+                exp.init(context);
+                bean = context.resolveLanguage("bean");
+            }
+
+            @Override
+            public String toString() {
+                return "messageOgnlAs[" + name + "](" + ognl + ")";
+            }
+        };
+    }
+
+    /**
      * Returns the expression for the exchanges inbound message body converted to the given type and invoking methods on
      * the converted body defined in a simple OGNL notation
      */
@@ -720,7 +819,7 @@ public final class SimpleExpressionBuilder {
                 if (body != null) {
                     // ognl is able to evaluate method name if it contains nested functions
                     // so we should not eager evaluate ognl as a string
-                    Expression ognlExp = bean.createExpression(null, new Object[] { body, ognl });
+                    Expression ognlExp = bean.createExpression(null, new Object[] { null, body, ognl });
                     ognlExp.init(exchange.getContext());
                     return ognlExp.evaluate(exchange, Object.class);
                 } else {
@@ -756,7 +855,7 @@ public final class SimpleExpressionBuilder {
             public Object evaluate(Exchange exchange) {
                 // ognl is able to evaluate method name if it contains nested functions
                 // so we should not eager evaluate ognl as a string
-                Expression ognlExp = bean.createExpression(null, new Object[] { exchange, ognl });
+                Expression ognlExp = bean.createExpression(null, new Object[] { null, exchange, ognl });
                 ognlExp.init(exchange.getContext());
                 return ognlExp.evaluate(exchange, Object.class);
             }
@@ -817,7 +916,7 @@ public final class SimpleExpressionBuilder {
                 if (body == null) {
                     return null;
                 }
-                Expression ognlExp = bean.createExpression(null, new Object[] { body, ognl });
+                Expression ognlExp = bean.createExpression(null, new Object[] { null, body, ognl });
                 ognlExp.init(exchange.getContext());
                 return ognlExp.evaluate(exchange, Object.class);
             }
@@ -965,7 +1064,7 @@ public final class SimpleExpressionBuilder {
 
                 // ognl is able to evaluate method name if it contains nested functions
                 // so we should not eager evaluate ognl as a string
-                Expression ognlExp = bean.createExpression(null, new Object[] { exception, ognl });
+                Expression ognlExp = bean.createExpression(null, new Object[] { null, exception, ognl });
                 ognlExp.init(exchange.getContext());
                 return ognlExp.evaluate(exchange, Object.class);
             }
@@ -1047,7 +1146,7 @@ public final class SimpleExpressionBuilder {
                 return null;
             }
             if (method != null) {
-                Expression exp = beanLanguage.createExpression(null, new Object[] { property, method });
+                Expression exp = beanLanguage.createExpression(null, new Object[] { null, property, method });
                 exp.init(exchange.getContext());
                 return exp.evaluate(exchange, Object.class);
             } else {

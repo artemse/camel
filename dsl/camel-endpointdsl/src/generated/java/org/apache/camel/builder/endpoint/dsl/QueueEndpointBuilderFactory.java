@@ -46,6 +46,40 @@ public interface QueueEndpointBuilderFactory {
             return (AdvancedQueueEndpointConsumerBuilder) this;
         }
         /**
+         * Determines the credential strategy to adopt.
+         * 
+         * The option is a:
+         * &lt;code&gt;org.apache.camel.component.azure.storage.queue.CredentialType&lt;/code&gt; type.
+         * 
+         * Default: SHARED_ACCOUNT_KEY
+         * Group: common
+         * 
+         * @param credentialType the value to set
+         * @return the dsl builder
+         */
+        default QueueEndpointConsumerBuilder credentialType(
+                org.apache.camel.component.azure.storage.queue.CredentialType credentialType) {
+            doSetProperty("credentialType", credentialType);
+            return this;
+        }
+        /**
+         * Determines the credential strategy to adopt.
+         * 
+         * The option will be converted to a
+         * &lt;code&gt;org.apache.camel.component.azure.storage.queue.CredentialType&lt;/code&gt; type.
+         * 
+         * Default: SHARED_ACCOUNT_KEY
+         * Group: common
+         * 
+         * @param credentialType the value to set
+         * @return the dsl builder
+         */
+        default QueueEndpointConsumerBuilder credentialType(
+                String credentialType) {
+            doSetProperty("credentialType", credentialType);
+            return this;
+        }
+        /**
          * Service client to a storage account to interact with the queue
          * service. This client does not hold any state about a particular
          * storage account but is instead a convenient way of sending off
@@ -846,12 +880,17 @@ public interface QueueEndpointBuilderFactory {
         }
         /**
          * Allows for bridging the consumer to the Camel routing Error Handler,
-         * which mean any exceptions occurred while the consumer is trying to
-         * pickup incoming messages, or the likes, will now be processed as a
-         * message and handled by the routing Error Handler. By default the
-         * consumer will use the org.apache.camel.spi.ExceptionHandler to deal
-         * with exceptions, that will be logged at WARN or ERROR level and
-         * ignored.
+         * which mean any exceptions (if possible) occurred while the Camel
+         * consumer is trying to pickup incoming messages, or the likes, will
+         * now be processed as a message and handled by the routing Error
+         * Handler. Important: This is only possible if the 3rd party component
+         * allows Camel to be alerted if an exception was thrown. Some
+         * components handle this internally only, and therefore
+         * bridgeErrorHandler is not possible. In other situations we may
+         * improve the Camel component to hook into the 3rd party component and
+         * make this possible for future releases. By default the consumer will
+         * use the org.apache.camel.spi.ExceptionHandler to deal with
+         * exceptions, that will be logged at WARN or ERROR level and ignored.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -868,12 +907,17 @@ public interface QueueEndpointBuilderFactory {
         }
         /**
          * Allows for bridging the consumer to the Camel routing Error Handler,
-         * which mean any exceptions occurred while the consumer is trying to
-         * pickup incoming messages, or the likes, will now be processed as a
-         * message and handled by the routing Error Handler. By default the
-         * consumer will use the org.apache.camel.spi.ExceptionHandler to deal
-         * with exceptions, that will be logged at WARN or ERROR level and
-         * ignored.
+         * which mean any exceptions (if possible) occurred while the Camel
+         * consumer is trying to pickup incoming messages, or the likes, will
+         * now be processed as a message and handled by the routing Error
+         * Handler. Important: This is only possible if the 3rd party component
+         * allows Camel to be alerted if an exception was thrown. Some
+         * components handle this internally only, and therefore
+         * bridgeErrorHandler is not possible. In other situations we may
+         * improve the Camel component to hook into the 3rd party component and
+         * make this possible for future releases. By default the consumer will
+         * use the org.apache.camel.spi.ExceptionHandler to deal with
+         * exceptions, that will be logged at WARN or ERROR level and ignored.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -1008,6 +1052,40 @@ public interface QueueEndpointBuilderFactory {
                 EndpointProducerBuilder {
         default AdvancedQueueEndpointProducerBuilder advanced() {
             return (AdvancedQueueEndpointProducerBuilder) this;
+        }
+        /**
+         * Determines the credential strategy to adopt.
+         * 
+         * The option is a:
+         * &lt;code&gt;org.apache.camel.component.azure.storage.queue.CredentialType&lt;/code&gt; type.
+         * 
+         * Default: SHARED_ACCOUNT_KEY
+         * Group: common
+         * 
+         * @param credentialType the value to set
+         * @return the dsl builder
+         */
+        default QueueEndpointProducerBuilder credentialType(
+                org.apache.camel.component.azure.storage.queue.CredentialType credentialType) {
+            doSetProperty("credentialType", credentialType);
+            return this;
+        }
+        /**
+         * Determines the credential strategy to adopt.
+         * 
+         * The option will be converted to a
+         * &lt;code&gt;org.apache.camel.component.azure.storage.queue.CredentialType&lt;/code&gt; type.
+         * 
+         * Default: SHARED_ACCOUNT_KEY
+         * Group: common
+         * 
+         * @param credentialType the value to set
+         * @return the dsl builder
+         */
+        default QueueEndpointProducerBuilder credentialType(
+                String credentialType) {
+            doSetProperty("credentialType", credentialType);
+            return this;
         }
         /**
          * Service client to a storage account to interact with the queue
@@ -1424,6 +1502,39 @@ public interface QueueEndpointBuilderFactory {
             return (AdvancedQueueEndpointBuilder) this;
         }
         /**
+         * Determines the credential strategy to adopt.
+         * 
+         * The option is a:
+         * &lt;code&gt;org.apache.camel.component.azure.storage.queue.CredentialType&lt;/code&gt; type.
+         * 
+         * Default: SHARED_ACCOUNT_KEY
+         * Group: common
+         * 
+         * @param credentialType the value to set
+         * @return the dsl builder
+         */
+        default QueueEndpointBuilder credentialType(
+                org.apache.camel.component.azure.storage.queue.CredentialType credentialType) {
+            doSetProperty("credentialType", credentialType);
+            return this;
+        }
+        /**
+         * Determines the credential strategy to adopt.
+         * 
+         * The option will be converted to a
+         * &lt;code&gt;org.apache.camel.component.azure.storage.queue.CredentialType&lt;/code&gt; type.
+         * 
+         * Default: SHARED_ACCOUNT_KEY
+         * Group: common
+         * 
+         * @param credentialType the value to set
+         * @return the dsl builder
+         */
+        default QueueEndpointBuilder credentialType(String credentialType) {
+            doSetProperty("credentialType", credentialType);
+            return this;
+        }
+        /**
          * Service client to a storage account to interact with the queue
          * service. This client does not hold any state about a particular
          * storage account but is instead a convenient way of sending off
@@ -1801,7 +1912,7 @@ public interface QueueEndpointBuilderFactory {
          * AzureStorageQueueRawHttpHeaders}.
          */
         public String azureStorageQueueRawHttpHeaders() {
-            return "AzureStorageQueueRawHttpHeaders";
+            return "CamelAzureStorageQueueRawHttpHeaders";
         }
 
         /**
@@ -1814,7 +1925,7 @@ public interface QueueEndpointBuilderFactory {
          * @return the name of the header {@code AzureStorageQueueMetadata}.
          */
         public String azureStorageQueueMetadata() {
-            return "AzureStorageQueueMetadata";
+            return "CamelAzureStorageQueueMetadata";
         }
 
         /**
@@ -1827,7 +1938,7 @@ public interface QueueEndpointBuilderFactory {
          * @return the name of the header {@code AzureStorageQueueMessageId}.
          */
         public String azureStorageQueueMessageId() {
-            return "AzureStorageQueueMessageId";
+            return "CamelAzureStorageQueueMessageId";
         }
 
         /**
@@ -1841,7 +1952,7 @@ public interface QueueEndpointBuilderFactory {
          * AzureStorageQueueInsertionTime}.
          */
         public String azureStorageQueueInsertionTime() {
-            return "AzureStorageQueueInsertionTime";
+            return "CamelAzureStorageQueueInsertionTime";
         }
 
         /**
@@ -1855,7 +1966,7 @@ public interface QueueEndpointBuilderFactory {
          * AzureStorageQueueExpirationTime}.
          */
         public String azureStorageQueueExpirationTime() {
-            return "AzureStorageQueueExpirationTime";
+            return "CamelAzureStorageQueueExpirationTime";
         }
 
         /**
@@ -1870,7 +1981,7 @@ public interface QueueEndpointBuilderFactory {
          * @return the name of the header {@code AzureStorageQueuePopReceipt}.
          */
         public String azureStorageQueuePopReceipt() {
-            return "AzureStorageQueuePopReceipt";
+            return "CamelAzureStorageQueuePopReceipt";
         }
 
         /**
@@ -1884,7 +1995,7 @@ public interface QueueEndpointBuilderFactory {
          * AzureStorageQueueTimeNextVisible}.
          */
         public String azureStorageQueueTimeNextVisible() {
-            return "AzureStorageQueueTimeNextVisible";
+            return "CamelAzureStorageQueueTimeNextVisible";
         }
 
         /**
@@ -1897,7 +2008,7 @@ public interface QueueEndpointBuilderFactory {
          * @return the name of the header {@code AzureStorageQueueDequeueCount}.
          */
         public String azureStorageQueueDequeueCount() {
-            return "AzureStorageQueueDequeueCount";
+            return "CamelAzureStorageQueueDequeueCount";
         }
 
         /**
@@ -1912,7 +2023,7 @@ public interface QueueEndpointBuilderFactory {
          * @return the name of the header {@code AzureStorageQueueOperation}.
          */
         public String azureStorageQueueOperation() {
-            return "AzureStorageQueueOperation";
+            return "CamelAzureStorageQueueOperation";
         }
 
         /**
@@ -1925,7 +2036,7 @@ public interface QueueEndpointBuilderFactory {
          * @return the name of the header {@code AzureStorageQueueName}.
          */
         public String azureStorageQueueName() {
-            return "AzureStorageQueueName";
+            return "CamelAzureStorageQueueName";
         }
 
         /**
@@ -1939,7 +2050,7 @@ public interface QueueEndpointBuilderFactory {
          * AzureStorageQueueSegmentOptions}.
          */
         public String azureStorageQueueSegmentOptions() {
-            return "AzureStorageQueueSegmentOptions";
+            return "CamelAzureStorageQueueSegmentOptions";
         }
 
         /**
@@ -1953,7 +2064,7 @@ public interface QueueEndpointBuilderFactory {
          * @return the name of the header {@code AzureStorageQueueTimeout}.
          */
         public String azureStorageQueueTimeout() {
-            return "AzureStorageQueueTimeout";
+            return "CamelAzureStorageQueueTimeout";
         }
 
         /**
@@ -1969,7 +2080,7 @@ public interface QueueEndpointBuilderFactory {
          * @return the name of the header {@code AzureStorageQueueMaxMessages}.
          */
         public String azureStorageQueueMaxMessages() {
-            return "AzureStorageQueueMaxMessages";
+            return "CamelAzureStorageQueueMaxMessages";
         }
 
         /**
@@ -1986,7 +2097,7 @@ public interface QueueEndpointBuilderFactory {
          * AzureStorageQueueVisibilityTimeout}.
          */
         public String azureStorageQueueVisibilityTimeout() {
-            return "AzureStorageQueueVisibilityTimeout";
+            return "CamelAzureStorageQueueVisibilityTimeout";
         }
 
         /**
@@ -2001,7 +2112,7 @@ public interface QueueEndpointBuilderFactory {
          * @return the name of the header {@code AzureStorageQueueTimeToLive}.
          */
         public String azureStorageQueueTimeToLive() {
-            return "AzureStorageQueueTimeToLive";
+            return "CamelAzureStorageQueueTimeToLive";
         }
 
         /**
@@ -2015,7 +2126,7 @@ public interface QueueEndpointBuilderFactory {
          * @return the name of the header {@code AzureStorageQueueCreateQueue}.
          */
         public String azureStorageQueueCreateQueue() {
-            return "AzureStorageQueueCreateQueue";
+            return "CamelAzureStorageQueueCreateQueue";
         }
     }
     static QueueEndpointBuilder endpointBuilder(

@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.apache.camel</groupId>
         <artifactId>catalog</artifactId>
-        <version>4.1.0-SNAPSHOT</version>
+        <version>4.5.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>camel-allcomponents</artifactId>
@@ -119,7 +119,17 @@
         </dependency>
         <dependency>
             <groupId>org.apache.camel</groupId>
+            <artifactId>camel-aws-bedrock</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
             <artifactId>camel-aws-cloudtrail</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-aws-config</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -199,6 +209,11 @@
         </dependency>
         <dependency>
             <groupId>org.apache.camel</groupId>
+            <artifactId>camel-aws2-redshift</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
             <artifactId>camel-aws2-s3</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -259,6 +274,11 @@
         </dependency>
         <dependency>
             <groupId>org.apache.camel</groupId>
+            <artifactId>camel-azure-schema-registry</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
             <artifactId>camel-azure-servicebus</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -295,6 +315,11 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-bean-validator</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-beanio</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -574,6 +599,11 @@
         </dependency>
         <dependency>
             <groupId>org.apache.camel</groupId>
+            <artifactId>camel-elasticsearch-rest-client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
             <artifactId>camel-elytron</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -585,11 +615,6 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-exec</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.camel</groupId>
-            <artifactId>camel-facebook</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -745,11 +770,6 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-hazelcast</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.camel</groupId>
-            <artifactId>camel-hdfs</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -1034,6 +1054,11 @@
         </dependency>
         <dependency>
             <groupId>org.apache.camel</groupId>
+            <artifactId>camel-jte</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
             <artifactId>camel-kafka</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -1140,6 +1165,11 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-micrometer</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-micrometer-prometheus</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -1319,6 +1349,11 @@
         </dependency>
         <dependency>
             <groupId>org.apache.camel</groupId>
+            <artifactId>camel-platform-http-jolokia</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
             <artifactId>camel-platform-http-main</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -1355,6 +1390,11 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-python</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-qdrant</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -1510,6 +1550,11 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-slack</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-smb</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -1679,6 +1724,11 @@
         </dependency>
         <dependency>
             <groupId>org.apache.camel</groupId>
+            <artifactId>camel-thymeleaf</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
             <artifactId>camel-tika</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -1750,6 +1800,11 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-wal</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-wasm</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

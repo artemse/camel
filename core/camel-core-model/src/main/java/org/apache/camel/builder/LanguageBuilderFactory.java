@@ -23,6 +23,7 @@ import org.apache.camel.model.language.ExchangePropertyExpression;
 import org.apache.camel.model.language.GroovyExpression;
 import org.apache.camel.model.language.HeaderExpression;
 import org.apache.camel.model.language.Hl7TerserExpression;
+import org.apache.camel.model.language.JavaExpression;
 import org.apache.camel.model.language.JavaScriptExpression;
 import org.apache.camel.model.language.JoorExpression;
 import org.apache.camel.model.language.JqExpression;
@@ -36,6 +37,8 @@ import org.apache.camel.model.language.RefExpression;
 import org.apache.camel.model.language.SimpleExpression;
 import org.apache.camel.model.language.SpELExpression;
 import org.apache.camel.model.language.TokenizerExpression;
+import org.apache.camel.model.language.VariableExpression;
+import org.apache.camel.model.language.WasmExpression;
 import org.apache.camel.model.language.XMLTokenizerExpression;
 import org.apache.camel.model.language.XPathExpression;
 import org.apache.camel.model.language.XQueryExpression;
@@ -102,14 +105,22 @@ public final class LanguageBuilderFactory {
     }
 
     /**
-     * Uses the Joor language
+     * Uses the Java language
      */
+    public JavaExpression.Builder java() {
+        return new JavaExpression.Builder();
+    }
+
+    /**
+     * Uses the JOOR language
+     */
+    @Deprecated
     public JoorExpression.Builder joor() {
         return new JoorExpression.Builder();
     }
 
     /**
-     * Uses the Jq language
+     * Uses the JQ language
      */
     public JqExpression.Builder jq() {
         return new JqExpression.Builder();
@@ -186,6 +197,13 @@ public final class LanguageBuilderFactory {
     }
 
     /**
+     * Uses the Variable language
+     */
+    public VariableExpression.Builder variable() {
+        return new VariableExpression.Builder();
+    }
+
+    /**
      * Uses the XMLTokenizer language
      */
     public XMLTokenizerExpression.Builder xtokenize() {
@@ -204,5 +222,12 @@ public final class LanguageBuilderFactory {
      */
     public XQueryExpression.Builder xquery() {
         return new XQueryExpression.Builder();
+    }
+
+    /**
+     * Uses the Wasm language
+     */
+    public WasmExpression.Builder wasm() {
+        return new WasmExpression.Builder();
     }
 }

@@ -89,7 +89,7 @@ public interface CloudtrailEndpointBuilderFactory {
             return this;
         }
         /**
-         * Set the need for overidding the endpoint. This option needs to be
+         * Set the need for overriding the endpoint. This option needs to be
          * used in combination with uriEndpointOverride option.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
@@ -106,7 +106,7 @@ public interface CloudtrailEndpointBuilderFactory {
             return this;
         }
         /**
-         * Set the need for overidding the endpoint. This option needs to be
+         * Set the need for overriding the endpoint. This option needs to be
          * used in combination with uriEndpointOverride option.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
@@ -784,6 +784,21 @@ public interface CloudtrailEndpointBuilderFactory {
             return this;
         }
         /**
+         * Amazon AWS Session Token used when the user needs to assume a IAM
+         * role.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: security
+         * 
+         * @param sessionToken the value to set
+         * @return the dsl builder
+         */
+        default CloudtrailEndpointBuilder sessionToken(String sessionToken) {
+            doSetProperty("sessionToken", sessionToken);
+            return this;
+        }
+        /**
          * If we want to trust all certificates in case of overriding the
          * endpoint.
          * 
@@ -890,6 +905,43 @@ public interface CloudtrailEndpointBuilderFactory {
             doSetProperty("useProfileCredentialsProvider", useProfileCredentialsProvider);
             return this;
         }
+        /**
+         * Set whether the CloudTrail client should expect to use Session
+         * Credentials. This is useful in situation in which the user needs to
+         * assume a IAM role for doing operations in CloudTrail.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default CloudtrailEndpointBuilder useSessionCredentials(
+                boolean useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
+            return this;
+        }
+        /**
+         * Set whether the CloudTrail client should expect to use Session
+         * Credentials. This is useful in situation in which the user needs to
+         * assume a IAM role for doing operations in CloudTrail.
+         * 
+         * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
+         * type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default CloudtrailEndpointBuilder useSessionCredentials(
+                String useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
+            return this;
+        }
     }
 
     /**
@@ -903,12 +955,17 @@ public interface CloudtrailEndpointBuilderFactory {
         }
         /**
          * Allows for bridging the consumer to the Camel routing Error Handler,
-         * which mean any exceptions occurred while the consumer is trying to
-         * pickup incoming messages, or the likes, will now be processed as a
-         * message and handled by the routing Error Handler. By default the
-         * consumer will use the org.apache.camel.spi.ExceptionHandler to deal
-         * with exceptions, that will be logged at WARN or ERROR level and
-         * ignored.
+         * which mean any exceptions (if possible) occurred while the Camel
+         * consumer is trying to pickup incoming messages, or the likes, will
+         * now be processed as a message and handled by the routing Error
+         * Handler. Important: This is only possible if the 3rd party component
+         * allows Camel to be alerted if an exception was thrown. Some
+         * components handle this internally only, and therefore
+         * bridgeErrorHandler is not possible. In other situations we may
+         * improve the Camel component to hook into the 3rd party component and
+         * make this possible for future releases. By default the consumer will
+         * use the org.apache.camel.spi.ExceptionHandler to deal with
+         * exceptions, that will be logged at WARN or ERROR level and ignored.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -925,12 +982,17 @@ public interface CloudtrailEndpointBuilderFactory {
         }
         /**
          * Allows for bridging the consumer to the Camel routing Error Handler,
-         * which mean any exceptions occurred while the consumer is trying to
-         * pickup incoming messages, or the likes, will now be processed as a
-         * message and handled by the routing Error Handler. By default the
-         * consumer will use the org.apache.camel.spi.ExceptionHandler to deal
-         * with exceptions, that will be logged at WARN or ERROR level and
-         * ignored.
+         * which mean any exceptions (if possible) occurred while the Camel
+         * consumer is trying to pickup incoming messages, or the likes, will
+         * now be processed as a message and handled by the routing Error
+         * Handler. Important: This is only possible if the 3rd party component
+         * allows Camel to be alerted if an exception was thrown. Some
+         * components handle this internally only, and therefore
+         * bridgeErrorHandler is not possible. In other situations we may
+         * improve the Camel component to hook into the 3rd party component and
+         * make this possible for future releases. By default the consumer will
+         * use the org.apache.camel.spi.ExceptionHandler to deal with
+         * exceptions, that will be logged at WARN or ERROR level and ignored.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -1097,6 +1159,19 @@ public interface CloudtrailEndpointBuilderFactory {
          * Since: 3.19
          * Maven coordinates: org.apache.camel:camel-aws-cloudtrail
          * 
+         * @return the dsl builder for the headers' name.
+         */
+        default CloudtrailHeaderNameBuilder awsCloudtrail() {
+            return CloudtrailHeaderNameBuilder.INSTANCE;
+        }
+        /**
+         * AWS Cloudtrail (camel-aws-cloudtrail)
+         * Consume events from Amazon Cloudtrail using AWS SDK version 2.x.
+         * 
+         * Category: cloud,management,monitoring
+         * Since: 3.19
+         * Maven coordinates: org.apache.camel:camel-aws-cloudtrail
+         * 
          * Syntax: <code>aws-cloudtrail:label</code>
          * 
          * Path parameter: label (required)
@@ -1130,6 +1205,70 @@ public interface CloudtrailEndpointBuilderFactory {
                 String componentName,
                 String path) {
             return CloudtrailEndpointBuilderFactory.endpointBuilder(componentName, path);
+        }
+    }
+
+    /**
+     * The builder of headers' name for the AWS Cloudtrail component.
+     */
+    public static class CloudtrailHeaderNameBuilder {
+        /**
+         * The internal instance of the builder used to access to all the
+         * methods representing the name of headers.
+         */
+        private static final CloudtrailHeaderNameBuilder INSTANCE = new CloudtrailHeaderNameBuilder();
+
+        /**
+         * The event ID of the cloud trail event consumed.
+         * 
+         * The option is a: {@code String} type.
+         * 
+         * Group: consumer
+         * 
+         * @return the name of the header {@code AwsCloudTrailEventId}.
+         */
+        public String awsCloudTrailEventId() {
+            return "CamelAwsCloudTrailEventId";
+        }
+
+        /**
+         * The event Name of the cloud trail event consumed.
+         * 
+         * The option is a: {@code String} type.
+         * 
+         * Group: consumer
+         * 
+         * @return the name of the header {@code AwsCloudTrailEventName}.
+         */
+        public String awsCloudTrailEventName() {
+            return "CamelAwsCloudTrailEventName";
+        }
+
+        /**
+         * The event Source of the cloud trail event consumed.
+         * 
+         * The option is a: {@code String} type.
+         * 
+         * Group: consumer
+         * 
+         * @return the name of the header {@code AwsCloudTrailEventSource}.
+         */
+        public String awsCloudTrailEventSource() {
+            return "CamelAwsCloudTrailEventSource";
+        }
+
+        /**
+         * The associated username of the event of the cloud trail event
+         * consumed.
+         * 
+         * The option is a: {@code String} type.
+         * 
+         * Group: consumer
+         * 
+         * @return the name of the header {@code AwsCloudTrailEventUsername}.
+         */
+        public String awsCloudTrailEventUsername() {
+            return "CamelAwsCloudTrailEventUsername";
         }
     }
     static CloudtrailEndpointBuilder endpointBuilder(

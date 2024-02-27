@@ -18,7 +18,6 @@ package org.apache.camel.component.http;
 
 import java.io.Closeable;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Map;
 
 import javax.net.ssl.HostnameVerifier;
@@ -145,29 +144,27 @@ public class HttpEndpoint extends HttpCommonEndpoint {
     @UriParam(label = "producer,advanced", description = "To use custom host header for producer. When not set in query will "
                                                          + "be ignored. When set will override host header derived from url.")
     private String customHostHeader;
-    @UriParam(label = "producer,advanced",
+    @UriParam(label = "producer",
               description = "Whether to skip mapping all the Camel headers as HTTP request headers."
                             + " If there are no data from Camel headers needed to be included in the HTTP request then this can avoid"
                             + " parsing overhead with many object allocations for the JVM garbage collector.")
     private boolean skipRequestHeaders;
-
-    @UriParam(label = "producer", defaultValue = "false",
-              description = "Whether to the HTTP request should follow redirects."
-                            + " By default the HTTP request does not follow redirects ")
-    private boolean followRedirects;
-
-    @UriParam(label = "producer,advanced",
+    @UriParam(label = "producer",
               description = "Whether to skip mapping all the HTTP response headers to Camel headers."
                             + " If there are no data needed from HTTP headers then this can avoid parsing overhead"
                             + " with many object allocations for the JVM garbage collector.")
     private boolean skipResponseHeaders;
+    @UriParam(label = "producer,advanced", defaultValue = "false",
+              description = "Whether to the HTTP request should follow redirects."
+                            + " By default the HTTP request does not follow redirects ")
+    private boolean followRedirects;
     @UriParam(label = "producer,advanced", description = "To set a custom HTTP User-Agent request header")
     private String userAgent;
 
     public HttpEndpoint() {
     }
 
-    public HttpEndpoint(String endPointURI, HttpComponent component, URI httpURI) throws URISyntaxException {
+    public HttpEndpoint(String endPointURI, HttpComponent component, URI httpURI) {
         this(endPointURI, component, httpURI, null);
     }
 
@@ -262,16 +259,11 @@ public class HttpEndpoint extends HttpCommonEndpoint {
 
         if (isAuthenticationPreemptive()) {
             // setup the preemptive authentication here
-            clientBuilder.addExecInterceptorFirst("preemptive-auth", new PreemptiveAuthExecChainHandler());
+            clientBuilder.addExecInterceptorFirst("preemptive-auth", new PreemptiveAuthExecChainHandler(this));
         }
         String userAgent = getUserAgent();
         if (userAgent != null) {
             clientBuilder.setUserAgent(userAgent);
-        }
-
-        HttpClientConfigurer configurer = getHttpClientConfigurer();
-        if (configurer != null) {
-            configurer.configureHttpClient(clientBuilder);
         }
 
         if (isBridgeEndpoint()) {
@@ -283,7 +275,13 @@ public class HttpEndpoint extends HttpCommonEndpoint {
             clientBuilder.setRedirectStrategy(DefaultRedirectStrategy.INSTANCE);
         }
 
+        HttpClientConfigurer configurer = getHttpClientConfigurer();
+        if (configurer != null) {
+            configurer.configureHttpClient(clientBuilder);
+        }
+
         LOG.debug("Setup the HttpClientBuilder {}", clientBuilder);
+
         return clientBuilder.build();
     }
 

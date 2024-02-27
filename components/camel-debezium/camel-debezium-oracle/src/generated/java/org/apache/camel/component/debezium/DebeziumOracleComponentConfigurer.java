@@ -44,6 +44,8 @@ public class DebeziumOracleComponentConfigurer extends PropertyConfigurerSupport
         case "columnPropagateSourceType": getOrCreateConfiguration(target).setColumnPropagateSourceType(property(camelContext, java.lang.String.class, value)); return true;
         case "configuration": target.setConfiguration(property(camelContext, org.apache.camel.component.debezium.configuration.OracleConnectorEmbeddedDebeziumConfiguration.class, value)); return true;
         case "converters": getOrCreateConfiguration(target).setConverters(property(camelContext, java.lang.String.class, value)); return true;
+        case "custommetrictags":
+        case "customMetricTags": getOrCreateConfiguration(target).setCustomMetricTags(property(camelContext, java.lang.String.class, value)); return true;
         case "databaseconnectionadapter":
         case "databaseConnectionAdapter": getOrCreateConfiguration(target).setDatabaseConnectionAdapter(property(camelContext, java.lang.String.class, value)); return true;
         case "databasedbname":
@@ -80,6 +82,8 @@ public class DebeziumOracleComponentConfigurer extends PropertyConfigurerSupport
         case "includeSchemaChanges": getOrCreateConfiguration(target).setIncludeSchemaChanges(property(camelContext, boolean.class, value)); return true;
         case "includeschemacomments":
         case "includeSchemaComments": getOrCreateConfiguration(target).setIncludeSchemaComments(property(camelContext, boolean.class, value)); return true;
+        case "incrementalsnapshotwatermarkingstrategy":
+        case "incrementalSnapshotWatermarkingStrategy": getOrCreateConfiguration(target).setIncrementalSnapshotWatermarkingStrategy(property(camelContext, java.lang.String.class, value)); return true;
         case "internalkeyconverter":
         case "internalKeyConverter": getOrCreateConfiguration(target).setInternalKeyConverter(property(camelContext, java.lang.String.class, value)); return true;
         case "internalvalueconverter":
@@ -106,6 +110,8 @@ public class DebeziumOracleComponentConfigurer extends PropertyConfigurerSupport
         case "logMiningBufferDropOnStop": getOrCreateConfiguration(target).setLogMiningBufferDropOnStop(property(camelContext, boolean.class, value)); return true;
         case "logminingbufferinfinispancacheevents":
         case "logMiningBufferInfinispanCacheEvents": getOrCreateConfiguration(target).setLogMiningBufferInfinispanCacheEvents(property(camelContext, java.lang.String.class, value)); return true;
+        case "logminingbufferinfinispancacheglobal":
+        case "logMiningBufferInfinispanCacheGlobal": getOrCreateConfiguration(target).setLogMiningBufferInfinispanCacheGlobal(property(camelContext, java.lang.String.class, value)); return true;
         case "logminingbufferinfinispancacheprocessedtransactions":
         case "logMiningBufferInfinispanCacheProcessedTransactions": getOrCreateConfiguration(target).setLogMiningBufferInfinispanCacheProcessedTransactions(property(camelContext, java.lang.String.class, value)); return true;
         case "logminingbufferinfinispancacheschemachanges":
@@ -172,8 +178,16 @@ public class DebeziumOracleComponentConfigurer extends PropertyConfigurerSupport
         case "offsetStorageReplicationFactor": getOrCreateConfiguration(target).setOffsetStorageReplicationFactor(property(camelContext, int.class, value)); return true;
         case "offsetstoragetopic":
         case "offsetStorageTopic": getOrCreateConfiguration(target).setOffsetStorageTopic(property(camelContext, java.lang.String.class, value)); return true;
+        case "openlogreplicatorhost":
+        case "openlogreplicatorHost": getOrCreateConfiguration(target).setOpenlogreplicatorHost(property(camelContext, java.lang.String.class, value)); return true;
+        case "openlogreplicatorport":
+        case "openlogreplicatorPort": getOrCreateConfiguration(target).setOpenlogreplicatorPort(property(camelContext, int.class, value)); return true;
+        case "openlogreplicatorsource":
+        case "openlogreplicatorSource": getOrCreateConfiguration(target).setOpenlogreplicatorSource(property(camelContext, java.lang.String.class, value)); return true;
         case "pollintervalms":
         case "pollIntervalMs": getOrCreateConfiguration(target).setPollIntervalMs(property(camelContext, java.time.Duration.class, value).toMillis()); return true;
+        case "postprocessors":
+        case "postProcessors": getOrCreateConfiguration(target).setPostProcessors(property(camelContext, java.lang.String.class, value)); return true;
         case "providetransactionmetadata":
         case "provideTransactionMetadata": getOrCreateConfiguration(target).setProvideTransactionMetadata(property(camelContext, boolean.class, value)); return true;
         case "queryfetchsize":
@@ -261,6 +275,8 @@ public class DebeziumOracleComponentConfigurer extends PropertyConfigurerSupport
         case "columnPropagateSourceType": return java.lang.String.class;
         case "configuration": return org.apache.camel.component.debezium.configuration.OracleConnectorEmbeddedDebeziumConfiguration.class;
         case "converters": return java.lang.String.class;
+        case "custommetrictags":
+        case "customMetricTags": return java.lang.String.class;
         case "databaseconnectionadapter":
         case "databaseConnectionAdapter": return java.lang.String.class;
         case "databasedbname":
@@ -297,6 +313,8 @@ public class DebeziumOracleComponentConfigurer extends PropertyConfigurerSupport
         case "includeSchemaChanges": return boolean.class;
         case "includeschemacomments":
         case "includeSchemaComments": return boolean.class;
+        case "incrementalsnapshotwatermarkingstrategy":
+        case "incrementalSnapshotWatermarkingStrategy": return java.lang.String.class;
         case "internalkeyconverter":
         case "internalKeyConverter": return java.lang.String.class;
         case "internalvalueconverter":
@@ -323,6 +341,8 @@ public class DebeziumOracleComponentConfigurer extends PropertyConfigurerSupport
         case "logMiningBufferDropOnStop": return boolean.class;
         case "logminingbufferinfinispancacheevents":
         case "logMiningBufferInfinispanCacheEvents": return java.lang.String.class;
+        case "logminingbufferinfinispancacheglobal":
+        case "logMiningBufferInfinispanCacheGlobal": return java.lang.String.class;
         case "logminingbufferinfinispancacheprocessedtransactions":
         case "logMiningBufferInfinispanCacheProcessedTransactions": return java.lang.String.class;
         case "logminingbufferinfinispancacheschemachanges":
@@ -389,8 +409,16 @@ public class DebeziumOracleComponentConfigurer extends PropertyConfigurerSupport
         case "offsetStorageReplicationFactor": return int.class;
         case "offsetstoragetopic":
         case "offsetStorageTopic": return java.lang.String.class;
+        case "openlogreplicatorhost":
+        case "openlogreplicatorHost": return java.lang.String.class;
+        case "openlogreplicatorport":
+        case "openlogreplicatorPort": return int.class;
+        case "openlogreplicatorsource":
+        case "openlogreplicatorSource": return java.lang.String.class;
         case "pollintervalms":
         case "pollIntervalMs": return long.class;
+        case "postprocessors":
+        case "postProcessors": return java.lang.String.class;
         case "providetransactionmetadata":
         case "provideTransactionMetadata": return boolean.class;
         case "queryfetchsize":
@@ -479,6 +507,8 @@ public class DebeziumOracleComponentConfigurer extends PropertyConfigurerSupport
         case "columnPropagateSourceType": return getOrCreateConfiguration(target).getColumnPropagateSourceType();
         case "configuration": return target.getConfiguration();
         case "converters": return getOrCreateConfiguration(target).getConverters();
+        case "custommetrictags":
+        case "customMetricTags": return getOrCreateConfiguration(target).getCustomMetricTags();
         case "databaseconnectionadapter":
         case "databaseConnectionAdapter": return getOrCreateConfiguration(target).getDatabaseConnectionAdapter();
         case "databasedbname":
@@ -515,6 +545,8 @@ public class DebeziumOracleComponentConfigurer extends PropertyConfigurerSupport
         case "includeSchemaChanges": return getOrCreateConfiguration(target).isIncludeSchemaChanges();
         case "includeschemacomments":
         case "includeSchemaComments": return getOrCreateConfiguration(target).isIncludeSchemaComments();
+        case "incrementalsnapshotwatermarkingstrategy":
+        case "incrementalSnapshotWatermarkingStrategy": return getOrCreateConfiguration(target).getIncrementalSnapshotWatermarkingStrategy();
         case "internalkeyconverter":
         case "internalKeyConverter": return getOrCreateConfiguration(target).getInternalKeyConverter();
         case "internalvalueconverter":
@@ -541,6 +573,8 @@ public class DebeziumOracleComponentConfigurer extends PropertyConfigurerSupport
         case "logMiningBufferDropOnStop": return getOrCreateConfiguration(target).isLogMiningBufferDropOnStop();
         case "logminingbufferinfinispancacheevents":
         case "logMiningBufferInfinispanCacheEvents": return getOrCreateConfiguration(target).getLogMiningBufferInfinispanCacheEvents();
+        case "logminingbufferinfinispancacheglobal":
+        case "logMiningBufferInfinispanCacheGlobal": return getOrCreateConfiguration(target).getLogMiningBufferInfinispanCacheGlobal();
         case "logminingbufferinfinispancacheprocessedtransactions":
         case "logMiningBufferInfinispanCacheProcessedTransactions": return getOrCreateConfiguration(target).getLogMiningBufferInfinispanCacheProcessedTransactions();
         case "logminingbufferinfinispancacheschemachanges":
@@ -607,8 +641,16 @@ public class DebeziumOracleComponentConfigurer extends PropertyConfigurerSupport
         case "offsetStorageReplicationFactor": return getOrCreateConfiguration(target).getOffsetStorageReplicationFactor();
         case "offsetstoragetopic":
         case "offsetStorageTopic": return getOrCreateConfiguration(target).getOffsetStorageTopic();
+        case "openlogreplicatorhost":
+        case "openlogreplicatorHost": return getOrCreateConfiguration(target).getOpenlogreplicatorHost();
+        case "openlogreplicatorport":
+        case "openlogreplicatorPort": return getOrCreateConfiguration(target).getOpenlogreplicatorPort();
+        case "openlogreplicatorsource":
+        case "openlogreplicatorSource": return getOrCreateConfiguration(target).getOpenlogreplicatorSource();
         case "pollintervalms":
         case "pollIntervalMs": return getOrCreateConfiguration(target).getPollIntervalMs();
+        case "postprocessors":
+        case "postProcessors": return getOrCreateConfiguration(target).getPostProcessors();
         case "providetransactionmetadata":
         case "provideTransactionMetadata": return getOrCreateConfiguration(target).isProvideTransactionMetadata();
         case "queryfetchsize":

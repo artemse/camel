@@ -75,10 +75,10 @@ public interface ConsulEndpointBuilderFactory {
             return this;
         }
         /**
-         * Reference to a com.orbitz.consul.Consul in the registry.
+         * Reference to a org.kiwiproject.consul.Consul in the registry.
          * 
-         * The option is a: &lt;code&gt;com.orbitz.consul.Consul&lt;/code&gt;
-         * type.
+         * The option is a:
+         * &lt;code&gt;org.kiwiproject.consul.Consul&lt;/code&gt; type.
          * 
          * Group: common
          * 
@@ -86,15 +86,15 @@ public interface ConsulEndpointBuilderFactory {
          * @return the dsl builder
          */
         default ConsulEndpointConsumerBuilder consulClient(
-                com.orbitz.consul.Consul consulClient) {
+                org.kiwiproject.consul.Consul consulClient) {
             doSetProperty("consulClient", consulClient);
             return this;
         }
         /**
-         * Reference to a com.orbitz.consul.Consul in the registry.
+         * Reference to a org.kiwiproject.consul.Consul in the registry.
          * 
          * The option will be converted to a
-         * &lt;code&gt;com.orbitz.consul.Consul&lt;/code&gt; type.
+         * &lt;code&gt;org.kiwiproject.consul.Consul&lt;/code&gt; type.
          * 
          * Group: common
          * 
@@ -423,12 +423,17 @@ public interface ConsulEndpointBuilderFactory {
         }
         /**
          * Allows for bridging the consumer to the Camel routing Error Handler,
-         * which mean any exceptions occurred while the consumer is trying to
-         * pickup incoming messages, or the likes, will now be processed as a
-         * message and handled by the routing Error Handler. By default the
-         * consumer will use the org.apache.camel.spi.ExceptionHandler to deal
-         * with exceptions, that will be logged at WARN or ERROR level and
-         * ignored.
+         * which mean any exceptions (if possible) occurred while the Camel
+         * consumer is trying to pickup incoming messages, or the likes, will
+         * now be processed as a message and handled by the routing Error
+         * Handler. Important: This is only possible if the 3rd party component
+         * allows Camel to be alerted if an exception was thrown. Some
+         * components handle this internally only, and therefore
+         * bridgeErrorHandler is not possible. In other situations we may
+         * improve the Camel component to hook into the 3rd party component and
+         * make this possible for future releases. By default the consumer will
+         * use the org.apache.camel.spi.ExceptionHandler to deal with
+         * exceptions, that will be logged at WARN or ERROR level and ignored.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -445,12 +450,17 @@ public interface ConsulEndpointBuilderFactory {
         }
         /**
          * Allows for bridging the consumer to the Camel routing Error Handler,
-         * which mean any exceptions occurred while the consumer is trying to
-         * pickup incoming messages, or the likes, will now be processed as a
-         * message and handled by the routing Error Handler. By default the
-         * consumer will use the org.apache.camel.spi.ExceptionHandler to deal
-         * with exceptions, that will be logged at WARN or ERROR level and
-         * ignored.
+         * which mean any exceptions (if possible) occurred while the Camel
+         * consumer is trying to pickup incoming messages, or the likes, will
+         * now be processed as a message and handled by the routing Error
+         * Handler. Important: This is only possible if the 3rd party component
+         * allows Camel to be alerted if an exception was thrown. Some
+         * components handle this internally only, and therefore
+         * bridgeErrorHandler is not possible. In other situations we may
+         * improve the Camel component to hook into the 3rd party component and
+         * make this possible for future releases. By default the consumer will
+         * use the org.apache.camel.spi.ExceptionHandler to deal with
+         * exceptions, that will be logged at WARN or ERROR level and ignored.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -541,8 +551,7 @@ public interface ConsulEndpointBuilderFactory {
          * ConsistencyMode.DEFAULT.
          * 
          * The option is a:
-         * &lt;code&gt;com.orbitz.consul.option.ConsistencyMode&lt;/code&gt;
-         * type.
+         * &lt;code&gt;org.kiwiproject.consul.option.ConsistencyMode&lt;/code&gt; type.
          * 
          * Default: DEFAULT
          * Group: advanced
@@ -551,7 +560,7 @@ public interface ConsulEndpointBuilderFactory {
          * @return the dsl builder
          */
         default AdvancedConsulEndpointConsumerBuilder consistencyMode(
-                com.orbitz.consul.option.ConsistencyMode consistencyMode) {
+                org.kiwiproject.consul.option.ConsistencyMode consistencyMode) {
             doSetProperty("consistencyMode", consistencyMode);
             return this;
         }
@@ -560,8 +569,7 @@ public interface ConsulEndpointBuilderFactory {
          * ConsistencyMode.DEFAULT.
          * 
          * The option will be converted to a
-         * &lt;code&gt;com.orbitz.consul.option.ConsistencyMode&lt;/code&gt;
-         * type.
+         * &lt;code&gt;org.kiwiproject.consul.option.ConsistencyMode&lt;/code&gt; type.
          * 
          * Default: DEFAULT
          * Group: advanced
@@ -677,10 +685,10 @@ public interface ConsulEndpointBuilderFactory {
             return this;
         }
         /**
-         * Reference to a com.orbitz.consul.Consul in the registry.
+         * Reference to a org.kiwiproject.consul.Consul in the registry.
          * 
-         * The option is a: &lt;code&gt;com.orbitz.consul.Consul&lt;/code&gt;
-         * type.
+         * The option is a:
+         * &lt;code&gt;org.kiwiproject.consul.Consul&lt;/code&gt; type.
          * 
          * Group: common
          * 
@@ -688,15 +696,15 @@ public interface ConsulEndpointBuilderFactory {
          * @return the dsl builder
          */
         default ConsulEndpointProducerBuilder consulClient(
-                com.orbitz.consul.Consul consulClient) {
+                org.kiwiproject.consul.Consul consulClient) {
             doSetProperty("consulClient", consulClient);
             return this;
         }
         /**
-         * Reference to a com.orbitz.consul.Consul in the registry.
+         * Reference to a org.kiwiproject.consul.Consul in the registry.
          * 
          * The option will be converted to a
-         * &lt;code&gt;com.orbitz.consul.Consul&lt;/code&gt; type.
+         * &lt;code&gt;org.kiwiproject.consul.Consul&lt;/code&gt; type.
          * 
          * Group: common
          * 
@@ -1031,8 +1039,7 @@ public interface ConsulEndpointBuilderFactory {
          * ConsistencyMode.DEFAULT.
          * 
          * The option is a:
-         * &lt;code&gt;com.orbitz.consul.option.ConsistencyMode&lt;/code&gt;
-         * type.
+         * &lt;code&gt;org.kiwiproject.consul.option.ConsistencyMode&lt;/code&gt; type.
          * 
          * Default: DEFAULT
          * Group: advanced
@@ -1041,7 +1048,7 @@ public interface ConsulEndpointBuilderFactory {
          * @return the dsl builder
          */
         default AdvancedConsulEndpointProducerBuilder consistencyMode(
-                com.orbitz.consul.option.ConsistencyMode consistencyMode) {
+                org.kiwiproject.consul.option.ConsistencyMode consistencyMode) {
             doSetProperty("consistencyMode", consistencyMode);
             return this;
         }
@@ -1050,8 +1057,7 @@ public interface ConsulEndpointBuilderFactory {
          * ConsistencyMode.DEFAULT.
          * 
          * The option will be converted to a
-         * &lt;code&gt;com.orbitz.consul.option.ConsistencyMode&lt;/code&gt;
-         * type.
+         * &lt;code&gt;org.kiwiproject.consul.option.ConsistencyMode&lt;/code&gt; type.
          * 
          * Default: DEFAULT
          * Group: advanced
@@ -1167,10 +1173,10 @@ public interface ConsulEndpointBuilderFactory {
             return this;
         }
         /**
-         * Reference to a com.orbitz.consul.Consul in the registry.
+         * Reference to a org.kiwiproject.consul.Consul in the registry.
          * 
-         * The option is a: &lt;code&gt;com.orbitz.consul.Consul&lt;/code&gt;
-         * type.
+         * The option is a:
+         * &lt;code&gt;org.kiwiproject.consul.Consul&lt;/code&gt; type.
          * 
          * Group: common
          * 
@@ -1178,15 +1184,15 @@ public interface ConsulEndpointBuilderFactory {
          * @return the dsl builder
          */
         default ConsulEndpointBuilder consulClient(
-                com.orbitz.consul.Consul consulClient) {
+                org.kiwiproject.consul.Consul consulClient) {
             doSetProperty("consulClient", consulClient);
             return this;
         }
         /**
-         * Reference to a com.orbitz.consul.Consul in the registry.
+         * Reference to a org.kiwiproject.consul.Consul in the registry.
          * 
          * The option will be converted to a
-         * &lt;code&gt;com.orbitz.consul.Consul&lt;/code&gt; type.
+         * &lt;code&gt;org.kiwiproject.consul.Consul&lt;/code&gt; type.
          * 
          * Group: common
          * 
@@ -1424,8 +1430,7 @@ public interface ConsulEndpointBuilderFactory {
          * ConsistencyMode.DEFAULT.
          * 
          * The option is a:
-         * &lt;code&gt;com.orbitz.consul.option.ConsistencyMode&lt;/code&gt;
-         * type.
+         * &lt;code&gt;org.kiwiproject.consul.option.ConsistencyMode&lt;/code&gt; type.
          * 
          * Default: DEFAULT
          * Group: advanced
@@ -1434,7 +1439,7 @@ public interface ConsulEndpointBuilderFactory {
          * @return the dsl builder
          */
         default AdvancedConsulEndpointBuilder consistencyMode(
-                com.orbitz.consul.option.ConsistencyMode consistencyMode) {
+                org.kiwiproject.consul.option.ConsistencyMode consistencyMode) {
             doSetProperty("consistencyMode", consistencyMode);
             return this;
         }
@@ -1443,8 +1448,7 @@ public interface ConsulEndpointBuilderFactory {
          * ConsistencyMode.DEFAULT.
          * 
          * The option will be converted to a
-         * &lt;code&gt;com.orbitz.consul.option.ConsistencyMode&lt;/code&gt;
-         * type.
+         * &lt;code&gt;org.kiwiproject.consul.option.ConsistencyMode&lt;/code&gt; type.
          * 
          * Default: DEFAULT
          * Group: advanced
@@ -1594,7 +1598,7 @@ public interface ConsulEndpointBuilderFactory {
          * @return the name of the header {@code ConsulAction}.
          */
         public String consulAction() {
-            return "ConsulAction";
+            return "CamelConsulAction";
         }
 
         /**
@@ -1607,7 +1611,7 @@ public interface ConsulEndpointBuilderFactory {
          * @return the name of the header {@code ConsulKey}.
          */
         public String consulKey() {
-            return "ConsulKey";
+            return "CamelConsulKey";
         }
 
         /**
@@ -1620,7 +1624,7 @@ public interface ConsulEndpointBuilderFactory {
          * @return the name of the header {@code ConsulEventId}.
          */
         public String consulEventId() {
-            return "ConsulEventId";
+            return "CamelConsulEventId";
         }
 
         /**
@@ -1633,7 +1637,7 @@ public interface ConsulEndpointBuilderFactory {
          * @return the name of the header {@code ConsulEventName}.
          */
         public String consulEventName() {
-            return "ConsulEventName";
+            return "CamelConsulEventName";
         }
 
         /**
@@ -1646,7 +1650,7 @@ public interface ConsulEndpointBuilderFactory {
          * @return the name of the header {@code ConsulEventLTime}.
          */
         public String consulEventLTime() {
-            return "ConsulEventLTime";
+            return "CamelConsulEventLTime";
         }
 
         /**
@@ -1659,7 +1663,7 @@ public interface ConsulEndpointBuilderFactory {
          * @return the name of the header {@code ConsulNodeFilter}.
          */
         public String consulNodeFilter() {
-            return "ConsulNodeFilter";
+            return "CamelConsulNodeFilter";
         }
 
         /**
@@ -1672,7 +1676,7 @@ public interface ConsulEndpointBuilderFactory {
          * @return the name of the header {@code ConsulTagFilter}.
          */
         public String consulTagFilter() {
-            return "ConsulTagFilter";
+            return "CamelConsulTagFilter";
         }
 
         /**
@@ -1685,7 +1689,7 @@ public interface ConsulEndpointBuilderFactory {
          * @return the name of the header {@code ConsulSessionFilter}.
          */
         public String consulSessionFilter() {
-            return "ConsulSessionFilter";
+            return "CamelConsulSessionFilter";
         }
 
         /**
@@ -1698,7 +1702,7 @@ public interface ConsulEndpointBuilderFactory {
          * @return the name of the header {@code ConsulVersion}.
          */
         public String consulVersion() {
-            return "ConsulVersion";
+            return "CamelConsulVersion";
         }
 
         /**
@@ -1711,7 +1715,7 @@ public interface ConsulEndpointBuilderFactory {
          * @return the name of the header {@code ConsulFlags}.
          */
         public String consulFlags() {
-            return "ConsulFlags";
+            return "CamelConsulFlags";
         }
 
         /**
@@ -1724,7 +1728,7 @@ public interface ConsulEndpointBuilderFactory {
          * @return the name of the header {@code ConsulIndex}.
          */
         public String consulIndex() {
-            return "ConsulIndex";
+            return "CamelConsulIndex";
         }
 
         /**
@@ -1737,7 +1741,7 @@ public interface ConsulEndpointBuilderFactory {
          * @return the name of the header {@code ConsulWait}.
          */
         public String consulWait() {
-            return "ConsulWait";
+            return "CamelConsulWait";
         }
 
         /**
@@ -1750,7 +1754,7 @@ public interface ConsulEndpointBuilderFactory {
          * @return the name of the header {@code ConsulCreateIndex}.
          */
         public String consulCreateIndex() {
-            return "ConsulCreateIndex";
+            return "CamelConsulCreateIndex";
         }
 
         /**
@@ -1764,7 +1768,7 @@ public interface ConsulEndpointBuilderFactory {
          * @return the name of the header {@code ConsulLockIndex}.
          */
         public String consulLockIndex() {
-            return "ConsulLockIndex";
+            return "CamelConsulLockIndex";
         }
 
         /**
@@ -1777,7 +1781,7 @@ public interface ConsulEndpointBuilderFactory {
          * @return the name of the header {@code ConsulModifyIndex}.
          */
         public String consulModifyIndex() {
-            return "ConsulModifyIndex";
+            return "CamelConsulModifyIndex";
         }
 
         /**
@@ -1790,7 +1794,7 @@ public interface ConsulEndpointBuilderFactory {
          * @return the name of the header {@code ConsulOptions}.
          */
         public String consulOptions() {
-            return "ConsulOptions";
+            return "CamelConsulOptions";
         }
 
         /**
@@ -1803,7 +1807,7 @@ public interface ConsulEndpointBuilderFactory {
          * @return the name of the header {@code ConsulResult}.
          */
         public String consulResult() {
-            return "ConsulResult";
+            return "CamelConsulResult";
         }
 
         /**
@@ -1816,7 +1820,7 @@ public interface ConsulEndpointBuilderFactory {
          * @return the name of the header {@code ConsulSession}.
          */
         public String consulSession() {
-            return "ConsulSession";
+            return "CamelConsulSession";
         }
 
         /**
@@ -1830,7 +1834,7 @@ public interface ConsulEndpointBuilderFactory {
          * @return the name of the header {@code ConsulValueAsString}.
          */
         public String consulValueAsString() {
-            return "ConsulValueAsString";
+            return "CamelConsulValueAsString";
         }
 
         /**
@@ -1843,7 +1847,7 @@ public interface ConsulEndpointBuilderFactory {
          * @return the name of the header {@code ConsulNode}.
          */
         public String consulNode() {
-            return "ConsulNode";
+            return "CamelConsulNode";
         }
 
         /**
@@ -1856,7 +1860,7 @@ public interface ConsulEndpointBuilderFactory {
          * @return the name of the header {@code ConsulService}.
          */
         public String consulService() {
-            return "ConsulService";
+            return "CamelConsulService";
         }
 
         /**
@@ -1869,7 +1873,7 @@ public interface ConsulEndpointBuilderFactory {
          * @return the name of the header {@code ConsulDatacenter}.
          */
         public String consulDatacenter() {
-            return "ConsulDatacenter";
+            return "CamelConsulDatacenter";
         }
 
         /**
@@ -1882,7 +1886,7 @@ public interface ConsulEndpointBuilderFactory {
          * @return the name of the header {@code ConsulNearNode}.
          */
         public String consulNearNode() {
-            return "ConsulNearNode";
+            return "CamelConsulNearNode";
         }
 
         /**
@@ -1895,7 +1899,7 @@ public interface ConsulEndpointBuilderFactory {
          * @return the name of the header {@code ConsulNodeMeta}.
          */
         public String consulNodeMeta() {
-            return "ConsulNodeMeta";
+            return "CamelConsulNodeMeta";
         }
 
         /**
@@ -1908,7 +1912,7 @@ public interface ConsulEndpointBuilderFactory {
          * @return the name of the header {@code ConsulLastContact}.
          */
         public String consulLastContact() {
-            return "ConsulLastContact";
+            return "CamelConsulLastContact";
         }
 
         /**
@@ -1921,14 +1925,14 @@ public interface ConsulEndpointBuilderFactory {
          * @return the name of the header {@code ConsulKnownLeader}.
          */
         public String consulKnownLeader() {
-            return "ConsulKnownLeader";
+            return "CamelConsulKnownLeader";
         }
 
         /**
          * The consistencyMode used for queries.
          * 
-         * The option is a: {@code com.orbitz.consul.option.ConsistencyMode}
-         * type.
+         * The option is a: {@code
+         * org.kiwiproject.consul.option.ConsistencyMode} type.
          * 
          * Default: DEFAULT
          * Group: producer
@@ -1936,7 +1940,7 @@ public interface ConsulEndpointBuilderFactory {
          * @return the name of the header {@code ConsulConsistencyMode}.
          */
         public String consulConsistencyMode() {
-            return "ConsulConsistencyMode";
+            return "CamelConsulConsistencyMode";
         }
 
         /**
@@ -1950,20 +1954,20 @@ public interface ConsulEndpointBuilderFactory {
          * @return the name of the header {@code ConsulHealthyOnly}.
          */
         public String consulHealthyOnly() {
-            return "ConsulHealthyOnly";
+            return "CamelConsulHealthyOnly";
         }
 
         /**
          * The state to query.
          * 
-         * The option is a: {@code com.orbitz.consul.model.State} type.
+         * The option is a: {@code org.kiwiproject.consul.model.State} type.
          * 
          * Group: producer
          * 
          * @return the name of the header {@code ConsulHealthyState}.
          */
         public String consulHealthyState() {
-            return "ConsulHealthyState";
+            return "CamelConsulHealthyState";
         }
 
         /**
@@ -1976,7 +1980,7 @@ public interface ConsulEndpointBuilderFactory {
          * @return the name of the header {@code ConsulPreparedQueryID}.
          */
         public String consulPreparedQueryID() {
-            return "ConsulPreparedQueryID";
+            return "CamelConsulPreparedQueryID";
         }
 
         /**
@@ -1989,7 +1993,7 @@ public interface ConsulEndpointBuilderFactory {
          * @return the name of the header {@code ConsulServiceId}.
          */
         public String consulServiceId() {
-            return "ConsulServiceId";
+            return "CamelConsulServiceId";
         }
     }
     static ConsulEndpointBuilder endpointBuilder(

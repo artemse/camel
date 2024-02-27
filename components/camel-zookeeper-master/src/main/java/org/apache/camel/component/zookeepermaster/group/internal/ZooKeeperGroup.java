@@ -182,6 +182,7 @@ public class ZooKeeperGroup<T extends NodeState> implements Group<T> {
             try {
                 executorService.awaitTermination(5, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 throw (IOException) new InterruptedIOException().initCause(e);
             }
             try {
@@ -482,9 +483,9 @@ public class ZooKeeperGroup<T extends NodeState> implements Group<T> {
      */
     protected void handleException(Throwable e) {
         if (e instanceof IllegalStateException && "Client is not started".equals(e.getMessage())) {
-            LOG.debug("", e);
+            LOG.debug("{}", e.getMessage(), e);
         } else {
-            LOG.error("", e);
+            LOG.error("{}", e.getMessage(), e);
         }
     }
 

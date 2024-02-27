@@ -44,7 +44,7 @@ public class SqlStoredEndpoint extends DefaultEndpoint {
     private JdbcTemplate jdbcTemplate;
 
     @UriPath(description = "Sets the stored procedure template to perform. You can externalize the template by using file: or classpath: as prefix and specify the location of the file.")
-    @Metadata(required = true, supportFileReference = true)
+    @Metadata(required = true, supportFileReference = true, largeInput = true, inputLanguage = "sql")
     private String template;
     @UriParam(description = "Sets the DataSource to use to communicate with the database.")
     private DataSource dataSource;
@@ -63,6 +63,10 @@ public class SqlStoredEndpoint extends DefaultEndpoint {
     @UriParam(label = "advanced", prefix = "template.", multiValue = true,
               description = "Configures the Spring JdbcTemplate with the key/values from the Map")
     private Map<String, Object> templateOptions;
+
+    public SqlStoredEndpoint(String uri, SqlStoredComponent component) {
+        super(uri, component);
+    }
 
     public SqlStoredEndpoint(String uri, SqlStoredComponent component, JdbcTemplate jdbcTemplate) {
         super(uri, component);

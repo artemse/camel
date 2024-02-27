@@ -31,7 +31,7 @@ public class StringHelperTest {
 
     @Test
     public void testCamelCashToDash() {
-        assertEquals(null, camelCaseToDash(null));
+        assertNull(camelCaseToDash(null));
         assertEquals("", camelCaseToDash(""));
 
         assertEquals("hello-world", camelCaseToDash("HelloWorld"));
@@ -59,6 +59,17 @@ public class StringHelperTest {
         assertEquals("available-phone-number-country", camelCaseToDash("available_phone_number_country"));
         assertEquals("available-phone-number-country", camelCaseToDash("availablePhoneNumberCountry"));
         assertEquals("available-phone-number-country", camelCaseToDash("AvailablePhoneNumberCountry"));
+    }
+
+    @Test
+    public void testDashToCamelCaseSkipQuotedOrKeyed() {
+        String line = "camel.component.rabbitmq.args[queue.x-queue-type]";
+        // no preserve
+        assertEquals("camel.component.rabbitmq.args[queue.xQueueType]",
+                dashToCamelCase(line));
+
+        // preserved
+        assertEquals(line, dashToCamelCase(line, true));
     }
 
     @Nested

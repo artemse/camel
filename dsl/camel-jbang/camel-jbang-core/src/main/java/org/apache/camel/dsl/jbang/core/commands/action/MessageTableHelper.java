@@ -24,8 +24,7 @@ import com.github.freva.asciitable.AsciiTable;
 import com.github.freva.asciitable.Column;
 import com.github.freva.asciitable.HorizontalAlign;
 import com.github.freva.asciitable.OverflowBehaviour;
-import org.apache.camel.dsl.jbang.core.common.JSonHelper;
-import org.apache.camel.dsl.jbang.core.common.XmlHelper;
+import org.apache.camel.dsl.jbang.core.common.CamelCommandHelper;
 import org.apache.camel.util.json.JsonArray;
 import org.apache.camel.util.json.JsonObject;
 import org.apache.camel.util.json.Jsoner;
@@ -37,13 +36,14 @@ import org.fusesource.jansi.Ansi;
 public class MessageTableHelper {
 
     @FunctionalInterface
-    interface ColorChooser {
+    public interface ColorChooser {
         Ansi.Color color(String value);
     }
 
     private boolean loggingColor;
     private boolean pretty;
     private boolean showExchangeProperties;
+    private boolean showExchangeVariables;
     private ColorChooser exchangeIdColorChooser;
 
     public boolean isLoggingColor() {
@@ -68,6 +68,14 @@ public class MessageTableHelper {
 
     public void setShowExchangeProperties(boolean showExchangeProperties) {
         this.showExchangeProperties = showExchangeProperties;
+    }
+
+    public boolean isShowExchangeVariables() {
+        return showExchangeVariables;
+    }
+
+    public void setShowExchangeVariables(boolean showExchangeVariables) {
+        this.showExchangeVariables = showExchangeVariables;
     }
 
     public ColorChooser getExchangeIdColorChooser() {
@@ -97,7 +105,7 @@ public class MessageTableHelper {
             eRow = new TableRow("Endpoint", null, null, endpoint.getString("endpoint"));
             tab0 = AsciiTable.getTable(AsciiTable.NO_BORDERS, List.of(eRow), Arrays.asList(
                     new Column().dataAlign(HorizontalAlign.LEFT)
-                            .minWidth(showExchangeProperties ? 12 : 10).with(TableRow::kindAsString),
+                            .minWidth(showExchangeProperties || showExchangeVariables ? 12 : 10).with(TableRow::kindAsString),
                     new Column().dataAlign(HorizontalAlign.LEFT).with(TableRow::valueAsString)));
         }
 
@@ -105,15 +113,23 @@ public class MessageTableHelper {
             eRow = new TableRow("Exchange", root.getString("exchangeType"), exchangePattern, exchangeId);
             tab1 = AsciiTable.getTable(AsciiTable.NO_BORDERS, List.of(eRow), Arrays.asList(
                     new Column().dataAlign(HorizontalAlign.LEFT)
-                            .minWidth(showExchangeProperties ? 12 : 10).with(TableRow::kindAsString),
+                            .minWidth(showExchangeProperties || showExchangeVariables ? 12 : 10).with(TableRow::kindAsString),
                     new Column().dataAlign(HorizontalAlign.LEFT).with(TableRow::typeAsString)));
             tab1b = AsciiTable.getTable(AsciiTable.NO_BORDERS, List.of(eRow), Arrays.asList(
                     new Column().dataAlign(HorizontalAlign.CENTER)
                             .minWidth(18).maxWidth(18).with(TableRow::mepAsKey),
                     new Column().dataAlign(HorizontalAlign.RIGHT)
                             .maxWidth(80).with(TableRow::exchangeIdAsValue)));
+            // exchange variables
+            JsonArray arr = root.getCollection("exchangeVariables");
+            if (arr != null) {
+                for (Object o : arr) {
+                    JsonObject jo = (JsonObject) o;
+                    rows.add(new TableRow("Variable", jo.getString("type"), jo.getString("key"), jo.get("value")));
+                }
+            }
             // exchange properties
-            JsonArray arr = root.getCollection("exchangeProperties");
+            arr = root.getCollection("exchangeProperties");
             if (arr != null) {
                 for (Object o : arr) {
                     JsonObject jo = (JsonObject) o;
@@ -130,7 +146,7 @@ public class MessageTableHelper {
             }
             tab2 = AsciiTable.getTable(AsciiTable.NO_BORDERS, rows, Arrays.asList(
                     new Column().dataAlign(HorizontalAlign.LEFT)
-                            .minWidth(showExchangeProperties ? 12 : 10).with(TableRow::kindAsString),
+                            .minWidth(showExchangeProperties || showExchangeVariables ? 12 : 10).with(TableRow::kindAsString),
                     new Column().dataAlign(HorizontalAlign.LEFT)
                             .minWidth(25).maxWidth(50, OverflowBehaviour.CLIP_LEFT).with(TableRow::typeAsString),
                     new Column().dataAlign(HorizontalAlign.RIGHT)
@@ -143,7 +159,7 @@ public class MessageTableHelper {
             TableRow msgRow = new TableRow("Message", root.getString("messageType"), null, null);
             tab3 = AsciiTable.getTable(AsciiTable.NO_BORDERS, List.of(msgRow), Arrays.asList(
                     new Column().dataAlign(HorizontalAlign.LEFT)
-                            .minWidth(showExchangeProperties ? 12 : 10).with(TableRow::kindAsString),
+                            .minWidth(showExchangeProperties || showExchangeVariables ? 12 : 10).with(TableRow::kindAsString),
                     new Column().dataAlign(HorizontalAlign.LEFT).with(TableRow::typeAsString)));
             arr = root.getCollection("headers");
             if (arr != null) {
@@ -155,7 +171,7 @@ public class MessageTableHelper {
             // headers
             tab4 = AsciiTable.getTable(AsciiTable.NO_BORDERS, rows, Arrays.asList(
                     new Column().dataAlign(HorizontalAlign.LEFT)
-                            .minWidth(showExchangeProperties ? 12 : 10).with(TableRow::kindAsString),
+                            .minWidth(showExchangeProperties || showExchangeVariables ? 12 : 10).with(TableRow::kindAsString),
                     new Column().dataAlign(HorizontalAlign.LEFT)
                             .minWidth(25).maxWidth(50, OverflowBehaviour.CLIP_LEFT).with(TableRow::typeAsString),
                     new Column().dataAlign(HorizontalAlign.RIGHT)
@@ -166,10 +182,12 @@ public class MessageTableHelper {
             // body and type
             JsonObject jo = root.getMap("body");
             if (jo != null) {
-                TableRow bodyRow = new TableRow("Body", jo.getString("type"), null, jo.get("value"), jo.getLong("position"));
+                TableRow bodyRow = new TableRow(
+                        "Body", jo.getString("type"), null, jo.get("value"), jo.getLong("size"), jo.getLong("position"));
                 tab5 = AsciiTable.getTable(AsciiTable.NO_BORDERS, List.of(bodyRow), Arrays.asList(
                         new Column().dataAlign(HorizontalAlign.LEFT)
-                                .minWidth(showExchangeProperties ? 12 : 10).with(TableRow::kindAsString),
+                                .minWidth(showExchangeProperties || showExchangeVariables ? 12 : 10)
+                                .with(TableRow::kindAsString),
                         new Column().dataAlign(HorizontalAlign.LEFT).with(TableRow::typeAndLengthAsString)));
                 // body value only (span)
                 if (bodyRow.value != null) {
@@ -185,7 +203,7 @@ public class MessageTableHelper {
             eRow = new TableRow("Exception", cause.getString("type"), null, cause.get("message"));
             tab7 = AsciiTable.getTable(AsciiTable.NO_BORDERS, List.of(eRow), Arrays.asList(
                     new Column().dataAlign(HorizontalAlign.LEFT)
-                            .minWidth(showExchangeProperties ? 12 : 10)
+                            .minWidth(showExchangeProperties || showExchangeVariables ? 12 : 10)
                             .with(TableRow::kindAsStringRed),
                     new Column().dataAlign(HorizontalAlign.LEFT)
                             .maxWidth(40, OverflowBehaviour.CLIP_LEFT).with(TableRow::typeAsString),
@@ -239,17 +257,19 @@ public class MessageTableHelper {
         String key;
         Object value;
         Long position;
+        Long size;
 
         TableRow(String kind, String type, String key, Object value) {
-            this(kind, type, key, value, null);
+            this(kind, type, key, value, null, null);
         }
 
-        TableRow(String kind, String type, String key, Object value, Long position) {
+        TableRow(String kind, String type, String key, Object value, Long size, Long position) {
             this.kind = kind;
             this.type = type;
             this.key = key;
             this.value = value;
             this.position = position;
+            this.size = size;
         }
 
         String valueAsString() {
@@ -257,49 +277,7 @@ public class MessageTableHelper {
         }
 
         String valueAsStringPretty() {
-            if (value == null) {
-                return "null";
-            }
-            boolean json = false;
-            String s = value.toString();
-            if (!s.isEmpty()) {
-                try {
-                    s = Jsoner.unescape(s);
-                    if (loggingColor) {
-                        s = JSonHelper.colorPrint(s, 2, true);
-                    } else {
-                        s = JSonHelper.prettyPrint(s, 2);
-                    }
-                    if (s != null && !s.isEmpty()) {
-                        json = true;
-                    }
-                } catch (Throwable e) {
-                    // ignore as not json
-                }
-                if (s == null || s.isEmpty()) {
-                    s = value.toString();
-                }
-                if (!json) {
-                    // try with xml
-                    try {
-                        s = Jsoner.unescape(s);
-                        if (loggingColor) {
-                            s = XmlHelper.colorPrint(s, 2, true);
-                        } else {
-                            s = XmlHelper.prettyPrint(s, 2);
-                        }
-                    } catch (Throwable e) {
-                        // ignore as not xml
-                    }
-                }
-                if (s == null || s.isEmpty()) {
-                    s = value.toString();
-                }
-            }
-            if (s == null) {
-                return "null";
-            }
-            return s;
+            return CamelCommandHelper.valueAsStringPretty(value, loggingColor);
         }
 
         String valueAsStringRed() {
@@ -342,6 +320,8 @@ public class MessageTableHelper {
                 s = type.substring(10);
             } else if (type.startsWith("org.apache.camel.support.")) {
                 s = type.substring(25);
+            } else if (type.equals("org.apache.camel.converter.stream.CachedOutputStream.WrappedInputStream")) {
+                s = "WrappedInputStream";
             } else if (type.startsWith("org.apache.camel.converter.stream.")) {
                 s = type.substring(34);
             } else if (type.length() > 34) {
@@ -371,6 +351,8 @@ public class MessageTableHelper {
                 s = type.substring(10);
             } else if (type.startsWith("org.apache.camel.support.")) {
                 s = type.substring(25);
+            } else if (type.equals("org.apache.camel.converter.stream.CachedOutputStream.WrappedInputStream")) {
+                s = "WrappedInputStream";
             } else if (type.startsWith("org.apache.camel.converter.stream.")) {
                 s = type.substring(34);
             } else {
@@ -378,13 +360,20 @@ public class MessageTableHelper {
             }
             s = "(" + s + ")";
             int l = valueLength();
+            long sz = size != null ? size : -1;
             long p = position != null ? position : -1;
-            if (l != -1 & p != -1) {
-                s = s + " (pos: " + p + " length: " + l + ")";
-            } else if (l != -1) {
-                s = s + " (length: " + l + ")";
-            } else if (p != -1) {
-                s = s + " (pos: " + p + ")";
+            StringBuilder sb = new StringBuilder();
+            if (sz != -1) {
+                sb.append(" size: ").append(sz);
+            }
+            if (p != -1) {
+                sb.append(" pos: ").append(p);
+            }
+            if (l != -1) {
+                sb.append(" bytes: ").append(l);
+            }
+            if (!sb.isEmpty()) {
+                s = s + " (" + sb.toString().trim() + ")";
             }
             if (loggingColor) {
                 s = Ansi.ansi().fgBrightDefault().a(Ansi.Attribute.INTENSITY_FAINT).a(s).reset().toString();

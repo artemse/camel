@@ -326,6 +326,7 @@ public class BaseExecutorServiceManager extends ServiceSupport implements Execut
                         }
                     }
                 } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                     warned = true;
                     LOG.warn("Forcing shutdown of ExecutorService: {} due interrupted.", executorService);
                     // we were interrupted during shutdown, so force shutdown
@@ -372,20 +373,16 @@ public class BaseExecutorServiceManager extends ServiceSupport implements Execut
 
     @Override
     public List<Runnable> shutdownNow(ExecutorService executorService) {
-        return doShutdownNow(executorService, false);
+        return doShutdownNow(executorService);
     }
 
-    private List<Runnable> doShutdownNow(ExecutorService executorService, boolean failSafe) {
+    private List<Runnable> doShutdownNow(ExecutorService executorService) {
         ObjectHelper.notNull(executorService, "executorService");
 
         List<Runnable> answer = null;
         if (!executorService.isShutdown()) {
-            if (failSafe) {
-                // log as warn, as we shutdown as fail-safe, so end user should see more details in the log.
-                LOG.warn("Forcing shutdown of ExecutorService: {}", executorService);
-            } else {
-                LOG.debug("Forcing shutdown of ExecutorService: {}", executorService);
-            }
+            LOG.debug("Forcing shutdown of ExecutorService: {}", executorService);
+
             answer = executorService.shutdownNow();
             if (LOG.isTraceEnabled()) {
                 LOG.trace("Shutdown of ExecutorService: {} is shutdown: {} and terminated: {}.",
@@ -393,7 +390,7 @@ public class BaseExecutorServiceManager extends ServiceSupport implements Execut
             }
         }
 
-        doRemove(executorService, failSafe);
+        doRemove(executorService, false);
 
         return answer;
     }

@@ -79,8 +79,8 @@ public interface StepFunctions2EndpointBuilderFactory {
             return this;
         }
         /**
-         * Set the need for overidding the endpoint. This option needs to be
-         * used in combination with uriEndpointOverride option.
+         * Set the need for overriding the endpoint. This option needs to be
+         * used in combination with the uriEndpointOverride option.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -96,8 +96,8 @@ public interface StepFunctions2EndpointBuilderFactory {
             return this;
         }
         /**
-         * Set the need for overidding the endpoint. This option needs to be
-         * used in combination with uriEndpointOverride option.
+         * Set the need for overriding the endpoint. This option needs to be
+         * used in combination with the uriEndpointOverride option.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -145,7 +145,7 @@ public interface StepFunctions2EndpointBuilderFactory {
             return this;
         }
         /**
-         * If using a profile credentials provider this parameter will set the
+         * If using a profile credentials provider, this parameter will set the
          * profile name.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -163,7 +163,7 @@ public interface StepFunctions2EndpointBuilderFactory {
         /**
          * The region in which StepFunctions client needs to work. When using
          * this parameter, the configuration will expect the lowercase name of
-         * the region (for example ap-east-1) You'll need to use the name
+         * the region (for example, ap-east-1) You'll need to use the name
          * Region.EU_WEST_1.id().
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -406,6 +406,58 @@ public interface StepFunctions2EndpointBuilderFactory {
             doSetProperty("secretKey", secretKey);
             return this;
         }
+        /**
+         * Amazon AWS Session Token used when the user needs to assume an IAM
+         * role.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: security
+         * 
+         * @param sessionToken the value to set
+         * @return the dsl builder
+         */
+        default StepFunctions2EndpointBuilder sessionToken(String sessionToken) {
+            doSetProperty("sessionToken", sessionToken);
+            return this;
+        }
+        /**
+         * Set whether the Step Functions client should expect to use Session
+         * Credentials. This is useful in a situation in which the user needs to
+         * assume an IAM role for doing operations in Step Functions.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default StepFunctions2EndpointBuilder useSessionCredentials(
+                boolean useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
+            return this;
+        }
+        /**
+         * Set whether the Step Functions client should expect to use Session
+         * Credentials. This is useful in a situation in which the user needs to
+         * assume an IAM role for doing operations in Step Functions.
+         * 
+         * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
+         * type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default StepFunctions2EndpointBuilder useSessionCredentials(
+                String useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
+            return this;
+        }
     }
 
     /**
@@ -467,7 +519,7 @@ public interface StepFunctions2EndpointBuilderFactory {
             return this;
         }
         /**
-         * To use a existing configured AwsStepFunctionsClient as client.
+         * To use an existing configured AwsStepFunctionsClient client.
          * 
          * The option is a:
          * &lt;code&gt;software.amazon.awssdk.services.sfn.SfnClient&lt;/code&gt; type.
@@ -483,7 +535,7 @@ public interface StepFunctions2EndpointBuilderFactory {
             return this;
         }
         /**
-         * To use a existing configured AwsStepFunctionsClient as client.
+         * To use an existing configured AwsStepFunctionsClient client.
          * 
          * The option will be converted to a
          * &lt;code&gt;software.amazon.awssdk.services.sfn.SfnClient&lt;/code&gt; type.
@@ -578,7 +630,7 @@ public interface StepFunctions2EndpointBuilderFactory {
          * @return the name of the header {@code AwsStepFunctionsOperation}.
          */
         public String awsStepFunctionsOperation() {
-            return "AwsStepFunctionsOperation";
+            return "CamelAwsStepFunctionsOperation";
         }
 
         /**
@@ -592,7 +644,7 @@ public interface StepFunctions2EndpointBuilderFactory {
          * AwsStepFunctionsStateMachineName}.
          */
         public String awsStepFunctionsStateMachineName() {
-            return "AwsStepFunctionsStateMachineName";
+            return "CamelAwsStepFunctionsStateMachineName";
         }
 
         /**
@@ -606,7 +658,7 @@ public interface StepFunctions2EndpointBuilderFactory {
          * AwsStepFunctionsStateMachineDefinition}.
          */
         public String awsStepFunctionsStateMachineDefinition() {
-            return "AwsStepFunctionsStateMachineDefinition";
+            return "CamelAwsStepFunctionsStateMachineDefinition";
         }
 
         /**
@@ -620,7 +672,7 @@ public interface StepFunctions2EndpointBuilderFactory {
          * AwsStepFunctionsStateMachineType}.
          */
         public String awsStepFunctionsStateMachineType() {
-            return "AwsStepFunctionsStateMachineType";
+            return "CamelAwsStepFunctionsStateMachineType";
         }
 
         /**
@@ -635,7 +687,7 @@ public interface StepFunctions2EndpointBuilderFactory {
          * AwsStepFunctionsStateMachineRoleArn}.
          */
         public String awsStepFunctionsStateMachineRoleArn() {
-            return "AwsStepFunctionsStateMachineRoleArn";
+            return "CamelAwsStepFunctionsStateMachineRoleArn";
         }
 
         /**
@@ -649,7 +701,7 @@ public interface StepFunctions2EndpointBuilderFactory {
          * AwsStepFunctionsStateMachineArn}.
          */
         public String awsStepFunctionsStateMachineArn() {
-            return "AwsStepFunctionsStateMachineArn";
+            return "CamelAwsStepFunctionsStateMachineArn";
         }
 
         /**
@@ -663,7 +715,7 @@ public interface StepFunctions2EndpointBuilderFactory {
          * AwsStepFunctionsStateMachinesMaxResults}.
          */
         public String awsStepFunctionsStateMachinesMaxResults() {
-            return "AwsStepFunctionsStateMachinesMaxResults";
+            return "CamelAwsStepFunctionsStateMachinesMaxResults";
         }
 
         /**
@@ -676,7 +728,7 @@ public interface StepFunctions2EndpointBuilderFactory {
          * @return the name of the header {@code AwsStepFunctionsActivityName}.
          */
         public String awsStepFunctionsActivityName() {
-            return "AwsStepFunctionsActivityName";
+            return "CamelAwsStepFunctionsActivityName";
         }
 
         /**
@@ -689,7 +741,7 @@ public interface StepFunctions2EndpointBuilderFactory {
          * @return the name of the header {@code AwsStepFunctionsActivityArn}.
          */
         public String awsStepFunctionsActivityArn() {
-            return "AwsStepFunctionsActivityArn";
+            return "CamelAwsStepFunctionsActivityArn";
         }
 
         /**
@@ -703,7 +755,7 @@ public interface StepFunctions2EndpointBuilderFactory {
          * AwsStepFunctionsActivitiesMaxResults}.
          */
         public String awsStepFunctionsActivitiesMaxResults() {
-            return "AwsStepFunctionsActivitiesMaxResults";
+            return "CamelAwsStepFunctionsActivitiesMaxResults";
         }
 
         /**
@@ -716,7 +768,7 @@ public interface StepFunctions2EndpointBuilderFactory {
          * @return the name of the header {@code AwsStepFunctionsExecutionArn}.
          */
         public String awsStepFunctionsExecutionArn() {
-            return "AwsStepFunctionsExecutionArn";
+            return "CamelAwsStepFunctionsExecutionArn";
         }
 
         /**
@@ -729,7 +781,7 @@ public interface StepFunctions2EndpointBuilderFactory {
          * @return the name of the header {@code AwsStepFunctionsExecutionName}.
          */
         public String awsStepFunctionsExecutionName() {
-            return "AwsStepFunctionsExecutionName";
+            return "CamelAwsStepFunctionsExecutionName";
         }
 
         /**
@@ -743,7 +795,7 @@ public interface StepFunctions2EndpointBuilderFactory {
          * AwsStepFunctionsExecutionInput}.
          */
         public String awsStepFunctionsExecutionInput() {
-            return "AwsStepFunctionsExecutionInput";
+            return "CamelAwsStepFunctionsExecutionInput";
         }
 
         /**
@@ -757,7 +809,7 @@ public interface StepFunctions2EndpointBuilderFactory {
          * AwsStepFunctionsExecutionTraceHeader}.
          */
         public String awsStepFunctionsExecutionTraceHeader() {
-            return "AwsStepFunctionsExecutionTraceHeader";
+            return "CamelAwsStepFunctionsExecutionTraceHeader";
         }
 
         /**
@@ -771,7 +823,7 @@ public interface StepFunctions2EndpointBuilderFactory {
          * AwsStepFunctionsExecutionHistoryMaxResults}.
          */
         public String awsStepFunctionsExecutionHistoryMaxResults() {
-            return "AwsStepFunctionsExecutionHistoryMaxResults";
+            return "CamelAwsStepFunctionsExecutionHistoryMaxResults";
         }
 
         /**
@@ -786,7 +838,7 @@ public interface StepFunctions2EndpointBuilderFactory {
          * AwsStepFunctionsExecutionHistoryIncludeExecutionData}.
          */
         public String awsStepFunctionsExecutionHistoryIncludeExecutionData() {
-            return "AwsStepFunctionsExecutionHistoryIncludeExecutionData";
+            return "CamelAwsStepFunctionsExecutionHistoryIncludeExecutionData";
         }
 
         /**
@@ -800,7 +852,7 @@ public interface StepFunctions2EndpointBuilderFactory {
          * AwsStepFunctionsExecutionHistoryReverseOrder}.
          */
         public String awsStepFunctionsExecutionHistoryReverseOrder() {
-            return "AwsStepFunctionsExecutionHistoryReverseOrder";
+            return "CamelAwsStepFunctionsExecutionHistoryReverseOrder";
         }
 
         /**
@@ -814,7 +866,7 @@ public interface StepFunctions2EndpointBuilderFactory {
          * AwsStepFunctionsExecutionMaxResults}.
          */
         public String awsStepFunctionsExecutionMaxResults() {
-            return "AwsStepFunctionsExecutionMaxResults";
+            return "CamelAwsStepFunctionsExecutionMaxResults";
         }
     }
     static StepFunctions2EndpointBuilder endpointBuilder(

@@ -97,8 +97,8 @@ public interface EventbridgeEndpointBuilderFactory {
             return this;
         }
         /**
-         * Set the need for overidding the endpoint. This option needs to be
-         * used in combination with uriEndpointOverride option.
+         * Set the need for overriding the endpoint. This option needs to be
+         * used in combination with the uriEndpointOverride option.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -114,8 +114,8 @@ public interface EventbridgeEndpointBuilderFactory {
             return this;
         }
         /**
-         * Set the need for overidding the endpoint. This option needs to be
-         * used in combination with uriEndpointOverride option.
+         * Set the need for overriding the endpoint. This option needs to be
+         * used in combination with the uriEndpointOverride option.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -163,9 +163,9 @@ public interface EventbridgeEndpointBuilderFactory {
             return this;
         }
         /**
-         * The region in which Eventbridge client needs to work. When using this
-         * parameter, the configuration will expect the lowercase name of the
-         * region (for example ap-east-1) You'll need to use the name
+         * The region in which the Eventbridge client needs to work. When using
+         * this parameter, the configuration will expect the lowercase name of
+         * the region (for example, ap-east-1) You'll need to use the name
          * Region.EU_WEST_1.id().
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
@@ -316,6 +316,21 @@ public interface EventbridgeEndpointBuilderFactory {
             return this;
         }
         /**
+         * Amazon AWS Session Token used when the user needs to assume an IAM
+         * role.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: security
+         * 
+         * @param sessionToken the value to set
+         * @return the dsl builder
+         */
+        default EventbridgeEndpointBuilder sessionToken(String sessionToken) {
+            doSetProperty("sessionToken", sessionToken);
+            return this;
+        }
+        /**
          * If we want to trust all certificates in case of overriding the
          * endpoint.
          * 
@@ -422,6 +437,43 @@ public interface EventbridgeEndpointBuilderFactory {
             doSetProperty("useProfileCredentialsProvider", useProfileCredentialsProvider);
             return this;
         }
+        /**
+         * Set whether the Eventbridge client should expect to use Session
+         * Credentials. This is useful in a situation in which the user needs to
+         * assume an IAM role for doing operations in Eventbridge.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default EventbridgeEndpointBuilder useSessionCredentials(
+                boolean useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
+            return this;
+        }
+        /**
+         * Set whether the Eventbridge client should expect to use Session
+         * Credentials. This is useful in a situation in which the user needs to
+         * assume an IAM role for doing operations in Eventbridge.
+         * 
+         * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
+         * type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default EventbridgeEndpointBuilder useSessionCredentials(
+                String useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
+            return this;
+        }
     }
 
     /**
@@ -483,7 +535,7 @@ public interface EventbridgeEndpointBuilderFactory {
             return this;
         }
         /**
-         * To use a existing configured AWS Eventbridge as client.
+         * To use an existing configured AWS Eventbridge client.
          * 
          * The option is a:
          * &lt;code&gt;software.amazon.awssdk.services.eventbridge.EventBridgeClient&lt;/code&gt; type.
@@ -499,7 +551,7 @@ public interface EventbridgeEndpointBuilderFactory {
             return this;
         }
         /**
-         * To use a existing configured AWS Eventbridge as client.
+         * To use an existing configured AWS Eventbridge client.
          * 
          * The option will be converted to a
          * &lt;code&gt;software.amazon.awssdk.services.eventbridge.EventBridgeClient&lt;/code&gt; type.
@@ -543,7 +595,7 @@ public interface EventbridgeEndpointBuilderFactory {
          * Path parameter: eventbusNameOrArn (required)
          * Event bus name or ARN
          * 
-         * @param path //eventbusNameOrArn
+         * @param path eventbusNameOrArn
          * @return the dsl builder
          */
         default EventbridgeEndpointBuilder aws2Eventbridge(String path) {
@@ -564,7 +616,7 @@ public interface EventbridgeEndpointBuilderFactory {
          * 
          * @param componentName to use a custom component name for the endpoint
          * instead of the default name
-         * @param path //eventbusNameOrArn
+         * @param path eventbusNameOrArn
          * @return the dsl builder
          */
         default EventbridgeEndpointBuilder aws2Eventbridge(
@@ -594,7 +646,7 @@ public interface EventbridgeEndpointBuilderFactory {
          * @return the name of the header {@code AwsEventbridgeOperation}.
          */
         public String awsEventbridgeOperation() {
-            return "AwsEventbridgeOperation";
+            return "CamelAwsEventbridgeOperation";
         }
 
         /**
@@ -607,7 +659,7 @@ public interface EventbridgeEndpointBuilderFactory {
          * @return the name of the header {@code AwsEventbridgeRuleName}.
          */
         public String awsEventbridgeRuleName() {
-            return "AwsEventbridgeRuleName";
+            return "CamelAwsEventbridgeRuleName";
         }
 
         /**
@@ -620,7 +672,7 @@ public interface EventbridgeEndpointBuilderFactory {
          * @return the name of the header {@code AwsEventbridgeRuleNamePrefix}.
          */
         public String awsEventbridgeRuleNamePrefix() {
-            return "AwsEventbridgeRuleNamePrefix";
+            return "CamelAwsEventbridgeRuleNamePrefix";
         }
 
         /**
@@ -633,7 +685,7 @@ public interface EventbridgeEndpointBuilderFactory {
          * @return the name of the header {@code AwsEventbridgeEventPattern}.
          */
         public String awsEventbridgeEventPattern() {
-            return "AwsEventbridgeEventPattern";
+            return "CamelAwsEventbridgeEventPattern";
         }
 
         /**
@@ -646,7 +698,7 @@ public interface EventbridgeEndpointBuilderFactory {
          * @return the name of the header {@code AwsEventbridgeTargets}.
          */
         public String awsEventbridgeTargets() {
-            return "AwsEventbridgeTargets";
+            return "CamelAwsEventbridgeTargets";
         }
 
         /**
@@ -659,7 +711,7 @@ public interface EventbridgeEndpointBuilderFactory {
          * @return the name of the header {@code AwsEventbridgeTargetsIds}.
          */
         public String awsEventbridgeTargetsIds() {
-            return "AwsEventbridgeTargetsIds";
+            return "CamelAwsEventbridgeTargetsIds";
         }
 
         /**
@@ -672,7 +724,7 @@ public interface EventbridgeEndpointBuilderFactory {
          * @return the name of the header {@code AwsEventbridgeTargetArn}.
          */
         public String awsEventbridgeTargetArn() {
-            return "AwsEventbridgeTargetArn";
+            return "CamelAwsEventbridgeTargetArn";
         }
 
         /**
@@ -686,7 +738,7 @@ public interface EventbridgeEndpointBuilderFactory {
          * @return the name of the header {@code AwsEventbridgeResourcesArn}.
          */
         public String awsEventbridgeResourcesArn() {
-            return "AwsEventbridgeResourcesArn";
+            return "CamelAwsEventbridgeResourcesArn";
         }
 
         /**
@@ -699,7 +751,7 @@ public interface EventbridgeEndpointBuilderFactory {
          * @return the name of the header {@code AwsEventbridgeSource}.
          */
         public String awsEventbridgeSource() {
-            return "AwsEventbridgeSource";
+            return "CamelAwsEventbridgeSource";
         }
 
         /**
@@ -712,7 +764,7 @@ public interface EventbridgeEndpointBuilderFactory {
          * @return the name of the header {@code AwsEventbridgeDetailType}.
          */
         public String awsEventbridgeDetailType() {
-            return "AwsEventbridgeDetailType";
+            return "CamelAwsEventbridgeDetailType";
         }
     }
     static EventbridgeEndpointBuilder endpointBuilder(

@@ -619,6 +619,21 @@ public interface Athena2EndpointBuilderFactory {
             return this;
         }
         /**
+         * Amazon AWS Session Token used when the user needs to assume an IAM
+         * role.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: security
+         * 
+         * @param sessionToken the value to set
+         * @return the dsl builder
+         */
+        default Athena2EndpointBuilder sessionToken(String sessionToken) {
+            doSetProperty("sessionToken", sessionToken);
+            return this;
+        }
+        /**
          * Set whether the Athena client should expect to load credentials
          * through a default credentials provider or to expect static
          * credentials to be passed in.
@@ -688,6 +703,43 @@ public interface Athena2EndpointBuilderFactory {
         default Athena2EndpointBuilder useProfileCredentialsProvider(
                 String useProfileCredentialsProvider) {
             doSetProperty("useProfileCredentialsProvider", useProfileCredentialsProvider);
+            return this;
+        }
+        /**
+         * Set whether the Athena client should expect to use Session
+         * Credentials. This is useful in a situation in which the user needs to
+         * assume a IAM role for doing operations in Athena.
+         * 
+         * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default Athena2EndpointBuilder useSessionCredentials(
+                boolean useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
+            return this;
+        }
+        /**
+         * Set whether the Athena client should expect to use Session
+         * Credentials. This is useful in a situation in which the user needs to
+         * assume a IAM role for doing operations in Athena.
+         * 
+         * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
+         * type.
+         * 
+         * Default: false
+         * Group: security
+         * 
+         * @param useSessionCredentials the value to set
+         * @return the dsl builder
+         */
+        default Athena2EndpointBuilder useSessionCredentials(
+                String useSessionCredentials) {
+            doSetProperty("useSessionCredentials", useSessionCredentials);
             return this;
         }
     }
@@ -914,7 +966,7 @@ public interface Athena2EndpointBuilderFactory {
          * @return the name of the header {@code AwsAthenaOperation}.
          */
         public String awsAthenaOperation() {
-            return "AwsAthenaOperation";
+            return "CamelAwsAthenaOperation";
         }
 
         /**
@@ -927,7 +979,7 @@ public interface Athena2EndpointBuilderFactory {
          * @return the name of the header {@code AwsAthenaDatabase}.
          */
         public String awsAthenaDatabase() {
-            return "AwsAthenaDatabase";
+            return "CamelAwsAthenaDatabase";
         }
 
         /**
@@ -940,7 +992,7 @@ public interface Athena2EndpointBuilderFactory {
          * @return the name of the header {@code AwsAthenaQueryExecutionId}.
          */
         public String awsAthenaQueryExecutionId() {
-            return "AwsAthenaQueryExecutionId";
+            return "CamelAwsAthenaQueryExecutionId";
         }
 
         /**
@@ -953,7 +1005,7 @@ public interface Athena2EndpointBuilderFactory {
          * @return the name of the header {@code AwsAthenaWorkGroup}.
          */
         public String awsAthenaWorkGroup() {
-            return "AwsAthenaWorkGroup";
+            return "CamelAwsAthenaWorkGroup";
         }
 
         /**
@@ -967,7 +1019,7 @@ public interface Athena2EndpointBuilderFactory {
          * @return the name of the header {@code AwsAthenaNextToken}.
          */
         public String awsAthenaNextToken() {
-            return "AwsAthenaNextToken";
+            return "CamelAwsAthenaNextToken";
         }
 
         /**
@@ -982,7 +1034,7 @@ public interface Athena2EndpointBuilderFactory {
          * @return the name of the header {@code AwsAthenaMaxResults}.
          */
         public String awsAthenaMaxResults() {
-            return "AwsAthenaMaxResults";
+            return "CamelAwsAthenaMaxResults";
         }
 
         /**
@@ -996,7 +1048,7 @@ public interface Athena2EndpointBuilderFactory {
          * @return the name of the header {@code AwsAthenaIncludeTrace}.
          */
         public String awsAthenaIncludeTrace() {
-            return "AwsAthenaIncludeTrace";
+            return "CamelAwsAthenaIncludeTrace";
         }
 
         /**
@@ -1011,7 +1063,7 @@ public interface Athena2EndpointBuilderFactory {
          * @return the name of the header {@code AwsAthenaOutputLocation}.
          */
         public String awsAthenaOutputLocation() {
-            return "AwsAthenaOutputLocation";
+            return "CamelAwsAthenaOutputLocation";
         }
 
         /**
@@ -1029,7 +1081,7 @@ public interface Athena2EndpointBuilderFactory {
          * @return the name of the header {@code AwsAthenaOutputType}.
          */
         public String awsAthenaOutputType() {
-            return "AwsAthenaOutputType";
+            return "CamelAwsAthenaOutputType";
         }
 
         /**
@@ -1044,7 +1096,7 @@ public interface Athena2EndpointBuilderFactory {
          * @return the name of the header {@code AwsAthenaQueryExecutionState}.
          */
         public String awsAthenaQueryExecutionState() {
-            return "AwsAthenaQueryExecutionState";
+            return "CamelAwsAthenaQueryExecutionState";
         }
 
         /**
@@ -1058,7 +1110,7 @@ public interface Athena2EndpointBuilderFactory {
          * @return the name of the header {@code AwsAthenaClientRequestToken}.
          */
         public String awsAthenaClientRequestToken() {
-            return "AwsAthenaClientRequestToken";
+            return "CamelAwsAthenaClientRequestToken";
         }
 
         /**
@@ -1073,7 +1125,7 @@ public interface Athena2EndpointBuilderFactory {
          * @return the name of the header {@code AwsAthenaQueryString}.
          */
         public String awsAthenaQueryString() {
-            return "AwsAthenaQueryString";
+            return "CamelAwsAthenaQueryString";
         }
 
         /**
@@ -1087,7 +1139,7 @@ public interface Athena2EndpointBuilderFactory {
          * @return the name of the header {@code AwsAthenaEncryptionOption}.
          */
         public String awsAthenaEncryptionOption() {
-            return "AwsAthenaEncryptionOption";
+            return "CamelAwsAthenaEncryptionOption";
         }
 
         /**
@@ -1100,7 +1152,7 @@ public interface Athena2EndpointBuilderFactory {
          * @return the name of the header {@code AwsAthenaKmsKey}.
          */
         public String awsAthenaKmsKey() {
-            return "AwsAthenaKmsKey";
+            return "CamelAwsAthenaKmsKey";
         }
 
         /**
@@ -1115,7 +1167,7 @@ public interface Athena2EndpointBuilderFactory {
          * @return the name of the header {@code AwsAthenaWaitTimeout}.
          */
         public String awsAthenaWaitTimeout() {
-            return "AwsAthenaWaitTimeout";
+            return "CamelAwsAthenaWaitTimeout";
         }
 
         /**
@@ -1130,7 +1182,7 @@ public interface Athena2EndpointBuilderFactory {
          * @return the name of the header {@code AwsAthenaInitialDelay}.
          */
         public String awsAthenaInitialDelay() {
-            return "AwsAthenaInitialDelay";
+            return "CamelAwsAthenaInitialDelay";
         }
 
         /**
@@ -1145,7 +1197,7 @@ public interface Athena2EndpointBuilderFactory {
          * @return the name of the header {@code AwsAthenaDelay}.
          */
         public String awsAthenaDelay() {
-            return "AwsAthenaDelay";
+            return "CamelAwsAthenaDelay";
         }
 
         /**
@@ -1160,7 +1212,7 @@ public interface Athena2EndpointBuilderFactory {
          * @return the name of the header {@code AwsAthenaMaxAttempts}.
          */
         public String awsAthenaMaxAttempts() {
-            return "AwsAthenaMaxAttempts";
+            return "CamelAwsAthenaMaxAttempts";
         }
 
         /**
@@ -1180,7 +1232,7 @@ public interface Athena2EndpointBuilderFactory {
          * @return the name of the header {@code AwsAthenaRetry}.
          */
         public String awsAthenaRetry() {
-            return "AwsAthenaRetry";
+            return "CamelAwsAthenaRetry";
         }
 
         /**
@@ -1197,7 +1249,7 @@ public interface Athena2EndpointBuilderFactory {
          * AwsAthenaResetWaitTimeoutOnRetry}.
          */
         public String awsAthenaResetWaitTimeoutOnRetry() {
-            return "AwsAthenaResetWaitTimeoutOnRetry";
+            return "CamelAwsAthenaResetWaitTimeoutOnRetry";
         }
 
         /**
@@ -1212,7 +1264,7 @@ public interface Athena2EndpointBuilderFactory {
          * AwsAthenaStartQueryExecutionAttempts}.
          */
         public String awsAthenaStartQueryExecutionAttempts() {
-            return "AwsAthenaStartQueryExecutionAttempts";
+            return "CamelAwsAthenaStartQueryExecutionAttempts";
         }
 
         /**
@@ -1227,7 +1279,7 @@ public interface Athena2EndpointBuilderFactory {
          * AwsAthenaStartQueryExecutionElapsedMillis}.
          */
         public String awsAthenaStartQueryExecutionElapsedMillis() {
-            return "AwsAthenaStartQueryExecutionElapsedMillis";
+            return "CamelAwsAthenaStartQueryExecutionElapsedMillis";
         }
     }
     static Athena2EndpointBuilder endpointBuilder(

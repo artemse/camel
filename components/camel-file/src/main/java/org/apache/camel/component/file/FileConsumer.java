@@ -160,7 +160,7 @@ public class FileConsumer extends GenericFileConsumer<File> implements ResumeAwa
 
         File directory = new File(fileName);
         if (!directory.exists() || !directory.isDirectory()) {
-            LOG.debug("Cannot poll as directory does not exists or its not a directory: {}", directory);
+            LOG.debug("Cannot poll as directory does not exist or its not a directory: {}", directory);
             if (getEndpoint().isDirectoryMustExist()) {
                 throw new GenericFileOperationFailedException("Directory does not exist: " + directory);
             }
@@ -171,6 +171,9 @@ public class FileConsumer extends GenericFileConsumer<File> implements ResumeAwa
     }
 
     private File[] listFiles(File directory) {
+        if (!getEndpoint().isIncludeHiddenDirs() && directory.isHidden()) {
+            return null;
+        }
         final File[] dirFiles = directory.listFiles();
 
         if (dirFiles == null || dirFiles.length == 0) {
@@ -314,14 +317,15 @@ public class FileConsumer extends GenericFileConsumer<File> implements ResumeAwa
 
     @Override
     protected boolean isMatchedHiddenFile(GenericFile<File> file, boolean isDirectory) {
-        if (getEndpoint().isIncludeHiddenFiles()) {
-            if (isDirectory) {
-                // skip hidden folders
-                String name = file.getFileNameOnly();
-                if (name.startsWith(".")) {
-                    return false;
-                }
+        if (isDirectory) {
+            String name = file.getFileNameOnly();
+            if (!name.startsWith(".")) {
+                return true;
             }
+            return getEndpoint().isIncludeHiddenDirs() && !FileConstants.DEFAULT_SUB_FOLDER.equals(name);
+        }
+
+        if (getEndpoint().isIncludeHiddenFiles()) {
             return true;
         } else {
             return super.isMatchedHiddenFile(file, isDirectory);

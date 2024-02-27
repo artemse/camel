@@ -20,7 +20,6 @@ package org.apache.camel.support;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.camel.AsyncCallback;
 import org.apache.camel.CamelContext;
@@ -76,6 +75,7 @@ public class ExtendedExchangeExtension implements ExchangeExtension {
     /**
      * Is stream caching disabled on the given exchange
      */
+    @Override
     public boolean isStreamCacheDisabled() {
         return this.streamCacheDisabled;
     }
@@ -83,6 +83,7 @@ public class ExtendedExchangeExtension implements ExchangeExtension {
     /**
      * Used to force disabling stream caching which some components can do in special use-cases.
      */
+    @Override
     public void setStreamCacheDisabled(boolean streamCacheDisabled) {
         this.streamCacheDisabled = streamCacheDisabled;
     }
@@ -244,7 +245,7 @@ public class ExtendedExchangeExtension implements ExchangeExtension {
         this.transacted = transacted;
     }
 
-    public boolean isTransacted() {
+    boolean isTransacted() {
         return transacted;
     }
 
@@ -290,6 +291,7 @@ public class ExtendedExchangeExtension implements ExchangeExtension {
         return this.exchange.getSafeCopyProperty(key, type);
     }
 
+    @Override
     public void copySafeCopyPropertiesTo(ExchangeExtension target) {
         if (exchange.safeCopyProperties != null && !exchange.safeCopyProperties.isEmpty()) {
             exchange.safeCopyProperties.entrySet().stream()
@@ -307,7 +309,7 @@ public class ExtendedExchangeExtension implements ExchangeExtension {
         this.failureHandled = failureHandled;
     }
 
-    public UnitOfWork getUnitOfWork() {
+    UnitOfWork getUnitOfWork() {
         return unitOfWork;
     }
 
@@ -315,9 +317,11 @@ public class ExtendedExchangeExtension implements ExchangeExtension {
         if (this.unitOfWork != null) {
             this.unitOfWork.reset();
         }
-
         if (this.onCompletions != null) {
             this.onCompletions.clear();
+        }
+        if (this.exchange.variableRepository != null) {
+            this.exchange.variableRepository.clear();
         }
 
         setHistoryNodeId(null);
@@ -331,21 +335,10 @@ public class ExtendedExchangeExtension implements ExchangeExtension {
         setStreamCacheDisabled(false);
     }
 
-    private static Map<String, Object> safeCopyProperties(Map<String, Object> properties) {
-        if (properties == null) {
-            return null;
-        }
-        return new ConcurrentHashMap<>(properties);
-    }
-
     @Override
     public Exchange createCopyWithProperties(CamelContext context) {
-        final Map<String, Object> properties = safeCopyProperties(exchange.properties);
-
-        DefaultExchange answer = new DefaultExchange(context, exchange.internalProperties, properties);
-
+        DefaultExchange answer = new DefaultExchange(context, exchange.internalProperties, exchange.properties);
         answer.setPattern(exchange.pattern);
-
         return answer;
     }
 }

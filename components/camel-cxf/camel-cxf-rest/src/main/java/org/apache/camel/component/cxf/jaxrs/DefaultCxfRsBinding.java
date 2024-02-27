@@ -58,7 +58,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Default strategy to bind between Camel and CXF exchange for RESTful resources.
- *
  */
 public class DefaultCxfRsBinding implements CxfRsBinding, HeaderFilterStrategyAware {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultCxfRsBinding.class);
@@ -212,13 +211,15 @@ public class DefaultCxfRsBinding implements CxfRsBinding, HeaderFilterStrategyAw
             throws Exception {
 
         Object request = camelMessage.getBody(MessageContentsList.class);
-        if (request != null) {
-            return ((MessageContentsList) request).get(0);
+        if (request instanceof MessageContentsList mcl) {
+            return mcl.get(0);
         }
 
         request = camelMessage.getBody();
         if (request instanceof List) {
             request = ((List<?>) request).get(0);
+        } else if (request instanceof byte[] byteArray) {
+            return byteArray;
         } else if (request != null && request.getClass().isArray()) {
             request = ((Object[]) request)[0];
         }
@@ -312,6 +313,9 @@ public class DefaultCxfRsBinding implements CxfRsBinding, HeaderFilterStrategyAw
             if (headerFilterStrategy.applyFilterToExternalHeaders(entry.getKey(), entry.getValue(), camelExchange)
                     || entry.getValue().isEmpty()) {
                 LOG.trace("Drop CXF message protocol header: {}={}", entry.getKey(), entry.getValue());
+            } else if (entry.getKey().startsWith(":")) {
+                /* Ignore HTTP/2 pseudo headers such as :status */
+                continue;
             } else {
                 // just put the first String element, as the complex one is filtered
                 camelMessage.setHeader(entry.getKey(), entry.getValue().get(0));

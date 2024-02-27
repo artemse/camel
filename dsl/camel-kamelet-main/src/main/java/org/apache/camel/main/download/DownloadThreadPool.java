@@ -76,6 +76,10 @@ class DownloadThreadPool extends ServiceSupport implements CamelContextAware {
                 done = true;
             } catch (TimeoutException e) {
                 // not done
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                log.error("Interrupted while downloading: {}", e.getMessage(), e);
+                return;
             } catch (Exception e) {
                 log.error("Error downloading: {} due to: {}", gav, e.getMessage(), e);
                 return;
@@ -86,11 +90,11 @@ class DownloadThreadPool extends ServiceSupport implements CamelContextAware {
         }
 
         MavenGav a = MavenGav.parseGav(gav);
-        DownloadRecord record = downloader.getDownloadState(a.getGroupId(), a.getArtifactId(), a.getVersion());
-        if (record != null) {
+        DownloadRecord downloadRecord = downloader.getDownloadState(a.getGroupId(), a.getArtifactId(), a.getVersion());
+        if (downloadRecord != null) {
             long taken = watch.taken();
-            String url = record.repoUrl();
-            String id = record.repoId();
+            String url = downloadRecord.repoUrl();
+            String id = downloadRecord.repoId();
             String msg = "Downloaded: " + gav + " (took: "
                          + TimeUtils.printDuration(taken, true) + ") from: " + id + "@" + url;
             log.info(msg);

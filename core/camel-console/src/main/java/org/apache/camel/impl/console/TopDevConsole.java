@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 
 import org.apache.camel.Exchange;
@@ -71,7 +72,7 @@ public class TopDevConsole extends AbstractDevConsole {
         if (mcc != null) {
             if (subPath == null || subPath.isBlank()) {
                 Function<ManagedRouteMBean, Object> task = mrb -> {
-                    if (sb.length() > 0) {
+                    if (!sb.isEmpty()) {
                         sb.append("\n");
                     }
                     sb.append(String.format("    Route Id: %s", mrb.getRouteId()));
@@ -97,7 +98,7 @@ public class TopDevConsole extends AbstractDevConsole {
                 topRoutes(filter, max, mcc, task);
             } else {
                 Function<ManagedProcessorMBean, Object> task = mpb -> {
-                    if (sb.length() > 0) {
+                    if (!sb.isEmpty()) {
                         sb.append("\n");
                     }
                     sb.append(String.format("    Route Id: %s", mpb.getRouteId()));
@@ -131,7 +132,7 @@ public class TopDevConsole extends AbstractDevConsole {
                     }
                     if (loc != null) {
                         sb.append(String.format("\n    Source: %s", loc));
-                        if (code.length() > 0) {
+                        if (!code.isEmpty()) {
                             sb.append(code);
                         }
                     }
@@ -270,6 +271,7 @@ public class TopDevConsole extends AbstractDevConsole {
         List<Route> routes = getCamelContext().getRoutes();
         routes.stream()
                 .map(route -> mcc.getManagedRoute(route.getRouteId()))
+                .filter(Objects::nonNull)
                 .filter(r -> acceptRoute(r, filter))
                 .sorted(TopDevConsole::top)
                 .limit(max)
@@ -284,6 +286,7 @@ public class TopDevConsole extends AbstractDevConsole {
 
         routes.stream()
                 .map(route -> mcc.getManagedRoute(route.getRouteId()))
+                .filter(Objects::nonNull)
                 .filter(r -> acceptRoute(r, subPath))
                 .forEach(r -> {
                     try {

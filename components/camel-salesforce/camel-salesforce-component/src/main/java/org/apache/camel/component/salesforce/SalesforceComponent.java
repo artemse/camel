@@ -49,13 +49,13 @@ import org.apache.camel.support.jsse.SSLContextParameters;
 import org.apache.camel.support.service.ServiceHelper;
 import org.apache.camel.util.ObjectHelper;
 import org.apache.camel.util.StringHelper;
+import org.eclipse.jetty.client.Authentication;
+import org.eclipse.jetty.client.BasicAuthentication;
+import org.eclipse.jetty.client.DigestAuthentication;
 import org.eclipse.jetty.client.HttpProxy;
 import org.eclipse.jetty.client.Origin;
 import org.eclipse.jetty.client.ProxyConfiguration;
 import org.eclipse.jetty.client.Socks4Proxy;
-import org.eclipse.jetty.client.api.Authentication;
-import org.eclipse.jetty.client.util.BasicAuthentication;
-import org.eclipse.jetty.client.util.DigestAuthentication;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -973,7 +973,7 @@ public class SalesforceComponent extends DefaultComponent implements SSLContextP
             if (httpProxyExcludedAddresses != null && !httpProxyExcludedAddresses.isEmpty()) {
                 proxy.getExcludedAddresses().addAll(httpProxyExcludedAddresses);
             }
-            httpClient.getProxyConfiguration().getProxies().add(proxy);
+            httpClient.getProxyConfiguration().addProxy(proxy);
         }
         if (httpProxyUsername != null && httpProxyPassword != null) {
             StringHelper.notEmpty(httpProxyAuthUri, "httpProxyAuthUri");

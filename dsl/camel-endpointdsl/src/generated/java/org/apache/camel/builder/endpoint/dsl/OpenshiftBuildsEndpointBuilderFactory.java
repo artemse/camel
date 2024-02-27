@@ -469,7 +469,13 @@ public interface OpenshiftBuildsEndpointBuilderFactory {
          * Syntax: <code>openshift-builds:masterUrl</code>
          * 
          * Path parameter: masterUrl (required)
-         * Kubernetes Master url
+         * URL to a remote Kubernetes API server. This should only be used when
+         * your Camel application is connecting from outside Kubernetes. If you
+         * run your Camel application inside Kubernetes, then you can use local
+         * or client as the URL to tell Camel to run in local mode. If you
+         * connect remotely to Kubernetes, then you may also need some of the
+         * many other configuration options for secured connection with
+         * certificates, etc.
          * 
          * @param path masterUrl
          * @return the dsl builder
@@ -488,7 +494,13 @@ public interface OpenshiftBuildsEndpointBuilderFactory {
          * Syntax: <code>openshift-builds:masterUrl</code>
          * 
          * Path parameter: masterUrl (required)
-         * Kubernetes Master url
+         * URL to a remote Kubernetes API server. This should only be used when
+         * your Camel application is connecting from outside Kubernetes. If you
+         * run your Camel application inside Kubernetes, then you can use local
+         * or client as the URL to tell Camel to run in local mode. If you
+         * connect remotely to Kubernetes, then you may also need some of the
+         * many other configuration options for secured connection with
+         * certificates, etc.
          * 
          * @param componentName to use a custom component name for the endpoint
          * instead of the default name
@@ -522,7 +534,7 @@ public interface OpenshiftBuildsEndpointBuilderFactory {
          * @return the name of the header {@code KubernetesOperation}.
          */
         public String kubernetesOperation() {
-            return "KubernetesOperation";
+            return "CamelKubernetesOperation";
         }
 
         /**
@@ -535,7 +547,7 @@ public interface OpenshiftBuildsEndpointBuilderFactory {
          * @return the name of the header {@code KubernetesNamespaceName}.
          */
         public String kubernetesNamespaceName() {
-            return "KubernetesNamespaceName";
+            return "CamelKubernetesNamespaceName";
         }
 
         /**
@@ -548,7 +560,7 @@ public interface OpenshiftBuildsEndpointBuilderFactory {
          * @return the name of the header {@code KubernetesBuildsLabels}.
          */
         public String kubernetesBuildsLabels() {
-            return "KubernetesBuildsLabels";
+            return "CamelKubernetesBuildsLabels";
         }
 
         /**
@@ -561,7 +573,7 @@ public interface OpenshiftBuildsEndpointBuilderFactory {
          * @return the name of the header {@code KubernetesBuildName}.
          */
         public String kubernetesBuildName() {
-            return "KubernetesBuildName";
+            return "CamelKubernetesBuildName";
         }
     }
     static OpenshiftBuildsEndpointBuilder endpointBuilder(

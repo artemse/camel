@@ -178,7 +178,8 @@ public class PackageDataFormatMojo extends AbstractGeneratorMojo {
 
                         String json = PackageHelper.loadText(new File(
                                 core,
-                                "target/classes/org/apache/camel/model/dataformat/" + modelName + PackageHelper.JSON_SUFIX));
+                                "src/generated/resources/META-INF/org/apache/camel/model/dataformat/" + modelName
+                                      + PackageHelper.JSON_SUFIX));
 
                         // any excluded properties
                         Class<?> clazz = loadClass(javaType);
@@ -396,7 +397,7 @@ public class PackageDataFormatMojo extends AbstractGeneratorMojo {
         }
         String name = file.getName();
         if (name.charAt(0) != '.') {
-            if (buffer.length() > 0) {
+            if (!buffer.isEmpty()) {
                 buffer.append(" ");
             }
             buffer.append(name);

@@ -27,6 +27,7 @@ import org.apache.camel.model.language.DatasonnetExpression;
 import org.apache.camel.model.language.ExchangePropertyExpression;
 import org.apache.camel.model.language.HeaderExpression;
 import org.apache.camel.model.language.SimpleExpression;
+import org.apache.camel.model.language.VariableExpression;
 import org.apache.camel.model.language.XPathExpression;
 import org.apache.camel.spi.TransactedPolicy;
 import org.apache.camel.support.builder.Namespaces;
@@ -88,6 +89,14 @@ public abstract class BuilderSupport implements CamelContextAware {
     }
 
     /**
+     * Returns a value builder for the given variable
+     */
+    public ValueBuilder variable(String name) {
+        Expression exp = new VariableExpression(name);
+        return new ValueBuilder(exp);
+    }
+
+    /**
      * Returns a value builder for the given system property
      */
     public ValueBuilder systemProperty(String name) {
@@ -124,16 +133,36 @@ public abstract class BuilderSupport implements CamelContextAware {
 
     /**
      * Returns a JOOR expression value builder
+     *
+     * @deprecated use java instead
      */
+    @Deprecated
     public ValueBuilder joor(String value) {
         return Builder.joor(value);
     }
 
     /**
      * Returns a JOOR expression value builder
+     *
+     * @deprecated use java instead
      */
+    @Deprecated
     public ValueBuilder joor(String value, Class<?> resultType) {
         return Builder.joor(value, resultType);
+    }
+
+    /**
+     * Returns a Java expression value builder
+     */
+    public ValueBuilder java(String value) {
+        return Builder.java(value);
+    }
+
+    /**
+     * Returns a Java expression value builder
+     */
+    public ValueBuilder java(String value, Class<?> resultType) {
+        return Builder.java(value, resultType);
     }
 
     /**
@@ -151,6 +180,20 @@ public abstract class BuilderSupport implements CamelContextAware {
      */
     public ValueBuilder jsonpath(String value, Class<?> resultType) {
         return Builder.jsonpath(value, resultType);
+    }
+
+    /**
+     * Returns a JQ expression value builder
+     */
+    public ValueBuilder jq(String value) {
+        return Builder.jq(value);
+    }
+
+    /**
+     * Returns a JQ expression value builder
+     */
+    public ValueBuilder jq(String value, Class<?> resultType) {
+        return Builder.jq(value, resultType);
     }
 
     /**

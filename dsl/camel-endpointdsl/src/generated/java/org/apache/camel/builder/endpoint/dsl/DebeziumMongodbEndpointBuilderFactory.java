@@ -349,8 +349,8 @@ public interface DebeziumMongodbEndpointBuilderFactory {
             return this;
         }
         /**
-         * A comma-separated list of regular expressions that match the
-         * collection names for which changes are to be excluded.
+         * A comma-separated list of regular expressions or literals that match
+         * the collection names for which changes are to be excluded.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
@@ -365,8 +365,8 @@ public interface DebeziumMongodbEndpointBuilderFactory {
             return this;
         }
         /**
-         * A comma-separated list of regular expressions that match the
-         * collection names for which changes are to be captured.
+         * A comma-separated list of regular expressions or literals that match
+         * the collection names for which changes are to be captured.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
@@ -429,8 +429,27 @@ public interface DebeziumMongodbEndpointBuilderFactory {
             return this;
         }
         /**
-         * A comma-separated list of regular expressions that match the database
-         * names for which changes are to be excluded.
+         * The custom metric tags will accept key-value pairs to customize the
+         * MBean object name which should be appended the end of regular name,
+         * each key would represent a tag for the MBean object name, and the
+         * corresponding value would be the value of that tag the key is. For
+         * example: k1=v1,k2=v2.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: mongodb
+         * 
+         * @param customMetricTags the value to set
+         * @return the dsl builder
+         */
+        default DebeziumMongodbEndpointBuilder customMetricTags(
+                String customMetricTags) {
+            doSetProperty("customMetricTags", customMetricTags);
+            return this;
+        }
+        /**
+         * A comma-separated list of regular expressions or literals that match
+         * the database names for which changes are to be excluded.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
@@ -445,8 +464,8 @@ public interface DebeziumMongodbEndpointBuilderFactory {
             return this;
         }
         /**
-         * A comma-separated list of regular expressions that match the database
-         * names for which changes are to be captured.
+         * A comma-separated list of regular expressions or literals that match
+         * the database names for which changes are to be captured.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
@@ -602,6 +621,26 @@ public interface DebeziumMongodbEndpointBuilderFactory {
             return this;
         }
         /**
+         * Specify the strategy used for watermarking during an incremental
+         * snapshot: 'insert_insert' both open and close signal is written into
+         * signal data collection (default); 'insert_delete' only open signal is
+         * written on signal data collection, the close will delete the relative
+         * open signal;.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Default: INSERT_INSERT
+         * Group: mongodb
+         * 
+         * @param incrementalSnapshotWatermarkingStrategy the value to set
+         * @return the dsl builder
+         */
+        default DebeziumMongodbEndpointBuilder incrementalSnapshotWatermarkingStrategy(
+                String incrementalSnapshotWatermarkingStrategy) {
+            doSetProperty("incrementalSnapshotWatermarkingStrategy", incrementalSnapshotWatermarkingStrategy);
+            return this;
+        }
+        /**
          * Maximum size of each batch of source records. Defaults to 2048.
          * 
          * The option is a: &lt;code&gt;int&lt;/code&gt; type.
@@ -719,13 +758,13 @@ public interface DebeziumMongodbEndpointBuilderFactory {
         }
         /**
          * The method used to connect to MongoDB cluster. Options include:
-         * 'replica_set' (the default) to individually connect to each replica
-         * set / shard 'sharded' to connect via single connection obtained from
-         * connection string.
+         * 'replica_set' to individually connect to each replica set / shard
+         * 'sharded' (the default) to connect via single connection obtained
+         * from connection string.
          * 
          * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
          * 
-         * Default: replica_set
+         * Default: sharded
          * Group: mongodb
          * 
          * @param mongodbConnectionMode the value to set
@@ -1080,6 +1119,22 @@ public interface DebeziumMongodbEndpointBuilderFactory {
         default DebeziumMongodbEndpointBuilder pollIntervalMs(
                 String pollIntervalMs) {
             doSetProperty("pollIntervalMs", pollIntervalMs);
+            return this;
+        }
+        /**
+         * Optional list of post processors. The processors are defined using
+         * '.type' config option and configured using options ''.
+         * 
+         * The option is a: &lt;code&gt;java.lang.String&lt;/code&gt; type.
+         * 
+         * Group: mongodb
+         * 
+         * @param postProcessors the value to set
+         * @return the dsl builder
+         */
+        default DebeziumMongodbEndpointBuilder postProcessors(
+                String postProcessors) {
+            doSetProperty("postProcessors", postProcessors);
             return this;
         }
         /**
@@ -1572,12 +1627,17 @@ public interface DebeziumMongodbEndpointBuilderFactory {
         }
         /**
          * Allows for bridging the consumer to the Camel routing Error Handler,
-         * which mean any exceptions occurred while the consumer is trying to
-         * pickup incoming messages, or the likes, will now be processed as a
-         * message and handled by the routing Error Handler. By default the
-         * consumer will use the org.apache.camel.spi.ExceptionHandler to deal
-         * with exceptions, that will be logged at WARN or ERROR level and
-         * ignored.
+         * which mean any exceptions (if possible) occurred while the Camel
+         * consumer is trying to pickup incoming messages, or the likes, will
+         * now be processed as a message and handled by the routing Error
+         * Handler. Important: This is only possible if the 3rd party component
+         * allows Camel to be alerted if an exception was thrown. Some
+         * components handle this internally only, and therefore
+         * bridgeErrorHandler is not possible. In other situations we may
+         * improve the Camel component to hook into the 3rd party component and
+         * make this possible for future releases. By default the consumer will
+         * use the org.apache.camel.spi.ExceptionHandler to deal with
+         * exceptions, that will be logged at WARN or ERROR level and ignored.
          * 
          * The option is a: &lt;code&gt;boolean&lt;/code&gt; type.
          * 
@@ -1594,12 +1654,17 @@ public interface DebeziumMongodbEndpointBuilderFactory {
         }
         /**
          * Allows for bridging the consumer to the Camel routing Error Handler,
-         * which mean any exceptions occurred while the consumer is trying to
-         * pickup incoming messages, or the likes, will now be processed as a
-         * message and handled by the routing Error Handler. By default the
-         * consumer will use the org.apache.camel.spi.ExceptionHandler to deal
-         * with exceptions, that will be logged at WARN or ERROR level and
-         * ignored.
+         * which mean any exceptions (if possible) occurred while the Camel
+         * consumer is trying to pickup incoming messages, or the likes, will
+         * now be processed as a message and handled by the routing Error
+         * Handler. Important: This is only possible if the 3rd party component
+         * allows Camel to be alerted if an exception was thrown. Some
+         * components handle this internally only, and therefore
+         * bridgeErrorHandler is not possible. In other situations we may
+         * improve the Camel component to hook into the 3rd party component and
+         * make this possible for future releases. By default the consumer will
+         * use the org.apache.camel.spi.ExceptionHandler to deal with
+         * exceptions, that will be logged at WARN or ERROR level and ignored.
          * 
          * The option will be converted to a &lt;code&gt;boolean&lt;/code&gt;
          * type.
@@ -1770,7 +1835,7 @@ public interface DebeziumMongodbEndpointBuilderFactory {
          * @return the name of the header {@code DebeziumSourceMetadata}.
          */
         public String debeziumSourceMetadata() {
-            return "DebeziumSourceMetadata";
+            return "CamelDebeziumSourceMetadata";
         }
 
         /**
@@ -1784,7 +1849,7 @@ public interface DebeziumMongodbEndpointBuilderFactory {
          * @return the name of the header {@code DebeziumIdentifier}.
          */
         public String debeziumIdentifier() {
-            return "DebeziumIdentifier";
+            return "CamelDebeziumIdentifier";
         }
 
         /**
@@ -1797,7 +1862,7 @@ public interface DebeziumMongodbEndpointBuilderFactory {
          * @return the name of the header {@code DebeziumKey}.
          */
         public String debeziumKey() {
-            return "DebeziumKey";
+            return "CamelDebeziumKey";
         }
 
         /**
@@ -1812,7 +1877,7 @@ public interface DebeziumMongodbEndpointBuilderFactory {
          * @return the name of the header {@code DebeziumOperation}.
          */
         public String debeziumOperation() {
-            return "DebeziumOperation";
+            return "CamelDebeziumOperation";
         }
 
         /**
@@ -1826,7 +1891,7 @@ public interface DebeziumMongodbEndpointBuilderFactory {
          * @return the name of the header {@code DebeziumTimestamp}.
          */
         public String debeziumTimestamp() {
-            return "DebeziumTimestamp";
+            return "CamelDebeziumTimestamp";
         }
 
         /**
@@ -1839,7 +1904,7 @@ public interface DebeziumMongodbEndpointBuilderFactory {
          * @return the name of the header {@code DebeziumBefore}.
          */
         public String debeziumBefore() {
-            return "DebeziumBefore";
+            return "CamelDebeziumBefore";
         }
 
         /**
@@ -1852,7 +1917,7 @@ public interface DebeziumMongodbEndpointBuilderFactory {
          * @return the name of the header {@code DebeziumDdlSQL}.
          */
         public String debeziumDdlSQL() {
-            return "DebeziumDdlSQL";
+            return "CamelDebeziumDdlSQL";
         }
     }
     static DebeziumMongodbEndpointBuilder endpointBuilder(
