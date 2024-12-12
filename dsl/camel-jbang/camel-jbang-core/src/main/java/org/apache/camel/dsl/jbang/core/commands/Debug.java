@@ -34,6 +34,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.apache.camel.dsl.jbang.core.commands.action.MessageTableHelper;
 import org.apache.camel.dsl.jbang.core.common.CamelCommandHelper;
 import org.apache.camel.dsl.jbang.core.common.CommandLineHelper;
+import org.apache.camel.dsl.jbang.core.common.VersionHelper;
 import org.apache.camel.main.KameletMain;
 import org.apache.camel.util.FileUtil;
 import org.apache.camel.util.IOHelper;
@@ -52,7 +53,7 @@ import picocli.CommandLine.Command;
 
 import static org.apache.camel.util.IOHelper.buffered;
 
-@Command(name = "debug", description = "Debug local Camel integration", sortOptions = false)
+@Command(name = "debug", description = "Debug local Camel integration", sortOptions = false, showDefaultValues = true)
 public class Debug extends Run {
 
     @CommandLine.Option(names = { "--breakpoint" },
@@ -91,9 +92,9 @@ public class Debug extends Run {
                         description = "Show exchange properties in traced messages")
     boolean showExchangeProperties;
 
-    @CommandLine.Option(names = { "--show-exchange-variables" }, defaultValue = "false",
+    @CommandLine.Option(names = { "--show-exchange-variables" }, defaultValue = "true",
                         description = "Show exchange variables in traced messages")
-    boolean showExchangeVariables;
+    boolean showExchangeVariables = true;
 
     @CommandLine.Option(names = { "--show-headers" }, defaultValue = "true",
                         description = "Show message headers in traced messages")
@@ -128,7 +129,7 @@ public class Debug extends Run {
 
     @Override
     public Integer doCall() throws Exception {
-        if (!silentRun) {
+        if (!exportRun) {
             printConfigurationValues("Debugging integration with the following configuration:");
         }
 
@@ -151,60 +152,13 @@ public class Debug extends Run {
         // read log input
         final AtomicBoolean quit = new AtomicBoolean();
         final Console c = System.console();
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                do {
-                    InputStreamReader isr = new InputStreamReader(spawnOutput);
-                    try {
-                        BufferedReader reader = buffered(isr);
-                        while (true) {
-                            String line = reader.readLine();
-                            if (line != null) {
-                                while (logBuffer.size() >= 100) {
-                                    logBuffer.remove(0);
-                                }
-                                logBuffer.add(line);
-                                logUpdated.set(true);
-                            } else {
-                                break;
-                            }
-                        }
-                    } catch (Exception e) {
-                        // ignore
-                    }
-                } while (!quit.get());
-            }
+        Thread t = new Thread(() -> {
+            doReadLog(quit);
         }, "ReadLog");
         t.start();
 
         // read CLI input from user
-        Thread t2 = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                do {
-                    String line = c.readLine();
-                    if (line != null) {
-                        line = line.trim();
-                        if ("quit".equalsIgnoreCase(line) || "exit".equalsIgnoreCase(line)) {
-                            quit.set(true);
-                        } else {
-                            // continue breakpoint
-                            if (suspendedRow != null) {
-                                // step to exit because it was the last
-                                if (suspendedRow.last) {
-                                    // we need to clear screen so fool by saying log is updated
-                                    logUpdated.set(true);
-                                }
-                            }
-                            sendDebugCommand(spawnPid, "step", null);
-                        }
-                        // user have pressed ENTER so continue
-                        waitForUser.set(false);
-                    }
-                } while (!quit.get());
-            }
-        }, "ReadCommand");
+        Thread t2 = new Thread(() -> doRead(c, quit), "ReadCommand");
         t2.start();
 
         do {
@@ -225,6 +179,53 @@ public class Debug extends Run {
         } while (exit == 0 && !quit.get());
 
         return 0;
+    }
+
+    private void doReadLog(AtomicBoolean quit) {
+        do {
+            InputStreamReader isr = new InputStreamReader(spawnOutput);
+            try {
+                BufferedReader reader = buffered(isr);
+                while (true) {
+                    String line = reader.readLine();
+                    if (line != null) {
+                        while (logBuffer.size() >= 100) {
+                            logBuffer.remove(0);
+                        }
+                        logBuffer.add(line);
+                        logUpdated.set(true);
+                    } else {
+                        break;
+                    }
+                }
+            } catch (Exception e) {
+                // ignore
+            }
+        } while (!quit.get());
+    }
+
+    private void doRead(Console c, AtomicBoolean quit) {
+        do {
+            String line = c.readLine();
+            if (line != null) {
+                line = line.trim();
+                if ("quit".equalsIgnoreCase(line) || "exit".equalsIgnoreCase(line)) {
+                    quit.set(true);
+                } else {
+                    // continue breakpoint
+                    if (suspendedRow != null) {
+                        // step to exit because it was the last
+                        if (suspendedRow.last) {
+                            // we need to clear screen so fool by saying log is updated
+                            logUpdated.set(true);
+                        }
+                    }
+                    sendDebugCommand(spawnPid, "step", null);
+                }
+                // user have pressed ENTER so continue
+                waitForUser.set(false);
+            }
+        } while (!quit.get());
     }
 
     @Override
@@ -251,7 +252,7 @@ public class Debug extends Run {
         cmds.add("--prop=camel.debug.loggingLevel=DEBUG");
         cmds.add("--prop=camel.debug.singleStepIncludeStartEnd=true");
 
-        cmds.add(0, "camel");
+        addCamelCommand(cmds);
 
         ProcessBuilder pb = new ProcessBuilder();
         pb.command(cmds);
@@ -265,13 +266,11 @@ public class Debug extends Run {
     }
 
     private void removeDebugOnlyOptions(List<String> cmds) {
-        ReflectionHelper.doWithFields(Debug.class, fc -> {
-            cmds.removeIf(c -> {
-                String n1 = "--" + fc.getName();
-                String n2 = "--" + StringHelper.camelCaseToDash(fc.getName());
-                return c.startsWith(n1) || c.startsWith(n2);
-            });
-        });
+        ReflectionHelper.doWithFields(Debug.class, fc -> cmds.removeIf(c -> {
+            String n1 = "--" + fc.getName();
+            String n2 = "--" + StringHelper.camelCaseToDash(fc.getName());
+            return c.startsWith(n1) || c.startsWith(n2);
+        }));
     }
 
     protected int doWatch() {
@@ -338,6 +337,7 @@ public class Debug extends Run {
 
             // only read if expecting new data
             long cnt = jo.getLongOrDefault("debugCounter", 0);
+            String version = jo.getString("version");
             if (cnt > debugCounter.get()) {
                 JsonArray arr = jo.getCollection("suspended");
                 if (arr != null) {
@@ -351,7 +351,7 @@ public class Debug extends Run {
                     for (Object o : arr) {
                         SuspendedRow row = new SuspendedRow();
                         row.pid = String.valueOf(pid);
-                        row.name = "TODO";//pid.name;
+                        row.version = version;
                         jo = (JsonObject) o;
                         row.uid = jo.getLong("uid");
                         row.first = jo.getBoolean("first");
@@ -366,6 +366,10 @@ public class Debug extends Run {
                                 uri = URISupport.sanitizeUri(uri);
                             }
                             row.endpoint.put("endpoint", uri);
+                        }
+                        JsonObject es = jo.getMap("endpointService");
+                        if (es != null) {
+                            row.endpointService = es;
                         }
                         Long ts = jo.getLong("timestamp");
                         if (ts != null) {
@@ -407,14 +411,18 @@ public class Debug extends Run {
                         lines = jo.getCollection("history");
                         if (lines != null) {
                             for (JsonObject line : lines) {
-                                History history = new History();
-                                history.routeId = line.getString("routeId");
-                                history.nodeId = line.getString("nodeId");
-                                history.elapsed = line.getLongOrDefault("elapsed", 0);
-                                history.location = line.getString("location");
-                                history.line = line.getIntegerOrDefault("line", -1);
-                                history.code = line.getString("code");
-                                row.history.add(history);
+                                // only include if accepted for debugging
+                                boolean accept = line.getBooleanOrDefault("acceptDebugger", true);
+                                if (accept) {
+                                    History history = new History();
+                                    history.routeId = line.getString("routeId");
+                                    history.nodeId = line.getString("nodeId");
+                                    history.elapsed = line.getLongOrDefault("elapsed", 0);
+                                    history.location = line.getString("location");
+                                    history.line = line.getIntegerOrDefault("line", -1);
+                                    history.code = line.getString("code");
+                                    row.history.add(history);
+                                }
                             }
                         }
                         rows.add(row);
@@ -478,8 +486,10 @@ public class Debug extends Run {
         List<Panel> panel = new ArrayList<>();
         if (!row.code.isEmpty()) {
             String loc = StringHelper.beforeLast(row.location, ":", row.location);
-            if (loc.length() < 72) {
+            if (loc != null && loc.length() < 72) {
                 loc = loc + " ".repeat(72 - loc.length());
+            } else {
+                loc = "";
             }
             panel.add(Panel.withCode("Source: " + loc).andHistory("History"));
             panel.add(Panel.withCode("-".repeat(80))
@@ -545,6 +555,13 @@ public class Debug extends Run {
                 if (row.history.size() > (i - 2)) {
                     History h = row.history.get(i - 2);
 
+                    // from camel 4.7 onwards then message history include current line as well
+                    // so the history panel needs to output a bit different in this situation
+                    boolean top = false;
+                    if (row.version != null && VersionHelper.isGE(row.version, "4.7")) {
+                        top = h == row.history.get(row.history.size() - 1);
+                    }
+
                     String ids;
                     if (source) {
                         ids = locationAndLine(h.location, h.line);
@@ -569,12 +586,21 @@ public class Debug extends Run {
                     }
 
                     String fids = String.format("%-30.30s", ids);
-                    String msg = String.format("%s %10.10s %4d:  %s", fids, elapsed, h.line, c);
+                    String msg;
+                    if (top && !row.last) {
+                        msg = String.format("%10.10s %s %4d:   %s", "--->", fids, h.line, c);
+                    } else {
+                        msg = String.format("%10.10s %s %4d:   %s", elapsed, fids, h.line, c);
+                    }
                     int len = msg.length();
                     if (loggingColor) {
                         fids = String.format("%-30.30s", ids);
                         fids = Ansi.ansi().fgCyan().a(fids).reset().toString();
-                        msg = String.format("%s %10.10s %4d:   %s", fids, elapsed, h.line, c);
+                        if (top && !row.last) {
+                            msg = String.format("%10.10s %s %4d:   %s", "--->", fids, h.line, c);
+                        } else {
+                            msg = String.format("%10.10s %s %4d:   %s", elapsed, fids, h.line, c);
+                        }
                     }
 
                     p.history = msg;
@@ -716,16 +742,19 @@ public class Debug extends Run {
     }
 
     private String getDataAsTable(SuspendedRow r) {
-        return tableHelper.getDataAsTable(r.exchangeId, r.exchangePattern, r.endpoint, r.message, r.exception);
+        return tableHelper.getDataAsTable(r.exchangeId, r.exchangePattern, r.endpoint, r.endpointService, r.message,
+                r.exception);
     }
 
     private String getStatus(SuspendedRow r) {
+        boolean remote = r.endpoint != null && r.endpoint.getBooleanOrDefault("remote", false);
+
         if (r.first) {
             String s = "Created";
             if (loggingColor) {
                 return Ansi.ansi().fg(Ansi.Color.GREEN).a(s).reset().toString();
             } else {
-                return "Input";
+                return s;
             }
         } else if (r.last) {
             String done = r.exception != null ? "Completed (exception)" : "Completed (success)";
@@ -749,10 +778,11 @@ public class Debug extends Run {
                 return fail;
             }
         } else {
+            String s = remote ? "Sent" : "Processed";
             if (loggingColor) {
-                return Ansi.ansi().fg(Ansi.Color.GREEN).a("Processed").reset().toString();
+                return Ansi.ansi().fg(Ansi.Color.GREEN).a(s).reset().toString();
             } else {
-                return "Processed";
+                return s;
             }
         }
     }
@@ -776,7 +806,7 @@ public class Debug extends Run {
 
     private static class SuspendedRow {
         String pid;
-        String name;
+        String version;
         boolean first;
         boolean last;
         long uid;
@@ -791,6 +821,7 @@ public class Debug extends Run {
         boolean done;
         boolean failed;
         JsonObject endpoint;
+        JsonObject endpointService;
         JsonObject message;
         JsonObject exception;
         List<Code> code = new ArrayList<>();

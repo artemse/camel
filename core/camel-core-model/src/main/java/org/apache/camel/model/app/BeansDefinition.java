@@ -23,11 +23,14 @@ import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlAnyElement;
 import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
 
 import org.w3c.dom.Element;
 
+import org.apache.camel.model.BeanFactoryDefinition;
+import org.apache.camel.model.DataFormatDefinition;
 import org.apache.camel.model.RouteConfigurationDefinition;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.model.RouteTemplateDefinition;
@@ -35,10 +38,14 @@ import org.apache.camel.model.TemplatedRouteDefinition;
 import org.apache.camel.model.rest.RestConfigurationDefinition;
 import org.apache.camel.model.rest.RestDefinition;
 import org.apache.camel.spi.Metadata;
+import org.apache.camel.spi.annotations.DslProperty;
 import org.apache.camel.spi.annotations.ExternalSchemaElement;
 
 /**
  * Container for beans, routes, and more.
+ *
+ * Important this is only supported when using XML DSL with camel-xml-io-dsl. This is NOT for the classic old Spring XML
+ * DSL used by Camel 1.x/2.x.
  */
 @Metadata(label = "configuration")
 @XmlRootElement(name = "beans")
@@ -47,6 +54,7 @@ import org.apache.camel.spi.annotations.ExternalSchemaElement;
         "beans",
         "springBeans",
         "blueprintBeans",
+        "dataFormats",
         "restConfigurations",
         "rests",
         "routeConfigurations",
@@ -66,7 +74,7 @@ public class BeansDefinition {
     // to "bean processors"
 
     @XmlElement(name = "bean")
-    private List<RegistryBeanDefinition> beans = new ArrayList<>();
+    private List<BeanFactoryDefinition> beans = new ArrayList<>();
 
     // this is the only way I found to generate usable Schema without imports, while allowing elements
     // from different namespaces
@@ -75,6 +83,10 @@ public class BeansDefinition {
                            documentElement = "beans")
     @XmlAnyElement
     private List<Element> springBeans = new ArrayList<>();
+
+    // Blueprint XML is deprecated, but we need those so that Camel JBang can
+    // load the routes and transform them
+
     @ExternalSchemaElement(names = { "bean" },
                            namespace = "http://www.osgi.org/xmlns/blueprint/v1.0.0",
                            documentElement = "blueprint")
@@ -88,6 +100,10 @@ public class BeansDefinition {
     // initially we'll be supporting only these elements which are parsed by
     // org.apache.camel.dsl.xml.io.XmlRoutesBuilderLoader in camel-xml-io-dsl
 
+    @XmlElementWrapper(name = "dataFormats")
+    @XmlElement(name = "dataFormat")
+    @DslProperty(name = "dataFormats") // yaml-dsl
+    private List<DataFormatDefinition> dataFormats;
     @XmlElement(name = "restConfiguration")
     private List<RestConfigurationDefinition> restConfigurations = new ArrayList<>();
     @XmlElement(name = "rest")
@@ -112,14 +128,14 @@ public class BeansDefinition {
         this.componentScanning = componentScanning;
     }
 
-    public List<RegistryBeanDefinition> getBeans() {
+    public List<BeanFactoryDefinition> getBeans() {
         return beans;
     }
 
     /**
      * List of bean
      */
-    public void setBeans(List<RegistryBeanDefinition> beans) {
+    public void setBeans(List<BeanFactoryDefinition> beans) {
         this.beans = beans;
     }
 
@@ -209,6 +225,17 @@ public class BeansDefinition {
      */
     public void setRoutes(List<RouteDefinition> routes) {
         this.routes = routes;
+    }
+
+    public List<DataFormatDefinition> getDataFormats() {
+        return dataFormats;
+    }
+
+    /**
+     * Camel data formats
+     */
+    public void setDataFormats(List<DataFormatDefinition> dataFormats) {
+        this.dataFormats = dataFormats;
     }
 
 }

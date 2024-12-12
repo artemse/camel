@@ -16,13 +16,20 @@
  */
 package org.apache.camel.dsl.xml.io;
 
+import java.util.Map;
+
+import org.apache.camel.Route;
 import org.apache.camel.component.mock.MockEndpoint;
+import org.apache.camel.component.rest.DummyRestConsumerFactory;
+import org.apache.camel.component.rest.DummyRestProcessorFactory;
 import org.apache.camel.dsl.xml.io.beans.GreeterMessage;
 import org.apache.camel.dsl.xml.io.beans.MyDestroyBean;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.spi.Resource;
+import org.apache.camel.spi.RestConfiguration;
 import org.apache.camel.spi.RoutesLoader;
 import org.apache.camel.support.PluginHelper;
+import org.apache.commons.codec.binary.Base64;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -274,6 +281,127 @@ public class XmlLoadAppTest {
             y10.assertIsSatisfied();
 
             context.stop();
+        }
+    }
+
+    @Test
+    public void testLoadCamelAppCamelXmlExt() throws Exception {
+        try (DefaultCamelContext context = new DefaultCamelContext()) {
+            context.start();
+
+            Resource resource = PluginHelper.getResourceLoader(context).resolveResource(
+                    "/org/apache/camel/dsl/xml/io/camel-app11.camel.xml");
+
+            RoutesLoader routesLoader = PluginHelper.getRoutesLoader(context);
+            routesLoader.preParseRoute(resource, false);
+            routesLoader.loadRoutes(resource);
+
+            assertNotNull(context.getRoute("r11"), "Loaded r11 route should be there");
+            assertEquals(1, context.getRoutes().size());
+
+            // test that loaded route works
+            MockEndpoint y11 = context.getEndpoint("mock:y11", MockEndpoint.class);
+            y11.expectedBodiesReceived("Hi World");
+            context.createProducerTemplate().sendBody("direct:x11", "Hi World");
+            y11.assertIsSatisfied();
+
+            context.stop();
+        }
+    }
+
+    @Test
+    public void testLoadCamelAppRestConfiguration() throws Exception {
+        try (DefaultCamelContext context = new DefaultCamelContext()) {
+            context.getCamelContextExtension().getRegistry().bind("dummy-rest", new DummyRestConsumerFactory());
+            context.getCamelContextExtension().getRegistry().bind("dummy-rest", new DummyRestProcessorFactory());
+
+            context.start();
+
+            Resource resource = PluginHelper.getResourceLoader(context).resolveResource(
+                    "/org/apache/camel/dsl/xml/io/camel-app12.xml");
+
+            RoutesLoader routesLoader = PluginHelper.getRoutesLoader(context);
+            routesLoader.preParseRoute(resource, false);
+            routesLoader.loadRoutes(resource);
+
+            RestConfiguration restConfiguration = context.getRestConfiguration();
+            assertNotNull(restConfiguration, "There should be a rest configuration");
+            assertEquals("dummy-rest", restConfiguration.getApiComponent());
+            assertEquals("dummy-rest", restConfiguration.getComponent());
+            assertEquals("api", restConfiguration.getContextPath());
+            assertEquals("api-doc", restConfiguration.getApiContextPath());
+
+            Map<String, Object> apiProperties = restConfiguration.getApiProperties();
+            assertEquals("test", apiProperties.get("api.title"));
+            assertEquals("3.0", apiProperties.get("openapi.version"));
+
+            context.stop();
+        }
+    }
+
+    @Test
+    public void testLoadAppWithRouteConfigAndRoutes() throws Exception {
+        try (DefaultCamelContext context = new DefaultCamelContext()) {
+            context.start();
+
+            // camel-app13 has a route configuration and a route using the configuration
+            Resource resource = PluginHelper.getResourceLoader(context).resolveResource(
+                    "/org/apache/camel/dsl/xml/io/camel-app13.xml");
+
+            PluginHelper.getRoutesLoader(context).loadRoutes(resource);
+
+            Route routewithConfig = context.getRoute("routeWithConfig");
+            assertNotNull(routewithConfig, "Loaded routeWithConfig route should be there");
+            assertEquals(1, routewithConfig.getOnExceptions().size(), "Loaded route should have onException");
+            assertEquals(1, context.getRoutes().size());
+
+            // test that loaded route works
+            MockEndpoint bar = context.getEndpoint("mock:afterException", MockEndpoint.class);
+            bar.expectedBodiesReceived("Hi World");
+            context.createProducerTemplate().sendBody("direct:throwException", "Hi World");
+            bar.assertIsSatisfied();
+        }
+    }
+
+    @Test
+    public void testLoadAppWithDataFormatSpring() throws Exception {
+        try (DefaultCamelContext context = new DefaultCamelContext()) {
+            context.start();
+
+            Resource resource = PluginHelper.getResourceLoader(context).resolveResource(
+                    "/org/apache/camel/dsl/xml/io/camel-app14.xml");
+
+            PluginHelper.getRoutesLoader(context).loadRoutes(resource);
+
+            // test that loaded route works
+            MockEndpoint bar = context.getEndpoint("mock:result", MockEndpoint.class);
+
+            Base64 codec = new Base64(40, new byte[] { '\r', '\n' }, true);
+            byte[] encoded = codec.encode("Hi World".getBytes());
+            bar.expectedBodiesReceived(encoded);
+            context.createProducerTemplate().sendBody("direct:start", "Hi World");
+            bar.assertIsSatisfied();
+        }
+    }
+
+    @Test
+    public void testLoadAppWithDataFormat() throws Exception {
+        try (DefaultCamelContext context = new DefaultCamelContext()) {
+            context.start();
+
+            Resource resource = PluginHelper.getResourceLoader(context).resolveResource(
+                    "/org/apache/camel/dsl/xml/io/camel-app15.xml");
+
+            PluginHelper.getRoutesLoader(context).loadRoutes(resource);
+
+            // test that loaded route works
+            MockEndpoint bar = context.getEndpoint("mock:result", MockEndpoint.class);
+
+            Base64 codec = new Base64(60, new byte[] { '\r', '\n' }, true);
+            byte[] encoded = codec.encode("Hi World".getBytes());
+            bar.expectedBodiesReceived(encoded);
+            context.createProducerTemplate().sendBody("direct:start", "Hi World");
+            bar.assertIsSatisfied();
         }
     }
 

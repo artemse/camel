@@ -9,9 +9,10 @@
     "label": "cloud",
     "javaType": "org.apache.camel.component.knative.KnativeComponent",
     "supportLevel": "Stable",
+    "metadata": { "protocol": "http" },
     "groupId": "org.apache.camel",
     "artifactId": "camel-knative",
-    "version": "4.5.0-SNAPSHOT",
+    "version": "4.10.0-SNAPSHOT",
     "scheme": "knative",
     "extendsScheme": "",
     "syntax": "knative:type\/typeId",
@@ -20,6 +21,7 @@
     "consumerOnly": false,
     "producerOnly": false,
     "lenientProperties": false,
+    "browsable": false,
     "remote": true
   },
   "componentProperties": {

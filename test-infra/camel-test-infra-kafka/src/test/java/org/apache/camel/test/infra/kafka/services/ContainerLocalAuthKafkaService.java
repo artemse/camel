@@ -21,7 +21,7 @@ import org.apache.camel.test.infra.common.services.ContainerService;
 import org.apache.camel.test.infra.kafka.common.KafkaProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testcontainers.containers.KafkaContainer;
+import org.testcontainers.kafka.KafkaContainer;
 import org.testcontainers.utility.DockerImageName;
 import org.testcontainers.utility.MountableFile;
 
@@ -36,13 +36,10 @@ public class ContainerLocalAuthKafkaService implements KafkaService, ContainerSe
                     ContainerLocalKafkaService.KAFKA3_IMAGE_NAME))
                     .asCompatibleSubstituteFor(ContainerLocalKafkaService.KAFKA3_IMAGE_NAME));
 
-            withEmbeddedZookeeper();
-
             final MountableFile mountableFile = MountableFile.forClasspathResource(jaasConfigFile);
             LOG.debug("Using mountable file at: {}", mountableFile.getFilesystemPath());
-            withCopyFileToContainer(mountableFile, "/tmp/kafka-jaas.config");
-
-            withEnv("KAFKA_OPTS", "-Djava.security.auth.login.config=/tmp/kafka-jaas.config")
+            withCopyFileToContainer(mountableFile, "/tmp/kafka-jaas.config")
+                    .withEnv("KAFKA_OPTS", "-Djava.security.auth.login.config=/tmp/kafka-jaas.config")
                     .withEnv("KAFKA_LISTENERS", "PLAINTEXT://0.0.0.0:9093,BROKER://0.0.0.0:9092")
                     .withEnv("KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL", "PLAIN")
                     .withEnv("KAFKA_LISTENER_SECURITY_PROTOCOL_MAP", "PLAINTEXT:SASL_PLAINTEXT,BROKER:PLAINTEXT")

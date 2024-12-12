@@ -36,6 +36,7 @@ import org.apache.camel.model.dataformat.CsvDataFormat;
 import org.apache.camel.model.dataformat.CustomDataFormat;
 import org.apache.camel.model.dataformat.FhirJsonDataFormat;
 import org.apache.camel.model.dataformat.FhirXmlDataFormat;
+import org.apache.camel.model.dataformat.FuryDataFormat;
 import org.apache.camel.model.dataformat.GrokDataFormat;
 import org.apache.camel.model.dataformat.GzipDeflaterDataFormat;
 import org.apache.camel.model.dataformat.HL7DataFormat;
@@ -52,6 +53,7 @@ import org.apache.camel.model.dataformat.ParquetAvroDataFormat;
 import org.apache.camel.model.dataformat.ProtobufDataFormat;
 import org.apache.camel.model.dataformat.ProtobufLibrary;
 import org.apache.camel.model.dataformat.RssDataFormat;
+import org.apache.camel.model.dataformat.SmooksDataFormat;
 import org.apache.camel.model.dataformat.SoapDataFormat;
 import org.apache.camel.model.dataformat.SwiftMtDataFormat;
 import org.apache.camel.model.dataformat.SwiftMxDataFormat;
@@ -96,14 +98,30 @@ public class DataFormatClause<T extends ProcessorDefinition<?>> {
         return dataFormat(new AvroDataFormat());
     }
 
-    public T avro(Object schema) {
+    /**
+     * Uses Avro data format with tje given library and schema
+     */
+    public T avro(AvroLibrary library, Object schema) {
         AvroDataFormat dataFormat = new AvroDataFormat();
+        dataFormat.setLibrary(library);
         dataFormat.setSchema(schema);
         return dataFormat(dataFormat);
     }
 
-    public T avro(String instanceClassName) {
-        return dataFormat(new AvroDataFormat(instanceClassName));
+    /**
+     * Uses Avro data format with the given unmarshalType
+     */
+    public T avro(String unmarshalTypeName) {
+        return dataFormat(new AvroDataFormat(unmarshalTypeName));
+    }
+
+    /**
+     * Uses Avro data format with given library and unmarshalType
+     */
+    public T avro(AvroLibrary library, String unmarshalTypeName) {
+        AvroDataFormat df = new AvroDataFormat(unmarshalTypeName);
+        df.setLibrary(library);
+        return dataFormat(df);
     }
 
     /**
@@ -129,6 +147,16 @@ public class DataFormatClause<T extends ProcessorDefinition<?>> {
         AvroDataFormat avroDataFormat = new AvroDataFormat();
         avroDataFormat.setLibrary(library);
         avroDataFormat.setUnmarshalType(unmarshalType);
+        return dataFormat(avroDataFormat);
+    }
+
+    /**
+     * Uses the Avro data format with given unmarshalType and schemaResolver
+     */
+    public T avro(Class<?> unmarshalType, String schemaResolver) {
+        AvroDataFormat avroDataFormat = new AvroDataFormat();
+        avroDataFormat.setUnmarshalType(unmarshalType);
+        avroDataFormat.setSchemaResolver(schemaResolver);
         return dataFormat(avroDataFormat);
     }
 
@@ -276,6 +304,23 @@ public class DataFormatClause<T extends ProcessorDefinition<?>> {
      */
     public T custom(String ref) {
         return dataFormat(new CustomDataFormat(ref));
+    }
+
+    /**
+     * Use the Fury data format
+     */
+    public T fury() {
+        return dataFormat(new FuryDataFormat());
+    }
+
+    /**
+     * Use the Fury data format with the given unmarshalType
+     */
+
+    public T fury(Class type) {
+        FuryDataFormat format = new FuryDataFormat();
+        format.setUnmarshalType(type);
+        return dataFormat(format);
     }
 
     /**
@@ -783,6 +828,15 @@ public class DataFormatClause<T extends ProcessorDefinition<?>> {
      */
     public T rss() {
         return dataFormat(new RssDataFormat());
+    }
+
+    /**
+     * Uses the Smooks data format
+     */
+    public T smooks(String smooksConfig) {
+        SmooksDataFormat smooksDataFormat = new SmooksDataFormat();
+        smooksDataFormat.setSmooksConfig(smooksConfig);
+        return dataFormat(smooksDataFormat);
     }
 
     /**
@@ -1404,11 +1458,11 @@ public class DataFormatClause<T extends ProcessorDefinition<?>> {
     }
 
     /**
-     * To use a variable to store the received message body (only body, not headers). This is handy for easy access to
-     * the received message body via variables.
-     *
-     * Important: When using receive variable then the received body is stored only in this variable and <b>not</b> on
-     * the current {@link org.apache.camel.Message}.
+     * To use a variable as the source for the message body to send. This makes it handy to use variables for user data
+     * and to easily control what data to use for sending and receiving. Important: When using send variable then the
+     * message body is taken from this variable instead of the current Message , however the headers from the Message
+     * will still be used as well. In other words, the variable is used instead of the message body, but everything else
+     * is as usual.
      */
     public DataFormatClause<T> variableSend(String variableSend) {
         this.variableSend = variableSend;
@@ -1416,18 +1470,17 @@ public class DataFormatClause<T extends ProcessorDefinition<?>> {
     }
 
     /**
-     * To use a variable to store the received message body (only body, not headers). This is handy for easy access to
-     * the received message body via variables.
+     * To use a variable to store the received message body (only body, not headers). This makes it handy to use
+     * variables for user data and to easily control what data to use for sending and receiving.
      *
-     * Important: When using receive variable then the received body is stored only in this variable and <b>not</b> on
-     * the current {@link org.apache.camel.Message}.
+     * Important: When using receive variable then the received body is stored only in this variable and not on the
+     * current message.
      */
     public DataFormatClause<T> variableReceive(String variableReceive) {
         this.variableReceive = variableReceive;
         return this;
     }
 
-    @SuppressWarnings("unchecked")
     private T dataFormat(DataFormatDefinition dataFormatType) {
         switch (operation) {
             case Unmarshal:

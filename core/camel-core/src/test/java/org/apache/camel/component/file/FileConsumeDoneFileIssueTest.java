@@ -122,15 +122,15 @@ public class FileConsumeDoneFileIssueTest extends ContextTestSupport {
     }
 
     @Override
-    protected RouteBuilder createRouteBuilder() throws Exception {
+    protected RouteBuilder createRouteBuilder() {
         return new RouteBuilder() {
             @Override
-            public void configure() throws Exception {
-                from(fileUri("done?doneFileName=foo.done&initialDelay=0&delay=10")).routeId("foo").noAutoStartup()
+            public void configure() {
+                from(fileUri("done?doneFileName=foo.done&initialDelay=0&delay=10")).routeId("foo").autoStartup(false)
                         .convertBodyTo(String.class).to("mock:result");
 
                 from(fileUri("done2?doneFileName=${file:name}.done&initialDelay=0&delay=10")).routeId("bar")
-                        .noAutoStartup().convertBodyTo(String.class).to("mock:result");
+                        .autoStartup(false).convertBodyTo(String.class).to("mock:result");
             }
         };
     }

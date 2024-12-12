@@ -17,8 +17,10 @@
 package org.apache.camel.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -47,6 +49,9 @@ import org.apache.camel.spi.ResourceAware;
 public class RouteTemplateDefinition extends OptionalIdentifiedDefinition<RouteTemplateDefinition> implements ResourceAware {
 
     @XmlTransient
+    private static final AtomicInteger COUNTER = new AtomicInteger();
+
+    @XmlTransient
     private Consumer<RouteTemplateContext> configurer;
 
     @XmlElement(name = "templateParameter")
@@ -54,7 +59,7 @@ public class RouteTemplateDefinition extends OptionalIdentifiedDefinition<RouteT
     private List<RouteTemplateParameterDefinition> templateParameters;
     @XmlElement(name = "templateBean")
     @Metadata(description = "Adds a local bean the route template uses")
-    private List<RouteTemplateBeanDefinition> templateBeans;
+    private List<BeanFactoryDefinition<RouteTemplateDefinition>> templateBeans;
     @XmlElement(name = "route", required = true)
     private RouteDefinition route = new RouteDefinition();
     @XmlTransient
@@ -68,11 +73,11 @@ public class RouteTemplateDefinition extends OptionalIdentifiedDefinition<RouteT
         this.templateParameters = templateParameters;
     }
 
-    public List<RouteTemplateBeanDefinition> getTemplateBeans() {
+    public List<BeanFactoryDefinition<RouteTemplateDefinition>> getTemplateBeans() {
         return templateBeans;
     }
 
-    public void setTemplateBeans(List<RouteTemplateBeanDefinition> templateBeans) {
+    public void setTemplateBeans(List<BeanFactoryDefinition<RouteTemplateDefinition>> templateBeans) {
         this.templateBeans = templateBeans;
     }
 
@@ -223,7 +228,7 @@ public class RouteTemplateDefinition extends OptionalIdentifiedDefinition<RouteT
         if (templateBeans == null) {
             templateBeans = new ArrayList<>();
         }
-        RouteTemplateBeanDefinition def = new RouteTemplateBeanDefinition();
+        BeanFactoryDefinition<RouteTemplateDefinition> def = new BeanFactoryDefinition<>();
         def.setName(name);
         def.setBeanType(type);
         templateBeans.add(def);
@@ -241,15 +246,15 @@ public class RouteTemplateDefinition extends OptionalIdentifiedDefinition<RouteT
         if (templateBeans == null) {
             templateBeans = new ArrayList<>();
         }
-        RouteTemplateBeanDefinition def = new RouteTemplateBeanDefinition();
+        BeanFactoryDefinition<RouteTemplateDefinition> def = new BeanFactoryDefinition<>();
         def.setName(name);
         if (bean instanceof RouteTemplateContext.BeanSupplier) {
             def.setBeanSupplier((RouteTemplateContext.BeanSupplier<Object>) bean);
         } else if (bean instanceof Supplier) {
             def.setBeanSupplier(ctx -> ((Supplier<?>) bean).get());
-        } else if (bean instanceof String) {
+        } else if (bean instanceof String str) {
             // its a string type
-            def.setType((String) bean);
+            def.setType(str);
         } else {
             def.setBeanSupplier(ctx -> bean);
         }
@@ -267,7 +272,7 @@ public class RouteTemplateDefinition extends OptionalIdentifiedDefinition<RouteT
         if (templateBeans == null) {
             templateBeans = new ArrayList<>();
         }
-        RouteTemplateBeanDefinition def = new RouteTemplateBeanDefinition();
+        BeanFactoryDefinition<RouteTemplateDefinition> def = new BeanFactoryDefinition();
         def.setName(name);
         def.setBeanSupplier(ctx -> ((Supplier<?>) bean).get());
         templateBeans.add(def);
@@ -285,7 +290,7 @@ public class RouteTemplateDefinition extends OptionalIdentifiedDefinition<RouteT
         if (templateBeans == null) {
             templateBeans = new ArrayList<>();
         }
-        RouteTemplateBeanDefinition def = new RouteTemplateBeanDefinition();
+        BeanFactoryDefinition<RouteTemplateDefinition> def = new BeanFactoryDefinition<>();
         def.setName(name);
         def.setBeanType(type);
         def.setBeanSupplier(bean);
@@ -304,7 +309,7 @@ public class RouteTemplateDefinition extends OptionalIdentifiedDefinition<RouteT
         if (templateBeans == null) {
             templateBeans = new ArrayList<>();
         }
-        RouteTemplateBeanDefinition def = new RouteTemplateBeanDefinition();
+        BeanFactoryDefinition<RouteTemplateDefinition> def = new BeanFactoryDefinition<>();
         def.setName(name);
         def.setScriptLanguage(language);
         def.setScript(script);
@@ -324,7 +329,7 @@ public class RouteTemplateDefinition extends OptionalIdentifiedDefinition<RouteT
         if (templateBeans == null) {
             templateBeans = new ArrayList<>();
         }
-        RouteTemplateBeanDefinition def = new RouteTemplateBeanDefinition();
+        BeanFactoryDefinition<RouteTemplateDefinition> def = new BeanFactoryDefinition<>();
         def.setName(name);
         def.setBeanType(type);
         def.setScriptLanguage(language);
@@ -339,11 +344,11 @@ public class RouteTemplateDefinition extends OptionalIdentifiedDefinition<RouteT
      * @param  name the name of the bean
      * @return      fluent builder to choose which language and script to use for creating the bean
      */
-    public RouteTemplateBeanDefinition templateBean(String name) {
+    public BeanFactoryDefinition<RouteTemplateDefinition> templateBean(String name) {
         if (templateBeans == null) {
             templateBeans = new ArrayList<>();
         }
-        RouteTemplateBeanDefinition def = new RouteTemplateBeanDefinition();
+        BeanFactoryDefinition<RouteTemplateDefinition> def = new BeanFactoryDefinition<>();
         def.setParent(this);
         def.setName(name);
         templateBeans.add(def);
@@ -403,6 +408,17 @@ public class RouteTemplateDefinition extends OptionalIdentifiedDefinition<RouteT
             // only set factory if not already set
             copy.setErrorHandlerFactory(route.getErrorHandlerFactory());
         }
+        copy.setErrorHandler(route.getErrorHandler());
+
+        // ensure the copy has unique node prefix to avoid duplicate id clash
+        // when creating multiple routes from the same template
+        copy.setNodePrefixId(route.getNodePrefixId());
+        String npi = copy.getNodePrefixId();
+        if (npi == null) {
+            npi = "route";
+        }
+        npi = npi + "-" + incNodePrefixId();
+        copy.setNodePrefixId(npi);
 
         // and then copy over the rest
         // (do not copy id as it is used for route template id)
@@ -410,15 +426,16 @@ public class RouteTemplateDefinition extends OptionalIdentifiedDefinition<RouteT
         copy.setDelayer(route.getDelayer());
         copy.setGroup(route.getGroup());
         copy.setInheritErrorHandler(route.isInheritErrorHandler());
-        copy.setInput(route.getInput());
+        // make a defensive copy of the input as input can be adviced during testing or other changes
+        copy.setInput(route.getInput().copy());
         copy.setInputType(route.getInputType());
         copy.setLogMask(route.getLogMask());
         copy.setMessageHistory(route.getMessageHistory());
         copy.setOutputType(route.getOutputType());
-        copy.setOutputs(route.getOutputs());
-        copy.setRoutePolicies(route.getRoutePolicies());
+        copy.setOutputs(ProcessorDefinitionHelper.deepCopyDefinitions(route.getOutputs()));
+        copy.setRoutePolicies(shallowCopy(route.getRoutePolicies()));
         copy.setRoutePolicyRef(route.getRoutePolicyRef());
-        copy.setRouteProperties(route.getRouteProperties());
+        copy.setRouteProperties(shallowCopy(route.getRouteProperties()));
         copy.setShutdownRoute(route.getShutdownRoute());
         copy.setShutdownRunningTask(route.getShutdownRunningTask());
         copy.setStartupOrder(route.getStartupOrder());
@@ -432,7 +449,20 @@ public class RouteTemplateDefinition extends OptionalIdentifiedDefinition<RouteT
         }
         copy.setPrecondition(route.getPrecondition());
         copy.setRouteConfigurationId(route.getRouteConfigurationId());
+        copy.setTemplateParameters(shallowCopy(route.getTemplateParameters()));
         return copy;
+    }
+
+    private <T> List<T> shallowCopy(List<T> list) {
+        return (list != null) ? new ArrayList<>(list) : null;
+    }
+
+    private <K, V> Map<K, V> shallowCopy(Map<K, V> map) {
+        return (map != null) ? new HashMap<>(map) : null;
+    }
+
+    private int incNodePrefixId() {
+        return COUNTER.incrementAndGet();
     }
 
     @FunctionalInterface

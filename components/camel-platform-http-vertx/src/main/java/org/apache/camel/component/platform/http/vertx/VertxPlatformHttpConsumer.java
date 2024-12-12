@@ -51,6 +51,7 @@ import org.apache.camel.component.platform.http.PlatformHttpEndpoint;
 import org.apache.camel.component.platform.http.cookie.CookieConfiguration;
 import org.apache.camel.component.platform.http.cookie.CookieHandler;
 import org.apache.camel.component.platform.http.spi.Method;
+import org.apache.camel.component.platform.http.spi.PlatformHttpConsumer;
 import org.apache.camel.spi.HeaderFilterStrategy;
 import org.apache.camel.support.DefaultConsumer;
 import org.apache.camel.util.FileUtil;
@@ -67,13 +68,15 @@ import static org.apache.camel.util.CollectionHelper.appendEntry;
  * A {@link org.apache.camel.Consumer} for the {@link org.apache.camel.component.platform.http.spi.PlatformHttpEngine}
  * based on Vert.x Web.
  */
-public class VertxPlatformHttpConsumer extends DefaultConsumer implements Suspendable, SuspendableService {
+public class VertxPlatformHttpConsumer extends DefaultConsumer
+        implements PlatformHttpConsumer, Suspendable, SuspendableService {
     private static final Logger LOGGER = LoggerFactory.getLogger(VertxPlatformHttpConsumer.class);
     private static final Pattern PATH_PARAMETER_PATTERN = Pattern.compile("\\{([^/}]+)\\}");
 
     private final List<Handler<RoutingContext>> handlers;
     private final String fileNameExtWhitelist;
     private final boolean muteExceptions;
+    private final boolean handleWriteResponseError;
     private Set<Method> methods;
     private String path;
     private Route route;
@@ -90,6 +93,7 @@ public class VertxPlatformHttpConsumer extends DefaultConsumer implements Suspen
         this.fileNameExtWhitelist
                 = endpoint.getFileNameExtWhitelist() == null ? null : endpoint.getFileNameExtWhitelist().toLowerCase(Locale.US);
         this.muteExceptions = endpoint.isMuteException();
+        this.handleWriteResponseError = endpoint.isHandleWriteResponseError();
     }
 
     @Override
@@ -236,6 +240,14 @@ public class VertxPlatformHttpConsumer extends DefaultConsumer implements Suspen
                 "Failed handling platform-http endpoint " + getEndpoint().getPath(),
                 failure);
         ctx.fail(failure);
+        if (handleWriteResponseError && failure != null) {
+            Exception existing = exchange.getException();
+            if (existing != null) {
+                failure.addSuppressed(existing);
+            }
+            exchange.setProperty(Exchange.EXCEPTION_CAUGHT, failure);
+            exchange.setException(failure);
+        }
         handleExchangeComplete(exchange);
     }
 
@@ -338,7 +350,7 @@ public class VertxPlatformHttpConsumer extends DefaultConsumer implements Suspen
             if (accepted) {
                 final File localFile = new File(upload.uploadedFileName());
                 final AttachmentMessage attachmentMessage = message.getExchange().getMessage(AttachmentMessage.class);
-                attachmentMessage.addAttachment(fileName, new DataHandler(new CamelFileDataSource(localFile, fileName)));
+                attachmentMessage.addAttachment(name, new DataHandler(new CamelFileDataSource(localFile, fileName)));
             } else {
                 LOGGER.debug(
                         "Cannot add file as attachment: {} because the file is not accepted according to fileNameExtWhitelist: {}",
@@ -349,7 +361,7 @@ public class VertxPlatformHttpConsumer extends DefaultConsumer implements Suspen
 
     class VertxCookieHandler implements CookieHandler {
 
-        private RoutingContext routingContext;
+        private final RoutingContext routingContext;
 
         VertxCookieHandler(RoutingContext routingContext) {
             this.routingContext = routingContext;

@@ -17,6 +17,7 @@
 package org.apache.camel.component.kamelet;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.function.Predicate;
@@ -30,6 +31,7 @@ import org.apache.camel.spi.PropertiesComponent;
 import org.apache.camel.spi.UuidGenerator;
 import org.apache.camel.support.CamelContextHelper;
 import org.apache.camel.support.SimpleUuidGenerator;
+import org.apache.camel.util.IOHelper;
 import org.apache.camel.util.ObjectHelper;
 import org.apache.camel.util.StringHelper;
 
@@ -37,13 +39,15 @@ import static org.apache.camel.model.ProcessorDefinitionHelper.filterTypeInOutpu
 
 public final class Kamelet {
     public static final String PROPERTIES_PREFIX = "camel.kamelet.";
+    public static final String ENV_VAR_PREFIX = "CAMEL_KAMELET_";
     public static final String SCHEME = "kamelet";
     public static final String SOURCE_ID = "source";
     public static final String SINK_ID = "sink";
     public static final String PARAM_ROUTE_ID = "routeId";
     public static final String PARAM_TEMPLATE_ID = "templateId";
     public static final String PARAM_LOCATION = "location";
-    public static final String DEFAULT_LOCATION = "classpath:/kamelets";
+    public static final String PARAM_UUID = "uuid";
+    public static final String DEFAULT_LOCATION = "classpath:kamelets";
     public static final String NO_ERROR_HANDLER = "noErrorHandler";
 
     // use a running counter as uuid
@@ -77,7 +81,11 @@ public final class Kamelet {
         return answer;
     }
 
-    public static String extractRouteId(CamelContext context, String remaining, Map<String, Object> parameters) {
+    public static String extractUuid() {
+        return UUID.generateUuid();
+    }
+
+    public static String extractRouteId(CamelContext context, String remaining, Map<String, Object> parameters, String uuid) {
         Object param = parameters.get(PARAM_ROUTE_ID);
         if (param != null) {
             return CamelContextHelper.mandatoryConvertTo(context, String.class, param);
@@ -92,7 +100,7 @@ public final class Kamelet {
             answer = StringHelper.after(remaining, "/");
         }
         if (answer == null) {
-            answer = extractTemplateId(context, remaining, parameters) + "-" + UUID.generateUuid();
+            answer = extractTemplateId(context, remaining, parameters) + "-" + uuid;
         }
 
         return answer;
@@ -123,11 +131,60 @@ public final class Kamelet {
         }
     }
 
+    /**
+     * Looking for OS environment variables that match the properties of the given Kamelet. At first lookup attempt is
+     * made without considering camelCase keys in the elements. The second lookup is converting camelCase to
+     * underscores.
+     *
+     * For example given an ENV variable in either format: - CAMEL_KAMELET_AWSS3SOURCE_BUCKETNAMEORARN=myArn -
+     * CAMEL_KAMELET_AWS_S3_SOURCE_BUCKET_NAME_OR_ARN=myArn
+     */
+    public static void extractKameletEnvironmentVariables(Map<String, Object> properties, String... elements) {
+        StringBuilder prefixBuffer = new StringBuilder(Kamelet.ENV_VAR_PREFIX);
+
+        // Map contains parameter name as key and full environment variable as value
+        Map<String, String> propertyMappings = new HashMap<>();
+        for (String element : elements) {
+            if (element == null) {
+                continue;
+            }
+            prefixBuffer.append(IOHelper.normalizeEnvironmentVariable(element)).append('_');
+
+            String prefix = prefixBuffer.toString();
+            System.getenv().keySet().stream()
+                    .filter(Kamelet.startsWith(prefix))
+                    .forEach(name -> propertyMappings.put(name.substring(prefix.length()), name));
+        }
+
+        prefixBuffer = new StringBuilder(Kamelet.ENV_VAR_PREFIX);
+
+        for (String element : elements) {
+            if (element == null) {
+                continue;
+            }
+            prefixBuffer.append(IOHelper.normalizeEnvironmentVariable(StringHelper.camelCaseToDash(element))).append('_');
+
+            String prefix = prefixBuffer.toString();
+            System.getenv().keySet().stream()
+                    .filter(Kamelet.startsWith(prefix))
+                    .forEach(name -> propertyMappings.put(name.substring(prefix.length()), name));
+        }
+
+        for (Map.Entry<String, String> mapping : propertyMappings.entrySet()) {
+            String value = System.getenv(mapping.getValue());
+            if (value != null) {
+                properties.put(mapping.getKey(), value);
+            }
+        }
+    }
+
     public static RouteDefinition templateToRoute(RouteTemplateDefinition in, Map<String, Object> parameters) {
         final String rid = (String) parameters.get(PARAM_ROUTE_ID);
         final boolean noErrorHandler = (boolean) parameters.get(NO_ERROR_HANDLER);
+        final String uuid = (String) parameters.get(PARAM_UUID);
 
         ObjectHelper.notNull(rid, PARAM_ROUTE_ID);
+        ObjectHelper.notNull(uuid, PARAM_UUID);
 
         RouteDefinition def = in.asRouteDefinition();
         // mark this as created from a kamelet
@@ -135,6 +192,7 @@ public final class Kamelet {
         def.setLocation(in.getLocation());
         def.setLineNumber(in.getLineNumber());
         def.setId(rid);
+        def.setNodePrefixId(uuid);
         if (noErrorHandler) {
             def.setErrorHandlerFactory(new NoErrorHandlerBuilder());
         }

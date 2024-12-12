@@ -34,7 +34,7 @@ public abstract class DefaultConfigurationProperties<T> {
 
     private String name;
     private String description;
-    @Metadata(defaultValue = "Default")
+    @Metadata(defaultValue = "Default", enums = "Verbose,Default,Brief,Oneline,Off")
     private StartupSummaryLevel startupSummaryLevel;
     private int durationMaxSeconds;
     private int durationMaxIdleSeconds;
@@ -71,9 +71,6 @@ public abstract class DefaultConfigurationProperties<T> {
     private int streamCachingBufferSize;
     private boolean streamCachingRemoveSpoolDirectoryWhenStopping = true;
     private boolean streamCachingStatisticsEnabled;
-    private boolean backlogTracing;
-    private boolean backlogTracingStandby;
-    private boolean backlogTracingTemplates;
     private boolean typeConverterStatisticsEnabled;
     private boolean tracing;
     private boolean tracingStandby;
@@ -85,6 +82,8 @@ public abstract class DefaultConfigurationProperties<T> {
     private boolean messageHistory;
     private boolean logMask;
     private boolean logExhaustedMessageBody;
+    private String logName;
+    private String logLanguage;
     private boolean autoStartup = true;
     private boolean allowUseOriginalMessage;
     private boolean caseInsensitiveHeaders = true;
@@ -96,9 +95,9 @@ public abstract class DefaultConfigurationProperties<T> {
     private boolean useDataType;
     private boolean useBreadcrumb;
     private boolean beanPostProcessorEnabled = true;
-    @Metadata(defaultValue = "Default")
+    @Metadata(defaultValue = "Default", enums = "ContextOnly,RoutesOnly,Default")
     private ManagementMBeansLevel jmxManagementMBeansLevel = ManagementMBeansLevel.Default;
-    @Metadata(defaultValue = "Default")
+    @Metadata(defaultValue = "Default", enums = "Extended,Default,RoutesOnly,Off")
     private ManagementStatisticsLevel jmxManagementStatisticsLevel = ManagementStatisticsLevel.Default;
     private String jmxManagementNamePattern = "#name#";
     private boolean jmxUpdateRouteEnabled;
@@ -151,6 +150,7 @@ public abstract class DefaultConfigurationProperties<T> {
     private String startupRecorderProfile = "default";
     private long startupRecorderDuration;
     private String startupRecorderDir;
+    private String cloudPropertiesLocation;
 
     // getter and setters
     // --------------------------------------------------------------
@@ -689,47 +689,6 @@ public abstract class DefaultConfigurationProperties<T> {
         tracingLoggingFormat = format;
     }
 
-    public boolean isBacklogTracing() {
-        return backlogTracing;
-    }
-
-    /**
-     * Sets whether backlog tracing is enabled or not.
-     *
-     * Default is false.
-     */
-    public void setBacklogTracing(boolean backlogTracing) {
-        this.backlogTracing = backlogTracing;
-    }
-
-    public boolean isBacklogTracingStandby() {
-        return backlogTracingStandby;
-    }
-
-    /**
-     * Whether to set backlog tracing on standby. If on standby then the backlog tracer is installed and made available.
-     * Then the backlog tracer can be enabled later at runtime via JMX or via Java API.
-     *
-     * Default is false.
-     */
-    public void setBacklogTracingStandby(boolean backlogTracingStandby) {
-        this.backlogTracingStandby = backlogTracingStandby;
-    }
-
-    public boolean isBacklogTracingTemplates() {
-        return backlogTracingTemplates;
-    }
-
-    /**
-     * Whether backlog tracing should trace inner details from route templates (or kamelets). Turning this on increases
-     * the verbosity of tracing by including events from internal routes in the templates or kamelets.
-     *
-     * Default is false.
-     */
-    public void setBacklogTracingTemplates(boolean backlogTracingTemplates) {
-        this.backlogTracingTemplates = backlogTracingTemplates;
-    }
-
     public boolean isMessageHistory() {
         return messageHistory;
     }
@@ -750,7 +709,7 @@ public abstract class DefaultConfigurationProperties<T> {
     /**
      * Whether to capture precise source location:line-number for all EIPs in Camel routes.
      *
-     * Enabling this will impact parsing Java based routes (also Groovy, Kotlin, etc.) on startup as this uses JDK
+     * Enabling this will impact parsing Java based routes (also Groovy etc.) on startup as this uses JDK
      * StackTraceElement to calculate the location from the Camel route, which comes with a performance cost. This only
      * impact startup, not the performance of the routes at runtime.
      */
@@ -782,6 +741,45 @@ public abstract class DefaultConfigurationProperties<T> {
      */
     public void setLogExhaustedMessageBody(boolean logExhaustedMessageBody) {
         this.logExhaustedMessageBody = logExhaustedMessageBody;
+    }
+
+    public String getLogName() {
+        return logName;
+    }
+
+    /**
+     * The global name to use for Log EIP
+     *
+     * The name is default the routeId or the source:line if source location is enabled. You can also specify the name
+     * using tokens:
+     *
+     * <br/>
+     * ${class} - the logger class name (org.apache.camel.processor.LogProcessor) <br/>
+     * ${contextId} - the camel context id <br/>
+     * ${routeId} - the route id <br/>
+     * ${groupId} - the route group id <br/>
+     * ${nodeId} - the node id <br/>
+     * ${nodePrefixId} - the node prefix id <br/>
+     * ${source} - the source:line (source location must be enabled) <br/>
+     * ${source.name} - the source filename (source location must be enabled) <br/>
+     * ${source.line} - the source line number (source location must be enabled)
+     *
+     * For example to use the route and node id you can specify the name as: ${routeId}/${nodeId}
+     */
+    public void setLogName(String logName) {
+        this.logName = logName;
+    }
+
+    public String getLogLanguage() {
+        return logLanguage;
+    }
+
+    /**
+     * To configure the language to use for Log EIP. By default, the simple language is used. However, Camel also
+     * supports other languages such as groovy.
+     */
+    public void setLogLanguage(String logLanguage) {
+        this.logLanguage = logLanguage;
     }
 
     public boolean isAutoStartup() {
@@ -952,7 +950,7 @@ public abstract class DefaultConfigurationProperties<T> {
      *
      * Turning this off should only be done if you are sure you do not use any of these Camel features.
      *
-     * Not all runtimes allow turning this off (such as camel-blueprint or camel-cdi with XML).
+     * Not all runtimes allow turning this off.
      *
      * The default value is true (enabled).
      */
@@ -1452,8 +1450,8 @@ public abstract class DefaultConfigurationProperties<T> {
     /**
      * Controls what to include in output for route dumping.
      *
-     * Possible values: all, routes, rests, routeConfigurations, routeTemplates, beans. Multiple values can be separated
-     * by comma. Default is routes.
+     * Possible values: all, routes, rests, routeConfigurations, routeTemplates, beans, dataFormats. Multiple values can
+     * be separated by comma. Default is routes.
      */
     public void setDumpRoutesInclude(String dumpRoutesInclude) {
         this.dumpRoutesInclude = dumpRoutesInclude;
@@ -2006,38 +2004,6 @@ public abstract class DefaultConfigurationProperties<T> {
     }
 
     /**
-     * Sets whether backlog tracing is enabled or not.
-     *
-     * Default is false.
-     */
-    public T withBacklogTracing(boolean backlogTracing) {
-        this.backlogTracing = backlogTracing;
-        return (T) this;
-    }
-
-    /**
-     * Whether to set backlog tracing on standby. If on standby then the backlog tracer is installed and made available.
-     * Then the backlog tracer can be enabled later at runtime via JMX or via Java API.
-     *
-     * Default is false.
-     */
-    public T withBacklogTracingStandby(boolean backlogTracingStandby) {
-        this.backlogTracingStandby = backlogTracingStandby;
-        return (T) this;
-    }
-
-    /**
-     * Whether backlog tracing should trace inner details from route templates (or kamelets). Turning this on increases
-     * the verbosity of tracing by including events from internal routes in the templates or kamelets.
-     *
-     * Default is false.
-     */
-    public T withBacklogTracingTemplates(boolean backlogTracingTemplates) {
-        this.backlogTracingTemplates = backlogTracingTemplates;
-        return (T) this;
-    }
-
-    /**
      * Sets whether message history is enabled or not.
      *
      * Default is false.
@@ -2050,7 +2016,7 @@ public abstract class DefaultConfigurationProperties<T> {
     /**
      * Whether to capture precise source location:line-number for all EIPs in Camel routes.
      *
-     * Enabling this will impact parsing Java based routes (also Groovy, Kotlin, etc.) on startup as this uses JDK
+     * Enabling this will impact parsing Java based routes (also Groovy, etc.) on startup as this uses JDK
      * StackTraceElement to calculate the location from the Camel route, which comes with a performance cost. This only
      * impact startup, not the performance of the routes at runtime.
      */
@@ -2076,6 +2042,39 @@ public abstract class DefaultConfigurationProperties<T> {
      */
     public T withLogExhaustedMessageBody(boolean logExhaustedMessageBody) {
         this.logExhaustedMessageBody = logExhaustedMessageBody;
+        return (T) this;
+    }
+
+    /**
+     * The global name to use for Log EIP
+     *
+     * The name is default the routeId or the source:line if source location is enabled. You can also specify the name
+     * using tokens:
+     *
+     * <br/>
+     * ${class} - the logger class name (org.apache.camel.processor.LogProcessor) <br/>
+     * ${contextId} - the camel context id <br/>
+     * ${routeId} - the route id <br/>
+     * ${groupId} - the route group id <br/>
+     * ${nodeId} - the node id <br/>
+     * ${nodePrefixId} - the node prefix id <br/>
+     * ${source} - the source:line (source location must be enabled) <br/>
+     * ${source.name} - the source filename (source location must be enabled) <br/>
+     * ${source.line} - the source line number (source location must be enabled)
+     *
+     * For example to use the route and node id you can specify the name as: ${routeId}/${nodeId}
+     */
+    public T withLogName(String logName) {
+        this.logName = logName;
+        return (T) this;
+    }
+
+    /**
+     * To configure the language to use for Log EIP. By default, the simple language is used. However, Camel also
+     * supports other languages such as groovy.
+     */
+    public T withLogLanguage(String logLanguage) {
+        this.logLanguage = logLanguage;
         return (T) this;
     }
 
@@ -2199,7 +2198,7 @@ public abstract class DefaultConfigurationProperties<T> {
      *
      * Turning this off should only be done if you are sure you do not use any of these Camel features.
      *
-     * Not all runtimes allow turning this off (such as camel-blueprint or camel-cdi with XML).
+     * Not all runtimes allow turning this off.
      *
      * The default value is true (enabled).
      */
@@ -2603,8 +2602,8 @@ public abstract class DefaultConfigurationProperties<T> {
     /**
      * Controls what to include in output for route dumping.
      *
-     * Possible values: all, routes, rests, routeConfigurations, routeTemplates, beans. Multiple values can be separated
-     * by comma. Default is routes.
+     * Possible values: all, routes, rests, routeConfigurations, routeTemplates, beans, dataFormats. Multiple values can
+     * be separated by comma. Default is routes.
      */
     public T withDumpRoutesInclude(String dumpRoutesInclude) {
         this.dumpRoutesInclude = dumpRoutesInclude;
@@ -2748,6 +2747,26 @@ public abstract class DefaultConfigurationProperties<T> {
      */
     public T withStartupRecorderDir(String startupRecorderDir) {
         this.startupRecorderDir = startupRecorderDir;
+        return (T) this;
+    }
+
+    public String getCloudPropertiesLocation() {
+        return cloudPropertiesLocation;
+    }
+
+    /**
+     * Sets the locations (comma separated values) where to find properties configuration as defined for cloud native
+     * environments such as Kubernetes. You should only scan text based mounted configuration.
+     */
+    public void setCloudPropertiesLocation(String cloudPropertiesLocation) {
+        this.cloudPropertiesLocation = cloudPropertiesLocation;
+    }
+
+    /**
+     * Whether to use cloud properties location setting. Default is none.
+     */
+    public T withCloudPropertiesLocation(boolean dumpRoutesResolvePlaceholders) {
+        this.cloudPropertiesLocation = cloudPropertiesLocation;
         return (T) this;
     }
 

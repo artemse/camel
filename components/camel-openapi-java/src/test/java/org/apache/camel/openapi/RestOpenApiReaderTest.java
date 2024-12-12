@@ -16,6 +16,14 @@
  */
 package org.apache.camel.openapi;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.TimeZone;
+
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.core.util.Json;
+import io.swagger.v3.core.util.Json31;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import org.apache.camel.BindToRegistry;
@@ -23,7 +31,6 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.impl.engine.DefaultClassResolver;
 import org.apache.camel.model.rest.RestParamType;
 import org.apache.camel.test.junit5.CamelTestSupport;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.slf4j.Logger;
@@ -216,64 +223,6 @@ public class RestOpenApiReaderTest extends CamelTestSupport {
         };
     }
 
-    @Test
-    public void testReaderRead() throws Exception {
-        BeanConfig config = new BeanConfig();
-        config.setHost("localhost:8080");
-        config.setSchemes(new String[] { "http" });
-        config.setBasePath("/api");
-        config.setInfo(new Info());
-        config.setVersion("2.0");
-
-        RestOpenApiReader reader = new RestOpenApiReader();
-
-        OpenAPI openApi = reader.read(context, context.getRestDefinitions(), config, context.getName(),
-                new DefaultClassResolver());
-        assertNotNull(openApi);
-
-        String json = RestOpenApiSupport.getJsonFromOpenAPIAsString(openApi, config);
-        String flatJson = json.replace("\n", " ").replaceAll("\\s+", " ");
-
-        log.info(json);
-
-        assertTrue(json.contains("\"host\" : \"localhost:8080\""));
-        assertTrue(json.contains("\"basePath\" : \"/api\""));
-        assertTrue(json.contains("\"/hello/bye\""));
-        assertTrue(json.contains("\"summary\" : \"To update the greeting message\""));
-        assertTrue(json.contains("\"/hello/bye/{name}\""));
-        assertTrue(json.contains("\"/hello/hi/{name}\""));
-        assertTrue(json.contains("\"type\" : \"number\""));
-        assertTrue(json.contains("\"format\" : \"float\""));
-        assertTrue(json.contains("\"application/xml\" : \"<hello>Hi</hello>\""));
-        assertTrue(json.contains("\"x-example\" : \"Donald Duck\""));
-        assertTrue(json.contains("\"success\" : \"123\""));
-        assertTrue(json.contains("\"error\" : \"-1\""));
-        assertTrue(json.contains("\"type\" : \"array\""));
-        assertTrue(json.contains("\"enum\" : [ \"A\", \"B\", \"C\" ]"));
-        assertTrue(json.contains("\"enum\" : [ 1, 2, 3 ]"));
-        assertTrue(json.contains("\"enum\" : [ 1.0, 2.0, 3.0 ]"));
-        assertTrue(json.contains("\"enum\" : [ \"true\", \"false\" ]"));
-        assertTrue(json.contains("\"enum\" : [ \"MQ==\", \"Mg==\", \"Mw==\" ]"));
-        assertTrue(json.contains("\"enum\" : [ \"2023-01-01\", \"2023-02-02\", \"2023-03-03\" ]"));
-        assertTrue(json.contains("\"enum\" : [ \"2011-12-03T10:15:30+01:00\" ]"));
-        assertTrue(json.contains("\"enum\" : [ \"foo\", \"bar\", \"cheese\" ]"));
-
-        flatJson = flatJson.replaceAll("\"operationId\" : \"[^\\\"]*\", ", "").replaceAll("\"summary\" : \"[^\\\"]*\", ", "");
-        log.info(flatJson);
-        assertTrue(flatJson.contains(
-                "\"/hello/bye\" : { \"post\" : { \"tags\" : [ \"/hello\" ], \"consumes\" : [ \"application/xml\" ], \"produces\" : [ \"application/xml\" ], "));
-        assertTrue(flatJson.contains(
-                "\"/tag/single\" : { \"get\" : { \"tags\" : [ \"Organisation\" ], \"consumes\" : [ \"application/json\" ], \"produces\" : [ \"application/json\" ], "));
-        assertTrue(flatJson.contains(
-                "\"/tag/multiple/a\" : { \"get\" : { \"tags\" : [ \"Organisation\", \"Group A\" ], \"consumes\" : [ \"application/json\" ], \"produces\" : [ \"application/json\" ], "));
-        assertTrue(flatJson.contains(
-                "\"/tag/multiple/b\" : { \"get\" : { \"tags\" : [ \"Organisation\", \"Group B\" ], \"consumes\" : [ \"application/json\" ], \"produces\" : [ \"application/json\" ], "));
-        assertTrue(flatJson.contains(
-                "\"tags\" : [ { \"name\" : \"/hello\" }, { \"name\" : \"Organisation\" }, { \"name\" : \"Group A\" }, { \"name\" : \"Group B\" } ]"));
-
-        context.stop();
-    }
-
     @ParameterizedTest
     @ValueSource(strings = { "3.0", "3.1" })
     public void testReaderReadV3(String version) throws Exception {
@@ -291,7 +240,7 @@ public class RestOpenApiReaderTest extends CamelTestSupport {
                 new DefaultClassResolver());
         assertNotNull(openApi);
 
-        String json = RestOpenApiSupport.getJsonFromOpenAPIAsString(openApi, config);
+        String json = getJsonFromOpenAPIAsString(openApi, config);
         log.info(json);
         json = json.replace("\n", " ").replaceAll("\\s+", " ");
 
@@ -327,6 +276,26 @@ public class RestOpenApiReaderTest extends CamelTestSupport {
         assertTrue(json.contains(
                 "\"tags\" : [ { \"name\" : \"/hello\" }, { \"name\" : \"Organisation\" }, { \"name\" : \"Group A\" }, { \"name\" : \"Group B\" } ]"));
         context.stop();
+    }
+
+    /*
+     * set TimeZone as default GMT to eusure this test pass everywhere
+     */
+    private String getJsonFromOpenAPIAsString(OpenAPI openApi, BeanConfig config) {
+        ObjectMapper mapper = config.isOpenApi31() ? Json31.mapper() : Json.mapper();
+        DateFormat origin = mapper.getDateFormat();
+        String result = null;
+        try {
+            DateFormat testDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            testDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+            mapper.setDateFormat(testDateFormat);
+            result = mapper.writer(new DefaultPrettyPrinter()).writeValueAsString(openApi);
+        } catch (Exception e) {
+            return null;
+        } finally {
+            mapper.setDateFormat(origin);
+        }
+        return result;
     }
 
 }

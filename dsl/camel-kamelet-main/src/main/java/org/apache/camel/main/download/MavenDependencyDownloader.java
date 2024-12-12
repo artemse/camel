@@ -52,6 +52,7 @@ import org.apache.camel.tooling.maven.MavenResolutionException;
 import org.apache.camel.tooling.maven.RemoteArtifactDownloadListener;
 import org.apache.camel.tooling.maven.RepositoryResolver;
 import org.apache.camel.util.FileUtil;
+import org.apache.camel.util.ObjectHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,12 +78,15 @@ public class MavenDependencyDownloader extends ServiceSupport implements Depende
     private MavenDownloader mavenDownloader;
 
     // repository URLs set from "camel.jbang.repos" property or --repos option.
-    private String repos;
+    private String repositories;
     private boolean fresh;
 
     // settings.xml and settings-security.xml locations to be passed to MavenDownloader from camel-tooling-maven
     private String mavenSettings;
     private String mavenSettingsSecurity;
+    // to make it easy to turn off maven central/snapshot
+    boolean mavenCentralEnabled = true;
+    boolean mavenApacheSnapshotEnabled = true;
 
     @Override
     public CamelContext getCamelContext() {
@@ -140,13 +144,13 @@ public class MavenDependencyDownloader extends ServiceSupport implements Depende
     }
 
     @Override
-    public String getRepos() {
-        return repos;
+    public String getRepositories() {
+        return repositories;
     }
 
     @Override
-    public void setRepos(String repos) {
-        this.repos = repos;
+    public void setRepositories(String repositories) {
+        this.repositories = repositories;
     }
 
     @Override
@@ -185,6 +189,26 @@ public class MavenDependencyDownloader extends ServiceSupport implements Depende
     @Override
     public void setMavenSettingsSecurity(String mavenSettingsSecurity) {
         this.mavenSettingsSecurity = mavenSettingsSecurity;
+    }
+
+    @Override
+    public boolean isMavenCentralEnabled() {
+        return mavenCentralEnabled;
+    }
+
+    @Override
+    public void setMavenCentralEnabled(boolean mavenCentralEnabled) {
+        this.mavenCentralEnabled = mavenCentralEnabled;
+    }
+
+    @Override
+    public boolean isMavenApacheSnapshotEnabled() {
+        return mavenApacheSnapshotEnabled;
+    }
+
+    @Override
+    public void setMavenApacheSnapshotEnabled(boolean mavenApacheSnapshotEnabled) {
+        this.mavenApacheSnapshotEnabled = mavenApacheSnapshotEnabled;
     }
 
     @Override
@@ -234,7 +258,7 @@ public class MavenDependencyDownloader extends ServiceSupport implements Depende
         }
 
         // we need version to be able to download from maven
-        if (version == null) {
+        if (ObjectHelper.isEmpty(version)) {
             return;
         }
 
@@ -243,7 +267,7 @@ public class MavenDependencyDownloader extends ServiceSupport implements Depende
             List<String> deps = List.of(gav);
 
             // include Apache snapshot to make it easy to use upcoming releases
-            boolean useApacheSnaphots = "org.apache.camel".equals(groupId) && version.contains("SNAPSHOT");
+            boolean useApacheSnapshots = "org.apache.camel".equals(groupId) && version.contains("SNAPSHOT");
 
             // include extra repositories (if any) - these will be used in addition
             // to the ones detected from ~/.m2/settings.xml and configured in
@@ -256,12 +280,12 @@ public class MavenDependencyDownloader extends ServiceSupport implements Depende
             }
 
             List<MavenArtifact> artifacts = resolveDependenciesViaAether(deps, extraRepositories,
-                    transitively, useApacheSnaphots);
+                    transitively, useApacheSnapshots);
             List<File> files = new ArrayList<>();
             if (verbose) {
-                LOG.info("Resolved: {} -> [{}]", gav, artifacts);
+                LOG.info("Dependencies: {} -> [{}]", gav, artifacts);
             } else {
-                LOG.debug("Resolved: {} -> [{}]", gav, artifacts);
+                LOG.debug("Dependencies: {} -> [{}]", gav, artifacts);
             }
 
             for (MavenArtifact a : artifacts) {
@@ -314,9 +338,9 @@ public class MavenDependencyDownloader extends ServiceSupport implements Depende
 
         List<MavenArtifact> artifacts = resolveDependenciesViaAether(deps, null, false, useApacheSnapshots);
         if (verbose) {
-            LOG.info("Resolved: {} -> [{}]", gav, artifacts);
+            LOG.info("Dependencies: {} -> [{}]", gav, artifacts);
         } else {
-            LOG.debug("Resolved: {} -> [{}]", gav, artifacts);
+            LOG.debug("Dependencies: {} -> [{}]", gav, artifacts);
         }
 
         if (artifacts.size() == 1) {
@@ -346,18 +370,9 @@ public class MavenDependencyDownloader extends ServiceSupport implements Depende
             for (MavenGav mavenGav : gavs) {
                 String v = mavenGav.getVersion();
                 if ("camel-spring-boot".equals(artifactId)) {
-                    String sbv = null;
-                    if (VersionHelper.isGE(v, minimumVersion)) {
-                        sbv = resolveSpringBootVersionByCamelVersion(v, extraRepos);
-                    }
-                    answer.add(new String[] { v, sbv });
+                    resolveSpringBoot(minimumVersion, v, extraRepos, answer);
                 } else if ("camel-quarkus-catalog".equals(artifactId)) {
-                    if (VersionHelper.isGE(v, MINIMUM_QUARKUS_VERSION)) {
-                        String cv = resolveCamelVersionByQuarkusVersion(v, extraRepos);
-                        if (cv != null && VersionHelper.isGE(cv, minimumVersion)) {
-                            answer.add(new String[] { cv, v });
-                        }
-                    }
+                    resolveQuarkus(minimumVersion, v, extraRepos, answer);
                 } else {
                     answer.add(new String[] { v, null });
                 }
@@ -367,6 +382,25 @@ public class MavenDependencyDownloader extends ServiceSupport implements Depende
         }
 
         return answer;
+    }
+
+    private void resolveQuarkus(String minimumVersion, String v, Set<String> extraRepos, List<String[]> answer)
+            throws Exception {
+        if (VersionHelper.isGE(v, MINIMUM_QUARKUS_VERSION)) {
+            String cv = resolveCamelVersionByQuarkusVersion(v, extraRepos);
+            if (cv != null && VersionHelper.isGE(cv, minimumVersion)) {
+                answer.add(new String[] { cv, v });
+            }
+        }
+    }
+
+    private void resolveSpringBoot(String minimumVersion, String v, Set<String> extraRepos, List<String[]> answer)
+            throws Exception {
+        String sbv = null;
+        if (VersionHelper.isGE(v, minimumVersion)) {
+            sbv = resolveSpringBootVersionByCamelVersion(v, extraRepos);
+        }
+        answer.add(new String[] { v, sbv });
     }
 
     public boolean alreadyOnClasspath(String groupId, String artifactId, String version) {
@@ -480,7 +514,9 @@ public class MavenDependencyDownloader extends ServiceSupport implements Depende
         MavenDownloaderImpl mavenDownloaderImpl = new MavenDownloaderImpl();
         mavenDownloaderImpl.setMavenSettingsLocation(mavenSettings);
         mavenDownloaderImpl.setMavenSettingsSecurityLocation(mavenSettingsSecurity);
-        mavenDownloaderImpl.setRepos(repos);
+        mavenDownloaderImpl.setMavenCentralEnabled(mavenCentralEnabled);
+        mavenDownloaderImpl.setMavenApacheSnapshotEnabled(mavenApacheSnapshotEnabled);
+        mavenDownloaderImpl.setRepos(repositories);
         mavenDownloaderImpl.setFresh(fresh);
         mavenDownloaderImpl.setOffline(!download);
         // use listener to keep track of which JARs was downloaded from a remote Maven repo (and how long time it took)
@@ -534,7 +570,7 @@ public class MavenDependencyDownloader extends ServiceSupport implements Depende
         try {
             return mavenDownloader.resolveArtifacts(depIds, extraRepositories, transitively, useApacheSnapshots);
         } catch (MavenResolutionException e) {
-            String repos = e.getRepositories() == null
+            String repos = (e.getRepositories() == null || e.getRepositories().isEmpty())
                     ? "(empty URL list)"
                     : String.join(", ", e.getRepositories());
             String msg = "Cannot resolve dependencies in " + repos;

@@ -23,7 +23,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Endpoint;
@@ -49,18 +53,22 @@ import static org.apache.camel.component.kamelet.Kamelet.NO_ERROR_HANDLER;
 import static org.apache.camel.component.kamelet.Kamelet.PARAM_LOCATION;
 import static org.apache.camel.component.kamelet.Kamelet.PARAM_ROUTE_ID;
 import static org.apache.camel.component.kamelet.Kamelet.PARAM_TEMPLATE_ID;
+import static org.apache.camel.component.kamelet.Kamelet.PARAM_UUID;
 
 /**
  * Materialize route templates
  */
 @Component(Kamelet.SCHEME)
 public class KameletComponent extends DefaultComponent {
-    private static final Logger LOGGER = LoggerFactory.getLogger(KameletComponent.class);
+
+    private static final Logger LOG = LoggerFactory.getLogger(KameletComponent.class);
 
     private final LifecycleHandler lifecycleHandler = new LifecycleHandler();
 
     // active consumers
     private final Map<String, KameletConsumer> consumers = new HashMap<>();
+    private final Lock consumersLock = new ReentrantLock();
+    private final Condition consumersCondition = consumersLock.newCondition();
     // active kamelet EIPs
     private final Map<String, Processor> kameletEips = new ConcurrentHashMap<>();
 
@@ -105,12 +113,14 @@ public class KameletComponent extends DefaultComponent {
     @Override
     protected Endpoint createEndpoint(String uri, String remaining, Map<String, Object> parameters) throws Exception {
         final String templateId = Kamelet.extractTemplateId(getCamelContext(), remaining, parameters);
-        final String routeId = Kamelet.extractRouteId(getCamelContext(), remaining, parameters);
+        final String uuid = Kamelet.extractUuid();
+        final String routeId = Kamelet.extractRouteId(getCamelContext(), remaining, parameters, uuid);
         final String loc = Kamelet.extractLocation(getCamelContext(), parameters);
 
         parameters.remove(PARAM_TEMPLATE_ID);
         parameters.remove(PARAM_ROUTE_ID);
         parameters.remove(PARAM_LOCATION);
+        parameters.remove(PARAM_UUID);
 
         // manually need to resolve raw parameters as input to the kamelet because
         // resolveRawParameterValues is false
@@ -215,6 +225,15 @@ public class KameletComponent extends DefaultComponent {
             }
 
             //
+            // Look for OS environment variables that match the Kamelet properties
+            // Environment variables are loaded in the following order:
+            //
+            //   CAMEL_KAMELET_" + templateId
+            //   CAMEL_KAMELET_" + templateId + "_" routeId
+            //
+            Kamelet.extractKameletEnvironmentVariables(kameletProperties, templateId, routeId);
+
+            //
             // Uri params have the highest precedence
             //
             kameletProperties.putAll(parameters);
@@ -224,6 +243,7 @@ public class KameletComponent extends DefaultComponent {
             //
             kameletProperties.put(PARAM_TEMPLATE_ID, templateId);
             kameletProperties.put(PARAM_ROUTE_ID, routeId);
+            kameletProperties.put(PARAM_UUID, uuid);
             kameletProperties.put(NO_ERROR_HANDLER, endpoint.isNoErrorHandler());
 
             // set kamelet specific properties
@@ -330,7 +350,8 @@ public class KameletComponent extends DefaultComponent {
     }
 
     public void addConsumer(String key, KameletConsumer consumer) {
-        synchronized (consumers) {
+        consumersLock.lock();
+        try {
             if (consumers.putIfAbsent(key, consumer) != null) {
                 throw new IllegalArgumentException(
                         "Cannot add a 2nd consumer to the same endpoint: " + key
@@ -338,21 +359,27 @@ public class KameletComponent extends DefaultComponent {
             }
             // state changed so inc counter
             stateCounter++;
-            consumers.notifyAll();
+            consumersCondition.signalAll();
+        } finally {
+            consumersLock.unlock();
         }
     }
 
     public void removeConsumer(String key, KameletConsumer consumer) {
-        synchronized (consumers) {
+        consumersLock.lock();
+        try {
             consumers.remove(key, consumer);
             // state changed so inc counter
             stateCounter++;
-            consumers.notifyAll();
+            consumersCondition.signalAll();
+        } finally {
+            consumersLock.unlock();
         }
     }
 
     protected KameletConsumer getConsumer(String key, boolean block, long timeout) throws InterruptedException {
-        synchronized (consumers) {
+        consumersLock.lock();
+        try {
             KameletConsumer answer = consumers.get(key);
             if (answer == null && block) {
                 StopWatch watch = new StopWatch();
@@ -365,10 +392,12 @@ public class KameletComponent extends DefaultComponent {
                     if (rem <= 0) {
                         break;
                     }
-                    consumers.wait(rem);
+                    consumersCondition.await(rem, TimeUnit.MILLISECONDS);
                 }
             }
             return answer;
+        } finally {
+            consumersLock.unlock();
         }
     }
 
@@ -415,16 +444,17 @@ public class KameletComponent extends DefaultComponent {
             final String templateId = endpoint.getTemplateId();
             final String routeId = endpoint.getRouteId();
             final String loc = endpoint.getLocation() != null ? endpoint.getLocation() : getLocation();
+            final String uuid = (String) endpoint.getKameletProperties().get(PARAM_UUID);
 
             if (context.getRouteTemplateDefinition(templateId) == null && loc != null) {
-                LOGGER.debug("Loading route template={} from {}", templateId, loc);
+                LOG.debug("Loading route template={} from {}", templateId, loc);
                 RouteTemplateHelper.loadRouteTemplateFromLocation(getCamelContext(), routeTemplateLoaderListener, templateId,
                         loc);
             }
 
-            LOGGER.debug("Creating route from template={} and id={}", templateId, routeId);
+            LOG.debug("Creating route from template={} and id={}", templateId, routeId);
             try {
-                String id = context.addRouteFromTemplate(routeId, templateId, endpoint.getKameletProperties());
+                String id = context.addRouteFromTemplate(routeId, templateId, uuid, endpoint.getKameletProperties());
                 RouteDefinition def = context.getRouteDefinition(id);
 
                 // start the route if not already started
@@ -434,9 +464,9 @@ public class KameletComponent extends DefaultComponent {
                     context.startRouteDefinitions(Collections.singletonList(def));
                 }
 
-                LOGGER.debug("Route with id={} created from template={}", id, templateId);
+                LOG.debug("Route with id={} created from template={}", id, templateId);
             } catch (Exception e) {
-                throw new KameletNotFoundException(templateId, loc, e);
+                throw new FailedToCreateKameletException(templateId, loc, e);
             }
         }
 
@@ -468,7 +498,7 @@ public class KameletComponent extends DefaultComponent {
                     throw RuntimeCamelException.wrapRuntimeException(e);
                 }
             } else {
-                LOGGER.debug("Tracking route template={} and id={}", endpoint.getTemplateId(), endpoint.getRouteId());
+                LOG.debug("Tracking route template={} and id={}", endpoint.getTemplateId(), endpoint.getRouteId());
                 this.endpoints.add(endpoint);
             }
         }

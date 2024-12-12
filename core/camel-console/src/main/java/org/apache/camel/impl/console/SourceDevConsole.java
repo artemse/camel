@@ -37,7 +37,7 @@ import org.apache.camel.util.IOHelper;
 import org.apache.camel.util.StringHelper;
 import org.apache.camel.util.json.JsonObject;
 
-@DevConsole("source")
+@DevConsole(name = "source", description = "Dump route source code")
 public class SourceDevConsole extends AbstractDevConsole {
 
     /**
@@ -51,7 +51,7 @@ public class SourceDevConsole extends AbstractDevConsole {
     public static final String LIMIT = "limit";
 
     public SourceDevConsole() {
-        super("camel", "source", "Source", "Display route source code");
+        super("camel", "source", "Source", "Dump route source code");
     }
 
     @Override
@@ -89,7 +89,9 @@ public class SourceDevConsole extends AbstractDevConsole {
                     sb.append(String.format("\n    Source: %s", mrb.getSourceLocation()));
                 }
                 if (!code.isEmpty()) {
+                    sb.append("\n");
                     sb.append(code);
+                    sb.append("\n\n");
                 }
             }
             sb.append("\n");
@@ -153,9 +155,11 @@ public class SourceDevConsole extends AbstractDevConsole {
             return true;
         }
 
+        String onlyName = LoggerHelper.sourceNameOnly(mrb.getSourceLocation());
         return PatternHelper.matchPattern(mrb.getRouteId(), filter)
                 || PatternHelper.matchPattern(mrb.getEndpointUri(), filter)
-                || PatternHelper.matchPattern(mrb.getSourceLocationShort(), filter);
+                || PatternHelper.matchPattern(mrb.getSourceLocationShort(), filter)
+                || PatternHelper.matchPattern(onlyName, filter);
     }
 
     private static int sort(ManagedRouteMBean o1, ManagedRouteMBean o2) {

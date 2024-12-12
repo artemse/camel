@@ -40,7 +40,7 @@ import picocli.CommandLine;
 
 @CommandLine.Command(name = "message",
                      description = "Transform message from one format to another via an existing running Camel integration",
-                     sortOptions = false)
+                     sortOptions = false, showDefaultValues = true)
 public class TransformMessageAction extends ActionWatchCommand {
 
     @CommandLine.Option(names = { "--camel-version" },
@@ -280,7 +280,7 @@ public class TransformMessageAction extends ActionWatchCommand {
                     tableHelper.setPretty(pretty);
                     tableHelper.setLoggingColor(loggingColor);
                     tableHelper.setShowExchangeProperties(showExchangeProperties);
-                    String table = tableHelper.getDataAsTable(exchangeId, "InOut", null, message, cause);
+                    String table = tableHelper.getDataAsTable(exchangeId, "InOut", null, null, message, cause);
                     printer().println(table);
                 }
             }

@@ -17,14 +17,15 @@
 package org.apache.camel.support.cache;
 
 import java.util.Collections;
+import java.util.Deque;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.LongAdder;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -41,6 +42,10 @@ public class SimpleLRUCache<K, V> extends ConcurrentHashMap<K, V> {
 
     static final float DEFAULT_LOAD_FACTOR = 0.75f;
     /**
+     * The minimum size of the queue of changes.
+     */
+    static final int MINIMUM_QUEUE_SIZE = 128;
+    /**
      * The flag indicating that an eviction process is in progress.
      */
     private final AtomicBoolean eviction = new AtomicBoolean();
@@ -51,11 +56,7 @@ public class SimpleLRUCache<K, V> extends ConcurrentHashMap<K, V> {
     /**
      * The last changes recorded.
      */
-    private final Queue<Entry<K, V>> lastChanges = new ConcurrentLinkedQueue<>();
-    /**
-     * The total amount of changes recorded.
-     */
-    private final LongAdder totalChanges = new LongAdder();
+    private final AtomicReference<Deque<Entry<K, V>>> lastChanges = new AtomicReference<>(new ConcurrentLinkedDeque<>());
     /**
      * The function to call when an entry is evicted.
      */
@@ -63,6 +64,9 @@ public class SimpleLRUCache<K, V> extends ConcurrentHashMap<K, V> {
 
     public SimpleLRUCache(int initialCapacity, int maximumCacheSize, Consumer<V> evicted) {
         super(initialCapacity, DEFAULT_LOAD_FACTOR);
+        if (maximumCacheSize <= 0) {
+            throw new IllegalArgumentException("The maximum cache size must be greater than 0");
+        }
         this.maximumCacheSize = maximumCacheSize;
         this.evict = Objects.requireNonNull(evicted);
     }
@@ -80,8 +84,7 @@ public class SimpleLRUCache<K, V> extends ConcurrentHashMap<K, V> {
         if (value == null) {
             return null;
         }
-        lastChanges.add(Map.entry(key, value));
-        totalChanges.increment();
+        lastChanges.get().add(Map.entry(key, value));
         return value;
     }
 
@@ -223,29 +226,57 @@ public class SimpleLRUCache<K, V> extends ConcurrentHashMap<K, V> {
      * @return the size of the queue of changes.
      */
     int getQueueSize() {
-        return totalChanges.intValue();
+        return lastChanges.get().size();
     }
 
     /**
-     * Indicates whether an eviction is needed. An eviction can be triggered if the size of the map or the queue of
-     * changes exceeds the maximum allowed size which is respectively {@code maximumCacheSize} and
-     * {@code 2 * maximumCacheSize}.
+     * Indicates whether an eviction is needed. An eviction can be triggered if either the cache or the queue is full.
      *
      * @return {@code true} if an eviction is needed, {@code false} otherwise.
      */
     private boolean evictionNeeded() {
-        return size() > maximumCacheSize || getQueueSize() > 2 * maximumCacheSize;
+        return isCacheFull() || isQueueFull();
+    }
+
+    /**
+     * Indicates whether the size of the map exceeds the maximum allowed size which is {@code maximumCacheSize}.
+     *
+     * @return {@code true} if the cache is full, {@code false} otherwise.
+     */
+    private boolean isCacheFull() {
+        return size() > maximumCacheSize;
+    }
+
+    /**
+     * Indicates whether the size of the queue of changes exceeds the maximum allowed size which is the max value
+     * between {@link #MINIMUM_QUEUE_SIZE} and {@code 2 * maximumCacheSize}.
+     *
+     * @return {@code true} if the queue is full, {@code false} otherwise.
+     */
+    private boolean isQueueFull() {
+        return getQueueSize() > Math.max(2 * maximumCacheSize, MINIMUM_QUEUE_SIZE);
     }
 
     /**
      * @return the oldest existing change.
      */
     private Entry<K, V> nextOldestChange() {
-        Entry<K, V> oldest = lastChanges.poll();
-        if (oldest != null) {
-            totalChanges.decrement();
+        return lastChanges.get().poll();
+    }
+
+    /**
+     * Removes duplicates from the queue of changes.
+     */
+    private void compressChanges() {
+        Deque<Entry<K, V>> newChanges = new ConcurrentLinkedDeque<>();
+        Deque<Entry<K, V>> currentChanges = lastChanges.getAndSet(newChanges);
+        Set<K> keys = new HashSet<>();
+        Entry<K, V> entry;
+        while ((entry = currentChanges.pollLast()) != null) {
+            if (keys.add(entry.getKey())) {
+                newChanges.addFirst(entry);
+            }
         }
-        return oldest;
     }
 
     /**
@@ -274,12 +305,17 @@ public class SimpleLRUCache<K, V> extends ConcurrentHashMap<K, V> {
         public void close() {
             if (cache.evictionNeeded() && cache.eviction.compareAndSet(false, true)) {
                 try {
-                    while (cache.evictionNeeded()) {
-                        Entry<K, V> oldest = cache.nextOldestChange();
-                        if (oldest != null && cache.remove(oldest.getKey(), oldest.getValue())) {
-                            cache.evict.accept(oldest.getValue());
+                    do {
+                        cache.compressChanges();
+                        if (cache.isCacheFull()) {
+                            Entry<K, V> oldest = cache.nextOldestChange();
+                            if (oldest != null && cache.remove(oldest.getKey(), oldest.getValue())) {
+                                cache.evict.accept(oldest.getValue());
+                            }
+                        } else {
+                            break;
                         }
-                    }
+                    } while (cache.evictionNeeded());
                 } finally {
                     cache.eviction.set(false);
                 }

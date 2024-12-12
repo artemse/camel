@@ -48,15 +48,15 @@ public class FileConsumerIdempotentKeyChangedIssueTest extends ContextTestSuppor
     }
 
     @Override
-    protected RouteBuilder createRouteBuilder() throws Exception {
+    protected RouteBuilder createRouteBuilder() {
         return new RouteBuilder() {
             @Override
-            public void configure() throws Exception {
+            public void configure() {
                 endpoint = endpoint(
                         fileUri("?noop=true&readLock=changed&initialDelay=0&delay=10&readLockCheckInterval=100"
                                 + "&idempotentKey=${file:onlyname}-${file:size}-${date:file:yyyyMMddHHmmss}"));
 
-                from(endpoint).noAutoStartup().convertBodyTo(String.class).to("log:file").to("mock:file");
+                from(endpoint).autoStartup(false).convertBodyTo(String.class).to("log:file").to("mock:file");
             }
         };
     }

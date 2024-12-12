@@ -233,6 +233,10 @@ abstract class BasePropertiesFunction extends ServiceSupport implements Properti
             return defaultValue;
         }
 
+        if (key.contains(":")) {
+            key = StringHelper.before(key, ":");
+        }
+
         // local-mode will not lookup in kubernetes but as local properties
         if (localMode) {
             String localKey = name + "/" + key;
@@ -245,7 +249,11 @@ abstract class BasePropertiesFunction extends ServiceSupport implements Properti
             Path file = root.resolve(name.toLowerCase(Locale.US)).resolve(key);
             if (Files.exists(file) && !Files.isDirectory(file)) {
                 try {
-                    answer = Files.readString(file, StandardCharsets.UTF_8);
+                    if (isBinaryProperty()) {
+                        answer = writeDataToTempFile(file.getFileName().toString(), Files.readAllBytes(file));
+                    } else {
+                        answer = Files.readString(file, StandardCharsets.UTF_8);
+                    }
                 } catch (IOException e) {
                     // ignore
                 }
@@ -265,4 +273,22 @@ abstract class BasePropertiesFunction extends ServiceSupport implements Properti
     abstract Path getMountPath();
 
     abstract String lookup(String name, String key, String defaultValue);
+
+    protected String handleData(String key, byte[] raw) {
+        return isBinaryProperty() ? writeDataToTempFile(key, raw) : new String(raw);
+    }
+
+    private boolean isBinaryProperty() {
+        return getName().endsWith("-binary");
+    }
+
+    protected String writeDataToTempFile(String fileName, byte[] data) {
+        try {
+            final Path filePath = Files.createTempDirectory("camel").resolve(fileName);
+            Files.write(filePath, data);
+            return filePath.toAbsolutePath().toString();
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
 }

@@ -24,7 +24,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.networknt.schema.JsonSchema;
 import com.networknt.schema.ValidationMessage;
-import org.apache.camel.*;
+import org.apache.camel.Category;
+import org.apache.camel.Component;
+import org.apache.camel.Exchange;
+import org.apache.camel.ExchangePattern;
+import org.apache.camel.StreamCache;
+import org.apache.camel.ValidationException;
 import org.apache.camel.api.management.ManagedResource;
 import org.apache.camel.component.ResourceEndpoint;
 import org.apache.camel.spi.UriEndpoint;
@@ -41,8 +46,6 @@ public class JsonValidatorEndpoint extends ResourceEndpoint {
 
     private volatile JsonSchema schema;
 
-    private ObjectMapper mapper;
-
     @UriParam(defaultValue = "true")
     private boolean failOnNullBody = true;
     @UriParam(defaultValue = "true")
@@ -53,17 +56,22 @@ public class JsonValidatorEndpoint extends ResourceEndpoint {
     private JsonValidatorErrorHandler errorHandler = new DefaultJsonValidationErrorHandler();
     @UriParam(label = "advanced")
     private JsonUriSchemaLoader uriSchemaLoader = new DefaultJsonUriSchemaLoader();
-
     @UriParam(label = "advanced",
               description = "Comma-separated list of Jackson DeserializationFeature enum values which will be enabled for parsing exchange body")
     private String enabledDeserializationFeatures;
-
     @UriParam(label = "advanced",
               description = "Comma-separated list of Jackson DeserializationFeature enum values which will be disabled for parsing exchange body")
     private String disabledDeserializationFeatures;
+    @UriParam(label = "advanced", description = "The used Jackson object mapper")
+    private ObjectMapper objectMapper;
 
     public JsonValidatorEndpoint(String endpointUri, Component component, String resourceUri) {
         super(endpointUri, component, resourceUri);
+    }
+
+    @Override
+    public boolean isRemote() {
+        return false;
     }
 
     @Override
@@ -75,17 +83,19 @@ public class JsonValidatorEndpoint extends ResourceEndpoint {
     @Override
     protected void doInit() throws Exception {
         super.doInit();
-        mapper = new ObjectMapper();
+        if (objectMapper == null) {
+            objectMapper = new ObjectMapper();
+        }
         if (enabledDeserializationFeatures != null) {
             for (var featureName : enabledDeserializationFeatures.split(",")) {
                 var feature = DeserializationFeature.valueOf(featureName);
-                mapper.enable(feature);
+                objectMapper.enable(feature);
             }
         }
         if (disabledDeserializationFeatures != null) {
             for (var featureName : disabledDeserializationFeatures.split(",")) {
                 var feature = DeserializationFeature.valueOf(featureName);
-                mapper.disable(feature);
+                objectMapper.disable(feature);
             }
         }
     }
@@ -134,7 +144,7 @@ public class JsonValidatorEndpoint extends ResourceEndpoint {
                 }
                 try (InputStream is = exchange.getContext().getTypeConverter().mandatoryConvertTo(InputStream.class, exchange,
                         cache != null ? cache : content)) {
-                    JsonNode node = mapper.readTree(is);
+                    JsonNode node = objectMapper.readTree(is);
                     if (node == null) {
                         throw new NoJsonBodyValidationException(exchange);
                     }
@@ -178,10 +188,13 @@ public class JsonValidatorEndpoint extends ResourceEndpoint {
      * @return The currently loaded schema
      */
     private JsonSchema getOrCreateSchema() throws Exception {
-        synchronized (this) {
+        getInternalLock().lock();
+        try {
             if (this.schema == null) {
                 this.schema = this.uriSchemaLoader.createSchema(getCamelContext(), getResourceUri());
             }
+        } finally {
+            getInternalLock().unlock();
         }
         return this.schema;
     }
@@ -264,5 +277,13 @@ public class JsonValidatorEndpoint extends ResourceEndpoint {
 
     public void setDisabledDeserializationFeatures(String disabledDeserializationFeatures) {
         this.disabledDeserializationFeatures = disabledDeserializationFeatures;
+    }
+
+    public ObjectMapper getObjectMapper() {
+        return objectMapper;
+    }
+
+    public void setObjectMapper(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
     }
 }

@@ -70,13 +70,12 @@ public class QueueReplyManager extends ReplyManagerSupport {
 
     @Override
     protected void handleReplyMessage(String correlationID, Message message, Session session) {
-        ReplyHandler handler = correlation.get(correlationID);
+        ReplyHandler handler = correlation.remove(correlationID);
         if (handler == null && endpoint.isUseMessageIDAsCorrelationID()) {
             handler = waitForProvisionCorrelationToBeUpdated(correlationID, message);
         }
 
         if (handler != null) {
-            correlation.remove(correlationID);
             handler.onReply(correlationID, message, session);
         } else {
             // we could not correlate the received reply message to a matching request and therefore
@@ -110,12 +109,15 @@ public class QueueReplyManager extends ReplyManagerSupport {
                 Session session, String destinationName,
                 boolean pubSubDomain)
                 throws JMSException {
-            synchronized (QueueReplyManager.this) {
+            QueueReplyManager.this.lock.lock();
+            try {
                 // resolve the reply to destination
                 if (destination == null) {
                     destination = delegate.resolveDestinationName(session, destinationName, pubSubDomain);
                     setReplyTo(destination);
                 }
+            } finally {
+                QueueReplyManager.this.lock.unlock();
             }
             return destination;
         }
@@ -271,6 +273,9 @@ public class QueueReplyManager extends ReplyManagerSupport {
         answer.setIdleTaskExecutionLimit(endpoint.getIdleTaskExecutionLimit());
         if (endpoint.getMaxMessagesPerTask() >= 0) {
             answer.setMaxMessagesPerTask(endpoint.getMaxMessagesPerTask());
+        }
+        if (endpoint.getIdleReceivesPerTaskLimit() != 0) {
+            answer.setIdleReceivesPerTaskLimit(endpoint.getIdleReceivesPerTaskLimit());
         }
         answer.setMessageListener(this);
         answer.setPubSubDomain(false);

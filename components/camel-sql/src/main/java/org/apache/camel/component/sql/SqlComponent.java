@@ -42,6 +42,12 @@ public class SqlComponent extends HealthCheckComponent {
     private boolean usePlaceholder = true;
     @Metadata(label = "advanced", autowired = true)
     private RowMapperFactory rowMapperFactory;
+    @Metadata(label = "advanced",
+              description = "Whether to detect the network address location of the JMS broker on startup."
+                            + " This information is gathered via reflection on the ConnectionFactory, and is vendor specific."
+                            + " This option can be used to turn this off.",
+              defaultValue = "true")
+    private boolean serviceLocationEnabled = true;
 
     public SqlComponent() {
     }
@@ -87,13 +93,15 @@ public class SqlComponent extends HealthCheckComponent {
         if (onConsumeBatchComplete != null && usePlaceholder) {
             onConsumeBatchComplete = onConsumeBatchComplete.replaceAll(parameterPlaceholderSubstitute, "?");
         }
-        RowMapperFactory factory = getAndRemoveParameter(parameters, "rowMapperFactory", RowMapperFactory.class);
+        RowMapperFactory factory
+                = getAndRemoveOrResolveReferenceParameter(parameters, "rowMapperFactory", RowMapperFactory.class);
         if (factory == null) {
             factory = rowMapperFactory;
         }
 
         // create endpoint
         SqlEndpoint endpoint = new SqlEndpoint(uri, this);
+        endpoint.setServiceLocationEnabled(serviceLocationEnabled);
         endpoint.setQuery(query);
         endpoint.setPlaceholder(parameterPlaceholderSubstitute);
         endpoint.setUsePlaceholder(isUsePlaceholder());
@@ -159,4 +167,17 @@ public class SqlComponent extends HealthCheckComponent {
     public void setRowMapperFactory(RowMapperFactory rowMapperFactory) {
         this.rowMapperFactory = rowMapperFactory;
     }
+
+    public boolean isServiceLocationEnabled() {
+        return serviceLocationEnabled;
+    }
+
+    /**
+     * Whether to detect the network address location of the JMS broker on startup. This information is gathered via
+     * reflection on the ConnectionFactory, and is vendor specific. This option can be used to turn this off.
+     */
+    public void setServiceLocationEnabled(boolean serviceLocationEnabled) {
+        this.serviceLocationEnabled = serviceLocationEnabled;
+    }
+
 }

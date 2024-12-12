@@ -374,9 +374,9 @@ class PipeLoaderTest extends YamlTestSupport {
         context.registry.bind 'chaos', new Processor() {
             @Override
             void process(Exchange exchange) throws Exception {
-                throw new IllegalArgumentException("Forced");
+                throw new IllegalArgumentException("Forced")
             }
-        };
+        }
 
         loadBindings('''
                 apiVersion: camel.apache.org/v1
@@ -705,7 +705,7 @@ class PipeLoaderTest extends YamlTestSupport {
 
         with (context.routeDefinitions[1]) {
             template == true
-            // stream-caching is disabled in the kamelet
+            // stream-cache is disabled in the kamelet
             streamCache == "false"
             messageHistory == "true"
         }
